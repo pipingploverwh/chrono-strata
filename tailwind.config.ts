@@ -57,6 +57,25 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        strata: {
+          black: "hsl(var(--strata-black))",
+          charcoal: "hsl(var(--strata-charcoal))",
+          steel: "hsl(var(--strata-steel))",
+          gunmetal: "hsl(var(--strata-gunmetal))",
+          silver: "hsl(var(--strata-silver))",
+          white: "hsl(var(--strata-white))",
+          orange: "hsl(var(--strata-orange))",
+          "orange-dim": "hsl(var(--strata-orange-dim))",
+          lume: "hsl(var(--strata-lume))",
+          "lume-dim": "hsl(var(--strata-lume-dim))",
+          blue: "hsl(var(--strata-blue))",
+          cyan: "hsl(var(--strata-cyan))",
+          red: "hsl(var(--strata-red))",
+        },
+      },
+      fontFamily: {
+        instrument: ["Oswald", "sans-serif"],
+        mono: ["JetBrains Mono", "monospace"],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -65,25 +84,27 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "sweep-second": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
+        "pulse-glow": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.6" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "sweep": "sweep-second 60s linear infinite",
+        "pulse-glow": "pulse-glow 3s ease-in-out infinite",
       },
     },
   },
