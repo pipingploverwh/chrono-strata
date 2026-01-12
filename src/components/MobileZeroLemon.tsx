@@ -387,18 +387,50 @@ const MobileZeroLemon = ({ className = "" }: MobileZeroLemonProps) => {
         </div>
       </div>
 
-      {/* Google Maps Overlay Space Indicator - Bottom Right */}
+      {/* Google Maps Overlay - Bottom Right */}
       <div 
-        className="fixed bottom-4 right-4 w-32 h-24 rounded-xl border-2 border-dashed flex items-center justify-center text-center transition-all duration-300 pointer-events-none z-10"
+        className="fixed bottom-4 right-4 w-36 h-28 rounded-xl overflow-hidden border-2 transition-all duration-300 z-10 shadow-lg"
         style={{
-          borderColor: lumeMode ? `hsla(120, 100%, 62%, ${glowOpacity(0.3)})` : 'rgba(255,255,255,0.2)',
-          backgroundColor: lumeMode ? `hsla(120, 100%, 62%, ${glowOpacity(0.05)})` : 'rgba(0,0,0,0.3)'
+          borderColor: lumeMode ? `hsla(120, 100%, 62%, ${glowOpacity(0.4)})` : 'rgba(255,255,255,0.3)',
+          boxShadow: lumeMode 
+            ? `0 0 ${glowSize(15)}px hsla(120, 100%, 62%, ${glowOpacity(0.3)}), 0 4px 20px rgba(0,0,0,0.5)` 
+            : '0 4px 20px rgba(0,0,0,0.5)'
         }}
       >
-        <div className={`text-xs font-mono ${lumeMode ? 'text-strata-lume/40' : 'text-neutral-500'}`}>
-          <MapPin className="w-4 h-4 mx-auto mb-1" />
-          Maps Overlay
+        {/* Live Map Label */}
+        <div 
+          className={`absolute top-1 left-1 z-20 px-1.5 py-0.5 rounded text-[8px] font-mono uppercase tracking-wider flex items-center gap-1 ${
+            lumeMode ? 'bg-black/80 text-strata-lume' : 'bg-black/80 text-white'
+          }`}
+          style={lumeMode ? { 
+            boxShadow: `0 0 ${glowSize(6)}px hsla(120, 100%, 62%, ${glowOpacity(0.5)})` 
+          } : {}}
+        >
+          <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${lumeMode ? 'bg-strata-lume' : 'bg-red-500'}`} />
+          Live
         </div>
+        
+        {/* Google Maps Embed - Gillette Stadium */}
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2959.8799073476584!2d-71.26648082346907!3d42.09095497123199!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89e4612ba3153e5d%3A0x54a9bb1c5e7c6f2c!2sGillette%20Stadium!5e0!3m2!1sen!2sus!4v1704989200000!5m2!1sen!2sus"
+          width="100%"
+          height="100%"
+          style={{ border: 0, filter: lumeMode ? 'invert(1) hue-rotate(180deg) saturate(0.5) brightness(0.8)' : 'none' }}
+          allowFullScreen={false}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          title="Gillette Stadium Location"
+          className="w-full h-full"
+        />
+        
+        {/* Tap to expand overlay */}
+        <a
+          href={`https://www.google.com/maps/place/Gillette+Stadium/@${GILLETTE_LAT},${GILLETTE_LON},15z`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute inset-0 z-10"
+          aria-label="Open Gillette Stadium in Google Maps"
+        />
       </div>
     </div>
   );
