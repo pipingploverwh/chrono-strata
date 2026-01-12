@@ -100,16 +100,40 @@ function parseNOAAForecast(text: string): MarineForecast {
   };
 }
 
+// Zone metadata for supported regions
+const ZONE_METADATA: Record<string, { name: string; description: string }> = {
+  'anz233': { name: 'Vineyard Sound', description: 'Including Woods Hole and Martha\'s Vineyard' },
+  'anz230': { name: 'Cape Cod Bay', description: 'Plymouth to Provincetown' },
+  'anz232': { name: 'Nantucket Sound', description: 'South of Cape Cod to Nantucket' },
+  'anz231': { name: 'Buzzards Bay', description: 'New Bedford to the Elizabeth Islands' },
+  'anz234': { name: 'Block Island Sound', description: 'Rhode Island to Block Island' },
+  'anz235': { name: 'Long Island Sound (East)', description: 'New London to Orient Point' },
+};
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { zone = 'anz233' } = await req.json().catch(() => ({}));
+    const { zone = 'anz233', listZones } = await req.json().catch(() => ({}));
+    
+    // Return list of supported zones if requested
+    if (listZones) {
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          zones: Object.entries(ZONE_METADATA).map(([id, meta]) => ({
+            id,
+            ...meta
+          }))
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
     
     // NOAA marine forecast URL
-    const url = `https://tgftp.nws.noaa.gov/data/forecasts/marine/coastal/an/${zone}.txt`;
+    const url = `https://tgftp.nws.noaa.gov/data/forecasts/marine/coastal/an/${zone.toLowerCase()}.txt`;
     
     console.log('Fetching NOAA marine forecast:', url);
     
