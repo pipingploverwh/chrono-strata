@@ -7,7 +7,6 @@ import GlobalWeatherProvider from "@/components/GlobalWeatherProvider";
 import { SiteNavigation, SiteMapPage } from "@/components/SiteNavigation";
 import SkipLinks from "@/components/SkipLinks";
 import Footer from "@/components/Footer";
-import AIHarmonyAssistant from "@/components/AIHarmonyAssistant";
 import AcquisitionPitch from "./pages/AcquisitionPitch";
 import LavandarHome from "./pages/LavandarHome";
 import Index from "./pages/Index";
@@ -24,7 +23,6 @@ import ValidationReport from "./pages/ValidationReport";
 import RecruiterOutreach from "./pages/RecruiterOutreach";
 import SecurityTestSuite from "./pages/SecurityTestSuite";
 import Portfolio from "./pages/Portfolio";
-import AIHarmony from "./pages/AIHarmony";
 import KraftHarmony from "./pages/KraftHarmony";
 import KraftCaseStudy from "./pages/KraftCaseStudy";
 import NotFound from "./pages/NotFound";
@@ -60,7 +58,6 @@ const App = () => (
                 <Route path="/recruiter-outreach" element={<RecruiterOutreach />} />
                 <Route path="/security" element={<SecurityTestSuite />} />
                 <Route path="/portfolio" element={<Portfolio />} />
-                <Route path="/ai-harmony" element={<AIHarmony />} />
                 <Route path="/kraft-harmony" element={<KraftHarmony />} />
                 <Route path="/case-study/kraft" element={<KraftCaseStudy />} />
                 <Route path="/sitemap" element={<SiteMapPage />} />
@@ -71,7 +68,6 @@ const App = () => (
             <Footer />
           </div>
           <SiteNavigation />
-          <AIHarmonyAssistant />
         </GlobalWeatherProvider>
       </BrowserRouter>
     </TooltipProvider>

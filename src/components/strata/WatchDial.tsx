@@ -77,11 +77,35 @@ const WatchDial = ({ bezelActive, lumeMode }: WatchDialProps) => {
 
   return (
     <div className="relative">
-      {/* Outer bezel ring */}
-      <div className={`absolute -inset-4 rounded-full strata-bezel transition-opacity duration-300 ${bezelActive ? 'opacity-100' : 'opacity-40'}`}>
+      {/* Outer bezel ring with lume glow */}
+      <div 
+        className={`absolute -inset-4 rounded-full strata-bezel transition-opacity duration-300 ${bezelActive ? 'opacity-100' : 'opacity-40'}`}
+        style={{ 
+          boxShadow: lumeMode 
+            ? '0 0 20px hsla(120, 100%, 62%, 0.6), 0 0 40px hsla(120, 100%, 62%, 0.3), inset 0 0 15px hsla(120, 100%, 62%, 0.2)' 
+            : '0 0 15px hsla(120, 100%, 62%, 0.4), 0 0 30px hsla(120, 100%, 62%, 0.2)'
+        }}
+      >
         <svg viewBox="0 0 240 240" className="w-full h-full">
-          {/* Bezel outer ring */}
-          <circle cx="120" cy="120" r="115" fill="none" stroke="hsl(var(--strata-gunmetal))" strokeWidth="8" />
+          {/* Bezel outer ring with lume glow */}
+          <circle 
+            cx="120" 
+            cy="120" 
+            r="115" 
+            fill="none" 
+            stroke="hsl(var(--strata-gunmetal))" 
+            strokeWidth="8"
+            style={{ filter: 'drop-shadow(0 0 8px hsla(120, 100%, 62%, 0.5))' }}
+          />
+          <circle 
+            cx="120" 
+            cy="120" 
+            r="118" 
+            fill="none" 
+            stroke="hsla(120, 100%, 62%, 0.3)" 
+            strokeWidth="1"
+            style={{ filter: 'drop-shadow(0 0 6px hsla(120, 100%, 62%, 0.8))' }}
+          />
           <circle cx="120" cy="120" r="108" fill="none" stroke="hsl(var(--strata-steel))" strokeWidth="2" />
           
           {bezelActive && bezelMarks.map((mark, i) => {
