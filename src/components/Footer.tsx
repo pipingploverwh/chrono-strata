@@ -124,8 +124,8 @@ const Footer = () => {
               <li className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-strata-silver/60 mt-0.5 shrink-0" />
                 <span className="text-sm text-strata-silver">
-                  Falmouth Town Center<br />
-                  Falmouth, MA 02540
+                  Built in Woods Hole<br />
+                  by Piping Plover
                 </span>
               </li>
               <li className="flex items-center gap-2">
