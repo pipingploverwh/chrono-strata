@@ -4,7 +4,7 @@ import {
   TrendingUp, 
   Crosshair, 
   Shuffle, 
-  Shield, 
+  Shield,
   Zap,
   Wind,
   Thermometer,
@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useWeatherData } from "@/hooks/useWeatherData";
+import lavandarLogo from "@/assets/lavandar-logo.png";
 
 interface RouteConceptProps {
   letter: string;
@@ -172,9 +173,9 @@ const ZeroLemonCard = () => {
           </div>
 
           {/* Lavandar AI badge */}
-          <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2 py-1 rounded bg-strata-charcoal/80 border border-patriots-silver/20">
-            <Shield className="w-3 h-3 text-patriots-silver" />
-            <span className="text-[8px] font-mono uppercase tracking-widest text-patriots-silver">Lavandar AI</span>
+          <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2 py-1 rounded bg-purple-950/80 border border-purple-400/20">
+            <img src={lavandarLogo} alt="Lavandar AI" className="w-4 h-4 rounded" />
+            <span className="text-[8px] font-mono uppercase tracking-widest text-purple-300">Lavandar AI</span>
           </div>
 
           <div className="relative">
