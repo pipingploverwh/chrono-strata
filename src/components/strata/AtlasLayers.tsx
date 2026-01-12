@@ -299,6 +299,66 @@ const AtlasLayers = () => {
     return null;
   }, [noaaData]);
 
+  // Calculate data freshness
+  const dataFreshness = useMemo(() => {
+    if (!noaaData?.issuedAt || !currentTime) return null;
+    
+    // Parse NOAA issued time (format: "430 AM EST Mon Jan 13 2026")
+    const issuedStr = noaaData.issuedAt;
+    const timeMatch = issuedStr.match(/(\d+)\s+(AM|PM)\s+(\w+)\s+(\w+)\s+(\w+)\s+(\d+)\s+(\d+)/i);
+    
+    if (!timeMatch) return null;
+    
+    const [, time, ampm, timezone, , month, day, year] = timeMatch;
+    const hours = time.length <= 2 ? parseInt(time) : parseInt(time.slice(0, -2));
+    const minutes = time.length <= 2 ? 0 : parseInt(time.slice(-2));
+    const hours24 = ampm.toUpperCase() === 'PM' && hours !== 12 ? hours + 12 : 
+                    ampm.toUpperCase() === 'AM' && hours === 12 ? 0 : hours;
+    
+    const monthMap: Record<string, number> = {
+      'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+      'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+    };
+    
+    const issuedDate = new Date(parseInt(year), monthMap[month] || 0, parseInt(day), hours24, minutes);
+    const diffMs = currentTime.getTime() - issuedDate.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    
+    let ageText: string;
+    let freshness: 'fresh' | 'recent' | 'stale' | 'old';
+    
+    if (diffMins < 0) {
+      ageText = 'Just now';
+      freshness = 'fresh';
+    } else if (diffMins < 60) {
+      ageText = `${diffMins}m ago`;
+      freshness = 'fresh';
+    } else if (diffHours < 6) {
+      ageText = `${diffHours}h ${diffMins % 60}m ago`;
+      freshness = 'fresh';
+    } else if (diffHours < 12) {
+      ageText = `${diffHours}h ago`;
+      freshness = 'recent';
+    } else if (diffHours < 24) {
+      ageText = `${diffHours}h ago`;
+      freshness = 'stale';
+    } else {
+      ageText = `${diffDays}d ${diffHours % 24}h ago`;
+      freshness = 'old';
+    }
+    
+    return {
+      ageText,
+      freshness,
+      issuedDate,
+      diffMins,
+      diffHours,
+      rawIssued: noaaData.issuedAt
+    };
+  }, [noaaData, currentTime]);
+
   // Generate particles for each layer
   const particles = useMemo(() => {
     const allParticles: Particle[] = [];
@@ -476,17 +536,80 @@ const AtlasLayers = () => {
       {/* NOAA Live Data Strip */}
       {noaaData && (
         <div className="mb-6 p-4 bg-cyan-500/5 rounded-lg border border-cyan-500/20">
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider">
               Live: {noaaData.location} ({noaaData.zone})
             </span>
+            
+            {/* Data Freshness Indicator */}
+            {dataFreshness && (
+              <div className={`flex items-center gap-2 px-3 py-1 rounded-full border ${
+                dataFreshness.freshness === 'fresh' 
+                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                  : dataFreshness.freshness === 'recent'
+                  ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400'
+                  : dataFreshness.freshness === 'stale'
+                  ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                  : 'bg-red-500/10 border-red-500/30 text-red-400'
+              }`}>
+                <div className={`w-1.5 h-1.5 rounded-full ${
+                  dataFreshness.freshness === 'fresh' ? 'bg-emerald-400' :
+                  dataFreshness.freshness === 'recent' ? 'bg-cyan-400' :
+                  dataFreshness.freshness === 'stale' ? 'bg-amber-400' : 'bg-red-400'
+                }`} />
+                <span className="text-[10px] font-mono uppercase">
+                  Issued: {dataFreshness.ageText}
+                </span>
+              </div>
+            )}
+            
             {lastFetched && (
               <span className="text-[10px] font-mono text-strata-silver/50 ml-auto">
-                Updated: {new Date(lastFetched).toLocaleTimeString()}
+                Fetched: {new Date(lastFetched).toLocaleTimeString()}
               </span>
             )}
           </div>
+          
+          {/* Forecast Issued Timestamp Detail */}
+          {dataFreshness && (
+            <div className="mb-3 p-3 bg-strata-charcoal/40 rounded border border-strata-steel/20">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div>
+                  <div className="text-[10px] font-mono text-strata-silver/50 uppercase mb-1">NOAA Issued</div>
+                  <div className="text-xs font-mono text-strata-white">{dataFreshness.rawIssued}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] font-mono text-strata-silver/50 uppercase mb-1">Data Age</div>
+                  <div className={`text-sm font-mono tabular-nums ${
+                    dataFreshness.freshness === 'fresh' ? 'text-emerald-400' :
+                    dataFreshness.freshness === 'recent' ? 'text-cyan-400' :
+                    dataFreshness.freshness === 'stale' ? 'text-amber-400' : 'text-red-400'
+                  }`}>
+                    {dataFreshness.diffHours > 0 ? `${dataFreshness.diffHours}h ` : ''}{dataFreshness.diffMins % 60}m
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[10px] font-mono text-strata-silver/50 uppercase mb-1">Freshness</div>
+                  <div className={`text-xs font-mono uppercase ${
+                    dataFreshness.freshness === 'fresh' ? 'text-emerald-400' :
+                    dataFreshness.freshness === 'recent' ? 'text-cyan-400' :
+                    dataFreshness.freshness === 'stale' ? 'text-amber-400' : 'text-red-400'
+                  }`}>
+                    {dataFreshness.freshness === 'fresh' ? '● FRESH' :
+                     dataFreshness.freshness === 'recent' ? '◐ RECENT' :
+                     dataFreshness.freshness === 'stale' ? '◔ STALE' : '○ OUTDATED'}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[10px] font-mono text-strata-silver/50 uppercase mb-1">Next Update</div>
+                  <div className="text-xs font-mono text-cyan-400">
+                    ~{Math.max(0, 6 - (dataFreshness.diffHours % 6))}h
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           
           {/* Warnings */}
           {noaaData.warnings.length > 0 && (
