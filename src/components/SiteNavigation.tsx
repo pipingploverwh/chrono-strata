@@ -16,7 +16,9 @@ import {
   Activity,
   FileCheck,
   ExternalLink,
-  Keyboard
+  Keyboard,
+  Mail,
+  ShieldCheck
 } from "lucide-react";
 import {
   Sheet,
@@ -32,7 +34,7 @@ interface NavItem {
   label: string;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
-  category: "main" | "industry" | "system";
+  category: "main" | "industry" | "system" | "tools";
 }
 
 const navItems: NavItem[] = [
@@ -108,6 +110,21 @@ const navItems: NavItem[] = [
     icon: CalendarDays,
     category: "industry"
   },
+  // Tools
+  { 
+    path: "/recruiter-outreach", 
+    label: "Recruiter Outreach", 
+    description: "Technical Recruiter Email Generator",
+    icon: Mail,
+    category: "tools"
+  },
+  { 
+    path: "/security", 
+    label: "Security Test Suite", 
+    description: "AI Security & Compliance Dashboard",
+    icon: ShieldCheck,
+    category: "tools"
+  },
   // System
   { 
     path: "/logs", 
@@ -130,6 +147,7 @@ export const SiteNavigation = () => {
 
   const mainItems = navItems.filter(item => item.category === "main");
   const industryItems = navItems.filter(item => item.category === "industry");
+  const toolsItems = navItems.filter(item => item.category === "tools");
   const systemItems = navItems.filter(item => item.category === "system");
 
   const currentPage = navItems.find(i => i.path === location.pathname);
@@ -287,6 +305,56 @@ export const SiteNavigation = () => {
             </ul>
           </section>
 
+          {/* Tools */}
+          <section aria-labelledby="nav-tools-heading">
+            <h3 
+              id="nav-tools-heading"
+              className="text-[10px] font-mono text-strata-silver/50 uppercase tracking-widest mb-3 px-2"
+            >
+              Tools
+            </h3>
+            <ul className="space-y-1" role="list">
+              {toolsItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                return (
+                  <li key={item.path}>
+                    <Link
+                      to={item.path}
+                      className={`flex items-center gap-3 p-3 rounded-lg transition-all group focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-inset ${
+                        isActive
+                          ? "bg-purple-500/10 border border-purple-500/30"
+                          : "hover:bg-strata-steel/20 border border-transparent"
+                      }`}
+                      aria-current={isActive ? "page" : undefined}
+                      aria-label={`${item.label}: ${item.description}`}
+                    >
+                      <div 
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                          isActive
+                            ? "bg-purple-500 text-white"
+                            : "bg-strata-steel/30 text-strata-silver group-hover:text-purple-400"
+                        }`}
+                        aria-hidden="true"
+                      >
+                        <item.icon className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className={`text-sm font-semibold ${
+                          isActive ? "text-purple-400" : "text-strata-white"
+                        }`}>
+                          {item.label}
+                        </div>
+                        <div className="text-[10px] text-strata-silver/50 truncate">
+                          {item.description}
+                        </div>
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+
           {/* System */}
           <section aria-labelledby="nav-system-heading">
             <h3 
@@ -349,6 +417,7 @@ export const SiteNavigation = () => {
 export const SiteMapPage = () => {
   const mainItems = navItems.filter(item => item.category === "main");
   const industryItems = navItems.filter(item => item.category === "industry");
+  const toolsItems = navItems.filter(item => item.category === "tools");
   const systemItems = navItems.filter(item => item.category === "system");
 
   return (
@@ -357,7 +426,7 @@ export const SiteMapPage = () => {
       className="min-h-screen bg-background p-8"
       role="main"
     >
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <header className="mb-8">
           <h1 className="font-instrument text-4xl text-strata-white mb-2">
             Site Map
@@ -368,7 +437,7 @@ export const SiteMapPage = () => {
           </p>
         </header>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           <section aria-labelledby="sitemap-main-heading">
             <h2 
               id="sitemap-main-heading" 
@@ -414,6 +483,34 @@ export const SiteMapPage = () => {
                     aria-label={`${item.label}: ${item.description}`}
                   >
                     <item.icon className="w-5 h-5 text-strata-cyan mt-0.5" aria-hidden="true" />
+                    <div>
+                      <div className="font-semibold text-strata-white">{item.label}</div>
+                      <div className="text-sm text-strata-silver/70">{item.description}</div>
+                      <code className="text-[10px] text-strata-silver/40 font-mono">{item.path}</code>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section aria-labelledby="sitemap-tools-heading">
+            <h2 
+              id="sitemap-tools-heading" 
+              className="font-instrument text-xl text-purple-400 mb-4 flex items-center gap-2"
+            >
+              <Mail className="w-5 h-5" aria-hidden="true" />
+              Tools
+            </h2>
+            <ul className="space-y-3" role="list">
+              {toolsItems.map((item) => (
+                <li key={item.path}>
+                  <Link 
+                    to={item.path}
+                    className="flex items-start gap-3 p-3 rounded-lg bg-strata-charcoal/50 hover:bg-strata-charcoal transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    aria-label={`${item.label}: ${item.description}`}
+                  >
+                    <item.icon className="w-5 h-5 text-purple-400 mt-0.5" aria-hidden="true" />
                     <div>
                       <div className="font-semibold text-strata-white">{item.label}</div>
                       <div className="text-sm text-strata-silver/70">{item.description}</div>

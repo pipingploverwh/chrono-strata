@@ -1,11 +1,13 @@
-import { useState } from "react";
-import { Mail, Copy, Check, Sparkles, Building2, User, Briefcase } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Mail, Copy, Check, Sparkles, Building2, User, Briefcase, Bell, BellOff, Timer } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const RecruiterOutreach = () => {
   const [formData, setFormData] = useState({
@@ -15,9 +17,112 @@ const RecruiterOutreach = () => {
     yourName: "",
     yourBackground: "",
     specificInterest: "",
+    notificationEmail: "",
   });
   const [generatedEmail, setGeneratedEmail] = useState("");
   const [copied, setCopied] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [nextNotification, setNextNotification] = useState<Date | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState("");
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Countdown timer
+  useEffect(() => {
+    if (nextNotification && notificationsEnabled) {
+      countdownRef.current = setInterval(() => {
+        const now = new Date();
+        const diff = nextNotification.getTime() - now.getTime();
+        
+        if (diff <= 0) {
+          setTimeRemaining("Sending...");
+        } else {
+          const minutes = Math.floor(diff / 60000);
+          const seconds = Math.floor((diff % 60000) / 1000);
+          setTimeRemaining(`${minutes}:${seconds.toString().padStart(2, '0')}`);
+        }
+      }, 1000);
+    }
+
+    return () => {
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+      }
+    };
+  }, [nextNotification, notificationsEnabled]);
+
+  // Send notification function
+  const sendNotification = async () => {
+    if (!formData.notificationEmail || !generatedEmail) return;
+
+    try {
+      const { data, error } = await supabase.functions.invoke('send-recruiter-notification', {
+        body: {
+          recipientEmail: formData.notificationEmail,
+          recruiterName: formData.recruiterName,
+          companyName: formData.companyName,
+          roleName: formData.roleName,
+          emailContent: generatedEmail,
+        },
+      });
+
+      if (error) throw error;
+
+      toast.success("Reminder notification sent to your email!");
+      setNextNotification(new Date(Date.now() + 5 * 60 * 1000)); // Next in 5 minutes
+    } catch (error: any) {
+      console.error("Error sending notification:", error);
+      toast.error("Failed to send notification. Please check your email address.");
+    }
+  };
+
+  // Toggle notifications
+  const toggleNotifications = () => {
+    if (!notificationsEnabled) {
+      if (!formData.notificationEmail) {
+        toast.error("Please enter your email address for notifications");
+        return;
+      }
+      if (!generatedEmail) {
+        toast.error("Please generate an email first");
+        return;
+      }
+
+      // Start notifications
+      setNotificationsEnabled(true);
+      setNextNotification(new Date(Date.now() + 5 * 60 * 1000)); // First notification in 5 minutes
+      
+      // Send immediately and then every 5 minutes
+      sendNotification();
+      intervalRef.current = setInterval(sendNotification, 5 * 60 * 1000);
+      
+      toast.success("Notifications enabled! You'll receive reminders every 5 minutes.");
+    } else {
+      // Stop notifications
+      setNotificationsEnabled(false);
+      setNextNotification(null);
+      setTimeRemaining("");
+      
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      
+      toast.info("Notifications disabled");
+    }
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+      }
+    };
+  }, []);
 
   const generateEmail = () => {
     const { recruiterName, companyName, roleName, yourName, yourBackground, specificInterest } = formData;
@@ -193,12 +298,12 @@ P.S. I'm happy to share more about my background if that would be helpful for co
             <CardContent>
               {generatedEmail ? (
                 <>
-                  <div className="bg-strata-black/50 rounded-lg p-4 border border-strata-steel/20 mb-4 max-h-[400px] overflow-y-auto">
+                  <div className="bg-strata-black/50 rounded-lg p-4 border border-strata-steel/20 mb-4 max-h-[300px] overflow-y-auto">
                     <pre className="text-sm text-strata-silver whitespace-pre-wrap font-mono leading-relaxed">
                       {generatedEmail}
                     </pre>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 mb-4">
                     <Button
                       onClick={copyToClipboard}
                       variant="outline"
@@ -218,6 +323,46 @@ P.S. I'm happy to share more about my background if that would be helpful for co
                       <Mail className="w-4 h-4 mr-2" />
                       Open in Email
                     </Button>
+                  </div>
+
+                  {/* Email Notifications */}
+                  <div className="p-4 rounded-lg bg-strata-steel/10 border border-strata-steel/20">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        {notificationsEnabled ? (
+                          <Bell className="w-4 h-4 text-strata-lume animate-pulse" />
+                        ) : (
+                          <BellOff className="w-4 h-4 text-strata-silver/50" />
+                        )}
+                        <span className="text-sm font-medium text-strata-white">
+                          5-Minute Reminders
+                        </span>
+                      </div>
+                      <Switch
+                        checked={notificationsEnabled}
+                        onCheckedChange={toggleNotifications}
+                        className="data-[state=checked]:bg-strata-lume"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label className="text-strata-silver text-xs">Your Email for Reminders</Label>
+                      <Input
+                        type="email"
+                        placeholder="your@email.com"
+                        value={formData.notificationEmail}
+                        onChange={(e) => setFormData({ ...formData, notificationEmail: e.target.value })}
+                        className="bg-strata-steel/20 border-strata-steel/30 text-strata-white text-sm"
+                        disabled={notificationsEnabled}
+                      />
+                    </div>
+
+                    {notificationsEnabled && timeRemaining && (
+                      <div className="mt-3 flex items-center gap-2 text-xs text-strata-lume">
+                        <Timer className="w-3 h-3" />
+                        <span>Next reminder in: {timeRemaining}</span>
+                      </div>
+                    )}
                   </div>
                 </>
               ) : (
