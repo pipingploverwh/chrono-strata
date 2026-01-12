@@ -231,73 +231,7 @@ const Portfolio = () => {
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-strata-orange/10 rounded-full blur-3xl" />
         
-        <div className="max-w-4xl mx-auto relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-strata-charcoal/80 border border-strata-steel/30 mb-8">
-            <Sparkles className="w-4 h-4 text-purple-400" />
-            <span className="text-xs font-mono uppercase tracking-wider text-strata-silver">
-              Product Leader & Growth Strategist
-            </span>
-          </div>
-          
-          <h1 className="font-instrument text-5xl md:text-7xl font-bold text-strata-white mb-6 leading-tight">
-            Bentzi Rubin
-            <span className="block text-3xl md:text-4xl mt-2 bg-gradient-to-r from-purple-400 via-strata-orange to-strata-lume bg-clip-text text-transparent">
-              Building 0→1 Products at Velocity
-            </span>
-          </h1>
-          
-          <p className="text-xl text-strata-silver/80 max-w-2xl mb-10 leading-relaxed">
-            Product owner and growth leader with a track record of scaling startups from zero to millions in revenue. 
-            I translate ambiguous market questions into experiments with clear success thresholds.
-          </p>
-          
-          <div className="flex flex-wrap gap-4">
-            <Button 
-              className="bg-purple-600 hover:bg-purple-500 text-white font-instrument tracking-wider group"
-              onClick={() => document.getElementById('experience')?.scrollIntoView({ behavior: 'smooth' })}
-            >
-              View Experience
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button 
-              variant="outline" 
-              className="border-strata-steel/30 text-strata-white hover:bg-strata-steel/20"
-              asChild
-            >
-              <a href="mailto:bentzirubin@gmail.com">
-                <Mail className="w-4 h-4 mr-2" />
-                Get in Touch
-              </a>
-            </Button>
-          </div>
-          
-          {/* Contact Info */}
-          <div className="flex flex-wrap gap-6 mt-12">
-            <a 
-              href="mailto:bentzirubin@gmail.com"
-              className="flex items-center gap-2 text-strata-silver hover:text-strata-white transition-colors"
-            >
-              <Mail className="w-4 h-4" />
-              <span className="text-sm">bentzirubin@gmail.com</span>
-            </a>
-            <a 
-              href="tel:530-207-9045"
-              className="flex items-center gap-2 text-strata-silver hover:text-strata-white transition-colors"
-            >
-              <Phone className="w-4 h-4" />
-              <span className="text-sm">530-207-9045</span>
-            </a>
-            <a 
-              href="https://linkedin.com/in/bentzig" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-strata-silver hover:text-strata-white transition-colors"
-            >
-              <Linkedin className="w-4 h-4" />
-              <span className="text-sm">linkedin.com/in/bentzig</span>
-            </a>
-          </div>
-        </div>
+        {/* Hero content removed */}
       </section>
 
       {/* Key Metrics - Hidden for now */}
