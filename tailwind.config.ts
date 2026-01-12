@@ -72,6 +72,19 @@ export default {
           cyan: "hsl(var(--strata-cyan))",
           red: "hsl(var(--strata-red))",
         },
+        patriots: {
+          navy: "hsl(var(--patriots-navy))",
+          "navy-light": "hsl(var(--patriots-navy-light))",
+          red: "hsl(var(--patriots-red))",
+          "red-bright": "hsl(var(--patriots-red-bright))",
+          silver: "hsl(var(--patriots-silver))",
+          "silver-bright": "hsl(var(--patriots-silver-bright))",
+          white: "hsl(var(--patriots-white))",
+        },
+        chargers: {
+          gold: "hsl(var(--chargers-gold))",
+          blue: "hsl(var(--chargers-blue))",
+        },
       },
       fontFamily: {
         instrument: ["Oswald", "sans-serif"],
