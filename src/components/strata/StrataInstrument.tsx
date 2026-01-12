@@ -8,7 +8,7 @@ import LayersSidebar from "./LayersSidebar";
 import ForecastStrip from "./ForecastStrip";
 import ControlToggles from "./ControlToggles";
 import HalftimeDistribution from "./HalftimeDistribution";
-
+import AtlasLayers from "./AtlasLayers";
 // Falmouth, MA data for January 11, 2026, 6:41 PM
 const weatherData = {
   pressure: { value: "29.64", unit: "inHg" },
@@ -141,6 +141,8 @@ const StrataInstrument = () => {
         {/* Halftime Distribution Analysis */}
         <HalftimeDistribution />
 
+        {/* Atlas Layers Visualization */}
+        <AtlasLayers />
         {/* Kraft Group CTA */}
         <div className="mt-8 relative overflow-hidden rounded-lg border border-red-600/30 bg-gradient-to-br from-neutral-900 via-neutral-900 to-red-950/30">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(220,38,38,0.1),transparent_50%)]" />
