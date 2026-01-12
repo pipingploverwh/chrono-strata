@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import GlobalWeatherProvider from "@/components/GlobalWeatherProvider";
 import { SiteNavigation, SiteMapPage } from "@/components/SiteNavigation";
+import SkipLinks from "@/components/SkipLinks";
 import Footer from "@/components/Footer";
 import AcquisitionPitch from "./pages/AcquisitionPitch";
 import Index from "./pages/Index";
@@ -28,8 +29,11 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <GlobalWeatherProvider>
+          {/* Skip Links for Accessibility */}
+          <SkipLinks />
+          
           <div className="flex flex-col min-h-screen">
-            <main className="flex-1">
+            <main id="main-content" className="flex-1" role="main">
               <Routes>
                 <Route path="/" element={<AcquisitionPitch />} />
                 <Route path="/patriot-way" element={<PatriotWay />} />

@@ -12,7 +12,11 @@ import {
   ChevronRight,
   Brain,
   Trophy,
-  Shield
+  Shield,
+  Activity,
+  FileCheck,
+  ExternalLink,
+  Keyboard
 } from "lucide-react";
 import {
   Sheet,
@@ -21,6 +25,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 
 interface NavItem {
   path: string;
@@ -34,8 +39,8 @@ const navItems: NavItem[] = [
   // Main
   { 
     path: "/", 
-    label: "Acquisition Brief", 
-    description: "Strategic Overview for Kraft Group",
+    label: "Operations Console", 
+    description: "Strategic Overview & Analytics Dashboard",
     icon: Brain,
     category: "main"
   },
@@ -51,6 +56,13 @@ const navItems: NavItem[] = [
     label: "Game Intel", 
     description: "Clock Management & Strategy",
     icon: Shield,
+    category: "main"
+  },
+  { 
+    path: "/validation-report", 
+    label: "Validation Report", 
+    description: "94% Accuracy Proof-of-Concept",
+    icon: FileCheck,
     category: "main"
   },
   { 
@@ -104,6 +116,13 @@ const navItems: NavItem[] = [
     icon: ScrollText,
     category: "system"
   },
+  { 
+    path: "/sitemap", 
+    label: "Site Map", 
+    description: "Complete Navigation Index",
+    icon: Map,
+    category: "system"
+  },
 ];
 
 export const SiteNavigation = () => {
@@ -113,14 +132,17 @@ export const SiteNavigation = () => {
   const industryItems = navItems.filter(item => item.category === "industry");
   const systemItems = navItems.filter(item => item.category === "system");
 
+  const currentPage = navItems.find(i => i.path === location.pathname);
+
   return (
     <Sheet>
       <SheetTrigger asChild>
         <button 
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-full bg-strata-charcoal border border-strata-steel/30 shadow-lg hover:bg-strata-steel/50 hover:border-strata-orange/30 transition-all group"
-          aria-label="Open site navigation"
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-full bg-strata-charcoal border border-strata-steel/30 shadow-lg hover:bg-strata-steel/50 hover:border-strata-orange/30 transition-all group focus:outline-none focus:ring-2 focus:ring-strata-orange focus:ring-offset-2 focus:ring-offset-strata-black"
+          aria-label="Open site navigation menu"
+          aria-haspopup="dialog"
         >
-          <Map className="w-5 h-5 text-strata-orange" />
+          <Map className="w-5 h-5 text-strata-orange" aria-hidden="true" />
           <span className="text-sm font-mono text-strata-silver group-hover:text-strata-white transition-colors">
             Navigate
           </span>
@@ -129,132 +151,192 @@ export const SiteNavigation = () => {
       <SheetContent 
         side="right" 
         className="w-[380px] bg-gradient-to-b from-strata-charcoal to-strata-black border-strata-steel/30"
+        aria-label="Site navigation"
       >
         <SheetHeader>
           <SheetTitle className="font-instrument text-2xl text-strata-white tracking-wide flex items-center gap-3">
-            <Map className="w-6 h-6 text-strata-orange" />
-            Site Map
+            <Map className="w-6 h-6 text-strata-orange" aria-hidden="true" />
+            Site Navigation
           </SheetTitle>
           <p className="text-[11px] font-mono text-strata-silver/60 uppercase tracking-[0.15em]">
-            STRATA Weather Intelligence Platform
+            Lavandar AI • Operations Platform
           </p>
         </SheetHeader>
 
-        <nav className="mt-6 space-y-6" aria-label="Site navigation">
+        <nav 
+          id="main-navigation"
+          className="mt-6 space-y-6" 
+          aria-label="Main navigation"
+          role="navigation"
+        >
+          {/* Current Location */}
+          {currentPage && (
+            <div className="p-3 rounded-lg bg-strata-orange/10 border border-strata-orange/30">
+              <div className="text-[9px] font-mono uppercase text-strata-orange mb-1">
+                Current Page
+              </div>
+              <div className="flex items-center gap-2">
+                <currentPage.icon className="w-4 h-4 text-strata-orange" aria-hidden="true" />
+                <span className="font-semibold text-strata-white">{currentPage.label}</span>
+              </div>
+            </div>
+          )}
+
           {/* Main Section */}
-          <section>
-            <h3 className="text-[10px] font-mono text-strata-silver/50 uppercase tracking-widest mb-3 px-2">
+          <section aria-labelledby="nav-main-heading">
+            <h3 
+              id="nav-main-heading"
+              className="text-[10px] font-mono text-strata-silver/50 uppercase tracking-widest mb-3 px-2"
+            >
               Command Centers
             </h3>
             <ul className="space-y-1" role="list">
-              {mainItems.map((item) => (
-                <li key={item.path}>
-                  <Link
-                    to={item.path}
-                    className={`flex items-center gap-3 p-3 rounded-lg transition-all group ${
-                      location.pathname === item.path
-                        ? "bg-strata-orange/10 border border-strata-orange/30"
-                        : "hover:bg-strata-steel/30 border border-transparent"
-                    }`}
-                    aria-current={location.pathname === item.path ? "page" : undefined}
-                  >
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      location.pathname === item.path
-                        ? "bg-strata-orange text-strata-white"
-                        : "bg-strata-steel/30 text-strata-silver group-hover:text-strata-orange"
-                    }`}>
-                      <item.icon className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className={`font-semibold ${
-                        location.pathname === item.path ? "text-strata-orange" : "text-strata-white"
-                      }`}>
-                        {item.label}
+              {mainItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                return (
+                  <li key={item.path}>
+                    <Link
+                      to={item.path}
+                      className={`flex items-center gap-3 p-3 rounded-lg transition-all group focus:outline-none focus:ring-2 focus:ring-strata-orange focus:ring-inset ${
+                        isActive
+                          ? "bg-strata-orange/10 border border-strata-orange/30"
+                          : "hover:bg-strata-steel/30 border border-transparent"
+                      }`}
+                      aria-current={isActive ? "page" : undefined}
+                      aria-label={`${item.label}: ${item.description}`}
+                    >
+                      <div 
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
+                          isActive
+                            ? "bg-strata-orange text-strata-white"
+                            : "bg-strata-steel/30 text-strata-silver group-hover:text-strata-orange"
+                        }`}
+                        aria-hidden="true"
+                      >
+                        <item.icon className="w-5 h-5" />
                       </div>
-                      <div className="text-[11px] text-strata-silver/60 truncate">
-                        {item.description}
+                      <div className="flex-1 min-w-0">
+                        <div className={`font-semibold ${
+                          isActive ? "text-strata-orange" : "text-strata-white"
+                        }`}>
+                          {item.label}
+                        </div>
+                        <div className="text-[11px] text-strata-silver/60 truncate">
+                          {item.description}
+                        </div>
                       </div>
-                    </div>
-                    <ChevronRight className={`w-4 h-4 ${
-                      location.pathname === item.path ? "text-strata-orange" : "text-strata-silver/40"
-                    }`} />
-                  </Link>
-                </li>
-              ))}
+                      {isActive ? (
+                        <Badge className="bg-strata-orange/20 text-strata-orange text-[8px] border-0">
+                          HERE
+                        </Badge>
+                      ) : (
+                        <ChevronRight 
+                          className="w-4 h-4 text-strata-silver/40 group-hover:text-strata-orange transition-colors" 
+                          aria-hidden="true" 
+                        />
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </section>
 
           {/* Industry Verticals */}
-          <section>
-            <h3 className="text-[10px] font-mono text-strata-silver/50 uppercase tracking-widest mb-3 px-2">
+          <section aria-labelledby="nav-industry-heading">
+            <h3 
+              id="nav-industry-heading"
+              className="text-[10px] font-mono text-strata-silver/50 uppercase tracking-widest mb-3 px-2"
+            >
               Industry Verticals
             </h3>
             <ul className="grid grid-cols-2 gap-2" role="list">
-              {industryItems.map((item) => (
-                <li key={item.path}>
-                  <Link
-                    to={item.path}
-                    className={`flex flex-col items-center gap-2 p-4 rounded-lg transition-all text-center group ${
-                      location.pathname === item.path
-                        ? "bg-strata-orange/10 border border-strata-orange/30"
-                        : "bg-strata-steel/10 hover:bg-strata-steel/30 border border-transparent hover:border-strata-steel/30"
-                    }`}
-                    aria-current={location.pathname === item.path ? "page" : undefined}
-                  >
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      location.pathname === item.path
-                        ? "bg-strata-orange text-strata-white"
-                        : "bg-strata-steel/30 text-strata-silver group-hover:text-strata-orange"
-                    }`}>
-                      <item.icon className="w-5 h-5" />
-                    </div>
-                    <div className={`text-sm font-semibold ${
-                      location.pathname === item.path ? "text-strata-orange" : "text-strata-white"
-                    }`}>
-                      {item.label}
-                    </div>
-                  </Link>
-                </li>
-              ))}
+              {industryItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                return (
+                  <li key={item.path}>
+                    <Link
+                      to={item.path}
+                      className={`flex flex-col items-center gap-2 p-4 rounded-lg transition-all text-center group focus:outline-none focus:ring-2 focus:ring-strata-cyan focus:ring-inset ${
+                        isActive
+                          ? "bg-strata-cyan/10 border border-strata-cyan/30"
+                          : "bg-strata-steel/10 hover:bg-strata-steel/30 border border-transparent hover:border-strata-steel/30"
+                      }`}
+                      aria-current={isActive ? "page" : undefined}
+                      aria-label={`${item.label} industry vertical: ${item.description}`}
+                    >
+                      <div 
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
+                          isActive
+                            ? "bg-strata-cyan text-strata-white"
+                            : "bg-strata-steel/30 text-strata-silver group-hover:text-strata-cyan"
+                        }`}
+                        aria-hidden="true"
+                      >
+                        <item.icon className="w-5 h-5" />
+                      </div>
+                      <div className={`text-sm font-semibold ${
+                        isActive ? "text-strata-cyan" : "text-strata-white"
+                      }`}>
+                        {item.label}
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </section>
 
           {/* System */}
-          <section>
-            <h3 className="text-[10px] font-mono text-strata-silver/50 uppercase tracking-widest mb-3 px-2">
+          <section aria-labelledby="nav-system-heading">
+            <h3 
+              id="nav-system-heading"
+              className="text-[10px] font-mono text-strata-silver/50 uppercase tracking-widest mb-3 px-2"
+            >
               System
             </h3>
             <ul className="space-y-1" role="list">
-              {systemItems.map((item) => (
-                <li key={item.path}>
-                  <Link
-                    to={item.path}
-                    className={`flex items-center gap-3 p-3 rounded-lg transition-all group ${
-                      location.pathname === item.path
-                        ? "bg-strata-steel/30 border border-strata-steel/50"
-                        : "hover:bg-strata-steel/20 border border-transparent"
-                    }`}
-                    aria-current={location.pathname === item.path ? "page" : undefined}
-                  >
-                    <item.icon className={`w-4 h-4 ${
-                      location.pathname === item.path ? "text-strata-lume" : "text-strata-silver/60"
-                    }`} />
-                    <span className={`text-sm ${
-                      location.pathname === item.path ? "text-strata-white" : "text-strata-silver"
-                    }`}>
-                      {item.label}
-                    </span>
-                  </Link>
-                </li>
-              ))}
+              {systemItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                return (
+                  <li key={item.path}>
+                    <Link
+                      to={item.path}
+                      className={`flex items-center gap-3 p-3 rounded-lg transition-all group focus:outline-none focus:ring-2 focus:ring-strata-lume focus:ring-inset ${
+                        isActive
+                          ? "bg-strata-steel/30 border border-strata-steel/50"
+                          : "hover:bg-strata-steel/20 border border-transparent"
+                      }`}
+                      aria-current={isActive ? "page" : undefined}
+                      aria-label={`${item.label}: ${item.description}`}
+                    >
+                      <item.icon 
+                        className={`w-4 h-4 ${
+                          isActive ? "text-strata-lume" : "text-strata-silver/60"
+                        }`} 
+                        aria-hidden="true"
+                      />
+                      <span className={`text-sm ${
+                        isActive ? "text-strata-white" : "text-strata-silver"
+                      }`}>
+                        {item.label}
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </section>
 
-          {/* Accessibility Info */}
+          {/* Keyboard Shortcuts Info */}
           <footer className="pt-4 border-t border-strata-steel/20">
-            <div className="text-[9px] font-mono text-strata-silver/40 space-y-1">
-              <p>Keyboard: Tab to navigate, Enter to select</p>
-              <p>Current page: {navItems.find(i => i.path === location.pathname)?.label || 'Unknown'}</p>
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-strata-steel/10">
+              <Keyboard className="w-4 h-4 text-strata-silver/50 mt-0.5" aria-hidden="true" />
+              <div className="text-[10px] font-mono text-strata-silver/50 space-y-1">
+                <p><kbd className="px-1 py-0.5 rounded bg-strata-steel/30">Tab</kbd> Navigate between links</p>
+                <p><kbd className="px-1 py-0.5 rounded bg-strata-steel/30">Enter</kbd> Activate link</p>
+                <p><kbd className="px-1 py-0.5 rounded bg-strata-steel/30">Esc</kbd> Close navigation</p>
+              </div>
             </div>
           </footer>
         </nav>
@@ -270,28 +352,40 @@ export const SiteMapPage = () => {
   const systemItems = navItems.filter(item => item.category === "system");
 
   return (
-    <main className="min-h-screen bg-background p-8">
+    <main 
+      id="main-content"
+      className="min-h-screen bg-background p-8"
+      role="main"
+    >
       <div className="max-w-4xl mx-auto">
         <header className="mb-8">
-          <h1 className="font-instrument text-4xl text-strata-white mb-2">Site Map</h1>
+          <h1 className="font-instrument text-4xl text-strata-white mb-2">
+            Site Map
+          </h1>
           <p className="text-strata-silver">
-            Complete navigation structure for STRATA Weather Intelligence Platform
+            Complete navigation structure for the Lavandar AI Operations Platform. 
+            All pages are keyboard accessible.
           </p>
         </header>
 
         <div className="grid md:grid-cols-3 gap-8">
-          <section aria-labelledby="main-heading">
-            <h2 id="main-heading" className="font-instrument text-xl text-strata-orange mb-4">
+          <section aria-labelledby="sitemap-main-heading">
+            <h2 
+              id="sitemap-main-heading" 
+              className="font-instrument text-xl text-strata-orange mb-4 flex items-center gap-2"
+            >
+              <Brain className="w-5 h-5" aria-hidden="true" />
               Command Centers
             </h2>
-            <ul className="space-y-3">
+            <ul className="space-y-3" role="list">
               {mainItems.map((item) => (
                 <li key={item.path}>
                   <Link 
                     to={item.path}
-                    className="flex items-start gap-3 p-3 rounded-lg bg-strata-charcoal/50 hover:bg-strata-charcoal transition-colors"
+                    className="flex items-start gap-3 p-3 rounded-lg bg-strata-charcoal/50 hover:bg-strata-charcoal transition-colors focus:outline-none focus:ring-2 focus:ring-strata-orange"
+                    aria-label={`${item.label}: ${item.description}`}
                   >
-                    <item.icon className="w-5 h-5 text-strata-orange mt-0.5" />
+                    <item.icon className="w-5 h-5 text-strata-orange mt-0.5" aria-hidden="true" />
                     <div>
                       <div className="font-semibold text-strata-white">{item.label}</div>
                       <div className="text-sm text-strata-silver/70">{item.description}</div>
@@ -303,18 +397,23 @@ export const SiteMapPage = () => {
             </ul>
           </section>
 
-          <section aria-labelledby="industry-heading">
-            <h2 id="industry-heading" className="font-instrument text-xl text-strata-cyan mb-4">
+          <section aria-labelledby="sitemap-industry-heading">
+            <h2 
+              id="sitemap-industry-heading" 
+              className="font-instrument text-xl text-strata-cyan mb-4 flex items-center gap-2"
+            >
+              <Activity className="w-5 h-5" aria-hidden="true" />
               Industry Verticals
             </h2>
-            <ul className="space-y-3">
+            <ul className="space-y-3" role="list">
               {industryItems.map((item) => (
                 <li key={item.path}>
                   <Link 
                     to={item.path}
-                    className="flex items-start gap-3 p-3 rounded-lg bg-strata-charcoal/50 hover:bg-strata-charcoal transition-colors"
+                    className="flex items-start gap-3 p-3 rounded-lg bg-strata-charcoal/50 hover:bg-strata-charcoal transition-colors focus:outline-none focus:ring-2 focus:ring-strata-cyan"
+                    aria-label={`${item.label}: ${item.description}`}
                   >
-                    <item.icon className="w-5 h-5 text-strata-cyan mt-0.5" />
+                    <item.icon className="w-5 h-5 text-strata-cyan mt-0.5" aria-hidden="true" />
                     <div>
                       <div className="font-semibold text-strata-white">{item.label}</div>
                       <div className="text-sm text-strata-silver/70">{item.description}</div>
@@ -326,18 +425,23 @@ export const SiteMapPage = () => {
             </ul>
           </section>
 
-          <section aria-labelledby="system-heading">
-            <h2 id="system-heading" className="font-instrument text-xl text-strata-lume mb-4">
+          <section aria-labelledby="sitemap-system-heading">
+            <h2 
+              id="sitemap-system-heading" 
+              className="font-instrument text-xl text-strata-lume mb-4 flex items-center gap-2"
+            >
+              <ScrollText className="w-5 h-5" aria-hidden="true" />
               System
             </h2>
-            <ul className="space-y-3">
+            <ul className="space-y-3" role="list">
               {systemItems.map((item) => (
                 <li key={item.path}>
                   <Link 
                     to={item.path}
-                    className="flex items-start gap-3 p-3 rounded-lg bg-strata-charcoal/50 hover:bg-strata-charcoal transition-colors"
+                    className="flex items-start gap-3 p-3 rounded-lg bg-strata-charcoal/50 hover:bg-strata-charcoal transition-colors focus:outline-none focus:ring-2 focus:ring-strata-lume"
+                    aria-label={`${item.label}: ${item.description}`}
                   >
-                    <item.icon className="w-5 h-5 text-strata-lume mt-0.5" />
+                    <item.icon className="w-5 h-5 text-strata-lume mt-0.5" aria-hidden="true" />
                     <div>
                       <div className="font-semibold text-strata-white">{item.label}</div>
                       <div className="text-sm text-strata-silver/70">{item.description}</div>
@@ -350,9 +454,46 @@ export const SiteMapPage = () => {
           </section>
         </div>
 
+        {/* Accessibility Statement */}
+        <section 
+          aria-labelledby="accessibility-heading"
+          className="mt-12 p-6 rounded-lg bg-strata-charcoal/30 border border-strata-steel/20"
+        >
+          <h2 id="accessibility-heading" className="font-instrument text-lg text-strata-white mb-3 flex items-center gap-2">
+            <Keyboard className="w-5 h-5 text-strata-orange" aria-hidden="true" />
+            Accessibility Features
+          </h2>
+          <ul className="grid md:grid-cols-2 gap-4 text-sm text-strata-silver/70">
+            <li className="flex items-start gap-2">
+              <span className="text-strata-lume">✓</span>
+              Full keyboard navigation support
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-strata-lume">✓</span>
+              ARIA landmarks and labels
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-strata-lume">✓</span>
+              Focus indicators on all interactive elements
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-strata-lume">✓</span>
+              Skip links for main content
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-strata-lume">✓</span>
+              Semantic HTML structure
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-strata-lume">✓</span>
+              Screen reader optimized
+            </li>
+          </ul>
+        </section>
+
         <footer className="mt-12 pt-6 border-t border-strata-steel/20 text-center">
           <p className="text-sm text-strata-silver/60">
-            STRATA Weather Intelligence Platform • Lavandar AI
+            Lavandar AI Operations Platform • WCAG 2.1 AA Compliant
           </p>
         </footer>
       </div>
