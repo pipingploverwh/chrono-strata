@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { 
   ArrowLeft, RefreshCw, MapPin, Clock, User, Globe, Filter, 
-  Calendar, Search, Download, ChevronDown 
+  Calendar, Search, Download 
 } from "lucide-react";
+import VoiceRecorder from "@/components/VoiceRecorder";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -186,6 +187,9 @@ const WeatherCoordinateLogs = () => {
             </Button>
           </div>
         </div>
+
+        {/* Voice Recorder CTA */}
+        <VoiceRecorder />
 
         {/* Stats Summary */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
