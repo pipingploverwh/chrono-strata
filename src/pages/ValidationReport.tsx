@@ -204,8 +204,314 @@ const ValidationReport = () => {
   const missedDrives = driveData.filter(d => !d.match);
   const accuracy = Math.round(matchedDrives / driveData.length * 100);
   const handleExportPDF = () => {
-    // Placeholder for PDF generation
-    console.log("Generating Executive Summary PDF...");
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert('Please allow popups to generate PDF');
+      return;
+    }
+
+    const currentDate = new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    const missedDrivesList = missedDrives.map(d => `
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #334155;">Drive ${d.drive} (${d.quarter})</td>
+        <td style="padding: 8px; border-bottom: 1px solid #334155;">${d.predictedCall}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #334155;">${d.actualCall}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #334155;">${d.varianceReason ? varianceReasonLabels[d.varianceReason].label : 'N/A'}</td>
+      </tr>
+    `).join('');
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Chrono-Strata Executive Summary</title>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+            
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            
+            body {
+              font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+              background: linear-gradient(135deg, #0a1628 0%, #1a1f2e 50%, #0a1628 100%);
+              color: #e2e8f0;
+              padding: 40px;
+              min-height: 100vh;
+            }
+            
+            .container { max-width: 800px; margin: 0 auto; }
+            
+            .header {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin-bottom: 40px;
+              padding-bottom: 20px;
+              border-bottom: 2px solid #334155;
+            }
+            
+            .logo-section { display: flex; align-items: center; gap: 16px; }
+            
+            .logo {
+              width: 60px;
+              height: 60px;
+              border-radius: 12px;
+            }
+            
+            .brand-text h1 {
+              font-size: 24px;
+              font-weight: 700;
+              color: #fff;
+              letter-spacing: 0.05em;
+            }
+            
+            .brand-text p {
+              font-size: 11px;
+              color: #94a3b8;
+              text-transform: uppercase;
+              letter-spacing: 0.15em;
+              margin-top: 4px;
+            }
+            
+            .date-badge {
+              background: rgba(185, 28, 28, 0.2);
+              border: 1px solid rgba(185, 28, 28, 0.5);
+              padding: 8px 16px;
+              border-radius: 6px;
+              font-size: 12px;
+              color: #fca5a5;
+            }
+            
+            .hero-stat {
+              background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6));
+              border: 1px solid #334155;
+              border-radius: 16px;
+              padding: 40px;
+              text-align: center;
+              margin-bottom: 32px;
+            }
+            
+            .hero-stat .label {
+              font-size: 12px;
+              text-transform: uppercase;
+              letter-spacing: 0.2em;
+              color: #94a3b8;
+              margin-bottom: 8px;
+            }
+            
+            .hero-stat .value {
+              font-size: 72px;
+              font-weight: 800;
+              color: #4ade80;
+              line-height: 1;
+            }
+            
+            .hero-stat .subtitle {
+              font-size: 14px;
+              color: #64748b;
+              margin-top: 12px;
+            }
+            
+            .metrics-grid {
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              gap: 16px;
+              margin-bottom: 32px;
+            }
+            
+            .metric-card {
+              background: rgba(15, 23, 42, 0.6);
+              border: 1px solid #334155;
+              border-radius: 12px;
+              padding: 20px;
+              text-align: center;
+            }
+            
+            .metric-card .label {
+              font-size: 10px;
+              text-transform: uppercase;
+              letter-spacing: 0.15em;
+              color: #64748b;
+              margin-bottom: 8px;
+            }
+            
+            .metric-card .value {
+              font-size: 28px;
+              font-weight: 700;
+            }
+            
+            .metric-card .value.green { color: #4ade80; }
+            .metric-card .value.red { color: #f87171; }
+            .metric-card .value.cyan { color: #22d3ee; }
+            
+            .section {
+              background: rgba(15, 23, 42, 0.6);
+              border: 1px solid #334155;
+              border-radius: 12px;
+              padding: 24px;
+              margin-bottom: 24px;
+            }
+            
+            .section h2 {
+              font-size: 16px;
+              font-weight: 600;
+              color: #fff;
+              margin-bottom: 16px;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            }
+            
+            .section h2::before {
+              content: '';
+              width: 4px;
+              height: 20px;
+              background: #b91c1c;
+              border-radius: 2px;
+            }
+            
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              font-size: 13px;
+            }
+            
+            th {
+              text-align: left;
+              padding: 12px 8px;
+              background: rgba(51, 65, 85, 0.5);
+              color: #94a3b8;
+              font-size: 10px;
+              text-transform: uppercase;
+              letter-spacing: 0.1em;
+              font-weight: 600;
+            }
+            
+            td {
+              padding: 8px;
+              color: #cbd5e1;
+            }
+            
+            .footer {
+              margin-top: 40px;
+              padding-top: 20px;
+              border-top: 1px solid #334155;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              font-size: 11px;
+              color: #64748b;
+            }
+            
+            .footer .confidential {
+              color: #f87171;
+              text-transform: uppercase;
+              letter-spacing: 0.1em;
+            }
+            
+            @media print {
+              body { 
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                background: #0a1628 !important;
+              }
+              .container { max-width: 100%; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <div class="logo-section">
+                <img src="${lavandarLogo}" alt="Chrono-Strata" class="logo" />
+                <div class="brand-text">
+                  <h1>CHRONO-STRATA</h1>
+                  <p>Executive Summary Report</p>
+                </div>
+              </div>
+              <div class="date-badge">${currentDate}</div>
+            </div>
+            
+            <div class="hero-stat">
+              <div class="label">Prediction Accuracy</div>
+              <div class="value">${accuracy}%</div>
+              <div class="subtitle">Patriots vs Bills • January 11, 2026 • Gillette Stadium</div>
+            </div>
+            
+            <div class="metrics-grid">
+              <div class="metric-card">
+                <div class="label">Drives Matched</div>
+                <div class="value green">${matchedDrives}/${driveData.length}</div>
+              </div>
+              <div class="metric-card">
+                <div class="label">Seam Route Efficiency</div>
+                <div class="value red">-14%</div>
+              </div>
+              <div class="metric-card">
+                <div class="label">Wind Range</div>
+                <div class="value cyan">12-23 mph</div>
+              </div>
+            </div>
+            
+            <div class="section">
+              <h2>Variance Analysis (${missedDrives.length} Events)</h2>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Drive</th>
+                    <th>Predicted</th>
+                    <th>Actual</th>
+                    <th>Reason</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${missedDrivesList}
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="section">
+              <h2>Key Findings</h2>
+              <ul style="list-style: none; padding: 0;">
+                <li style="padding: 8px 0; border-bottom: 1px solid #334155; color: #cbd5e1;">
+                  • <strong style="color: #4ade80;">94% correlation</strong> between weather-adjusted predictions and actual play calls
+                </li>
+                <li style="padding: 8px 0; border-bottom: 1px solid #334155; color: #cbd5e1;">
+                  • <strong style="color: #f87171;">14% efficiency drop</strong> in seam routes during high-wind conditions (>18 mph)
+                </li>
+                <li style="padding: 8px 0; border-bottom: 1px solid #334155; color: #cbd5e1;">
+                  • <strong style="color: #22d3ee;">Wind direction shifts</strong> account for 33% of prediction variance
+                </li>
+                <li style="padding: 8px 0; color: #cbd5e1;">
+                  • <strong style="color: #fbbf24;">Coaching overrides</strong> most common in red zone situations
+                </li>
+              </ul>
+            </div>
+            
+            <div class="footer">
+              <span>Generated by LAVANDAR TECH • Chrono-Strata Platform v2.4.1</span>
+              <span class="confidential">Confidential</span>
+            </div>
+          </div>
+          
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+              }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
   };
   return <div className="min-h-screen bg-gradient-to-b from-patriots-navy via-strata-black to-patriots-navy">
       {/* War Room Header */}
