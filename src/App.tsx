@@ -20,6 +20,7 @@ import StrataEvents from "./pages/StrataEvents";
 import ValidationReport from "./pages/ValidationReport";
 import RecruiterOutreach from "./pages/RecruiterOutreach";
 import SecurityTestSuite from "./pages/SecurityTestSuite";
+import Portfolio from "./pages/Portfolio";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => (
                 <Route path="/validation-report" element={<ValidationReport />} />
                 <Route path="/recruiter-outreach" element={<RecruiterOutreach />} />
                 <Route path="/security" element={<SecurityTestSuite />} />
+                <Route path="/portfolio" element={<Portfolio />} />
                 <Route path="/sitemap" element={<SiteMapPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
