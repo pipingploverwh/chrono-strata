@@ -11,6 +11,7 @@ import AcquisitionPitch from "./pages/AcquisitionPitch";
 import Index from "./pages/Index";
 import Strata from "./pages/Strata";
 import Logs from "./pages/Logs";
+import WeatherCoordinateLogs from "./pages/WeatherCoordinateLogs";
 import WeatherShowcase from "./pages/WeatherShowcase";
 import WeatherIntelligence from "./pages/WeatherIntelligence";
 import StrataAviation from "./pages/StrataAviation";
@@ -42,6 +43,7 @@ const App = () => (
                 <Route path="/weather-showcase" element={<WeatherShowcase />} />
                 <Route path="/strata" element={<Strata />} />
                 <Route path="/logs" element={<Logs />} />
+                <Route path="/coordinate-logs" element={<WeatherCoordinateLogs />} />
                 <Route path="/launch" element={<Index />} />
                 <Route path="/aviation" element={<StrataAviation />} />
                 <Route path="/marine" element={<StrataMarine />} />
