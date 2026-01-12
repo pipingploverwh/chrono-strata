@@ -16,7 +16,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   const mainLinks = [
-    { path: "/", label: "Patriot Way" },
+    { path: "/", label: "Home" },
     { path: "/strata", label: "STRATA Instrument" },
     { path: "/launch", label: "Launch" },
     { path: "/logs", label: "System Logs" },
@@ -124,17 +124,17 @@ const Footer = () => {
               <li className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-strata-silver/60 mt-0.5 shrink-0" />
                 <span className="text-sm text-strata-silver">
-                  One Patriot Place<br />
-                  Foxborough, MA 02035
+                  Falmouth Town Center<br />
+                  Falmouth, MA 02540
                 </span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-strata-silver/60 shrink-0" />
                 <a 
-                  href="tel:+15085431776" 
+                  href="tel:+15084571776" 
                   className="text-sm text-strata-silver hover:text-strata-white transition-colors"
                 >
-                  (508) 543-1776
+                  (508) 457-1776
                 </a>
               </li>
               <li className="flex items-center gap-2">
