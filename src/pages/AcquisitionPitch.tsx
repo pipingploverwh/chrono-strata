@@ -31,7 +31,7 @@ import ModernizationTimeline from "@/components/ModernizationTimeline";
 import KAGRDashboard from "@/components/KAGRDashboard";
 import PerformanceAnalytics from "@/components/PerformanceAnalytics";
 import LivePredictions from "@/components/LivePredictions";
-import { useSportsData } from "@/hooks/useSportsData";
+
 
 interface MetricCardProps {
   title: string;
@@ -108,66 +108,28 @@ const CapabilityCard = ({ title, description, features, icon, color }: Capabilit
   </Card>
 );
 
-const LiveGameStrip = () => {
-  const { patriotsGame, revolutionGame, isLoading, lastUpdated, refetch } = useSportsData();
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center gap-2 text-strata-silver/50 text-xs font-mono">
-        <RefreshCw className="w-3 h-3 animate-spin" />
-        Syncing game data...
-      </div>
-    );
-  }
-
-  const hasGame = patriotsGame || revolutionGame;
+const LiveStatusStrip = () => {
+  const [currentTime, setCurrentTime] = useState(new Date());
+  
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <div className="flex items-center gap-4 flex-wrap">
-      {patriotsGame && (
-        <div className="flex items-center gap-3 px-3 py-2 rounded bg-patriots-navy/30 border border-patriots-silver/20">
-          <div className="flex items-center gap-2">
-            {patriotsGame.isLive && (
-              <div className="w-2 h-2 rounded-full bg-patriots-red animate-pulse" />
-            )}
-            <span className="text-[10px] font-mono uppercase text-strata-silver/50">NFL</span>
-          </div>
-          <span className="text-sm font-mono text-strata-white">
-            {patriotsGame.awayTeam.abbreviation} {patriotsGame.awayTeam.score} - {patriotsGame.homeTeam.score} {patriotsGame.homeTeam.abbreviation}
-          </span>
-          <span className="text-[9px] font-mono text-strata-silver/40">
-            {patriotsGame.statusDetail}
-          </span>
+      <div className="flex items-center gap-3 px-3 py-2 rounded bg-purple-950/30 border border-purple-400/20">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-strata-lume animate-pulse" />
+          <span className="text-[10px] font-mono uppercase text-strata-silver/50">LIVE</span>
         </div>
-      )}
-      {revolutionGame && (
-        <div className="flex items-center gap-3 px-3 py-2 rounded bg-blue-950/30 border border-blue-400/20">
-          <div className="flex items-center gap-2">
-            {revolutionGame.isLive && (
-              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-            )}
-            <span className="text-[10px] font-mono uppercase text-strata-silver/50">MLS</span>
-          </div>
-          <span className="text-sm font-mono text-strata-white">
-            {revolutionGame.awayTeam.abbreviation} {revolutionGame.awayTeam.score} - {revolutionGame.homeTeam.score} {revolutionGame.homeTeam.abbreviation}
-          </span>
-          <span className="text-[9px] font-mono text-strata-silver/40">
-            {revolutionGame.statusDetail}
-          </span>
-        </div>
-      )}
-      {!hasGame && (
-        <span className="text-xs font-mono text-strata-silver/40">No active games</span>
-      )}
-      {lastUpdated && (
-        <button 
-          onClick={refetch}
-          className="flex items-center gap-1 text-[9px] font-mono text-strata-silver/30 hover:text-strata-silver/50 transition-colors"
-        >
-          <RefreshCw className="w-3 h-3" />
-          {lastUpdated.toLocaleTimeString()}
-        </button>
-      )}
+        <span className="text-sm font-mono text-strata-white">
+          Falmouth, MA
+        </span>
+        <span className="text-[9px] font-mono text-strata-silver/40">
+          {currentTime.toLocaleTimeString()}
+        </span>
+      </div>
     </div>
   );
 };
@@ -189,12 +151,12 @@ const OperationalDashboard = () => {
                   Operations Console
                 </h1>
                 <span className="text-[9px] font-mono uppercase tracking-[0.15em] text-strata-silver/40">
-                  Kraft Group Enterprise Intelligence
+                  LAVANDAR AI Enterprise Intelligence
                 </span>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <LiveGameStrip />
+              <LiveStatusStrip />
               <div className="h-6 w-px bg-strata-steel/30" />
               <div className="flex items-center gap-2">
                 <Activity className="w-4 h-4 text-strata-lume" />
@@ -239,7 +201,7 @@ const OperationalDashboard = () => {
             </TabsTrigger>
             <TabsTrigger 
               value="predictions" 
-              className="data-[state=active]:bg-patriots-red/30 data-[state=active]:text-patriots-red-bright text-strata-silver/60"
+              className="data-[state=active]:bg-purple-600/30 data-[state=active]:text-purple-300 text-strata-silver/60"
             >
               <Activity className="w-4 h-4 mr-2" />
               Live Predictions
@@ -323,7 +285,7 @@ const OperationalDashboard = () => {
                     <span className="text-xs font-mono uppercase text-strata-cyan">2026 World Cup</span>
                   </div>
                   <p className="text-[11px] text-strata-silver/50">
-                    Target: Full AI-native venue operations for FIFA World Cup matches at Gillette Stadium
+                    Target: Full AI-native weather operations for major venues and events
                   </p>
                 </div>
               </div>
@@ -432,15 +394,15 @@ const OperationalDashboard = () => {
           <TabsContent value="systems" className="space-y-6">
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
               <button 
-                onClick={() => navigate("/patriot-way")}
-                className="group p-6 rounded-lg bg-gradient-to-br from-patriots-navy/40 to-strata-charcoal/60 border border-patriots-silver/20 hover:border-patriots-red/40 transition-all text-left"
+                onClick={() => navigate("/strata")}
+                className="group p-6 rounded-lg bg-gradient-to-br from-purple-950/40 to-strata-charcoal/60 border border-purple-400/20 hover:border-purple-400/40 transition-all text-left"
               >
-                <Trophy className="w-8 h-8 text-patriots-red mb-3" />
+                <Layers className="w-8 h-8 text-purple-400 mb-3" />
                 <h4 className="font-instrument text-lg text-strata-white mb-1">
-                  Game Day Command
+                  Weather Command
                 </h4>
                 <p className="text-xs text-strata-silver/60 mb-3">
-                  Real-time play-calling with weather integration
+                  Real-time atmospheric monitoring
                 </p>
                 <div className="flex items-center gap-1 text-xs font-mono text-strata-orange group-hover:translate-x-1 transition-transform">
                   Launch <ArrowUpRight className="w-3 h-3" />
@@ -448,31 +410,15 @@ const OperationalDashboard = () => {
               </button>
 
               <button 
-                onClick={() => navigate("/strata")}
+                onClick={() => navigate("/aviation")}
                 className="group p-6 rounded-lg bg-strata-charcoal/50 border border-strata-steel/20 hover:border-strata-orange/40 transition-all text-left"
               >
-                <Layers className="w-8 h-8 text-strata-orange mb-3" />
-                <h4 className="font-instrument text-lg text-strata-white mb-1">
-                  STRATA Weather
-                </h4>
-                <p className="text-xs text-strata-silver/60 mb-3">
-                  Precision atmospheric monitoring
-                </p>
-                <div className="flex items-center gap-1 text-xs font-mono text-strata-orange group-hover:translate-x-1 transition-transform">
-                  Launch <ArrowUpRight className="w-3 h-3" />
-                </div>
-              </button>
-
-              <button 
-                onClick={() => navigate("/strata-aviation")}
-                className="group p-6 rounded-lg bg-strata-charcoal/50 border border-strata-steel/20 hover:border-strata-cyan/40 transition-all text-left"
-              >
-                <Globe className="w-8 h-8 text-strata-cyan mb-3" />
+                <Globe className="w-8 h-8 text-strata-orange mb-3" />
                 <h4 className="font-instrument text-lg text-strata-white mb-1">
                   Aviation Suite
                 </h4>
                 <p className="text-xs text-strata-silver/60 mb-3">
-                  Team travel optimization
+                  Flight operations optimization
                 </p>
                 <div className="flex items-center gap-1 text-xs font-mono text-strata-orange group-hover:translate-x-1 transition-transform">
                   Launch <ArrowUpRight className="w-3 h-3" />
@@ -480,7 +426,23 @@ const OperationalDashboard = () => {
               </button>
 
               <button 
-                onClick={() => navigate("/strata-events")}
+                onClick={() => navigate("/marine")}
+                className="group p-6 rounded-lg bg-strata-charcoal/50 border border-strata-steel/20 hover:border-strata-cyan/40 transition-all text-left"
+              >
+                <Network className="w-8 h-8 text-strata-cyan mb-3" />
+                <h4 className="font-instrument text-lg text-strata-white mb-1">
+                  Marine Operations
+                </h4>
+                <p className="text-xs text-strata-silver/60 mb-3">
+                  Coastal weather intelligence
+                </p>
+                <div className="flex items-center gap-1 text-xs font-mono text-strata-orange group-hover:translate-x-1 transition-transform">
+                  Launch <ArrowUpRight className="w-3 h-3" />
+                </div>
+              </button>
+
+              <button 
+                onClick={() => navigate("/events")}
                 className="group p-6 rounded-lg bg-strata-charcoal/50 border border-strata-steel/20 hover:border-strata-lume/40 transition-all text-left"
               >
                 <Ticket className="w-8 h-8 text-strata-lume mb-3" />
@@ -488,7 +450,7 @@ const OperationalDashboard = () => {
                   Events Platform
                 </h4>
                 <p className="text-xs text-strata-silver/60 mb-3">
-                  Stadium operations hub
+                  Venue operations hub
                 </p>
                 <div className="flex items-center gap-1 text-xs font-mono text-strata-orange group-hover:translate-x-1 transition-transform">
                   Launch <ArrowUpRight className="w-3 h-3" />
@@ -499,18 +461,18 @@ const OperationalDashboard = () => {
             {/* Additional system links */}
             <div className="grid md:grid-cols-3 gap-4">
               <button 
-                onClick={() => navigate("/patriots-evaluation")}
+                onClick={() => navigate("/validation-report")}
                 className="flex items-center justify-between p-4 rounded border border-strata-steel/20 bg-strata-charcoal/20 hover:bg-strata-charcoal/40 transition-all"
               >
                 <div className="flex items-center gap-3">
-                  <Shield className="w-5 h-5 text-patriots-silver" />
-                  <span className="text-sm font-instrument text-strata-white">Game Intel</span>
+                  <Shield className="w-5 h-5 text-strata-silver" />
+                  <span className="text-sm font-instrument text-strata-white">Validation Report</span>
                 </div>
                 <ArrowUpRight className="w-4 h-4 text-strata-silver/40" />
               </button>
               
               <button 
-                onClick={() => navigate("/strata-marine")}
+                onClick={() => navigate("/marine")}
                 className="flex items-center justify-between p-4 rounded border border-strata-steel/20 bg-strata-charcoal/20 hover:bg-strata-charcoal/40 transition-all"
               >
                 <div className="flex items-center gap-3">
@@ -521,7 +483,7 @@ const OperationalDashboard = () => {
               </button>
               
               <button 
-                onClick={() => navigate("/strata-construction")}
+                onClick={() => navigate("/construction")}
                 className="flex items-center justify-between p-4 rounded border border-strata-steel/20 bg-strata-charcoal/20 hover:bg-strata-charcoal/40 transition-all"
               >
                 <div className="flex items-center gap-3">

@@ -11,8 +11,8 @@ import AcquisitionPitch from "./pages/AcquisitionPitch";
 import Index from "./pages/Index";
 import Strata from "./pages/Strata";
 import Logs from "./pages/Logs";
-import PatriotWay from "./pages/PatriotWay";
-import PatriotsEvaluation from "./pages/PatriotsEvaluation";
+import WeatherShowcase from "./pages/WeatherShowcase";
+import WeatherIntelligence from "./pages/WeatherIntelligence";
 import StrataAviation from "./pages/StrataAviation";
 import StrataMarine from "./pages/StrataMarine";
 import StrataConstruction from "./pages/StrataConstruction";
@@ -36,15 +36,15 @@ const App = () => (
             <main id="main-content" className="flex-1" role="main">
               <Routes>
                 <Route path="/" element={<AcquisitionPitch />} />
-                <Route path="/patriot-way" element={<PatriotWay />} />
+                <Route path="/weather-showcase" element={<WeatherShowcase />} />
                 <Route path="/strata" element={<Strata />} />
                 <Route path="/logs" element={<Logs />} />
                 <Route path="/launch" element={<Index />} />
-                <Route path="/strata-aviation" element={<StrataAviation />} />
-                <Route path="/strata-marine" element={<StrataMarine />} />
-                <Route path="/strata-construction" element={<StrataConstruction />} />
-                <Route path="/strata-events" element={<StrataEvents />} />
-                <Route path="/patriots-evaluation" element={<PatriotsEvaluation />} />
+                <Route path="/aviation" element={<StrataAviation />} />
+                <Route path="/marine" element={<StrataMarine />} />
+                <Route path="/construction" element={<StrataConstruction />} />
+                <Route path="/events" element={<StrataEvents />} />
+                <Route path="/weather-intelligence" element={<WeatherIntelligence />} />
                 <Route path="/validation-report" element={<ValidationReport />} />
                 <Route path="/sitemap" element={<SiteMapPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
