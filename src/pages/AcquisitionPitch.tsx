@@ -30,6 +30,7 @@ import lavandarLogo from "@/assets/lavandar-logo.png";
 import ModernizationTimeline from "@/components/ModernizationTimeline";
 import KAGRDashboard from "@/components/KAGRDashboard";
 import PerformanceAnalytics from "@/components/PerformanceAnalytics";
+import LivePredictions from "@/components/LivePredictions";
 import { useSportsData } from "@/hooks/useSportsData";
 
 interface MetricCardProps {
@@ -237,6 +238,13 @@ const OperationalDashboard = () => {
               Performance Analytics
             </TabsTrigger>
             <TabsTrigger 
+              value="predictions" 
+              className="data-[state=active]:bg-patriots-red/30 data-[state=active]:text-patriots-red-bright text-strata-silver/60"
+            >
+              <Activity className="w-4 h-4 mr-2" />
+              Live Predictions
+            </TabsTrigger>
+            <TabsTrigger 
               value="systems" 
               className="data-[state=active]:bg-strata-steel/30 data-[state=active]:text-strata-white text-strata-silver/60"
             >
@@ -413,6 +421,11 @@ const OperationalDashboard = () => {
           {/* Performance Analytics Tab */}
           <TabsContent value="analytics" className="space-y-6">
             <PerformanceAnalytics />
+          </TabsContent>
+
+          {/* Live Predictions Tab */}
+          <TabsContent value="predictions" className="space-y-6">
+            <LivePredictions />
           </TabsContent>
 
           {/* Live Systems Tab */}
