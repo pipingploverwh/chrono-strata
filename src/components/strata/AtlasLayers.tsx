@@ -133,6 +133,9 @@ const AtlasLayers = () => {
   const [isSoundEnabled, setIsSoundEnabled] = useState(false);
   const [isPlayingSound, setIsPlayingSound] = useState(false);
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
+  
+  // Real-time clock state
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   // Generate weather-appropriate sound prompt
   const generateSoundPrompt = useCallback(() => {
@@ -258,6 +261,14 @@ const AtlasLayers = () => {
     const interval = setInterval(fetchNOAAData, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [fetchNOAAData]);
+
+  // Real-time clock - updates every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Pulse animation
   useEffect(() => {
@@ -416,13 +427,31 @@ const AtlasLayers = () => {
       
       {/* Current Date/Time Sync Display */}
       <div className="mb-4 flex items-center justify-between px-3 py-2 bg-strata-charcoal/40 rounded border border-strata-steel/20">
-        <div className="flex items-center gap-3">
-          <div className="text-[10px] font-mono text-strata-silver/50 uppercase">Forecast Time</div>
+        <div className="flex items-center gap-4">
+          <div className="text-[10px] font-mono text-strata-silver/50 uppercase">Local Time</div>
           <div className="text-sm font-mono text-strata-white">
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+            {currentTime.toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              year: 'numeric',
+              month: 'short', 
+              day: 'numeric' 
+            })}
           </div>
-          <div className="text-sm font-mono text-cyan-400">
-            {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })}
+          <div className="flex items-center gap-1">
+            <div className="text-lg font-mono text-cyan-400 tabular-nums">
+              {currentTime.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: false 
+              })}
+            </div>
+            <span className="text-[10px] font-mono text-strata-silver/50">
+              {Intl.DateTimeFormat().resolvedOptions().timeZone}
+            </span>
+          </div>
+          <div className="text-xs font-mono text-strata-silver/40">
+            UTC: {currentTime.toISOString().slice(11, 19)}
           </div>
         </div>
         {isSoundEnabled && (
