@@ -171,10 +171,10 @@ const ZeroLemonCard = () => {
             />
           </div>
 
-          {/* Kraft Group badge */}
+          {/* Lavandar AI badge */}
           <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2 py-1 rounded bg-strata-charcoal/80 border border-patriots-silver/20">
             <Shield className="w-3 h-3 text-patriots-silver" />
-            <span className="text-[8px] font-mono uppercase tracking-widest text-patriots-silver">Kraft Group</span>
+            <span className="text-[8px] font-mono uppercase tracking-widest text-patriots-silver">Lavandar AI</span>
           </div>
 
           <div className="relative">
@@ -253,7 +253,7 @@ const ZeroLemonCard = () => {
                   </span>
                 </DialogTitle>
                 <p className="text-[11px] font-mono text-strata-silver/60 uppercase tracking-[0.2em] mt-1">
-                  Weather-Adjusted Halftime Analysis • Kraft Group
+                  Weather-Adjusted Halftime Analysis • Lavandar AI
                 </p>
               </div>
             </div>
@@ -326,7 +326,7 @@ const ZeroLemonCard = () => {
               <p className="text-sm text-strata-silver">
                 <span className="text-patriots-red-bright font-semibold">Enterprise Ready</span>
                 <span className="text-strata-silver/80 ml-2">
-                  — All data transmissions are encrypted and comply with Kraft Group security protocols.
+                  — All data transmissions are encrypted and comply with Lavandar AI security protocols.
                 </span>
               </p>
             </div>
