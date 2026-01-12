@@ -120,7 +120,7 @@ at Gillette Stadium & Surrounding Areas<br />
                 decisions must be made in real-time.
               </p>
               <p>
-                The Kraft Group sought a solution that could transform weather from a liability 
+                LAVANDAR TECH sought to build a solution that could transform weather from a liability 
                 into a strategic advantage for fan experience and operational efficiency.
               </p>
             </div>
