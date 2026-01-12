@@ -300,8 +300,8 @@ const Portfolio = () => {
         </div>
       </section>
 
-      {/* Key Metrics */}
-      <section className="py-12 px-4 bg-strata-charcoal/50 border-y border-strata-steel/20">
+      {/* Key Metrics - Hidden for now */}
+      {/* <section className="py-12 px-4 bg-strata-charcoal/50 border-y border-strata-steel/20">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
             { value: "$250K+", label: "Revenue Scaled", icon: TrendingUp },
@@ -318,7 +318,7 @@ const Portfolio = () => {
             </div>
           ))}
         </div>
-      </section>
+      </section> */}
 
       {/* Experience Timeline */}
       <section id="experience" className="py-20 px-4">
