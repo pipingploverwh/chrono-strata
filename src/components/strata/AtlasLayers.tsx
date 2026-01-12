@@ -1,6 +1,13 @@
-import { useState, useEffect, useMemo } from "react";
-import { Globe, Mountain, Cloud, Plane, Rocket, Satellite, Activity, Wind, Waves, AlertTriangle, RefreshCw } from "lucide-react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { Globe, Mountain, Cloud, Plane, Rocket, Satellite, Activity, Wind, Waves, AlertTriangle, RefreshCw, MapPin, Volume2, VolumeX, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Particle {
   id: number;
@@ -41,6 +48,12 @@ interface NOAAResponse {
   data?: MarineForecast;
   fetchedAt?: string;
   error?: string;
+}
+
+interface ZoneInfo {
+  id: string;
+  name: string;
+  description: string;
 }
 
 const layersData: LayerData[] = [
@@ -104,14 +117,124 @@ const AtlasLayers = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [lastFetched, setLastFetched] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  // Zone selection state
+  const [selectedZone, setSelectedZone] = useState("anz233");
+  const [availableZones, setAvailableZones] = useState<ZoneInfo[]>([
+    { id: 'anz233', name: 'Vineyard Sound', description: 'Including Woods Hole and Martha\'s Vineyard' },
+    { id: 'anz230', name: 'Cape Cod Bay', description: 'Plymouth to Provincetown' },
+    { id: 'anz232', name: 'Nantucket Sound', description: 'South of Cape Cod to Nantucket' },
+    { id: 'anz231', name: 'Buzzards Bay', description: 'New Bedford to the Elizabeth Islands' },
+    { id: 'anz234', name: 'Block Island Sound', description: 'Rhode Island to Block Island' },
+    { id: 'anz235', name: 'Long Island Sound (East)', description: 'New London to Orient Point' },
+  ]);
+  
+  // Sound state
+  const [isSoundEnabled, setIsSoundEnabled] = useState(false);
+  const [isPlayingSound, setIsPlayingSound] = useState(false);
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
+
+  // Generate weather-appropriate sound prompt
+  const generateSoundPrompt = useCallback(() => {
+    if (!noaaData) return null;
+    
+    const conditions = noaaData.periods[0]?.conditions?.toLowerCase() || '';
+    const warnings = noaaData.warnings || [];
+    const wind = noaaData.periods[0]?.wind?.toLowerCase() || '';
+    
+    let prompt = "Ambient ocean waves and ";
+    
+    if (warnings.some(w => w.includes('GALE') || w.includes('STORM'))) {
+      prompt += "strong howling wind with heavy rain, stormy marine atmosphere";
+    } else if (wind.includes('15') || wind.includes('20') || wind.includes('25')) {
+      prompt += "moderate coastal wind, seagulls in distance, choppy water sounds";
+    } else if (conditions.includes('rain') || conditions.includes('shower')) {
+      prompt += "light rain falling on water, gentle maritime atmosphere";
+    } else if (conditions.includes('fog') || conditions.includes('mist')) {
+      prompt += "foghorn in distance, calm misty harbor ambiance";
+    } else {
+      prompt += "gentle breeze, calm harbor with buoy bells, peaceful marina sounds";
+    }
+    
+    return prompt;
+  }, [noaaData]);
+
+  // Play weather sound using ElevenLabs
+  const playWeatherSound = useCallback(async () => {
+    if (!isSoundEnabled || isPlayingSound) return;
+    
+    const prompt = generateSoundPrompt();
+    if (!prompt) return;
+    
+    setIsPlayingSound(true);
+    
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-sfx`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ prompt, duration: 10 }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`SFX request failed: ${response.status}`);
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audio.loop = true;
+      audio.volume = 0.4;
+      
+      setCurrentAudio(audio);
+      await audio.play();
+    } catch (err) {
+      console.error('Sound playback error:', err);
+    } finally {
+      setIsPlayingSound(false);
+    }
+  }, [isSoundEnabled, isPlayingSound, generateSoundPrompt]);
+
+  // Toggle sound
+  const toggleSound = useCallback(() => {
+    if (isSoundEnabled && currentAudio) {
+      currentAudio.pause();
+      currentAudio.src = '';
+      setCurrentAudio(null);
+    }
+    setIsSoundEnabled(!isSoundEnabled);
+  }, [isSoundEnabled, currentAudio]);
+
+  // Play sound when enabled and data available
+  useEffect(() => {
+    if (isSoundEnabled && noaaData && !currentAudio) {
+      playWeatherSound();
+    }
+  }, [isSoundEnabled, noaaData, currentAudio, playWeatherSound]);
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.src = '';
+      }
+    };
+  }, [currentAudio]);
 
   // Fetch NOAA data
-  const fetchNOAAData = async () => {
+  const fetchNOAAData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
       const { data, error: fnError } = await supabase.functions.invoke<NOAAResponse>('noaa-marine', {
-        body: { zone: 'anz233' }
+        body: { zone: selectedZone }
       });
       
       if (fnError) throw fnError;
@@ -127,14 +250,14 @@ const AtlasLayers = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedZone]);
 
-  // Initial fetch and auto-refresh every 5 minutes
+  // Fetch on zone change and auto-refresh every 5 minutes
   useEffect(() => {
     fetchNOAAData();
     const interval = setInterval(fetchNOAAData, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchNOAAData]);
 
   // Pulse animation
   useEffect(() => {
@@ -231,6 +354,42 @@ const AtlasLayers = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {/* Zone Selector */}
+          <Select value={selectedZone} onValueChange={setSelectedZone}>
+            <SelectTrigger className="w-[180px] h-9 bg-strata-charcoal/50 border-strata-steel/30 text-strata-white text-xs font-mono">
+              <MapPin className="w-3 h-3 mr-2 text-cyan-400" />
+              <SelectValue placeholder="Select Zone" />
+            </SelectTrigger>
+            <SelectContent className="bg-strata-charcoal border-strata-steel/30">
+              {availableZones.map((zone) => (
+                <SelectItem 
+                  key={zone.id} 
+                  value={zone.id}
+                  className="text-strata-white text-xs font-mono hover:bg-strata-steel/20 focus:bg-strata-steel/20"
+                >
+                  <div className="flex flex-col">
+                    <span>{zone.name}</span>
+                    <span className="text-[10px] text-strata-silver/50">{zone.id.toUpperCase()}</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          {/* Sound Toggle */}
+          <button
+            onClick={toggleSound}
+            disabled={isPlayingSound}
+            className={`p-2 rounded border transition-all ${
+              isSoundEnabled 
+                ? 'bg-purple-500/20 border-purple-500/40 text-purple-400' 
+                : 'bg-strata-steel/10 border-strata-steel/30 text-strata-silver/60 hover:text-strata-silver'
+            } ${isPlayingSound ? 'animate-pulse' : ''}`}
+            title={isSoundEnabled ? 'Disable ambient sound' : 'Enable ambient sound'}
+          >
+            {isSoundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+          </button>
+          
           <button
             onClick={fetchNOAAData}
             disabled={isLoading}
@@ -253,6 +412,36 @@ const AtlasLayers = () => {
             <Activity className="w-4 h-4" />
           </button>
         </div>
+      </div>
+      
+      {/* Current Date/Time Sync Display */}
+      <div className="mb-4 flex items-center justify-between px-3 py-2 bg-strata-charcoal/40 rounded border border-strata-steel/20">
+        <div className="flex items-center gap-3">
+          <div className="text-[10px] font-mono text-strata-silver/50 uppercase">Forecast Time</div>
+          <div className="text-sm font-mono text-strata-white">
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+          </div>
+          <div className="text-sm font-mono text-cyan-400">
+            {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })}
+          </div>
+        </div>
+        {isSoundEnabled && (
+          <div className="flex items-center gap-2 text-purple-400">
+            <div className="flex gap-0.5">
+              {[...Array(4)].map((_, i) => (
+                <div 
+                  key={i} 
+                  className="w-0.5 bg-purple-400 rounded-full animate-pulse"
+                  style={{ 
+                    height: `${8 + Math.random() * 8}px`,
+                    animationDelay: `${i * 0.1}s`
+                  }}
+                />
+              ))}
+            </div>
+            <span className="text-[10px] font-mono uppercase">Audio Synced</span>
+          </div>
+        )}
       </div>
 
       {/* NOAA Live Data Strip */}
