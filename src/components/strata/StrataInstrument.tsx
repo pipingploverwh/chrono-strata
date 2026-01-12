@@ -6,6 +6,7 @@ import MetricPod from "./MetricPod";
 import LayersSidebar from "./LayersSidebar";
 import ForecastStrip from "./ForecastStrip";
 import ControlToggles from "./ControlToggles";
+import HalftimeDistribution from "./HalftimeDistribution";
 
 // Falmouth, MA data for January 11, 2026, 6:41 PM
 const weatherData = {
@@ -146,6 +147,9 @@ const StrataInstrument = () => {
         <div className="mt-6">
           <ForecastStrip />
         </div>
+
+        {/* Halftime Distribution Analysis */}
+        <HalftimeDistribution />
 
         {/* Footer info */}
         <div className="mt-4 flex items-center justify-between text-[8px] font-mono text-strata-silver/40 uppercase tracking-wider">
