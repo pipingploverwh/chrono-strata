@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import GlobalWeatherProvider from "@/components/GlobalWeatherProvider";
+import { SiteNavigation, SiteMapPage } from "@/components/SiteNavigation";
 import Index from "./pages/Index";
 import Strata from "./pages/Strata";
 import Logs from "./pages/Logs";
@@ -32,9 +33,11 @@ const App = () => (
             <Route path="/marine" element={<StrataMarine />} />
             <Route path="/construction" element={<StrataConstruction />} />
             <Route path="/events" element={<StrataEvents />} />
+            <Route path="/sitemap" element={<SiteMapPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <SiteNavigation />
         </GlobalWeatherProvider>
       </BrowserRouter>
     </TooltipProvider>
