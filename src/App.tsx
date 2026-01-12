@@ -19,6 +19,7 @@ import StrataConstruction from "./pages/StrataConstruction";
 import StrataEvents from "./pages/StrataEvents";
 import ValidationReport from "./pages/ValidationReport";
 import RecruiterOutreach from "./pages/RecruiterOutreach";
+import SecurityTestSuite from "./pages/SecurityTestSuite";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,7 @@ const App = () => (
                 <Route path="/weather-intelligence" element={<WeatherIntelligence />} />
                 <Route path="/validation-report" element={<ValidationReport />} />
                 <Route path="/recruiter-outreach" element={<RecruiterOutreach />} />
+                <Route path="/security" element={<SecurityTestSuite />} />
                 <Route path="/sitemap" element={<SiteMapPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
