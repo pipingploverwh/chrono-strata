@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 interface WatchDialProps {
   bezelActive: boolean;
   lumeMode: boolean;
+  lumeIntensity?: number;
 }
 
-const WatchDial = ({ bezelActive, lumeMode }: WatchDialProps) => {
+const WatchDial = ({ bezelActive, lumeMode, lumeIntensity = 70 }: WatchDialProps) => {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -60,6 +61,11 @@ const WatchDial = ({ bezelActive, lumeMode }: WatchDialProps) => {
     { depth: 190, time: 0, angle: 180 },
   ];
 
+  // Calculate glow intensity based on slider (20-100 maps to 0.2-1.0)
+  const glowMultiplier = lumeIntensity / 100;
+  const glowOpacity = (base: number) => (base * glowMultiplier).toFixed(2);
+  const glowSize = (base: number) => Math.round(base * glowMultiplier);
+
   // Lume marker colors for night mode
   const getMarkerColor = (isCardinal: boolean) => {
     if (lumeMode) {
@@ -70,21 +76,22 @@ const WatchDial = ({ bezelActive, lumeMode }: WatchDialProps) => {
 
   const getMarkerFilter = (isCardinal: boolean) => {
     if (lumeMode && isCardinal) {
-      return "drop-shadow(0 0 6px hsla(120, 100%, 62%, 0.8))";
+      return `drop-shadow(0 0 ${glowSize(6)}px hsla(120, 100%, 62%, ${glowOpacity(0.8)}))`;
     }
     return "none";
   };
+
+  // Dynamic bezel glow based on intensity
+  const bezelGlow = lumeMode 
+    ? `0 0 ${glowSize(20)}px hsla(120, 100%, 62%, ${glowOpacity(0.6)}), 0 0 ${glowSize(40)}px hsla(120, 100%, 62%, ${glowOpacity(0.3)}), inset 0 0 ${glowSize(15)}px hsla(120, 100%, 62%, ${glowOpacity(0.2)})` 
+    : `0 0 ${glowSize(15)}px hsla(120, 100%, 62%, ${glowOpacity(0.4)}), 0 0 ${glowSize(30)}px hsla(120, 100%, 62%, ${glowOpacity(0.2)})`;
 
   return (
     <div className="relative">
       {/* Outer bezel ring with lume glow */}
       <div 
-        className={`absolute -inset-4 rounded-full strata-bezel transition-opacity duration-300 ${bezelActive ? 'opacity-100' : 'opacity-40'}`}
-        style={{ 
-          boxShadow: lumeMode 
-            ? '0 0 20px hsla(120, 100%, 62%, 0.6), 0 0 40px hsla(120, 100%, 62%, 0.3), inset 0 0 15px hsla(120, 100%, 62%, 0.2)' 
-            : '0 0 15px hsla(120, 100%, 62%, 0.4), 0 0 30px hsla(120, 100%, 62%, 0.2)'
-        }}
+        className={`absolute -inset-4 rounded-full strata-bezel transition-all duration-300 ${bezelActive ? 'opacity-100' : 'opacity-40'}`}
+        style={{ boxShadow: bezelGlow }}
       >
         <svg viewBox="0 0 240 240" className="w-full h-full">
           {/* Bezel outer ring with lume glow */}
@@ -95,16 +102,16 @@ const WatchDial = ({ bezelActive, lumeMode }: WatchDialProps) => {
             fill="none" 
             stroke="hsl(var(--strata-gunmetal))" 
             strokeWidth="8"
-            style={{ filter: 'drop-shadow(0 0 8px hsla(120, 100%, 62%, 0.5))' }}
+            style={{ filter: `drop-shadow(0 0 ${glowSize(8)}px hsla(120, 100%, 62%, ${glowOpacity(0.5)}))` }}
           />
           <circle 
             cx="120" 
             cy="120" 
             r="118" 
             fill="none" 
-            stroke="hsla(120, 100%, 62%, 0.3)" 
+            stroke={`hsla(120, 100%, 62%, ${glowOpacity(0.3)})`}
             strokeWidth="1"
-            style={{ filter: 'drop-shadow(0 0 6px hsla(120, 100%, 62%, 0.8))' }}
+            style={{ filter: `drop-shadow(0 0 ${glowSize(6)}px hsla(120, 100%, 62%, ${glowOpacity(0.8)}))` }}
           />
           <circle cx="120" cy="120" r="108" fill="none" stroke="hsl(var(--strata-steel))" strokeWidth="2" />
           
@@ -119,7 +126,7 @@ const WatchDial = ({ bezelActive, lumeMode }: WatchDialProps) => {
                   y={y - 6}
                   textAnchor="middle"
                   className={`text-[8px] font-instrument font-bold ${lumeMode ? 'fill-strata-lume' : 'fill-strata-orange'}`}
-                  style={lumeMode ? { filter: 'drop-shadow(0 0 4px hsla(120, 100%, 62%, 0.8))' } : {}}
+                  style={lumeMode ? { filter: `drop-shadow(0 0 ${glowSize(4)}px hsla(120, 100%, 62%, ${glowOpacity(0.8)}))` } : {}}
                 >
                   {mark.depth}'
                 </text>
@@ -186,7 +193,7 @@ const WatchDial = ({ bezelActive, lumeMode }: WatchDialProps) => {
             y="58" 
             textAnchor="middle" 
             className={`text-[14px] font-instrument font-bold tracking-widest ${lumeMode ? 'fill-strata-lume' : 'fill-strata-white'}`}
-            style={lumeMode ? { filter: 'drop-shadow(0 0 8px hsla(120, 100%, 62%, 0.8))' } : {}}
+            style={lumeMode ? { filter: `drop-shadow(0 0 ${glowSize(8)}px hsla(120, 100%, 62%, ${glowOpacity(0.8)}))` } : {}}
           >
             STRATA
           </text>
@@ -214,7 +221,7 @@ const WatchDial = ({ bezelActive, lumeMode }: WatchDialProps) => {
             y="103" 
             textAnchor="middle" 
             className={`text-[9px] font-mono font-bold ${lumeMode ? 'fill-strata-lume' : 'fill-strata-white'}`}
-            style={lumeMode ? { filter: 'drop-shadow(0 0 4px hsla(120, 100%, 62%, 0.8))' } : {}}
+            style={lumeMode ? { filter: `drop-shadow(0 0 ${glowSize(4)}px hsla(120, 100%, 62%, ${glowOpacity(0.8)}))` } : {}}
           >
             11
           </text>
@@ -235,7 +242,7 @@ const WatchDial = ({ bezelActive, lumeMode }: WatchDialProps) => {
             y="152" 
             textAnchor="middle" 
             className={`text-[9px] font-mono font-medium animate-lume-pulse ${lumeMode ? 'fill-strata-lume' : 'strata-lume'}`}
-            style={lumeMode ? { filter: 'drop-shadow(0 0 10px hsla(120, 100%, 62%, 0.9))' } : {}}
+            style={lumeMode ? { filter: `drop-shadow(0 0 ${glowSize(10)}px hsla(120, 100%, 62%, ${glowOpacity(0.9)}))` } : {}}
           >
             Falmouth
           </text>
@@ -250,7 +257,7 @@ const WatchDial = ({ bezelActive, lumeMode }: WatchDialProps) => {
               rx="2" 
               className={lumeMode ? '' : 'strata-hand-hour'} 
               fill={lumeMode ? "hsl(var(--strata-lume))" : undefined}
-              style={lumeMode ? { filter: 'drop-shadow(0 0 8px hsla(120, 100%, 62%, 0.9))' } : {}}
+              style={lumeMode ? { filter: `drop-shadow(0 0 ${glowSize(8)}px hsla(120, 100%, 62%, ${glowOpacity(0.9)}))` } : {}}
             />
             <circle cx="100" cy="100" r="6" className="fill-strata-charcoal" />
           </g>
@@ -265,14 +272,14 @@ const WatchDial = ({ bezelActive, lumeMode }: WatchDialProps) => {
               rx="1" 
               className={lumeMode ? '' : 'strata-hand-minute'} 
               fill={lumeMode ? "hsl(var(--strata-lume))" : undefined}
-              style={lumeMode ? { filter: 'drop-shadow(0 0 6px hsla(120, 100%, 62%, 0.8))' } : {}}
+              style={lumeMode ? { filter: `drop-shadow(0 0 ${glowSize(6)}px hsla(120, 100%, 62%, ${glowOpacity(0.8)}))` } : {}}
             />
           </g>
 
           {/* Second hand */}
           <g style={{ transform: `rotate(${secondDeg}deg)`, transformOrigin: '100px 100px' }}>
-            <line x1="100" y1="115" x2="100" y2="30" stroke="hsl(var(--strata-lume))" strokeWidth="1.5" style={{ filter: 'drop-shadow(0 0 6px hsla(120, 100%, 62%, 0.8))' }} />
-            <circle cx="100" cy="30" r="3" className="fill-strata-lume" style={{ filter: 'drop-shadow(0 0 8px hsla(120, 100%, 62%, 0.9))' }} />
+            <line x1="100" y1="115" x2="100" y2="30" stroke="hsl(var(--strata-lume))" strokeWidth="1.5" style={{ filter: `drop-shadow(0 0 ${glowSize(6)}px hsla(120, 100%, 62%, ${glowOpacity(0.8)}))` }} />
+            <circle cx="100" cy="30" r="3" className="fill-strata-lume" style={{ filter: `drop-shadow(0 0 ${glowSize(8)}px hsla(120, 100%, 62%, ${glowOpacity(0.9)}))` }} />
             <circle cx="100" cy="100" r="4" className="fill-strata-lume" />
           </g>
 
