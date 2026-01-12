@@ -1,52 +1,63 @@
-import { 
-  Trophy, Users, Cloud, TrendingUp, Shield, Zap, 
-  Target, BarChart3, Clock, CheckCircle2, ArrowRight,
-  Building2, Thermometer, Wind, Droplets
-} from "lucide-react";
+import { Trophy, Users, Cloud, TrendingUp, Shield, Zap, Target, BarChart3, Clock, CheckCircle2, ArrowRight, Building2, Thermometer, Wind, Droplets } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-
 const KraftCaseStudy = () => {
-  const metrics = [
-    { label: "Fan Satisfaction", value: "94%", change: "+12%", icon: Users },
-    { label: "Weather Accuracy", value: "99.2%", change: "+8%", icon: Cloud },
-    { label: "Response Time", value: "<2s", change: "-67%", icon: Zap },
-    { label: "Revenue Impact", value: "$4.2M", change: "+23%", icon: TrendingUp },
-  ];
-
-  const capabilities = [
-    {
-      title: "Real-Time Weather Intelligence",
-      description: "Hyperlocal forecasting for Gillette Stadium with 15-minute precision windows, enabling proactive fan experience management.",
-      icon: Thermometer,
-    },
-    {
-      title: "Predictive Crowd Analytics",
-      description: "ML-driven models correlating weather patterns with fan behavior, concession sales, and parking dynamics.",
-      icon: BarChart3,
-    },
-    {
-      title: "Operational Decision Support",
-      description: "Automated alerts for roof operations, field conditions, and safety protocols based on atmospheric conditions.",
-      icon: Shield,
-    },
-    {
-      title: "Fan Experience Optimization",
-      description: "Weather-aware mobile notifications, personalized recommendations, and comfort-driven amenity adjustments.",
-      icon: Target,
-    },
-  ];
-
-  const timeline = [
-    { phase: "Discovery", duration: "2 weeks", status: "complete" },
-    { phase: "Integration", duration: "4 weeks", status: "complete" },
-    { phase: "Pilot Season", duration: "8 games", status: "complete" },
-    { phase: "Full Deployment", duration: "Ongoing", status: "active" },
-  ];
-
-
-  return (
-    <div className="min-h-screen bg-[#f8f5f1]">
+  const metrics = [{
+    label: "Fan Satisfaction",
+    value: "94%",
+    change: "+12%",
+    icon: Users
+  }, {
+    label: "Weather Accuracy",
+    value: "99.2%",
+    change: "+8%",
+    icon: Cloud
+  }, {
+    label: "Response Time",
+    value: "<2s",
+    change: "-67%",
+    icon: Zap
+  }, {
+    label: "Revenue Impact",
+    value: "$4.2M",
+    change: "+23%",
+    icon: TrendingUp
+  }];
+  const capabilities = [{
+    title: "Real-Time Weather Intelligence",
+    description: "Hyperlocal forecasting for Gillette Stadium with 15-minute precision windows, enabling proactive fan experience management.",
+    icon: Thermometer
+  }, {
+    title: "Predictive Crowd Analytics",
+    description: "ML-driven models correlating weather patterns with fan behavior, concession sales, and parking dynamics.",
+    icon: BarChart3
+  }, {
+    title: "Operational Decision Support",
+    description: "Automated alerts for roof operations, field conditions, and safety protocols based on atmospheric conditions.",
+    icon: Shield
+  }, {
+    title: "Fan Experience Optimization",
+    description: "Weather-aware mobile notifications, personalized recommendations, and comfort-driven amenity adjustments.",
+    icon: Target
+  }];
+  const timeline = [{
+    phase: "Discovery",
+    duration: "2 weeks",
+    status: "complete"
+  }, {
+    phase: "Integration",
+    duration: "4 weeks",
+    status: "complete"
+  }, {
+    phase: "Pilot Season",
+    duration: "8 games",
+    status: "complete"
+  }, {
+    phase: "Full Deployment",
+    duration: "Ongoing",
+    status: "active"
+  }];
+  return <div className="min-h-screen bg-[#f8f5f1]">
       {/* Hero */}
       <section className="relative bg-neutral-900 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-red-900/20 via-transparent to-blue-900/10" />
@@ -63,8 +74,8 @@ const KraftCaseStudy = () => {
             </span>
           </div>
           
-          <h1 className="text-4xl md:text-6xl font-light text-white mb-6 leading-tight">
-            The Kraft Group &<br />
+          <h1 className="text-4xl md:text-6xl font-light text-white mb-6 leading-tight">LAVANDAR TECH
+at Gillette Stadium & Surrounding Areas<br />
             <span className="text-red-500">New England Patriots</span>
           </h1>
           
@@ -75,16 +86,14 @@ const KraftCaseStudy = () => {
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {metrics.map((metric, i) => {
-              const Icon = metric.icon;
-              return (
-                <div key={i} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+            const Icon = metric.icon;
+            return <div key={i} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
                   <Icon className="w-5 h-5 text-neutral-500 mb-3" />
                   <div className="text-3xl font-light text-white mb-1">{metric.value}</div>
                   <div className="text-sm text-neutral-500">{metric.label}</div>
                   <div className="text-xs text-green-400 mt-2">{metric.change}</div>
-                </div>
-              );
-            })}
+                </div>;
+          })}
           </div>
         </div>
       </section>
@@ -120,18 +129,10 @@ const KraftCaseStudy = () => {
           <div className="bg-neutral-900 rounded-2xl p-8 space-y-6">
             <h3 className="text-lg font-medium text-white">Key Challenges</h3>
             <div className="space-y-4">
-              {[
-                "Unpredictable New England weather patterns",
-                "68,000+ seat capacity requiring proactive management",
-                "Real-time decision-making for roof and field operations",
-                "Fan comfort and safety during extreme conditions",
-                "Inventory and staffing optimization based on conditions",
-              ].map((challenge, i) => (
-                <div key={i} className="flex items-start gap-3 text-neutral-400">
+              {["Unpredictable New England weather patterns", "68,000+ seat capacity requiring proactive management", "Real-time decision-making for roof and field operations", "Fan comfort and safety during extreme conditions", "Inventory and staffing optimization based on conditions"].map((challenge, i) => <div key={i} className="flex items-start gap-3 text-neutral-400">
                   <Wind className="w-4 h-4 text-red-500 mt-1 flex-shrink-0" />
                   <span className="text-sm">{challenge}</span>
-                </div>
-              ))}
+                </div>)}
             </div>
           </div>
         </div>
@@ -155,17 +156,15 @@ const KraftCaseStudy = () => {
           
           <div className="grid md:grid-cols-2 gap-8">
             {capabilities.map((cap, i) => {
-              const Icon = cap.icon;
-              return (
-                <div key={i} className="bg-white rounded-xl p-8 shadow-sm">
+            const Icon = cap.icon;
+            return <div key={i} className="bg-white rounded-xl p-8 shadow-sm">
                   <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center mb-6">
                     <Icon className="w-6 h-6 text-red-600" />
                   </div>
                   <h3 className="text-xl font-medium text-neutral-900 mb-3">{cap.title}</h3>
                   <p className="text-neutral-600">{cap.description}</p>
-                </div>
-              );
-            })}
+                </div>;
+          })}
           </div>
         </div>
       </section>
@@ -182,29 +181,17 @@ const KraftCaseStudy = () => {
         </div>
         
         <div className="flex flex-col md:flex-row gap-4 justify-center">
-          {timeline.map((phase, i) => (
-            <div key={i} className="flex items-center gap-4">
-              <div className={`flex-1 md:w-48 p-6 rounded-xl border ${
-                phase.status === 'active' 
-                  ? 'bg-red-50 border-red-200' 
-                  : 'bg-white border-neutral-200'
-              }`}>
+          {timeline.map((phase, i) => <div key={i} className="flex items-center gap-4">
+              <div className={`flex-1 md:w-48 p-6 rounded-xl border ${phase.status === 'active' ? 'bg-red-50 border-red-200' : 'bg-white border-neutral-200'}`}>
                 <div className="flex items-center gap-2 mb-2">
-                  {phase.status === 'complete' && (
-                    <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  )}
-                  {phase.status === 'active' && (
-                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                  )}
+                  {phase.status === 'complete' && <CheckCircle2 className="w-4 h-4 text-green-500" />}
+                  {phase.status === 'active' && <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />}
                   <span className="text-xs text-neutral-500 uppercase">{phase.duration}</span>
                 </div>
                 <h4 className="font-medium text-neutral-900">{phase.phase}</h4>
               </div>
-              {i < timeline.length - 1 && (
-                <ArrowRight className="w-5 h-5 text-neutral-300 hidden md:block" />
-              )}
-            </div>
-          ))}
+              {i < timeline.length - 1 && <ArrowRight className="w-5 h-5 text-neutral-300 hidden md:block" />}
+            </div>)}
         </div>
       </section>
 
@@ -261,8 +248,6 @@ const KraftCaseStudy = () => {
           </Link>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
-
 export default KraftCaseStudy;
