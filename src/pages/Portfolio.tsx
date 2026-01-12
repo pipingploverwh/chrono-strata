@@ -7,19 +7,40 @@ import {
   Code2, 
   Layers, 
   Database, 
-  Cloud,
   Sparkles,
   ArrowRight,
   Star,
-  GitBranch,
-  Terminal,
   Zap,
   Shield,
-  Cpu
+  Cpu,
+  Target,
+  TrendingUp,
+  Users,
+  Rocket,
+  Award,
+  GraduationCap,
+  Briefcase,
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  Phone,
+  BarChart3,
+  Brain,
+  Compass,
+  Heart
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+
+interface Experience {
+  title: string;
+  company: string;
+  period: string;
+  description: string;
+  highlights: string[];
+  type: "leadership" | "founder" | "growth";
+}
 
 interface Project {
   title: string;
@@ -31,15 +52,92 @@ interface Project {
   metrics?: string;
 }
 
-interface Skill {
-  name: string;
-  level: number;
-  icon: React.ComponentType<{ className?: string }>;
-  category: string;
-}
-
 const Portfolio = () => {
-  const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [expandedExp, setExpandedExp] = useState<number | null>(0);
+
+  const experiences: Experience[] = [
+    {
+      title: "Startup Growth Lead (Tiger Team / Product Owner)",
+      company: "Mechanism Ventures",
+      period: "2025–Present",
+      description: "Own 0→1 product feasibility for new ventures under aggressive timelines.",
+      highlights: [
+        "Translate ambiguous market questions into experiments with clear success thresholds",
+        "Lead rapid iteration cycles, implementing user and stakeholder feedback within hours",
+        "Define MVP scope, prioritize backlogs, and ship learnings aligned to launch velocity",
+        "Document and codify transferable learnings to compound future team execution"
+      ],
+      type: "leadership"
+    },
+    {
+      title: "Interim VP, E-Commerce (Product Owner)",
+      company: "Uncle Arnie's",
+      period: "2024–2025",
+      description: "Owned end-to-end e-commerce product roadmap across acquisition, checkout, fulfillment, and CX.",
+      highlights: [
+        "Scaled platform from $0→$250K revenue and 0→70K users through rapid experimentation",
+        "Built AI-powered customer support system reducing manual tickets while improving response time",
+        "Implemented real-time dashboards to guide prioritization across conversion, retention, and ops"
+      ],
+      type: "leadership"
+    },
+    {
+      title: "Co-Founder & CEO (Product Owner)",
+      company: "paar.ai",
+      period: "2021–2022",
+      description: "Defined product vision and MVP for AI marketing platform integrated with Shopify, Google, and Meta.",
+      highlights: [
+        "Led customer discovery to identify automation pain points and validate willingness to pay",
+        "Owned backlog, sprint planning, and scope tradeoffs for a 4-person eng/design team",
+        "Raised $1M pre-seed/seed and shipped v1 to 6 paying customers"
+      ],
+      type: "founder"
+    },
+    {
+      title: "Head of Marketing Optimization (Product)",
+      company: "quip",
+      period: "2019–2020",
+      description: "Owned experimentation roadmap supporting $100M+ DTC revenue business.",
+      highlights: [
+        "Reduced cost-per-lead by 50% through data-driven prioritization and CRO initiatives",
+        "Balanced speed with rigor by testing, learning, and iterating on customer-facing experiences"
+      ],
+      type: "growth"
+    },
+    {
+      title: "Senior Growth Product Manager",
+      company: "Resident Home",
+      period: "2018–2019",
+      description: "Owned roadmap across 10+ e-commerce properties with revenue and margin accountability.",
+      highlights: [
+        "Shipped pricing, warranty, and lead-capture features increasing AOV and contribution margin",
+        "Partnered with engineering and data to prioritize based on customer behavior and funnel drop-offs"
+      ],
+      type: "growth"
+    },
+    {
+      title: "Optimization Team Lead",
+      company: "Wunderkind (formerly BounceX)",
+      period: "2013–2018",
+      description: "Early employee; helped define core product and experimentation playbook.",
+      highlights: [
+        "Co-authored patent for exit-intent detection technology (US10082945B2)",
+        "Owned experimentation roadmap delivering 20% CPA reduction and 50% conversion lift",
+        "Worked directly with enterprise customers to translate needs into shipped product features"
+      ],
+      type: "growth"
+    },
+    {
+      title: "Director of Growth",
+      company: "Plated",
+      period: "2013",
+      description: "One of first 10 hires; built growth analytics and acquisition systems from scratch.",
+      highlights: [
+        "Drove collection of 500K+ emails and established repeatable growth processes"
+      ],
+      type: "growth"
+    }
+  ];
 
   const projects: Project[] = [
     {
@@ -74,22 +172,51 @@ const Portfolio = () => {
     },
   ];
 
-  const skills: Skill[] = [
-    { name: "React / TypeScript", level: 95, icon: Code2, category: "frontend" },
-    { name: "Node.js / Deno", level: 88, icon: Terminal, category: "backend" },
-    { name: "PostgreSQL / Supabase", level: 85, icon: Database, category: "backend" },
-    { name: "Cloud Architecture", level: 82, icon: Cloud, category: "infrastructure" },
-    { name: "System Design", level: 80, icon: Layers, category: "architecture" },
-    { name: "Security & Auth", level: 78, icon: Shield, category: "security" },
-    { name: "AI/ML Integration", level: 75, icon: Cpu, category: "ai" },
-    { name: "CI/CD & DevOps", level: 72, icon: GitBranch, category: "infrastructure" },
+  const skillCategories = [
+    {
+      title: "Product & Strategy",
+      icon: Target,
+      skills: ["Product Discovery & Feasibility Testing", "Backlog Ownership & Roadmap Prioritization", "Rapid Experimentation & Data-Driven Decision Making"]
+    },
+    {
+      title: "Technical",
+      icon: Code2,
+      skills: ["Analytics, SQL, Python", "Experimentation Platforms", "AI-Enabled Product Development", "Deep Learning Agentic Building"]
+    },
+    {
+      title: "Research",
+      icon: Users,
+      skills: ["User Research (Qualitative & Quantitative)", "Customer Discovery", "Market Validation"]
+    },
+    {
+      title: "Unique",
+      icon: Compass,
+      skills: ["Paramedic", "Outdoor Wilderness Survival", "Celestial Navigation", "Astrophysics"]
+    }
   ];
 
-  const categories = ["all", "frontend", "backend", "infrastructure", "architecture", "security", "ai"];
+  const education = [
+    { degree: "MBA", school: "Columbia Business School", year: "2022" },
+    { degree: "BA", school: "University of Wisconsin–Madison", year: "2009" }
+  ];
 
-  const filteredSkills = activeCategory === "all" 
-    ? skills 
-    : skills.filter(s => s.category === activeCategory);
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case "leadership": return "strata-orange";
+      case "founder": return "purple-400";
+      case "growth": return "strata-cyan";
+      default: return "strata-silver";
+    }
+  };
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case "leadership": return Briefcase;
+      case "founder": return Rocket;
+      case "growth": return TrendingUp;
+      default: return Briefcase;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -103,28 +230,28 @@ const Portfolio = () => {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-strata-charcoal/80 border border-strata-steel/30 mb-8">
             <Sparkles className="w-4 h-4 text-purple-400" />
             <span className="text-xs font-mono uppercase tracking-wider text-strata-silver">
-              Full-Stack Engineer
+              Product Leader & Growth Strategist
             </span>
           </div>
           
           <h1 className="font-instrument text-5xl md:text-7xl font-bold text-strata-white mb-6 leading-tight">
-            Building intelligent
-            <span className="block bg-gradient-to-r from-purple-400 via-strata-orange to-strata-lume bg-clip-text text-transparent">
-              digital experiences
+            Bentzi Rubin
+            <span className="block text-3xl md:text-4xl mt-2 bg-gradient-to-r from-purple-400 via-strata-orange to-strata-lume bg-clip-text text-transparent">
+              Building 0→1 Products at Velocity
             </span>
           </h1>
           
           <p className="text-xl text-strata-silver/80 max-w-2xl mb-10 leading-relaxed">
-            I craft performant, accessible web applications with modern technologies. 
-            Passionate about developer experience, clean architecture, and solving complex problems elegantly.
+            Product owner and growth leader with a track record of scaling startups from zero to millions in revenue. 
+            I translate ambiguous market questions into experiments with clear success thresholds.
           </p>
           
           <div className="flex flex-wrap gap-4">
             <Button 
               className="bg-purple-600 hover:bg-purple-500 text-white font-instrument tracking-wider group"
-              onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => document.getElementById('experience')?.scrollIntoView({ behavior: 'smooth' })}
             >
-              View Projects
+              View Experience
               <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button 
@@ -132,33 +259,156 @@ const Portfolio = () => {
               className="border-strata-steel/30 text-strata-white hover:bg-strata-steel/20"
               asChild
             >
-              <a href="mailto:hello@example.com">
+              <a href="mailto:bentzirubin@gmail.com">
                 <Mail className="w-4 h-4 mr-2" />
                 Get in Touch
               </a>
             </Button>
           </div>
           
-          {/* Social Links */}
-          <div className="flex gap-4 mt-12">
+          {/* Contact Info */}
+          <div className="flex flex-wrap gap-6 mt-12">
             <a 
-              href="https://github.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="p-3 rounded-lg bg-strata-steel/20 hover:bg-strata-steel/40 text-strata-silver hover:text-strata-white transition-all"
-              aria-label="GitHub Profile"
+              href="mailto:bentzirubin@gmail.com"
+              className="flex items-center gap-2 text-strata-silver hover:text-strata-white transition-colors"
             >
-              <Github className="w-5 h-5" />
+              <Mail className="w-4 h-4" />
+              <span className="text-sm">bentzirubin@gmail.com</span>
             </a>
             <a 
-              href="https://linkedin.com" 
+              href="tel:530-207-9045"
+              className="flex items-center gap-2 text-strata-silver hover:text-strata-white transition-colors"
+            >
+              <Phone className="w-4 h-4" />
+              <span className="text-sm">530-207-9045</span>
+            </a>
+            <a 
+              href="https://linkedin.com/in/bentzig" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3 rounded-lg bg-strata-steel/20 hover:bg-strata-steel/40 text-strata-silver hover:text-strata-white transition-all"
-              aria-label="LinkedIn Profile"
+              className="flex items-center gap-2 text-strata-silver hover:text-strata-white transition-colors"
             >
-              <Linkedin className="w-5 h-5" />
+              <Linkedin className="w-4 h-4" />
+              <span className="text-sm">linkedin.com/in/bentzig</span>
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Key Metrics */}
+      <section className="py-12 px-4 bg-strata-charcoal/50 border-y border-strata-steel/20">
+        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
+          {[
+            { value: "$250K+", label: "Revenue Scaled", icon: TrendingUp },
+            { value: "70K+", label: "Users Acquired", icon: Users },
+            { value: "$1M", label: "Funding Raised", icon: Rocket },
+            { value: "50%", label: "Cost Reduction", icon: BarChart3 }
+          ].map((metric) => (
+            <div key={metric.label} className="text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-purple-500/10 mb-3">
+                <metric.icon className="w-6 h-6 text-purple-400" />
+              </div>
+              <div className="text-2xl md:text-3xl font-bold text-strata-white mb-1">{metric.value}</div>
+              <div className="text-xs font-mono uppercase text-strata-silver/60 tracking-wider">{metric.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Experience Timeline */}
+      <section id="experience" className="py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="font-instrument text-3xl text-strata-white mb-4">Experience</h2>
+            <p className="text-strata-silver/70">A decade of building and scaling products</p>
+          </div>
+
+          {/* Timeline Legend */}
+          <div className="flex flex-wrap justify-center gap-4 mb-10">
+            {[
+              { type: "leadership", label: "Leadership", icon: Briefcase },
+              { type: "founder", label: "Founder", icon: Rocket },
+              { type: "growth", label: "Growth", icon: TrendingUp }
+            ].map((item) => (
+              <div key={item.type} className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded-full bg-${getTypeColor(item.type)}`} />
+                <span className="text-sm text-strata-silver">{item.label}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Timeline */}
+          <div className="relative">
+            {/* Vertical line */}
+            <div className="absolute left-6 md:left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 via-strata-orange to-strata-cyan" />
+            
+            <div className="space-y-6">
+              {experiences.map((exp, index) => {
+                const TypeIcon = getTypeIcon(exp.type);
+                const isExpanded = expandedExp === index;
+                const colorClass = getTypeColor(exp.type);
+                
+                return (
+                  <div key={index} className="relative pl-16 md:pl-20">
+                    {/* Timeline dot */}
+                    <div className={`absolute left-4 md:left-6 w-4 h-4 rounded-full bg-${colorClass} border-4 border-background`} />
+                    
+                    <Card 
+                      className={`bg-strata-charcoal/50 border-strata-steel/20 hover:border-${colorClass}/30 transition-all cursor-pointer`}
+                      onClick={() => setExpandedExp(isExpanded ? null : index)}
+                    >
+                      <CardHeader className="pb-2">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Badge 
+                                className={`bg-${colorClass}/20 text-${colorClass} border-0 text-[10px]`}
+                              >
+                                <TypeIcon className="w-3 h-3 mr-1" />
+                                {exp.type.charAt(0).toUpperCase() + exp.type.slice(1)}
+                              </Badge>
+                              <span className="text-xs font-mono text-strata-silver/50 flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                {exp.period}
+                              </span>
+                            </div>
+                            <CardTitle className="text-strata-white text-lg leading-snug">
+                              {exp.title}
+                            </CardTitle>
+                            <p className={`text-${colorClass} font-medium text-sm mt-1`}>{exp.company}</p>
+                          </div>
+                          <button 
+                            className="p-2 hover:bg-strata-steel/20 rounded-lg transition-colors"
+                            aria-label={isExpanded ? "Collapse" : "Expand"}
+                          >
+                            {isExpanded ? (
+                              <ChevronUp className="w-5 h-5 text-strata-silver" />
+                            ) : (
+                              <ChevronDown className="w-5 h-5 text-strata-silver" />
+                            )}
+                          </button>
+                        </div>
+                      </CardHeader>
+                      
+                      <CardContent>
+                        <p className="text-strata-silver/80 text-sm mb-3">{exp.description}</p>
+                        
+                        {isExpanded && (
+                          <ul className="space-y-2 mt-4 pt-4 border-t border-strata-steel/20">
+                            {exp.highlights.map((highlight, i) => (
+                              <li key={i} className="flex items-start gap-2 text-sm text-strata-silver/70">
+                                <Zap className={`w-4 h-4 text-${colorClass} mt-0.5 shrink-0`} />
+                                <span>{highlight}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
@@ -167,53 +417,33 @@ const Portfolio = () => {
       <section className="py-20 px-4 bg-strata-charcoal/30">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="font-instrument text-3xl text-strata-white mb-4">Technical Skills</h2>
-            <p className="text-strata-silver/70">Technologies and tools I work with</p>
+            <h2 className="font-instrument text-3xl text-strata-white mb-4">Skills & Expertise</h2>
+            <p className="text-strata-silver/70">Capabilities honed across product, growth, and technical domains</p>
           </div>
 
-          {/* Category Filter */}
-          <div className="flex flex-wrap justify-center gap-2 mb-10">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  activeCategory === category
-                    ? "bg-purple-600 text-white"
-                    : "bg-strata-steel/20 text-strata-silver hover:bg-strata-steel/40 hover:text-strata-white"
-                }`}
-              >
-                {category.charAt(0).toUpperCase() + category.slice(1)}
-              </button>
-            ))}
-          </div>
-
-          {/* Skills Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {filteredSkills.map((skill) => (
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {skillCategories.map((category) => (
               <Card 
-                key={skill.name} 
-                className="bg-strata-black/50 border-strata-steel/20 hover:border-purple-500/30 transition-all group"
+                key={category.title} 
+                className="bg-strata-black/50 border-strata-steel/20 hover:border-purple-500/30 transition-all"
               >
-                <CardContent className="p-5">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 rounded-lg bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors">
-                      <skill.icon className="w-5 h-5 text-purple-400" />
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-purple-500/10">
+                      <category.icon className="w-5 h-5 text-purple-400" />
                     </div>
-                    <span className="font-semibold text-strata-white">{skill.name}</span>
+                    <CardTitle className="text-strata-white text-base">{category.title}</CardTitle>
                   </div>
-                  <div className="relative h-2 bg-strata-steel/20 rounded-full overflow-hidden">
-                    <div 
-                      className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-500 to-strata-orange rounded-full transition-all duration-700"
-                      style={{ width: `${skill.level}%` }}
-                    />
-                  </div>
-                  <div className="flex justify-between items-center mt-2">
-                    <span className="text-[10px] font-mono uppercase text-strata-silver/50">
-                      {skill.category}
-                    </span>
-                    <span className="text-xs font-mono text-purple-400">{skill.level}%</span>
-                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {category.skills.map((skill, i) => (
+                      <li key={i} className="text-sm text-strata-silver/70 flex items-start gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-2 shrink-0" />
+                        {skill}
+                      </li>
+                    ))}
+                  </ul>
                 </CardContent>
               </Card>
             ))}
@@ -221,21 +451,46 @@ const Portfolio = () => {
         </div>
       </section>
 
+      {/* Education */}
+      <section className="py-16 px-4">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="font-instrument text-2xl text-strata-white mb-2">Education</h2>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row justify-center gap-6">
+            {education.map((edu) => (
+              <div 
+                key={edu.school}
+                className="flex items-center gap-4 p-5 rounded-xl bg-strata-charcoal/30 border border-strata-steel/20"
+              >
+                <div className="p-3 rounded-xl bg-strata-orange/10">
+                  <GraduationCap className="w-6 h-6 text-strata-orange" />
+                </div>
+                <div>
+                  <div className="font-semibold text-strata-white">{edu.degree}</div>
+                  <div className="text-sm text-strata-silver/70">{edu.school}</div>
+                  <div className="text-xs font-mono text-strata-silver/50">{edu.year}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Projects Section */}
-      <section id="projects" className="py-20 px-4">
+      <section id="projects" className="py-20 px-4 bg-gradient-to-b from-transparent via-purple-900/10 to-transparent">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="font-instrument text-3xl text-strata-white mb-4">Featured Projects</h2>
-            <p className="text-strata-silver/70">A selection of work I'm proud of</p>
+            <h2 className="font-instrument text-3xl text-strata-white mb-4">Recent Projects</h2>
+            <p className="text-strata-silver/70">Building with modern tools</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             {projects.map((project) => (
               <Card 
                 key={project.title}
-                className={`bg-strata-charcoal/50 border-strata-steel/20 hover:border-purple-500/30 transition-all group ${
-                  project.featured ? "md:col-span-1" : ""
-                }`}
+                className="bg-strata-charcoal/50 border-strata-steel/20 hover:border-purple-500/30 transition-all group"
               >
                 <CardHeader>
                   <div className="flex items-start justify-between">
@@ -304,43 +559,22 @@ const Portfolio = () => {
         </div>
       </section>
 
-      {/* Values Section */}
-      <section className="py-20 px-4 bg-gradient-to-b from-transparent via-purple-900/10 to-transparent">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="font-instrument text-3xl text-strata-white mb-4">How I Work</h2>
-            <p className="text-strata-silver/70">Principles that guide my engineering decisions</p>
-          </div>
-
-          <div className="grid sm:grid-cols-3 gap-6">
-            {[
-              {
-                icon: Zap,
-                title: "Performance First",
-                description: "Every millisecond matters. I optimize for speed, efficiency, and seamless user experiences."
-              },
-              {
-                icon: Shield,
-                title: "Security Minded",
-                description: "Building secure systems from the ground up, not as an afterthought. Defense in depth."
-              },
-              {
-                icon: Layers,
-                title: "Clean Architecture",
-                description: "Maintainable, testable code that scales. SOLID principles and pragmatic abstractions."
-              },
-            ].map((value) => (
-              <div 
-                key={value.title}
-                className="p-6 rounded-xl bg-strata-charcoal/30 border border-strata-steel/20 hover:border-purple-500/30 transition-all text-center group"
-              >
-                <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
-                  <value.icon className="w-7 h-7 text-purple-400" />
-                </div>
-                <h3 className="font-instrument text-lg text-strata-white mb-2">{value.title}</h3>
-                <p className="text-sm text-strata-silver/70 leading-relaxed">{value.description}</p>
+      {/* Patent Highlight */}
+      <section className="py-12 px-4">
+        <div className="max-w-3xl mx-auto">
+          <div className="p-6 rounded-xl bg-gradient-to-r from-strata-orange/10 to-purple-500/10 border border-strata-orange/20">
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-xl bg-strata-orange/20">
+                <Award className="w-6 h-6 text-strata-orange" />
               </div>
-            ))}
+              <div>
+                <h3 className="font-instrument text-lg text-strata-white mb-1">Patent Holder</h3>
+                <p className="text-strata-silver/70 text-sm mb-2">
+                  Co-authored patent for exit-intent detection technology
+                </p>
+                <code className="text-xs font-mono text-strata-orange/80">US10082945B2</code>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -352,15 +586,15 @@ const Portfolio = () => {
             Let's Build Something Together
           </h2>
           <p className="text-strata-silver/70 mb-8">
-            I'm always interested in hearing about new opportunities, interesting projects, 
-            or just connecting with fellow engineers.
+            I'm always interested in hearing about new opportunities, interesting ventures, 
+            or connecting with fellow builders.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button 
               className="bg-purple-600 hover:bg-purple-500 text-white font-instrument tracking-wider"
               asChild
             >
-              <a href="mailto:hello@example.com">
+              <a href="mailto:bentzirubin@gmail.com">
                 <Mail className="w-4 h-4 mr-2" />
                 Send an Email
               </a>
@@ -387,22 +621,20 @@ const Portfolio = () => {
           </p>
           <div className="flex gap-4">
             <a 
-              href="https://github.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-strata-silver/50 hover:text-strata-white transition-colors"
-              aria-label="GitHub"
-            >
-              <Github className="w-4 h-4" />
-            </a>
-            <a 
-              href="https://linkedin.com" 
+              href="https://linkedin.com/in/bentzig" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-strata-silver/50 hover:text-strata-white transition-colors"
               aria-label="LinkedIn"
             >
               <Linkedin className="w-4 h-4" />
+            </a>
+            <a 
+              href="mailto:bentzirubin@gmail.com"
+              className="text-strata-silver/50 hover:text-strata-white transition-colors"
+              aria-label="Email"
+            >
+              <Mail className="w-4 h-4" />
             </a>
           </div>
         </div>
