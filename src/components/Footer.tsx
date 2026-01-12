@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { 
-  Shield, 
   Gauge, 
   Plane, 
   Anchor, 
@@ -11,6 +10,7 @@ import {
   Phone,
   MapPin
 } from "lucide-react";
+import lavandarLogo from "@/assets/lavandar-logo.png";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -54,13 +54,13 @@ const Footer = () => {
             </p>
             
             {/* Lavandar AI Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-patriots-navy/30 border border-patriots-silver/20">
-              <Shield className="w-4 h-4 text-patriots-silver" />
+            <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-purple-950/30 border border-purple-400/20">
+              <img src={lavandarLogo} alt="Lavandar AI" className="w-8 h-8 rounded" />
               <div>
-                <div className="text-[10px] font-mono text-patriots-silver/60 uppercase tracking-wider">
+                <div className="text-[10px] font-mono text-purple-300/60 uppercase tracking-wider">
                   Powered by
                 </div>
-                <div className="text-sm font-semibold text-patriots-white">
+                <div className="text-sm font-semibold text-purple-200">
                   Lavandar AI
                 </div>
               </div>
