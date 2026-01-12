@@ -344,7 +344,7 @@ export const SiteMapPage = () => {
 
         <footer className="mt-12 pt-6 border-t border-strata-steel/20 text-center">
           <p className="text-sm text-strata-silver/60">
-            STRATA Weather Intelligence Platform • Kraft Group
+            STRATA Weather Intelligence Platform • Lavandar AI
           </p>
         </footer>
       </div>

@@ -156,7 +156,7 @@ export default function PatriotsEvaluation() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-red-500 font-mono text-lg md:text-xl font-bold tracking-wider">
-              CLASSIFIED - KRAFT GROUP INTERNAL
+              CLASSIFIED - LAVANDAR AI INTERNAL
             </h1>
             <div className="flex items-center gap-2 mt-2 text-slate-400">
               <Lock className="w-4 h-4" />
@@ -436,7 +436,7 @@ export default function PatriotsEvaluation() {
       {/* Footer */}
       <div className="mx-4 mb-4 p-4 bg-slate-900/50 border border-slate-800 rounded-lg text-center">
         <p className="text-slate-500 font-mono text-xs">
-          KRAFT GROUP ENTERPRISES • PROPRIETARY GAME INTELLIGENCE SYSTEM
+          LAVANDAR AI ENTERPRISES • PROPRIETARY GAME INTELLIGENCE SYSTEM
         </p>
         <p className="text-slate-600 font-mono text-xs mt-1">
           Document Classification: INTERNAL USE ONLY • {documentId}

@@ -53,7 +53,7 @@ const Footer = () => {
               Precision atmospheric monitoring delivering time-critical weather intelligence through a professional instrument aesthetic.
             </p>
             
-            {/* Kraft Group Badge */}
+            {/* Lavandar AI Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-patriots-navy/30 border border-patriots-silver/20">
               <Shield className="w-4 h-4 text-patriots-silver" />
               <div>
@@ -61,7 +61,7 @@ const Footer = () => {
                   Powered by
                 </div>
                 <div className="text-sm font-semibold text-patriots-white">
-                  Kraft Group
+                  Lavandar AI
                 </div>
               </div>
             </div>
@@ -140,10 +140,10 @@ const Footer = () => {
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-strata-silver/60 shrink-0" />
                 <a 
-                  href="mailto:strata@kraftgroup.com" 
+                  href="mailto:admin@lavandar.ai" 
                   className="text-sm text-strata-silver hover:text-strata-white transition-colors"
                 >
-                  strata@kraftgroup.com
+                  admin@lavandar.ai
                 </a>
               </li>
             </ul>
@@ -191,7 +191,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-strata-steel/20">
           <div className="flex items-center gap-6 text-[10px] font-mono text-strata-silver/50 uppercase tracking-wider">
-            <span>© {currentYear} Kraft Group</span>
+            <span>© {currentYear} Lavandar AI</span>
             <span className="hidden sm:inline">•</span>
             <a href="#" className="hover:text-strata-silver transition-colors">Privacy Policy</a>
             <span className="hidden sm:inline">•</span>
