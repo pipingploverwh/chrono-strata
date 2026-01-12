@@ -28,6 +28,8 @@ import KraftHarmony from "./pages/KraftHarmony";
 import KraftCaseStudy from "./pages/KraftCaseStudy";
 import ZeroLemonMobile from "./pages/ZeroLemonMobile";
 import StrataCoordinator from "./pages/StrataCoordinator";
+import Auth from "./pages/Auth";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -68,6 +70,8 @@ const App = () => (
                 <Route path="/case-study/kraft" element={<KraftCaseStudy />} />
                 <Route path="/zero-lemon" element={<ZeroLemonMobile />} />
                 <Route path="/coordinator" element={<StrataCoordinator />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/sitemap" element={<SiteMapPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
