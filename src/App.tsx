@@ -7,6 +7,7 @@ import GlobalWeatherProvider from "@/components/GlobalWeatherProvider";
 import { SiteNavigation, SiteMapPage } from "@/components/SiteNavigation";
 import SkipLinks from "@/components/SkipLinks";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 import AcquisitionPitch from "./pages/AcquisitionPitch";
 import LavandarHome from "./pages/LavandarHome";
 import Index from "./pages/Index";
@@ -25,6 +26,7 @@ import SecurityTestSuite from "./pages/SecurityTestSuite";
 import Portfolio from "./pages/Portfolio";
 import KraftHarmony from "./pages/KraftHarmony";
 import KraftCaseStudy from "./pages/KraftCaseStudy";
+import ZeroLemonMobile from "./pages/ZeroLemonMobile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +38,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <GlobalWeatherProvider>
+          {/* Smooth scroll to top on route changes */}
+          <ScrollToTop />
+          
           {/* Skip Links for Accessibility */}
           <SkipLinks />
           
@@ -60,6 +65,7 @@ const App = () => (
                 <Route path="/portfolio" element={<Portfolio />} />
                 <Route path="/kraft-harmony" element={<KraftHarmony />} />
                 <Route path="/case-study/kraft" element={<KraftCaseStudy />} />
+                <Route path="/zero-lemon" element={<ZeroLemonMobile />} />
                 <Route path="/sitemap" element={<SiteMapPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
