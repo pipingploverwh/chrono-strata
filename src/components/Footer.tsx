@@ -181,8 +181,8 @@ const Footer = () => {
             </div>
             <p className="text-[11px] text-strata-silver/50 mt-4">
               If you encounter any accessibility barriers, please contact us at{" "}
-              <a href="mailto:accessibility@kraftgroup.com" className="text-strata-orange hover:underline">
-                accessibility@kraftgroup.com
+              <a href="mailto:admin@lavandar.ai" className="text-strata-orange hover:underline">
+                admin@lavandar.ai
               </a>
             </p>
           </div>
