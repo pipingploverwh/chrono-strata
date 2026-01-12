@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Navigation, Loader2, ChevronRight } from "lucide-react";
+import ZeroLemonCard from "@/components/ZeroLemonAnalysis";
 
 const locations = [
   { name: "Foxborough, MA", coords: "42.09°N, 71.26°W", country: "USA" },
@@ -233,6 +234,11 @@ const LandingPage = () => {
             <span className="w-1 h-1 rounded-full bg-strata-lume" />
             <span>Data Link Active</span>
           </div>
+        </div>
+
+        {/* Zero Lemon Halftime Analysis Card */}
+        <div className="mt-8 flex justify-center">
+          <ZeroLemonCard />
         </div>
       </div>
 
