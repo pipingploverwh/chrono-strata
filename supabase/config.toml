@@ -1,1 +1,19 @@
 project_id = "gcujdymsfxsyejfkvroq"
+
+[functions.ai-harmony]
+verify_jwt = false
+
+[functions.kraft-harmony]
+verify_jwt = false
+
+[functions.game-predictions]
+verify_jwt = false
+
+[functions.get-weather]
+verify_jwt = false
+
+[functions.noaa-marine]
+verify_jwt = false
+
+[functions.send-recruiter-notification]
+verify_jwt = false

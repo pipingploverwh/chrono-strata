@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Gauge, Droplets, Wind, CloudRain, Sun, Eye, Cloud, Activity, ScrollText, ArrowRight } from "lucide-react";
+import { Gauge, Droplets, Wind, CloudRain, Sun, Eye, Cloud, Activity, ScrollText, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import WatchDial from "./WatchDial";
 import MetricPod from "./MetricPod";
@@ -169,13 +169,23 @@ const StrataInstrument = () => {
                 events, and operational requirements.
               </p>
             </div>
-            <Button 
-              onClick={() => navigate("/recruiter-outreach")}
-              className="bg-red-600 hover:bg-red-700 text-white text-xs tracking-[0.2em] uppercase px-8 py-6 rounded-none group whitespace-nowrap"
-            >
-              Get Started
-              <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" />
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button 
+                onClick={() => navigate("/kraft-harmony")}
+                variant="outline"
+                className="border-red-600/50 text-red-500 hover:bg-red-600/10 text-xs tracking-[0.2em] uppercase px-6 py-6 rounded-none group whitespace-nowrap"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                AI Harmony
+              </Button>
+              <Button 
+                onClick={() => navigate("/recruiter-outreach")}
+                className="bg-red-600 hover:bg-red-700 text-white text-xs tracking-[0.2em] uppercase px-8 py-6 rounded-none group whitespace-nowrap"
+              >
+                Get Started
+                <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </div>
           </div>
         </div>
 
