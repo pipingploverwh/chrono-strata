@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { MapPin, Navigation, Loader2, ChevronRight } from "lucide-react";
 
 const locations = [
-  { name: "Falmouth, MA", coords: "41.65°N, 70.52°W", country: "USA" },
-  { name: "Tel Aviv", coords: "32.08°N, 34.78°E", country: "Israel" },
-  { name: "Reykjavik", coords: "64.15°N, 21.94°W", country: "Iceland" },
-  { name: "Tokyo", coords: "35.68°N, 139.69°E", country: "Japan" },
-  { name: "Sydney", coords: "33.87°S, 151.21°E", country: "Australia" },
+  { name: "Foxborough, MA", coords: "42.09°N, 71.26°W", country: "USA" },
+  { name: "Woods Hole, MA", coords: "41.52°N, 70.67°W", country: "USA" },
+  { name: "Falmouth, MA", coords: "41.55°N, 70.61°W", country: "USA" },
+  { name: "Boston, MA", coords: "42.36°N, 71.06°W", country: "USA" },
+  { name: "Provincetown, MA", coords: "42.05°N, 70.19°W", country: "USA" },
 ];
 
 const LandingPage = () => {
