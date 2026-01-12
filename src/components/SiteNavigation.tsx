@@ -18,7 +18,8 @@ import {
   ExternalLink,
   Keyboard,
   Mail,
-  ShieldCheck
+  ShieldCheck,
+  User
 } from "lucide-react";
 import {
   Sheet,
@@ -123,6 +124,13 @@ const navItems: NavItem[] = [
     label: "Security Test Suite", 
     description: "AI Security & Compliance Dashboard",
     icon: ShieldCheck,
+    category: "tools"
+  },
+  { 
+    path: "/portfolio", 
+    label: "Portfolio", 
+    description: "Projects & Skills Showcase",
+    icon: User,
     category: "tools"
   },
   // System
