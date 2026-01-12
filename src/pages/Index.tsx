@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { 
   ChevronRight, ArrowRight, Anchor, Wind, Waves, 
   Shield, Zap, Globe, BarChart3, Cloud, Ship,
-  Building2, Plane, CalendarDays, Check, Loader2
+  Building2, Plane, CalendarDays, Check, Loader2,
+  Ticket, Brain, Users, Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -245,6 +246,133 @@ const LandingPage = () => {
                 <p className="text-sm text-neutral-500 leading-relaxed">{feature.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Fan Experience Section */}
+      <section id="fan-experience" className="py-32 bg-neutral-900 relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-bl from-red-900/20 to-transparent rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gradient-to-tr from-red-950/30 to-transparent rounded-full blur-3xl" />
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-20">
+            <div className="text-xs tracking-[0.3em] uppercase text-red-500 mb-4">Fan Experience Intelligence</div>
+            <h2 className="text-4xl md:text-5xl font-extralight leading-tight mb-6 text-white">
+              Transform every
+              <span className="text-red-500"> touchpoint</span>
+            </h2>
+            <p className="text-lg text-neutral-400 font-light">
+              AI-powered fan experience optimization that drives 25% increase in per-fan spend 
+              and 40% faster response times.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Frictionless Monetization */}
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-red-600/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative p-10 bg-neutral-800/50 backdrop-blur border border-neutral-700 hover:border-red-600/50 rounded-2xl transition-all duration-500">
+                <div className="w-14 h-14 bg-red-600/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-red-600/20 transition-colors">
+                  <Ticket className="w-7 h-7 text-red-500" />
+                </div>
+                <h3 className="text-2xl font-light text-white mb-4">Frictionless Monetization</h3>
+                <p className="text-neutral-400 leading-relaxed mb-6">
+                  Ticketless entry and seamless payment systems that eliminate friction 
+                  from wayfinding to checkout.
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-3 text-sm text-neutral-300">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                    Mobile-first ticketless entry
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-300">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                    Integrated wayfinding navigation
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-300">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                    Tap-to-pay everywhere
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Predictive Personalization */}
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-red-600/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative p-10 bg-neutral-800/50 backdrop-blur border border-neutral-700 hover:border-red-600/50 rounded-2xl transition-all duration-500">
+                <div className="w-14 h-14 bg-red-600/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-red-600/20 transition-colors">
+                  <Brain className="w-7 h-7 text-red-500" />
+                </div>
+                <h3 className="text-2xl font-light text-white mb-4">Predictive Personalization</h3>
+                <p className="text-neutral-400 leading-relaxed mb-6">
+                  ML-driven hyper-personalized offers based on behavior patterns, 
+                  betting activity, and retail history.
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-3 text-sm text-neutral-300">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                    Real-time behavior analysis
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-300">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                    Dynamic offer optimization
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-300">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                    Cross-property insights
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Crowd Sentiment */}
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-red-600/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative p-10 bg-neutral-800/50 backdrop-blur border border-neutral-700 hover:border-red-600/50 rounded-2xl transition-all duration-500">
+                <div className="w-14 h-14 bg-red-600/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-red-600/20 transition-colors">
+                  <Users className="w-7 h-7 text-red-500" />
+                </div>
+                <h3 className="text-2xl font-light text-white mb-4">Crowd Sentiment</h3>
+                <p className="text-neutral-400 leading-relaxed mb-6">
+                  Real-time crowd intelligence for experience optimization 
+                  and proactive guest services.
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-3 text-sm text-neutral-300">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                    Live sentiment monitoring
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-300">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                    Predictive crowd flow
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-neutral-300">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                    40% faster response time
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Impact Metrics */}
+          <div className="mt-20 grid grid-cols-3 gap-8 max-w-3xl mx-auto">
+            <div className="text-center">
+              <div className="text-4xl md:text-5xl font-extralight text-red-500 mb-2">25%</div>
+              <div className="text-xs tracking-[0.2em] uppercase text-neutral-500">Spend Increase</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl md:text-5xl font-extralight text-red-500 mb-2">40%</div>
+              <div className="text-xs tracking-[0.2em] uppercase text-neutral-500">Faster Response</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl md:text-5xl font-extralight text-red-500 mb-2">3x</div>
+              <div className="text-xs tracking-[0.2em] uppercase text-neutral-500">Fan Engagement</div>
+            </div>
           </div>
         </div>
       </section>
