@@ -100,7 +100,6 @@ const LavandarHome = () => {
             </div>
             <div className="hidden md:flex items-center gap-8">
               <Link to="/strata" className="text-sm text-neutral-400 hover:text-white transition-colors">STRATA</Link>
-              <Link to="/ai-harmony" className="text-sm text-neutral-400 hover:text-white transition-colors">AI Harmony</Link>
               <Link to="/alpha-os" className="text-sm text-neutral-400 hover:text-white transition-colors">Operations</Link>
               <Button 
                 onClick={() => navigate("/recruiter-outreach")}
@@ -147,13 +146,13 @@ const LavandarHome = () => {
                 <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button 
-                onClick={() => navigate("/ai-harmony")}
+                onClick={() => navigate("/case-study/kraft")}
                 size="lg"
                 variant="outline"
                 className="border-purple-500/50 text-purple-400 hover:bg-purple-500/10 text-sm tracking-wider uppercase px-8 py-6 rounded-none group"
               >
-                <Sparkles className="w-5 h-5 mr-3" />
-                AI Harmony
+                <Building2 className="w-5 h-5 mr-3" />
+                Case Study
               </Button>
             </div>
           </div>
