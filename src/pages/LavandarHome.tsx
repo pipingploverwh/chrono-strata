@@ -75,7 +75,7 @@ const LavandarHome = () => {
   const capabilities = [
     { icon: Zap, title: "Real-Time Intelligence", desc: "Sub-second data processing for critical decisions" },
     { icon: Globe, title: "Global Coverage", desc: "Worldwide weather data from trusted sources" },
-    { icon: Shield, title: "Enterprise Security", desc: "SOC 2 compliant infrastructure" },
+    { icon: Shield, title: "Secure Architecture", desc: "Built with security-first principles" },
     { icon: Users, title: "Multi-Property", desc: "Unified analytics across portfolios" },
   ];
 
@@ -239,7 +239,7 @@ const LavandarHome = () => {
               Ready to Transform Your Operations?
             </h2>
             <p className="text-neutral-400 mb-8">
-              Join industry leaders using Lavandar to make smarter, faster decisions.
+              See how weather intelligence can power smarter, faster decisions.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button 
