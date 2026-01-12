@@ -27,6 +27,7 @@ import Portfolio from "./pages/Portfolio";
 import KraftHarmony from "./pages/KraftHarmony";
 import KraftCaseStudy from "./pages/KraftCaseStudy";
 import ZeroLemonMobile from "./pages/ZeroLemonMobile";
+import StrataCoordinator from "./pages/StrataCoordinator";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -66,6 +67,7 @@ const App = () => (
                 <Route path="/kraft-harmony" element={<KraftHarmony />} />
                 <Route path="/case-study/kraft" element={<KraftCaseStudy />} />
                 <Route path="/zero-lemon" element={<ZeroLemonMobile />} />
+                <Route path="/coordinator" element={<StrataCoordinator />} />
                 <Route path="/sitemap" element={<SiteMapPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
