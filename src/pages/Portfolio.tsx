@@ -179,6 +179,11 @@ const Portfolio = () => {
       skills: ["Product Discovery & Feasibility Testing", "Backlog Ownership & Roadmap Prioritization", "Rapid Experimentation & Data-Driven Decision Making"]
     },
     {
+      title: "E-Commerce",
+      icon: TrendingUp,
+      skills: ["DTC Revenue Optimization", "Checkout & Fulfillment", "Pricing & AOV Strategy", "CRO & Conversion Funnels", "Customer Acquisition & Retention"]
+    },
+    {
       title: "Technical",
       icon: Code2,
       skills: ["Analytics, SQL, Python", "Experimentation Platforms", "AI-Enabled Product Development", "Deep Learning Agentic Building"]
@@ -189,9 +194,9 @@ const Portfolio = () => {
       skills: ["User Research (Qualitative & Quantitative)", "Customer Discovery", "Market Validation"]
     },
     {
-      title: "Unique",
+      title: "Range",
       icon: Compass,
-      skills: ["Paramedic", "Outdoor Wilderness Survival", "Celestial Navigation", "Astrophysics"]
+      skills: ["Paramedic", "Paratrooper", "Camouflage", "Outdoor Wilderness Survival", "Celestial Navigation", "Astrophysics"]
     }
   ];
 
