@@ -26,6 +26,7 @@ import SecurityTestSuite from "./pages/SecurityTestSuite";
 import Portfolio from "./pages/Portfolio";
 import AIHarmony from "./pages/AIHarmony";
 import KraftHarmony from "./pages/KraftHarmony";
+import KraftCaseStudy from "./pages/KraftCaseStudy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -61,6 +62,7 @@ const App = () => (
                 <Route path="/portfolio" element={<Portfolio />} />
                 <Route path="/ai-harmony" element={<AIHarmony />} />
                 <Route path="/kraft-harmony" element={<KraftHarmony />} />
+                <Route path="/case-study/kraft" element={<KraftCaseStudy />} />
                 <Route path="/sitemap" element={<SiteMapPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
