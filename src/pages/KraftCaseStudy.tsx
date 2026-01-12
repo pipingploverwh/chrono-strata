@@ -74,14 +74,14 @@ const KraftCaseStudy = () => {
             </span>
           </div>
           
-          <h1 className="text-4xl md:text-6xl font-light text-white mb-6 leading-tight">LAVANDAR TECH
-at Gillette Stadium & Surrounding Areas<br />
-            <span className="text-red-500">New England Patriots</span>
+          <h1 className="text-4xl md:text-6xl font-light text-white mb-6 leading-tight">
+            LAVANDAR TECH<br />
+            <span className="text-red-500">NFL Stadium Deployment</span>
           </h1>
           
           <p className="text-xl text-neutral-400 max-w-2xl mb-12">
             How STRATA Weather Intelligence revolutionized game day operations, 
-            fan experience, and operational efficiency at Gillette Stadium.
+            fan experience, and operational efficiency at a premier NFL venue.
           </p>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -110,8 +110,8 @@ at Gillette Stadium & Surrounding Areas<br />
             </h2>
             <div className="space-y-4 text-neutral-600">
               <p>
-                Gillette Stadium, home to the New England Patriots, hosts over 1 million visitors annually. 
-                New England's notoriously unpredictable weather presents unique operational challenges—from 
+                This premier NFL stadium hosts over 1 million visitors annually. 
+                The region's notoriously unpredictable weather presents unique operational challenges—from 
                 sudden temperature drops to lake-effect precipitation.
               </p>
               <p>
@@ -120,7 +120,7 @@ at Gillette Stadium & Surrounding Areas<br />
                 decisions must be made in real-time.
               </p>
               <p>
-                LAVANDAR TECH sought to build a solution that could transform weather from a liability 
+                LAVANDAR TECH built a solution that could transform weather from a liability 
                 into a strategic advantage for fan experience and operational efficiency.
               </p>
             </div>
@@ -129,7 +129,7 @@ at Gillette Stadium & Surrounding Areas<br />
           <div className="bg-neutral-900 rounded-2xl p-8 space-y-6">
             <h3 className="text-lg font-medium text-white">Key Challenges</h3>
             <div className="space-y-4">
-              {["Unpredictable New England weather patterns", "68,000+ seat capacity requiring proactive management", "Real-time decision-making for roof and field operations", "Fan comfort and safety during extreme conditions", "Inventory and staffing optimization based on conditions"].map((challenge, i) => <div key={i} className="flex items-start gap-3 text-neutral-400">
+              {["Unpredictable regional weather patterns", "68,000+ seat capacity requiring proactive management", "Real-time decision-making for roof and field operations", "Fan comfort and safety during extreme conditions", "Inventory and staffing optimization based on conditions"].map((challenge, i) => <div key={i} className="flex items-start gap-3 text-neutral-400">
                   <Wind className="w-4 h-4 text-red-500 mt-1 flex-shrink-0" />
                   <span className="text-sm">{challenge}</span>
                 </div>)}
