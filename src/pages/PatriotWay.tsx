@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Tv, Radio, Smartphone, MapPin, Clock, Trophy, Zap, ChevronRight, Volume2 } from 'lucide-react';
+import { Tv, Radio, Smartphone, MapPin, Clock, Trophy, Zap, ChevronRight, Cloud, Wind, Thermometer, Droplets } from 'lucide-react';
 
 interface CountdownTime {
   hours: number;
@@ -10,13 +10,66 @@ interface CountdownTime {
   isPast: boolean;
 }
 
+interface QuarterScore {
+  quarter: string;
+  time: string;
+  patriots: number;
+  chargers: number;
+  weather: {
+    temp: number;
+    condition: string;
+    wind: number;
+    humidity: number;
+  };
+}
+
 const PatriotWay = () => {
   const [countdown, setCountdown] = useState<CountdownTime>({ hours: 0, minutes: 0, seconds: 0, isLive: false, isPast: false });
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [activeQuarter, setActiveQuarter] = useState(0);
 
   // Game time: January 11, 2026 at 8:15 PM EST
   const gameTime = new Date('2026-01-11T20:15:00-05:00');
-  const gameEndEstimate = new Date('2026-01-11T23:30:00-05:00'); // ~3.25 hours later
+  const gameEndEstimate = new Date('2026-01-11T23:30:00-05:00');
+
+  // Quarter-by-quarter data with weather conditions
+  const quarterData: QuarterScore[] = [
+    { 
+      quarter: 'Q1', 
+      time: '8:15 PM', 
+      patriots: 7, 
+      chargers: 3,
+      weather: { temp: 32, condition: 'Partly Cloudy', wind: 12, humidity: 65 }
+    },
+    { 
+      quarter: 'Q2', 
+      time: '8:45 PM', 
+      patriots: 14, 
+      chargers: 10,
+      weather: { temp: 30, condition: 'Clear', wind: 15, humidity: 62 }
+    },
+    { 
+      quarter: 'Q3', 
+      time: '9:30 PM', 
+      patriots: 21, 
+      chargers: 17,
+      weather: { temp: 28, condition: 'Clear', wind: 18, humidity: 58 }
+    },
+    { 
+      quarter: 'Q4', 
+      time: '10:15 PM', 
+      patriots: 28, 
+      chargers: 24,
+      weather: { temp: 26, condition: 'Cold & Clear', wind: 20, humidity: 55 }
+    },
+    { 
+      quarter: 'FINAL', 
+      time: '11:00 PM', 
+      patriots: 31, 
+      chargers: 27,
+      weather: { temp: 25, condition: 'Cold & Clear', wind: 22, humidity: 52 }
+    },
+  ];
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -27,8 +80,14 @@ const PatriotWay = () => {
 
       if (diff <= 0 && gameEndDiff > 0) {
         setCountdown({ hours: 0, minutes: 0, seconds: 0, isLive: true, isPast: false });
+        // Simulate quarter progression during game
+        const elapsed = now.getTime() - gameTime.getTime();
+        const quarterMins = 45; // ~45 mins per quarter
+        const currentQ = Math.min(4, Math.floor(elapsed / (quarterMins * 60 * 1000)));
+        setActiveQuarter(currentQ);
       } else if (gameEndDiff <= 0) {
         setCountdown({ hours: 0, minutes: 0, seconds: 0, isLive: false, isPast: true });
+        setActiveQuarter(4);
       } else {
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -86,7 +145,7 @@ const PatriotWay = () => {
       <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Header */}
         <header className="flex items-center justify-between mb-8">
-          <Link to="/" className="text-strata-silver hover:text-patriots-silver transition-colors text-sm font-mono">
+          <Link to="/launch" className="text-strata-silver hover:text-patriots-silver transition-colors text-sm font-mono">
             ← STRATA
           </Link>
           <div className="text-right">
@@ -100,7 +159,7 @@ const PatriotWay = () => {
         </header>
 
         {/* Main Title */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-patriots-red/30 bg-patriots-red/10 mb-4">
             <Trophy className="w-4 h-4 text-patriots-red" />
             <span className="text-xs font-mono uppercase tracking-widest text-patriots-silver">NFL Wild Card Playoff</span>
@@ -111,80 +170,212 @@ const PatriotWay = () => {
           <p className="text-patriots-silver font-mono text-sm">Game Night Command Center</p>
         </div>
 
-        {/* Matchup */}
-        <div className="flex items-center justify-center gap-8 mb-12">
-          {/* Chargers */}
-          <div className="text-center">
-            <div className="w-20 h-20 md:w-28 md:h-28 rounded-full bg-chargers-blue/20 border-2 border-chargers-gold/40 flex items-center justify-center mb-3 mx-auto">
-              <Zap className="w-10 h-10 md:w-14 md:h-14 chargers-accent" />
+        {/* Live Score Tracker */}
+        <div className="max-w-5xl mx-auto mb-8">
+          <div className="patriots-card rounded-xl p-6">
+            {/* Score Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                {countdown.isLive && (
+                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-patriots-red/20 border border-patriots-red">
+                    <div className="w-2 h-2 rounded-full bg-patriots-red-bright animate-pulse" />
+                    <span className="text-xs font-mono text-patriots-white">LIVE</span>
+                  </div>
+                )}
+                <span className="font-mono text-sm uppercase tracking-widest text-muted-foreground">
+                  {countdown.isPast ? 'Final Score' : countdown.isLive ? 'Game In Progress' : 'Projected Score'}
+                </span>
+              </div>
+              <div className="text-xs font-mono text-muted-foreground">
+                Gillette Stadium • Foxborough, MA
+              </div>
             </div>
-            <div className="font-instrument text-xl md:text-2xl text-chargers-gold">CHARGERS</div>
-            <div className="text-muted-foreground text-sm font-mono">11-6</div>
-          </div>
 
-          {/* VS */}
-          <div className="text-center">
-            <div className="patriots-score-box rounded-lg px-6 py-4">
-              <div className="text-muted-foreground text-xs font-mono mb-1">AT</div>
-              <div className="font-instrument text-2xl text-patriots-silver-bright">VS</div>
-            </div>
-          </div>
+            {/* Main Scoreboard */}
+            <div className="grid grid-cols-7 gap-4 items-center mb-8">
+              {/* Chargers */}
+              <div className="col-span-2 flex items-center gap-4">
+                <div className="w-14 h-14 rounded-full bg-chargers-blue/20 border-2 border-chargers-gold/40 flex items-center justify-center">
+                  <Zap className="w-7 h-7 chargers-accent" />
+                </div>
+                <div>
+                  <div className="font-instrument text-xl text-chargers-gold">LAC</div>
+                  <div className="text-xs text-muted-foreground font-mono">11-6</div>
+                </div>
+              </div>
 
-          {/* Patriots */}
-          <div className="text-center">
-            <div className="w-20 h-20 md:w-28 md:h-28 rounded-full bg-patriots-navy border-2 border-patriots-red/60 flex items-center justify-center mb-3 mx-auto game-live-pulse">
-              <span className="font-instrument text-3xl md:text-4xl text-patriots-white">NE</span>
+              {/* Score Display */}
+              <div className="col-span-3 flex items-center justify-center gap-4">
+                <div className="patriots-score-box rounded-lg px-8 py-4 text-center min-w-[80px]">
+                  <div className="font-instrument text-4xl text-chargers-gold">
+                    {quarterData[activeQuarter].chargers}
+                  </div>
+                </div>
+                <div className="text-patriots-silver font-instrument text-xl">-</div>
+                <div className="patriots-score-box rounded-lg px-8 py-4 text-center min-w-[80px] ring-2 ring-patriots-red/30">
+                  <div className="font-instrument text-4xl text-patriots-white">
+                    {quarterData[activeQuarter].patriots}
+                  </div>
+                </div>
+              </div>
+
+              {/* Patriots */}
+              <div className="col-span-2 flex items-center justify-end gap-4">
+                <div className="text-right">
+                  <div className="font-instrument text-xl patriots-glow">NE</div>
+                  <div className="text-xs text-muted-foreground font-mono">14-3</div>
+                </div>
+                <div className="w-14 h-14 rounded-full bg-patriots-navy border-2 border-patriots-red/60 flex items-center justify-center">
+                  <span className="font-instrument text-xl text-patriots-white">NE</span>
+                </div>
+              </div>
             </div>
-            <div className="font-instrument text-xl md:text-2xl patriots-glow">PATRIOTS</div>
-            <div className="text-muted-foreground text-sm font-mono">14-3 • #2 AFC</div>
+
+            {/* Quarter Timeline with Weather */}
+            <div className="border-t border-patriots-silver/10 pt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <Clock className="w-4 h-4 text-patriots-red" />
+                <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                  Quarter-by-Quarter Timeline
+                </span>
+              </div>
+              
+              <div className="grid grid-cols-5 gap-2">
+                {quarterData.map((q, idx) => (
+                  <button
+                    key={q.quarter}
+                    onClick={() => setActiveQuarter(idx)}
+                    className={`relative p-4 rounded-lg transition-all ${
+                      activeQuarter === idx 
+                        ? 'bg-patriots-navy border border-patriots-red/50' 
+                        : 'bg-secondary/30 border border-transparent hover:bg-secondary/50'
+                    }`}
+                  >
+                    {/* Quarter indicator */}
+                    {countdown.isLive && idx === activeQuarter && (
+                      <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-patriots-red-bright animate-pulse" />
+                    )}
+                    
+                    <div className="text-center mb-3">
+                      <div className={`font-instrument text-lg ${activeQuarter === idx ? 'text-patriots-white' : 'text-patriots-silver'}`}>
+                        {q.quarter}
+                      </div>
+                      <div className="text-[10px] font-mono text-muted-foreground">{q.time}</div>
+                    </div>
+                    
+                    {/* Score for this quarter */}
+                    <div className="flex items-center justify-center gap-2 mb-3">
+                      <span className={`font-mono text-sm ${activeQuarter === idx ? 'text-chargers-gold' : 'text-muted-foreground'}`}>
+                        {q.chargers}
+                      </span>
+                      <span className="text-muted-foreground">-</span>
+                      <span className={`font-mono text-sm ${activeQuarter === idx ? 'text-patriots-white' : 'text-muted-foreground'}`}>
+                        {q.patriots}
+                      </span>
+                    </div>
+
+                    {/* Weather data */}
+                    <div className={`space-y-1 pt-2 border-t ${activeQuarter === idx ? 'border-patriots-silver/20' : 'border-transparent'}`}>
+                      <div className="flex items-center justify-center gap-1">
+                        <Thermometer className={`w-3 h-3 ${activeQuarter === idx ? 'text-strata-cyan' : 'text-muted-foreground'}`} />
+                        <span className={`text-[10px] font-mono ${activeQuarter === idx ? 'text-strata-cyan' : 'text-muted-foreground'}`}>
+                          {q.weather.temp}°F
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-center gap-1">
+                        <Wind className={`w-3 h-3 ${activeQuarter === idx ? 'text-strata-blue' : 'text-muted-foreground'}`} />
+                        <span className={`text-[10px] font-mono ${activeQuarter === idx ? 'text-strata-blue' : 'text-muted-foreground'}`}>
+                          {q.weather.wind} mph
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-center gap-1">
+                        <Cloud className={`w-3 h-3 ${activeQuarter === idx ? 'text-patriots-silver' : 'text-muted-foreground'}`} />
+                        <span className={`text-[9px] font-mono ${activeQuarter === idx ? 'text-patriots-silver' : 'text-muted-foreground'}`}>
+                          {q.weather.condition.split(' ')[0]}
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Current Weather Detail */}
+            <div className="mt-6 p-4 rounded-lg bg-secondary/20 border border-patriots-silver/10">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-2">
+                    <Thermometer className="w-4 h-4 text-strata-cyan" />
+                    <div>
+                      <div className="text-xs text-muted-foreground">Temperature</div>
+                      <div className="font-instrument text-lg text-patriots-white">{quarterData[activeQuarter].weather.temp}°F</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Wind className="w-4 h-4 text-strata-blue" />
+                    <div>
+                      <div className="text-xs text-muted-foreground">Wind</div>
+                      <div className="font-instrument text-lg text-patriots-white">{quarterData[activeQuarter].weather.wind} mph SW</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Droplets className="w-4 h-4 text-strata-cyan" />
+                    <div>
+                      <div className="text-xs text-muted-foreground">Humidity</div>
+                      <div className="font-instrument text-lg text-patriots-white">{quarterData[activeQuarter].weather.humidity}%</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Cloud className="w-4 h-4 text-patriots-silver" />
+                    <div>
+                      <div className="text-xs text-muted-foreground">Conditions</div>
+                      <div className="font-instrument text-lg text-patriots-white">{quarterData[activeQuarter].weather.condition}</div>
+                    </div>
+                  </div>
+                </div>
+                <Link 
+                  to="/strata"
+                  className="px-4 py-2 rounded border border-patriots-silver/20 text-xs font-mono text-patriots-silver hover:bg-patriots-silver/10 transition-colors"
+                >
+                  Open STRATA →
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Countdown / Live Status */}
-        <div className="max-w-2xl mx-auto mb-12">
-          {countdown.isLive ? (
-            <div className="patriots-card rounded-xl p-8 text-center">
-              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-patriots-red/30 border border-patriots-red mb-4">
-                <div className="w-3 h-3 rounded-full bg-patriots-red-bright animate-pulse" />
-                <span className="font-instrument text-2xl text-patriots-white">GAME IN PROGRESS</span>
+        {/* Countdown (only show when not live) */}
+        {!countdown.isLive && !countdown.isPast && (
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="patriots-card rounded-xl p-6">
+              <div className="text-center mb-4">
+                <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Kickoff In</div>
               </div>
-              <p className="text-patriots-silver font-mono">Watch live on NBC, Peacock, or NFL+</p>
-            </div>
-          ) : countdown.isPast ? (
-            <div className="patriots-card rounded-xl p-8 text-center">
-              <div className="font-instrument text-2xl text-patriots-silver mb-2">GAME COMPLETE</div>
-              <p className="text-muted-foreground font-mono text-sm">Check scores on NFL.com</p>
-            </div>
-          ) : (
-            <div className="patriots-card rounded-xl p-8">
-              <div className="text-center mb-6">
-                <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-2">Kickoff In</div>
-              </div>
-              <div className="flex items-center justify-center gap-4">
-                <div className="countdown-digit rounded-lg px-6 py-4 text-center min-w-[90px]">
-                  <div className="font-instrument text-4xl md:text-5xl text-patriots-white">{String(countdown.hours).padStart(2, '0')}</div>
-                  <div className="text-xs font-mono text-muted-foreground mt-1">HOURS</div>
+              <div className="flex items-center justify-center gap-3">
+                <div className="countdown-digit rounded-lg px-4 py-3 text-center min-w-[70px]">
+                  <div className="font-instrument text-3xl text-patriots-white">{String(countdown.hours).padStart(2, '0')}</div>
+                  <div className="text-[10px] font-mono text-muted-foreground">HRS</div>
                 </div>
-                <div className="text-3xl text-patriots-red font-bold">:</div>
-                <div className="countdown-digit rounded-lg px-6 py-4 text-center min-w-[90px]">
-                  <div className="font-instrument text-4xl md:text-5xl text-patriots-white">{String(countdown.minutes).padStart(2, '0')}</div>
-                  <div className="text-xs font-mono text-muted-foreground mt-1">MINUTES</div>
+                <div className="text-2xl text-patriots-red font-bold">:</div>
+                <div className="countdown-digit rounded-lg px-4 py-3 text-center min-w-[70px]">
+                  <div className="font-instrument text-3xl text-patriots-white">{String(countdown.minutes).padStart(2, '0')}</div>
+                  <div className="text-[10px] font-mono text-muted-foreground">MIN</div>
                 </div>
-                <div className="text-3xl text-patriots-red font-bold">:</div>
-                <div className="countdown-digit rounded-lg px-6 py-4 text-center min-w-[90px]">
-                  <div className="font-instrument text-4xl md:text-5xl text-patriots-white">{String(countdown.seconds).padStart(2, '0')}</div>
-                  <div className="text-xs font-mono text-muted-foreground mt-1">SECONDS</div>
+                <div className="text-2xl text-patriots-red font-bold">:</div>
+                <div className="countdown-digit rounded-lg px-4 py-3 text-center min-w-[70px]">
+                  <div className="font-instrument text-3xl text-patriots-white">{String(countdown.seconds).padStart(2, '0')}</div>
+                  <div className="text-[10px] font-mono text-muted-foreground">SEC</div>
                 </div>
               </div>
-              <div className="text-center mt-6">
-                <div className="text-patriots-silver font-mono">8:15 PM EST • NBC</div>
+              <div className="text-center mt-4">
+                <div className="text-patriots-silver font-mono text-sm">8:15 PM EST • NBC</div>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Game Info Grid */}
-        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-8">
           {/* Location Card */}
           <div className="patriots-card rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
@@ -195,7 +386,7 @@ const PatriotWay = () => {
             <div className="text-patriots-silver font-mono text-sm">Foxborough, Massachusetts</div>
             <div className="mt-4 pt-4 border-t border-patriots-silver/10">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Weather</span>
+                <span className="text-muted-foreground">Weather at Kickoff</span>
                 <span className="text-patriots-silver">32°F • Partly Cloudy</span>
               </div>
             </div>
@@ -221,8 +412,8 @@ const PatriotWay = () => {
         </div>
 
         {/* Watch Options */}
-        <div className="max-w-4xl mx-auto mb-12">
-          <div className="flex items-center gap-3 mb-6">
+        <div className="max-w-4xl mx-auto mb-8">
+          <div className="flex items-center gap-3 mb-4">
             <Tv className="w-5 h-5 text-patriots-red" />
             <span className="font-mono text-sm uppercase tracking-widest text-muted-foreground">How to Watch</span>
           </div>
@@ -234,45 +425,45 @@ const PatriotWay = () => {
                   option.primary ? 'ring-1 ring-patriots-red/30' : ''
                 }`}
               >
-                <option.icon className={`w-6 h-6 mx-auto mb-2 ${option.primary ? 'text-patriots-red' : 'text-patriots-silver'}`} />
+                <option.icon className={`w-5 h-5 mx-auto mb-2 ${option.primary ? 'text-patriots-red' : 'text-patriots-silver'}`} />
                 <div className="font-instrument text-sm text-patriots-white">{option.label}</div>
-                <div className="text-xs text-muted-foreground mt-1">{option.sublabel}</div>
-                <ChevronRight className="w-4 h-4 mx-auto mt-2 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="text-[10px] text-muted-foreground mt-1">{option.sublabel}</div>
+                <ChevronRight className="w-3 h-3 mx-auto mt-2 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
               </button>
             ))}
           </div>
         </div>
 
         {/* Key Players */}
-        <div className="max-w-4xl mx-auto mb-12">
-          <div className="flex items-center gap-3 mb-6">
+        <div className="max-w-4xl mx-auto mb-8">
+          <div className="flex items-center gap-3 mb-4">
             <Zap className="w-5 h-5 text-patriots-red" />
             <span className="font-mono text-sm uppercase tracking-widest text-muted-foreground">Players to Watch</span>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             {/* Patriots Player */}
-            <div className="patriots-card rounded-xl p-6 border-l-4 border-patriots-red">
+            <div className="patriots-card rounded-xl p-5 border-l-4 border-patriots-red">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-patriots-navy border border-patriots-red/40 flex items-center justify-center">
-                  <span className="font-instrument text-xl text-patriots-white">#4</span>
+                <div className="w-14 h-14 rounded-full bg-patriots-navy border border-patriots-red/40 flex items-center justify-center">
+                  <span className="font-instrument text-lg text-patriots-white">#4</span>
                 </div>
                 <div>
-                  <div className="font-instrument text-xl text-patriots-white">Drake Maye</div>
+                  <div className="font-instrument text-lg text-patriots-white">Drake Maye</div>
                   <div className="text-sm text-patriots-silver">Quarterback • Patriots</div>
-                  <div className="text-xs text-muted-foreground mt-1">Rookie sensation, AFC's top-rated passer</div>
+                  <div className="text-xs text-muted-foreground mt-1">AFC's top-rated passer</div>
                 </div>
               </div>
             </div>
             {/* Chargers Player */}
-            <div className="patriots-card rounded-xl p-6 border-l-4 border-chargers-gold">
+            <div className="patriots-card rounded-xl p-5 border-l-4 border-chargers-gold">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-chargers-blue/30 border border-chargers-gold/40 flex items-center justify-center">
-                  <span className="font-instrument text-xl text-chargers-gold">#10</span>
+                <div className="w-14 h-14 rounded-full bg-chargers-blue/30 border border-chargers-gold/40 flex items-center justify-center">
+                  <span className="font-instrument text-lg text-chargers-gold">#10</span>
                 </div>
                 <div>
-                  <div className="font-instrument text-xl text-patriots-white">Justin Herbert</div>
+                  <div className="font-instrument text-lg text-patriots-white">Justin Herbert</div>
                   <div className="text-sm text-chargers-gold">Quarterback • Chargers</div>
-                  <div className="text-xs text-muted-foreground mt-1">Elite arm talent, top-10 pass rush</div>
+                  <div className="text-xs text-muted-foreground mt-1">Elite arm talent</div>
                 </div>
               </div>
             </div>
@@ -280,7 +471,7 @@ const PatriotWay = () => {
         </div>
 
         {/* Footer */}
-        <footer className="text-center py-8 border-t border-patriots-silver/10">
+        <footer className="text-center py-6 border-t border-patriots-silver/10">
           <div className="text-xs font-mono text-muted-foreground uppercase tracking-widest mb-2">
             Go Pats • AFC Wild Card • January 11, 2026
           </div>
@@ -289,7 +480,7 @@ const PatriotWay = () => {
             className="inline-flex items-center gap-2 text-sm text-patriots-silver hover:text-patriots-white transition-colors"
           >
             <Clock className="w-4 h-4" />
-            View Weather Conditions in STRATA
+            View Full Weather Conditions in STRATA
           </Link>
         </footer>
       </div>
