@@ -100,7 +100,6 @@ const LavandarHome = () => {
             </div>
             <div className="hidden md:flex items-center gap-8">
               <Link to="/strata" className="text-sm text-neutral-400 hover:text-white transition-colors">STRATA</Link>
-              <Link to="/alpha-os" className="text-sm text-neutral-400 hover:text-white transition-colors">Operations</Link>
               <Button 
                 onClick={() => navigate("/recruiter-outreach")}
                 className="bg-purple-600 hover:bg-purple-700 text-white text-xs tracking-wider uppercase px-6"
