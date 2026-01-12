@@ -26,6 +26,7 @@ const StrataInstrument = () => {
   const [activeLayer, setActiveLayer] = useState("surface");
   const [bezelActive, setBezelActive] = useState(false);
   const [lumeMode, setLumeMode] = useState(false);
+  const [lumeIntensity, setLumeIntensity] = useState(70);
 
   const data = weatherData;
 
@@ -59,6 +60,8 @@ const StrataInstrument = () => {
               onBezelToggle={setBezelActive}
               lumeMode={lumeMode}
               onLumeModeToggle={setLumeMode}
+              lumeIntensity={lumeIntensity}
+              onLumeIntensityChange={setLumeIntensity}
             />
           </div>
         </div>
@@ -70,7 +73,7 @@ const StrataInstrument = () => {
 
           {/* Center: Watch dial */}
           <div className="flex justify-center items-center">
-            <WatchDial bezelActive={bezelActive} lumeMode={lumeMode} />
+            <WatchDial bezelActive={bezelActive} lumeMode={lumeMode} lumeIntensity={lumeIntensity} />
           </div>
 
           {/* Right: Metric pods */}
