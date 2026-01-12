@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import { Globe, Layers, Mountain, Cloud, Plane, Rocket, Satellite, Activity } from "lucide-react";
+import { Globe, Mountain, Cloud, Plane, Rocket, Satellite, Activity, Wind, Waves, AlertTriangle, RefreshCw } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Particle {
   id: number;
@@ -22,13 +23,33 @@ interface LayerData {
   description: string;
 }
 
+interface MarineForecast {
+  zone: string;
+  location: string;
+  issuedAt: string;
+  warnings: string[];
+  periods: {
+    name: string;
+    wind: string;
+    seas: string;
+    conditions: string;
+  }[];
+}
+
+interface NOAAResponse {
+  success: boolean;
+  data?: MarineForecast;
+  fetchedAt?: string;
+  error?: string;
+}
+
 const layersData: LayerData[] = [
   { 
     id: "surface", 
     label: "Surface", 
     icon: Mountain, 
     altitude: "0km",
-    color: "hsl(25, 85%, 55%)", // copper/orange
+    color: "hsl(25, 85%, 55%)",
     particleCount: 180,
     density: 0.95,
     description: "Ground-level observations"
@@ -79,6 +100,41 @@ const AtlasLayers = () => {
   const [activeLayer, setActiveLayer] = useState("surface");
   const [isAnimating, setIsAnimating] = useState(true);
   const [pulsePhase, setPulsePhase] = useState(0);
+  const [noaaData, setNoaaData] = useState<MarineForecast | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [lastFetched, setLastFetched] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch NOAA data
+  const fetchNOAAData = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke<NOAAResponse>('noaa-marine', {
+        body: { zone: 'anz233' }
+      });
+      
+      if (fnError) throw fnError;
+      if (data?.success && data.data) {
+        setNoaaData(data.data);
+        setLastFetched(data.fetchedAt || new Date().toISOString());
+      } else {
+        throw new Error(data?.error || 'Failed to fetch NOAA data');
+      }
+    } catch (err) {
+      console.error('NOAA fetch error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Initial fetch and auto-refresh every 5 minutes
+  useEffect(() => {
+    fetchNOAAData();
+    const interval = setInterval(fetchNOAAData, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Pulse animation
   useEffect(() => {
@@ -89,6 +145,26 @@ const AtlasLayers = () => {
     return () => clearInterval(interval);
   }, [isAnimating]);
 
+  // Parse wind speed from NOAA data for visualization
+  const windSpeed = useMemo(() => {
+    if (!noaaData?.periods?.[0]?.wind) return null;
+    const match = noaaData.periods[0].wind.match(/(\d+)\s+to\s+(\d+)/);
+    if (match) {
+      return { min: parseInt(match[1]), max: parseInt(match[2]) };
+    }
+    return null;
+  }, [noaaData]);
+
+  // Parse sea height from NOAA data
+  const seaHeight = useMemo(() => {
+    if (!noaaData?.periods?.[0]?.seas) return null;
+    const match = noaaData.periods[0].seas.match(/(\d+)\s+to\s+(\d+)/);
+    if (match) {
+      return { min: parseInt(match[1]), max: parseInt(match[2]) };
+    }
+    return null;
+  }, [noaaData]);
+
   // Generate particles for each layer
   const particles = useMemo(() => {
     const allParticles: Particle[] = [];
@@ -98,22 +174,23 @@ const AtlasLayers = () => {
       const yStart = (layerIndex / layersData.length) * 100;
       const yEnd = ((layerIndex + 1) / layersData.length) * 100;
       
-      // Create cluster in center with scatter at edges (inspired by copper sphere image)
-      for (let i = 0; i < layer.particleCount; i++) {
-        // Gaussian-like distribution for clustering
+      // Adjust particle count based on wind for surface layer
+      let particleCount = layer.particleCount;
+      if (layer.id === 'surface' && windSpeed) {
+        particleCount = Math.round(layer.particleCount * (1 + windSpeed.max / 50));
+      }
+      
+      for (let i = 0; i < particleCount; i++) {
         const u1 = Math.random();
         const u2 = Math.random();
         const gaussian = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
         
-        // Center cluster with variance
         const xCenter = 50 + gaussian * 15;
         const x = Math.max(5, Math.min(95, xCenter + (Math.random() - 0.5) * 40));
         
-        // Distribute vertically within layer band
         const yBase = yStart + (Math.random() * (yEnd - yStart));
         const y = Math.max(yStart + 2, Math.min(yEnd - 2, yBase));
         
-        // Size variation - denser at center
         const distFromCenter = Math.abs(x - 50);
         const sizeMultiplier = 1 - (distFromCenter / 100);
         const size = 3 + Math.random() * 4 * sizeMultiplier * layer.density;
@@ -131,7 +208,7 @@ const AtlasLayers = () => {
     });
 
     return allParticles;
-  }, []);
+  }, [windSpeed]);
 
   const currentLayer = layersData.find(l => l.id === activeLayer);
   const activeIndex = layersData.findIndex(l => l.id === activeLayer);
@@ -149,26 +226,142 @@ const AtlasLayers = () => {
               Atlas Layers
             </h3>
             <p className="text-[10px] font-mono text-strata-silver/60 uppercase tracking-wider">
-              Atmospheric Density Visualization
+              Live NOAA Marine Data Integration
             </p>
           </div>
         </div>
-        <button
-          onClick={() => setIsAnimating(!isAnimating)}
-          className={`p-2 rounded border transition-all ${
-            isAnimating 
-              ? 'bg-strata-orange/10 border-strata-orange/30 text-strata-orange' 
-              : 'bg-strata-steel/20 border-strata-steel/30 text-strata-silver/60'
-          }`}
-        >
-          <Activity className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={fetchNOAAData}
+            disabled={isLoading}
+            className={`p-2 rounded border transition-all ${
+              isLoading 
+                ? 'bg-strata-steel/10 border-strata-steel/20 text-strata-silver/40 cursor-wait' 
+                : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20'
+            }`}
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          </button>
+          <button
+            onClick={() => setIsAnimating(!isAnimating)}
+            className={`p-2 rounded border transition-all ${
+              isAnimating 
+                ? 'bg-strata-orange/10 border-strata-orange/30 text-strata-orange' 
+                : 'bg-strata-steel/20 border-strata-steel/30 text-strata-silver/60'
+            }`}
+          >
+            <Activity className="w-4 h-4" />
+          </button>
+        </div>
       </div>
+
+      {/* NOAA Live Data Strip */}
+      {noaaData && (
+        <div className="mb-6 p-4 bg-cyan-500/5 rounded-lg border border-cyan-500/20">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider">
+              Live: {noaaData.location} ({noaaData.zone})
+            </span>
+            {lastFetched && (
+              <span className="text-[10px] font-mono text-strata-silver/50 ml-auto">
+                Updated: {new Date(lastFetched).toLocaleTimeString()}
+              </span>
+            )}
+          </div>
+          
+          {/* Warnings */}
+          {noaaData.warnings.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-3">
+              {noaaData.warnings.map((warning, i) => (
+                <div key={i} className="flex items-center gap-1 px-2 py-1 bg-amber-500/20 rounded text-amber-400 text-[10px] font-mono uppercase">
+                  <AlertTriangle className="w-3 h-3" />
+                  {warning}
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {/* Current Conditions Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {windSpeed && (
+              <div className="bg-strata-charcoal/50 rounded p-3 border border-strata-steel/20">
+                <div className="flex items-center gap-2 mb-1">
+                  <Wind className="w-4 h-4 text-cyan-400" />
+                  <span className="text-[10px] font-mono text-strata-silver/60 uppercase">Wind</span>
+                </div>
+                <div className="text-lg font-mono text-strata-white">
+                  {windSpeed.min}-{windSpeed.max} <span className="text-xs text-strata-silver/60">kt</span>
+                </div>
+              </div>
+            )}
+            {seaHeight && (
+              <div className="bg-strata-charcoal/50 rounded p-3 border border-strata-steel/20">
+                <div className="flex items-center gap-2 mb-1">
+                  <Waves className="w-4 h-4 text-cyan-400" />
+                  <span className="text-[10px] font-mono text-strata-silver/60 uppercase">Seas</span>
+                </div>
+                <div className="text-lg font-mono text-strata-white">
+                  {seaHeight.min}-{seaHeight.max} <span className="text-xs text-strata-silver/60">ft</span>
+                </div>
+              </div>
+            )}
+            {noaaData.periods[0] && (
+              <>
+                <div className="bg-strata-charcoal/50 rounded p-3 border border-strata-steel/20">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Cloud className="w-4 h-4 text-cyan-400" />
+                    <span className="text-[10px] font-mono text-strata-silver/60 uppercase">Period</span>
+                  </div>
+                  <div className="text-sm font-mono text-strata-white truncate">
+                    {noaaData.periods[0].name}
+                  </div>
+                </div>
+                <div className="bg-strata-charcoal/50 rounded p-3 border border-strata-steel/20">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Activity className="w-4 h-4 text-emerald-400" />
+                    <span className="text-[10px] font-mono text-strata-silver/60 uppercase">Status</span>
+                  </div>
+                  <div className="text-sm font-mono text-emerald-400">
+                    CONNECTED
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-500/10 rounded-lg border border-red-500/20">
+          <div className="flex items-center gap-2 text-red-400 text-sm">
+            <AlertTriangle className="w-4 h-4" />
+            <span className="font-mono">{error}</span>
+            <button 
+              onClick={fetchNOAAData}
+              className="ml-auto text-xs underline hover:no-underline"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {isLoading && !noaaData && (
+        <div className="mb-6 p-4 bg-strata-charcoal/30 rounded-lg border border-strata-steel/20 animate-pulse">
+          <div className="flex items-center gap-2 text-strata-silver/60 text-sm">
+            <RefreshCw className="w-4 h-4 animate-spin" />
+            <span className="font-mono">Connecting to NOAA...</span>
+          </div>
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-[1fr_280px] gap-6">
         {/* Particle Visualization */}
         <div className="relative h-[400px] bg-neutral-950 rounded-lg overflow-hidden border border-strata-steel/20">
-          {/* Background texture - inspired by speckled dark surface */}
+          {/* Background texture */}
           <div className="absolute inset-0 opacity-30">
             {[...Array(100)].map((_, i) => (
               <div
@@ -203,7 +396,6 @@ const AtlasLayers = () => {
                     : 'transparent',
                 }}
               >
-                {/* Layer label */}
                 <div className={`absolute left-3 top-1/2 -translate-y-1/2 transition-all duration-300 ${
                   isActive ? 'opacity-100' : 'opacity-40'
                 }`}>
@@ -215,13 +407,10 @@ const AtlasLayers = () => {
             );
           })}
 
-          {/* Copper particles - main visualization */}
+          {/* Copper particles */}
           {particles.map((particle) => {
             const isActiveLayer = particle.layer === activeLayer;
-            const layerIndex = layersData.findIndex(l => l.id === particle.layer);
-            const layer = layersData[layerIndex];
             
-            // Pulse effect for active layer
             const pulseOffset = isActiveLayer && isAnimating
               ? Math.sin((pulsePhase + particle.delay * 180) * Math.PI / 180) * 0.2
               : 0;
@@ -267,6 +456,17 @@ const AtlasLayers = () => {
             <div className="flex-1 mx-auto w-1 my-2 rounded-full bg-gradient-to-b from-strata-silver/10 via-strata-orange/50 to-strata-orange" />
             <span className="text-[7px] font-mono text-strata-silver/60 text-center">LOW</span>
           </div>
+
+          {/* NOAA Data Overlay for Surface */}
+          {activeLayer === 'surface' && windSpeed && (
+            <div className="absolute bottom-3 left-3 bg-strata-charcoal/80 rounded p-2 border border-cyan-500/30">
+              <div className="text-[8px] font-mono text-cyan-400 uppercase mb-1">NOAA Surface</div>
+              <div className="flex items-center gap-2">
+                <Wind className="w-3 h-3 text-cyan-400" />
+                <span className="text-xs font-mono text-strata-white">{windSpeed.min}-{windSpeed.max}kt</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Layer Details Panel */}
@@ -351,8 +551,29 @@ const AtlasLayers = () => {
             <div className="text-[8px] font-mono text-strata-silver/50 uppercase tracking-wider">Active Sensors</div>
           </div>
           <div className="bg-strata-charcoal/30 rounded p-3 border border-strata-steel/20 text-center">
-            <div className="text-lg font-mono text-cyan-400">LIVE</div>
-            <div className="text-[8px] font-mono text-strata-silver/50 uppercase tracking-wider">Data Status</div>
+            <div className={`text-lg font-mono ${noaaData ? 'text-emerald-400' : 'text-amber-400'}`}>
+              {noaaData ? 'LIVE' : 'OFFLINE'}
+            </div>
+            <div className="text-[8px] font-mono text-strata-silver/50 uppercase tracking-wider">NOAA Status</div>
+          </div>
+        </div>
+      )}
+
+      {/* Forecast Periods */}
+      {noaaData && noaaData.periods.length > 1 && (
+        <div className="mt-6">
+          <div className="text-xs font-mono text-strata-silver/60 uppercase tracking-wider mb-3">
+            Upcoming Forecast Periods
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+            {noaaData.periods.slice(1, 6).map((period, i) => (
+              <div key={i} className="bg-strata-charcoal/30 rounded p-2 border border-strata-steel/20">
+                <div className="text-[9px] font-mono text-cyan-400 uppercase mb-1">{period.name}</div>
+                <div className="text-[8px] font-mono text-strata-silver/60 truncate" title={period.wind}>
+                  {period.wind || 'Variable'}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
