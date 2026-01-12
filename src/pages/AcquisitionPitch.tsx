@@ -29,6 +29,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import lavandarLogo from "@/assets/lavandar-logo.png";
 import ModernizationTimeline from "@/components/ModernizationTimeline";
 import KAGRDashboard from "@/components/KAGRDashboard";
+import PerformanceAnalytics from "@/components/PerformanceAnalytics";
 import { useSportsData } from "@/hooks/useSportsData";
 
 interface MetricCardProps {
@@ -229,6 +230,13 @@ const OperationalDashboard = () => {
               AI Capabilities
             </TabsTrigger>
             <TabsTrigger 
+              value="analytics" 
+              className="data-[state=active]:bg-strata-steel/30 data-[state=active]:text-strata-white text-strata-silver/60"
+            >
+              <TrendingUp className="w-4 h-4 mr-2" />
+              Performance Analytics
+            </TabsTrigger>
+            <TabsTrigger 
               value="systems" 
               className="data-[state=active]:bg-strata-steel/30 data-[state=active]:text-strata-white text-strata-silver/60"
             >
@@ -400,6 +408,11 @@ const OperationalDashboard = () => {
                 />
               </div>
             </div>
+          </TabsContent>
+
+          {/* Performance Analytics Tab */}
+          <TabsContent value="analytics" className="space-y-6">
+            <PerformanceAnalytics />
           </TabsContent>
 
           {/* Live Systems Tab */}
