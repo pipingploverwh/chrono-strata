@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   BarChart, 
   Bar, 
@@ -19,7 +20,8 @@ import {
   CloudRain,
   RefreshCw,
   Download,
-  Filter
+  Filter,
+  ArrowUpRight
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -87,6 +89,7 @@ const weatherSeverityData = [
 ];
 
 const PerformanceAnalytics = () => {
+  const navigate = useNavigate();
   const [severityFilter, setSeverityFilter] = useState<"all" | "low" | "moderate" | "high">("all");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -128,6 +131,13 @@ const PerformanceAnalytics = () => {
           >
             <RefreshCw className={`w-4 h-4 text-strata-silver/70 ${isRefreshing ? 'animate-spin' : ''}`} />
             <span className="text-xs font-mono text-strata-silver/70">Sync Live</span>
+          </button>
+          <button 
+            onClick={() => navigate("/validation-report")}
+            className="flex items-center gap-2 px-3 py-2 rounded bg-patriots-red/20 border border-patriots-red/30 hover:bg-patriots-red/30 transition-colors"
+          >
+            <ArrowUpRight className="w-4 h-4 text-patriots-red-bright" />
+            <span className="text-xs font-mono text-patriots-red-bright">Full Report</span>
           </button>
           <button className="flex items-center gap-2 px-3 py-2 rounded bg-strata-lume/10 border border-strata-lume/30 hover:bg-strata-lume/20 transition-colors">
             <Download className="w-4 h-4 text-strata-lume" />

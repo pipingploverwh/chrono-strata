@@ -16,6 +16,7 @@ import StrataAviation from "./pages/StrataAviation";
 import StrataMarine from "./pages/StrataMarine";
 import StrataConstruction from "./pages/StrataConstruction";
 import StrataEvents from "./pages/StrataEvents";
+import ValidationReport from "./pages/ValidationReport";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
                 <Route path="/strata-construction" element={<StrataConstruction />} />
                 <Route path="/strata-events" element={<StrataEvents />} />
                 <Route path="/patriots-evaluation" element={<PatriotsEvaluation />} />
+                <Route path="/validation-report" element={<ValidationReport />} />
                 <Route path="/sitemap" element={<SiteMapPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
