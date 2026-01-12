@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { 
   Sparkles, 
@@ -17,14 +17,28 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import lavandarLogo from "@/assets/lavandar-logo.png";
+import WeatherGate from "@/components/WeatherGate";
 
 const LavandarHome = () => {
   const navigate = useNavigate();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [weatherGranted, setWeatherGranted] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  // Check session on mount
+  useEffect(() => {
+    const granted = sessionStorage.getItem("weather_access_granted");
+    if (granted === "true") {
+      setWeatherGranted(true);
+    }
+  }, []);
+
+  const handleWeatherGranted = useCallback(() => {
+    setWeatherGranted(true);
   }, []);
 
   const industries = [
@@ -65,7 +79,7 @@ const LavandarHome = () => {
     { icon: Users, title: "Multi-Property", desc: "Unified analytics across portfolios" },
   ];
 
-  return (
+  const content = (
     <div className="min-h-screen bg-[#0a0a0a]">
       {/* Hero Section */}
       <header className="relative overflow-hidden">
@@ -249,6 +263,18 @@ const LavandarHome = () => {
         </div>
       </section>
     </div>
+  );
+
+  // If already granted, show content directly
+  if (weatherGranted) {
+    return content;
+  }
+
+  // Otherwise wrap in weather gate
+  return (
+    <WeatherGate onGranted={handleWeatherGranted}>
+      {content}
+    </WeatherGate>
   );
 };
 
