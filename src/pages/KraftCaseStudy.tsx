@@ -247,17 +247,6 @@ const KraftCaseStudy = () => {
             </div>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-8">
-            {testimonials.map((t, i) => (
-              <div key={i} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-8">
-                <p className="text-lg text-white mb-6 italic">"{t.quote}"</p>
-                <div>
-                  <div className="text-neutral-400">{t.author}</div>
-                  <div className="text-sm text-neutral-500">{t.org}</div>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
