@@ -10,7 +10,8 @@ import {
   Rocket,
   Map,
   ChevronRight,
-  ExternalLink,
+  Brain,
+  Trophy,
   Shield
 } from "lucide-react";
 import {
@@ -33,23 +34,23 @@ const navItems: NavItem[] = [
   // Main
   { 
     path: "/", 
+    label: "Acquisition Brief", 
+    description: "Strategic Overview for Kraft Group",
+    icon: Brain,
+    category: "main"
+  },
+  { 
+    path: "/patriot-way", 
     label: "Patriot Way", 
     description: "Game Night Command Center",
-    icon: Home,
+    icon: Trophy,
     category: "main"
   },
   { 
     path: "/patriots-evaluation", 
-    label: "Patriots Evaluation", 
-    description: "Game Intel & Clock Management",
+    label: "Game Intel", 
+    description: "Clock Management & Strategy",
     icon: Shield,
-    category: "main"
-  },
-  { 
-    path: "/launch", 
-    label: "STRATA Launch", 
-    description: "Location Selection & Initialization",
-    icon: Rocket,
     category: "main"
   },
   { 
@@ -59,30 +60,37 @@ const navItems: NavItem[] = [
     icon: Gauge,
     category: "main"
   },
+  { 
+    path: "/launch", 
+    label: "Location Select", 
+    description: "Observation Point Initialization",
+    icon: Rocket,
+    category: "main"
+  },
   // Industry Verticals
   { 
-    path: "/aviation", 
+    path: "/strata-aviation", 
     label: "Aviation", 
     description: "Pilot Weather Briefing System",
     icon: Plane,
     category: "industry"
   },
   { 
-    path: "/marine", 
+    path: "/strata-marine", 
     label: "Marine", 
     description: "Maritime Weather Intelligence",
     icon: Anchor,
     category: "industry"
   },
   { 
-    path: "/construction", 
+    path: "/strata-construction", 
     label: "Construction", 
     description: "Jobsite Weather Monitoring",
     icon: HardHat,
     category: "industry"
   },
   { 
-    path: "/events", 
+    path: "/strata-events", 
     label: "Events", 
     description: "Venue Weather Operations",
     icon: CalendarDays,
