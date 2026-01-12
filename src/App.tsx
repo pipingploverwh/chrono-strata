@@ -9,6 +9,7 @@ import SkipLinks from "@/components/SkipLinks";
 import Footer from "@/components/Footer";
 import AIHarmonyAssistant from "@/components/AIHarmonyAssistant";
 import AcquisitionPitch from "./pages/AcquisitionPitch";
+import LavandarHome from "./pages/LavandarHome";
 import Index from "./pages/Index";
 import Strata from "./pages/Strata";
 import Logs from "./pages/Logs";
@@ -42,7 +43,8 @@ const App = () => (
           <div className="flex flex-col min-h-screen">
             <main id="main-content" className="flex-1" role="main">
               <Routes>
-                <Route path="/" element={<AcquisitionPitch />} />
+                <Route path="/" element={<LavandarHome />} />
+                <Route path="/alpha-os" element={<AcquisitionPitch />} />
                 <Route path="/weather-showcase" element={<WeatherShowcase />} />
                 <Route path="/strata" element={<Strata />} />
                 <Route path="/logs" element={<Logs />} />
