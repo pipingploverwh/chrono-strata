@@ -8,6 +8,10 @@ import Index from "./pages/Index";
 import Strata from "./pages/Strata";
 import Logs from "./pages/Logs";
 import PatriotWay from "./pages/PatriotWay";
+import StrataAviation from "./pages/StrataAviation";
+import StrataMarine from "./pages/StrataMarine";
+import StrataConstruction from "./pages/StrataConstruction";
+import StrataEvents from "./pages/StrataEvents";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +28,10 @@ const App = () => (
             <Route path="/strata" element={<Strata />} />
             <Route path="/logs" element={<Logs />} />
             <Route path="/launch" element={<Index />} />
+            <Route path="/aviation" element={<StrataAviation />} />
+            <Route path="/marine" element={<StrataMarine />} />
+            <Route path="/construction" element={<StrataConstruction />} />
+            <Route path="/events" element={<StrataEvents />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
