@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Strata from "./pages/Strata";
 import Logs from "./pages/Logs";
 import PatriotWay from "./pages/PatriotWay";
+import PatriotsEvaluation from "./pages/PatriotsEvaluation";
 import StrataAviation from "./pages/StrataAviation";
 import StrataMarine from "./pages/StrataMarine";
 import StrataConstruction from "./pages/StrataConstruction";
@@ -36,6 +37,7 @@ const App = () => (
                 <Route path="/marine" element={<StrataMarine />} />
                 <Route path="/construction" element={<StrataConstruction />} />
                 <Route path="/events" element={<StrataEvents />} />
+                <Route path="/patriots-evaluation" element={<PatriotsEvaluation />} />
                 <Route path="/sitemap" element={<SiteMapPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />

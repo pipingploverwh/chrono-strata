@@ -10,7 +10,8 @@ import {
   Rocket,
   Map,
   ChevronRight,
-  ExternalLink
+  ExternalLink,
+  Shield
 } from "lucide-react";
 import {
   Sheet,
@@ -35,6 +36,13 @@ const navItems: NavItem[] = [
     label: "Patriot Way", 
     description: "Game Night Command Center",
     icon: Home,
+    category: "main"
+  },
+  { 
+    path: "/patriots-evaluation", 
+    label: "Patriots Evaluation", 
+    description: "Game Intel & Clock Management",
+    icon: Shield,
     category: "main"
   },
   { 
