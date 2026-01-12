@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Gauge, Droplets, Wind, CloudRain, Sun, Eye, Cloud, Activity } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Gauge, Droplets, Wind, CloudRain, Sun, Eye, Cloud, Activity, ScrollText } from "lucide-react";
 import WatchDial from "./WatchDial";
 import MetricPod from "./MetricPod";
 import LayersSidebar from "./LayersSidebar";
@@ -33,29 +34,45 @@ const weatherData = {
 const StrataInstrument = () => {
   const [activeLayer, setActiveLayer] = useState("surface");
   const [bezelActive, setBezelActive] = useState(false);
+  const [lumeMode, setLumeMode] = useState(false);
   const [mode, setMode] = useState<"USA" | "ISR">("USA");
 
   const data = weatherData[mode];
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-8">
+    <div className={`min-h-screen bg-background flex items-center justify-center p-4 sm:p-8 transition-all duration-700 ${lumeMode ? 'lume-mode' : ''}`}>
       <div className="w-full max-w-5xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="font-instrument text-2xl sm:text-3xl font-bold text-strata-white tracking-wide">
+            <h1 className={`font-instrument text-2xl sm:text-3xl font-bold tracking-wide transition-all duration-500 ${lumeMode ? 'lume-text' : 'text-strata-white'}`}>
               STRATA
             </h1>
-            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-strata-silver/60 mt-1">
+            <p className={`text-[10px] font-mono uppercase tracking-[0.25em] mt-1 transition-all duration-500 ${lumeMode ? 'text-strata-lume/40' : 'text-strata-silver/60'}`}>
               Geological Weather Instrument
             </p>
           </div>
-          <ControlToggles
-            bezelActive={bezelActive}
-            onBezelToggle={setBezelActive}
-            mode={mode}
-            onModeChange={setMode}
-          />
+          <div className="flex items-center gap-3">
+            <Link 
+              to="/logs" 
+              className={`flex items-center gap-2 px-3 py-2 rounded border transition-all duration-300 ${
+                lumeMode 
+                  ? 'bg-strata-charcoal/50 border-strata-lume/20 text-strata-lume hover:bg-strata-lume/10 lume-glow-box' 
+                  : 'bg-strata-charcoal/50 border-strata-steel/20 text-strata-silver hover:bg-strata-steel/50'
+              }`}
+            >
+              <ScrollText className="w-3.5 h-3.5" />
+              <span className="text-[9px] font-mono uppercase tracking-wider">Logs</span>
+            </Link>
+            <ControlToggles
+              bezelActive={bezelActive}
+              onBezelToggle={setBezelActive}
+              lumeMode={lumeMode}
+              onLumeModeToggle={setLumeMode}
+              mode={mode}
+              onModeChange={setMode}
+            />
+          </div>
         </div>
 
         {/* Main instrument panel */}
@@ -65,7 +82,7 @@ const StrataInstrument = () => {
 
           {/* Center: Watch dial */}
           <div className="flex justify-center items-center">
-            <WatchDial bezelActive={bezelActive} />
+            <WatchDial bezelActive={bezelActive} lumeMode={lumeMode} />
           </div>
 
           {/* Right: Metric pods */}
