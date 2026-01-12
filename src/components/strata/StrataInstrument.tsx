@@ -11,26 +11,14 @@ import HalftimeDistribution from "./HalftimeDistribution";
 
 // Falmouth, MA data for January 11, 2026, 6:41 PM
 const weatherData = {
-  USA: {
-    pressure: { value: "29.64", unit: "inHg" },
-    humidity: { value: "84", unit: "%" },
-    wind: { value: "25", unit: "mph" },
-    precip: { value: "0.00", unit: "in" },
-    uvIndex: { value: "0", status: "Low" },
-    visibility: { value: "10", unit: "mi" },
-    cloudCover: { value: "34", unit: "%" },
-    airQuality: { value: "31", status: "Good" },
-  },
-  ISR: {
-    pressure: { value: "1003.7", unit: "hPa" },
-    humidity: { value: "84", unit: "%" },
-    wind: { value: "40", unit: "km/h" },
-    precip: { value: "0", unit: "mm" },
-    uvIndex: { value: "0", status: "Low" },
-    visibility: { value: "16.1", unit: "km" },
-    cloudCover: { value: "34", unit: "%" },
-    airQuality: { value: "31", status: "Good" },
-  },
+  pressure: { value: "29.64", unit: "inHg" },
+  humidity: { value: "84", unit: "%" },
+  wind: { value: "25", unit: "mph" },
+  precip: { value: "0.00", unit: "in" },
+  uvIndex: { value: "0", status: "Low" },
+  visibility: { value: "10", unit: "mi" },
+  cloudCover: { value: "34", unit: "%" },
+  airQuality: { value: "31", status: "Good" },
 };
 
 const StrataInstrument = () => {
@@ -38,9 +26,8 @@ const StrataInstrument = () => {
   const [activeLayer, setActiveLayer] = useState("surface");
   const [bezelActive, setBezelActive] = useState(false);
   const [lumeMode, setLumeMode] = useState(false);
-  const [mode, setMode] = useState<"USA" | "ISR">("USA");
 
-  const data = weatherData[mode];
+  const data = weatherData;
 
   return (
     <div className={`min-h-screen bg-background flex items-center justify-center p-4 sm:p-8 transition-all duration-700 ${lumeMode ? 'lume-mode' : ''}`}>
@@ -72,8 +59,6 @@ const StrataInstrument = () => {
               onBezelToggle={setBezelActive}
               lumeMode={lumeMode}
               onLumeModeToggle={setLumeMode}
-              mode={mode}
-              onModeChange={setMode}
             />
           </div>
         </div>

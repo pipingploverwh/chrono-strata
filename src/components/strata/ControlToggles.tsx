@@ -6,17 +6,13 @@ interface ControlTogglesProps {
   onBezelToggle: (active: boolean) => void;
   lumeMode: boolean;
   onLumeModeToggle: (active: boolean) => void;
-  mode: "USA" | "ISR";
-  onModeChange: (mode: "USA" | "ISR") => void;
 }
 
 const ControlToggles = ({ 
   bezelActive, 
   onBezelToggle, 
   lumeMode, 
-  onLumeModeToggle, 
-  mode, 
-  onModeChange 
+  onLumeModeToggle
 }: ControlTogglesProps) => {
   return (
     <div className="flex items-center gap-3">
@@ -62,51 +58,6 @@ const ControlToggles = ({
         }`}>
           {bezelActive ? 'ON' : 'OFF'}
         </span>
-      </div>
-
-      {/* Mode Toggle */}
-      <div className={`flex items-center gap-2 rounded px-3 py-2 border transition-all duration-300 ${
-        lumeMode 
-          ? 'bg-strata-charcoal/50 border-strata-lume/20' 
-          : 'bg-strata-charcoal/50 border-strata-steel/20'
-      }`}>
-        <span className={`text-[9px] font-mono uppercase tracking-wider ${
-          lumeMode ? 'text-strata-lume/60' : 'text-strata-silver/70'
-        }`}>
-          Mode
-        </span>
-        <div className={`flex rounded overflow-hidden border ${
-          lumeMode ? 'border-strata-lume/30' : 'border-strata-steel/30'
-        }`}>
-          <button
-            onClick={() => onModeChange("USA")}
-            className={`px-2 py-1 text-[9px] font-mono font-semibold transition-colors ${
-              mode === "USA" 
-                ? lumeMode 
-                  ? 'bg-strata-lume text-strata-black' 
-                  : 'bg-strata-orange text-white'
-                : lumeMode
-                  ? 'bg-strata-steel/30 text-strata-lume/60 hover:bg-strata-lume/10'
-                  : 'bg-strata-steel/30 text-strata-silver hover:bg-strata-steel/50'
-            }`}
-          >
-            USA
-          </button>
-          <button
-            onClick={() => onModeChange("ISR")}
-            className={`px-2 py-1 text-[9px] font-mono font-semibold transition-colors ${
-              mode === "ISR" 
-                ? lumeMode 
-                  ? 'bg-strata-lume text-strata-black' 
-                  : 'bg-strata-orange text-white'
-                : lumeMode
-                  ? 'bg-strata-steel/30 text-strata-lume/60 hover:bg-strata-lume/10'
-                  : 'bg-strata-steel/30 text-strata-silver hover:bg-strata-steel/50'
-            }`}
-          >
-            ישראל
-          </button>
-        </div>
       </div>
     </div>
   );
