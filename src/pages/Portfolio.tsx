@@ -320,15 +320,14 @@ const Portfolio = () => {
         </div>
       </section> */}
 
-      {/* Experience Timeline */}
-      <section id="experience" className="py-20 px-4">
+      {/* Experience Timeline - Hidden for now */}
+      {/* <section id="experience" className="py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="font-instrument text-3xl text-strata-white mb-4">Experience</h2>
             <p className="text-strata-silver/70">A decade of building and scaling products</p>
           </div>
 
-          {/* Timeline Legend */}
           <div className="flex flex-wrap justify-center gap-4 mb-10">
             {[
               { type: "leadership", label: "Leadership", icon: Briefcase },
@@ -342,9 +341,7 @@ const Portfolio = () => {
             ))}
           </div>
 
-          {/* Timeline */}
           <div className="relative">
-            {/* Vertical line */}
             <div className="absolute left-6 md:left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 via-strata-orange to-strata-cyan" />
             
             <div className="space-y-6">
@@ -355,7 +352,6 @@ const Portfolio = () => {
                 
                 return (
                   <div key={index} className="relative pl-16 md:pl-20">
-                    {/* Timeline dot */}
                     <div className={`absolute left-4 md:left-6 w-4 h-4 rounded-full bg-${colorClass} border-4 border-background`} />
                     
                     <Card 
@@ -416,7 +412,7 @@ const Portfolio = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Skills Section */}
       <section className="py-20 px-4 bg-strata-charcoal/30">
