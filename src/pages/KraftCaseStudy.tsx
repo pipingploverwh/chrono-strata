@@ -44,18 +44,6 @@ const KraftCaseStudy = () => {
     { phase: "Full Deployment", duration: "Ongoing", status: "active" },
   ];
 
-  const testimonials = [
-    {
-      quote: "STRATA transformed how we approach game day operations. Weather is no longer a variable—it's an advantage.",
-      author: "Director of Operations",
-      org: "New England Patriots",
-    },
-    {
-      quote: "The precision of the forecasting allowed us to optimize concession inventory and reduce waste by 34%.",
-      author: "VP of Fan Experience",
-      org: "Kraft Sports + Entertainment",
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-[#f8f5f1]">
