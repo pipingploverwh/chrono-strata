@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ScatterChart, Scatter, ZAxis, Legend } from "recharts";
-import { Target, TrendingUp, AlertTriangle, CheckCircle2, Wind, ArrowLeft, Download, FileText, Clock, Crosshair, Activity, ChevronDown, ChevronUp, Zap, ThermometerSun } from "lucide-react";
+import { Target, TrendingUp, AlertTriangle, CheckCircle2, Wind, ArrowLeft, Download, FileText, Clock, Crosshair, Activity, ChevronDown, ChevronUp, Zap, ThermometerSun, Mail, Send, X, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -196,13 +201,77 @@ const varianceReasonLabels = {
 };
 const ValidationReport = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [expandedDrives, setExpandedDrives] = useState<number[]>([]);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [recipientEmail, setRecipientEmail] = useState("");
+  const [recipientName, setRecipientName] = useState("");
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  
   const toggleDrive = (drive: number) => {
     setExpandedDrives(prev => prev.includes(drive) ? prev.filter(d => d !== drive) : [...prev, drive]);
   };
   const matchedDrives = driveData.filter(d => d.match).length;
   const missedDrives = driveData.filter(d => !d.match);
   const accuracy = Math.round(matchedDrives / driveData.length * 100);
+
+  const handleSendEmail = async () => {
+    if (!recipientEmail) {
+      toast({
+        title: "Email Required",
+        description: "Please enter a recipient email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSendingEmail(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('send-executive-summary', {
+        body: {
+          recipientEmail,
+          recipientName: recipientName || undefined,
+          accuracy,
+          matchedDrives,
+          totalDrives: driveData.length,
+          missedDrives: missedDrives.map(d => ({
+            drive: d.drive,
+            quarter: d.quarter,
+            predictedCall: d.predictedCall,
+            actualCall: d.actualCall,
+            varianceReason: d.varianceReason ? varianceReasonLabels[d.varianceReason].label : 'N/A'
+          })),
+          gameInfo: {
+            teams: "Patriots vs Bills",
+            date: "January 11, 2026",
+            venue: "Gillette Stadium"
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Email Sent Successfully",
+        description: `Executive summary sent to ${recipientEmail}`,
+      });
+
+      setEmailDialogOpen(false);
+      setRecipientEmail("");
+      setRecipientName("");
+    } catch (error: any) {
+      console.error("Failed to send email:", error);
+      toast({
+        title: "Failed to Send Email",
+        description: error.message || "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
+
   const handleExportPDF = () => {
     // Create a new window for printing
     const printWindow = window.open('', '_blank');
@@ -540,12 +609,101 @@ const ValidationReport = () => {
               </div>
               <button onClick={handleExportPDF} className="flex items-center gap-2 px-4 py-2 rounded bg-patriots-red hover:bg-patriots-red-bright transition-colors">
                 <Download className="w-4 h-4 text-strata-white" />
-                <span className="text-sm font-medium text-strata-white">Generate Executive Summary PDF</span>
+                <span className="text-sm font-medium text-strata-white">Export PDF</span>
+              </button>
+              <button onClick={() => setEmailDialogOpen(true)} className="flex items-center gap-2 px-4 py-2 rounded bg-strata-cyan/20 border border-strata-cyan/50 hover:bg-strata-cyan/30 transition-colors">
+                <Mail className="w-4 h-4 text-strata-cyan" />
+                <span className="text-sm font-medium text-strata-cyan">Email Summary</span>
               </button>
             </div>
           </div>
         </div>
       </header>
+
+      {/* Email Dialog */}
+      <Dialog open={emailDialogOpen} onOpenChange={setEmailDialogOpen}>
+        <DialogContent className="bg-patriots-navy border-patriots-silver/20 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-strata-white flex items-center gap-2">
+              <Mail className="w-5 h-5 text-strata-cyan" />
+              Send Executive Summary
+            </DialogTitle>
+            <DialogDescription className="text-strata-silver/60">
+              Email the validation report to stakeholders
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="recipientEmail" className="text-strata-silver text-sm">
+                Recipient Email <span className="text-patriots-red">*</span>
+              </Label>
+              <Input
+                id="recipientEmail"
+                type="email"
+                placeholder="stakeholder@example.com"
+                value={recipientEmail}
+                onChange={(e) => setRecipientEmail(e.target.value)}
+                className="bg-strata-charcoal border-patriots-silver/30 text-strata-white placeholder:text-strata-silver/40"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="recipientName" className="text-strata-silver text-sm">
+                Recipient Name <span className="text-strata-silver/40">(optional)</span>
+              </Label>
+              <Input
+                id="recipientName"
+                type="text"
+                placeholder="John Smith"
+                value={recipientName}
+                onChange={(e) => setRecipientName(e.target.value)}
+                className="bg-strata-charcoal border-patriots-silver/30 text-strata-white placeholder:text-strata-silver/40"
+              />
+            </div>
+
+            <div className="bg-strata-charcoal/50 rounded-lg p-4 border border-patriots-silver/10">
+              <div className="text-[10px] font-mono uppercase text-strata-silver/50 mb-2">Email Preview</div>
+              <div className="text-sm text-strata-silver">
+                <p className="font-semibold text-strata-white mb-1">Subject:</p>
+                <p className="text-strata-cyan mb-3">Executive Summary: Patriots vs Bills - {accuracy}% Prediction Accuracy</p>
+                <p className="font-semibold text-strata-white mb-1">Contents:</p>
+                <ul className="text-xs space-y-1 text-strata-silver/70">
+                  <li>• Prediction accuracy metrics</li>
+                  <li>• Drive-by-drive variance analysis</li>
+                  <li>• Key findings and recommendations</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3">
+            <button 
+              onClick={() => setEmailDialogOpen(false)}
+              className="px-4 py-2 rounded text-strata-silver hover:bg-patriots-silver/10 transition-colors"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={handleSendEmail}
+              disabled={isSendingEmail || !recipientEmail}
+              className="flex items-center gap-2 px-4 py-2 rounded bg-strata-cyan hover:bg-strata-cyan/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isSendingEmail ? (
+                <>
+                  <Loader2 className="w-4 h-4 text-strata-black animate-spin" />
+                  <span className="text-sm font-medium text-strata-black">Sending...</span>
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4 text-strata-black" />
+                  <span className="text-sm font-medium text-strata-black">Send Email</span>
+                </>
+              )}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
         {/* Hero Stats */}
