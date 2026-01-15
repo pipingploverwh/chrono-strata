@@ -184,10 +184,10 @@ export const SiteNavigation = () => {
       </SheetTrigger>
       <SheetContent 
         side="right" 
-        className="w-[380px] bg-gradient-to-b from-strata-charcoal to-strata-black border-strata-steel/30"
+        className="w-[380px] bg-gradient-to-b from-strata-charcoal to-strata-black border-strata-steel/30 flex flex-col overflow-hidden"
         aria-label="Site navigation"
       >
-        <SheetHeader>
+        <SheetHeader className="flex-shrink-0">
           <SheetTitle className="font-instrument text-2xl text-strata-white tracking-wide flex items-center gap-3">
             <Map className="w-6 h-6 text-strata-orange" aria-hidden="true" />
             Site Navigation
@@ -199,7 +199,7 @@ export const SiteNavigation = () => {
 
         <nav 
           id="main-navigation"
-          className="mt-6 space-y-6" 
+          className="mt-6 space-y-6 flex-1 overflow-y-auto pr-2 pb-4" 
           aria-label="Main navigation"
           role="navigation"
         >
