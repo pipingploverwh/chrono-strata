@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ScatterChart, Scatter, ZAxis, Legend } from "recharts";
-import { Target, TrendingUp, AlertTriangle, CheckCircle2, Wind, ArrowLeft, Download, FileText, Clock, Crosshair, Activity, ChevronDown, ChevronUp, Zap, ThermometerSun, Mail, Send, X, Loader2 } from "lucide-react";
+import { Target, TrendingUp, AlertTriangle, CheckCircle2, Wind, ArrowLeft, Download, FileText, Clock, Crosshair, Activity, ChevronDown, ChevronUp, Zap, ThermometerSun, Mail, Send, X, Loader2, Calendar, Timer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -207,6 +208,9 @@ const ValidationReport = () => {
   const [recipientEmail, setRecipientEmail] = useState("");
   const [recipientName, setRecipientName] = useState("");
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [sendOption, setSendOption] = useState<"now" | "scheduled" | "game-complete">("now");
+  const [scheduledDate, setScheduledDate] = useState("");
+  const [scheduledTime, setScheduledTime] = useState("");
   
   const toggleDrive = (drive: number) => {
     setExpandedDrives(prev => prev.includes(drive) ? prev.filter(d => d !== drive) : [...prev, drive]);
@@ -214,6 +218,26 @@ const ValidationReport = () => {
   const matchedDrives = driveData.filter(d => d.match).length;
   const missedDrives = driveData.filter(d => !d.match);
   const accuracy = Math.round(matchedDrives / driveData.length * 100);
+
+  const getEmailPayload = () => ({
+    recipientEmail,
+    recipientName: recipientName || undefined,
+    accuracy,
+    matchedDrives,
+    totalDrives: driveData.length,
+    missedDrives: missedDrives.map(d => ({
+      drive: d.drive,
+      quarter: d.quarter,
+      predictedCall: d.predictedCall,
+      actualCall: d.actualCall,
+      varianceReason: d.varianceReason ? varianceReasonLabels[d.varianceReason].label : 'N/A'
+    })),
+    gameInfo: {
+      teams: "Patriots vs Bills",
+      date: "January 11, 2026",
+      venue: "Gillette Stadium"
+    }
+  });
 
   const handleSendEmail = async () => {
     if (!recipientEmail) {
@@ -225,45 +249,81 @@ const ValidationReport = () => {
       return;
     }
 
+    // Validate scheduled option
+    if (sendOption === "scheduled") {
+      if (!scheduledDate || !scheduledTime) {
+        toast({
+          title: "Schedule Required",
+          description: "Please select both date and time for scheduled delivery.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     setIsSendingEmail(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('send-executive-summary', {
-        body: {
-          recipientEmail,
-          recipientName: recipientName || undefined,
-          accuracy,
-          matchedDrives,
-          totalDrives: driveData.length,
-          missedDrives: missedDrives.map(d => ({
-            drive: d.drive,
-            quarter: d.quarter,
-            predictedCall: d.predictedCall,
-            actualCall: d.actualCall,
-            varianceReason: d.varianceReason ? varianceReasonLabels[d.varianceReason].label : 'N/A'
-          })),
-          gameInfo: {
-            teams: "Patriots vs Bills",
-            date: "January 11, 2026",
-            venue: "Gillette Stadium"
-          }
+      if (sendOption === "now") {
+        // Send immediately
+        const { data, error } = await supabase.functions.invoke('send-executive-summary', {
+          body: getEmailPayload()
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Email Sent Successfully",
+          description: `Executive summary sent to ${recipientEmail}`,
+        });
+      } else {
+        // Schedule for later
+        let scheduledAt: Date;
+        
+        if (sendOption === "scheduled") {
+          scheduledAt = new Date(`${scheduledDate}T${scheduledTime}`);
+        } else {
+          // Game complete - estimate 3.5 hours from now as game end
+          scheduledAt = new Date();
+          scheduledAt.setHours(scheduledAt.getHours() + 3, scheduledAt.getMinutes() + 30);
         }
-      });
 
-      if (error) throw error;
+        const { error } = await supabase.from('scheduled_emails').insert({
+          recipient_email: recipientEmail,
+          recipient_name: recipientName || null,
+          scheduled_at: scheduledAt.toISOString(),
+          email_type: 'executive_summary',
+          payload: getEmailPayload(),
+          status: 'pending'
+        });
 
-      toast({
-        title: "Email Sent Successfully",
-        description: `Executive summary sent to ${recipientEmail}`,
-      });
+        if (error) throw error;
+
+        const formattedTime = scheduledAt.toLocaleString('en-US', {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        });
+
+        toast({
+          title: "Email Scheduled",
+          description: `Executive summary will be sent to ${recipientEmail} on ${formattedTime}`,
+        });
+      }
 
       setEmailDialogOpen(false);
       setRecipientEmail("");
       setRecipientName("");
+      setSendOption("now");
+      setScheduledDate("");
+      setScheduledTime("");
     } catch (error: any) {
-      console.error("Failed to send email:", error);
+      console.error("Failed to send/schedule email:", error);
       toast({
-        title: "Failed to Send Email",
+        title: sendOption === "now" ? "Failed to Send Email" : "Failed to Schedule Email",
         description: error.message || "Please try again later.",
         variant: "destructive",
       });
@@ -662,6 +722,76 @@ const ValidationReport = () => {
               />
             </div>
 
+            {/* Send Timing Options */}
+            <div className="space-y-3">
+              <Label className="text-strata-silver text-sm">When to Send</Label>
+              <RadioGroup value={sendOption} onValueChange={(val) => setSendOption(val as "now" | "scheduled" | "game-complete")} className="space-y-2">
+                <div className="flex items-center space-x-3 p-3 rounded-lg bg-strata-charcoal/30 border border-patriots-silver/10 hover:border-strata-cyan/30 transition-colors">
+                  <RadioGroupItem value="now" id="send-now" className="border-strata-silver text-strata-cyan" />
+                  <Label htmlFor="send-now" className="flex items-center gap-2 cursor-pointer flex-1">
+                    <Send className="w-4 h-4 text-strata-cyan" />
+                    <div>
+                      <span className="text-strata-white text-sm">Send Now</span>
+                      <p className="text-[10px] text-strata-silver/50">Deliver immediately</p>
+                    </div>
+                  </Label>
+                </div>
+                
+                <div className="flex items-center space-x-3 p-3 rounded-lg bg-strata-charcoal/30 border border-patriots-silver/10 hover:border-strata-cyan/30 transition-colors">
+                  <RadioGroupItem value="scheduled" id="send-scheduled" className="border-strata-silver text-strata-cyan" />
+                  <Label htmlFor="send-scheduled" className="flex items-center gap-2 cursor-pointer flex-1">
+                    <Calendar className="w-4 h-4 text-strata-orange" />
+                    <div>
+                      <span className="text-strata-white text-sm">Schedule for Later</span>
+                      <p className="text-[10px] text-strata-silver/50">Choose specific date and time</p>
+                    </div>
+                  </Label>
+                </div>
+
+                <div className="flex items-center space-x-3 p-3 rounded-lg bg-strata-charcoal/30 border border-patriots-silver/10 hover:border-strata-cyan/30 transition-colors">
+                  <RadioGroupItem value="game-complete" id="send-game" className="border-strata-silver text-strata-cyan" />
+                  <Label htmlFor="send-game" className="flex items-center gap-2 cursor-pointer flex-1">
+                    <Timer className="w-4 h-4 text-strata-lume" />
+                    <div>
+                      <span className="text-strata-white text-sm">After Game Completion</span>
+                      <p className="text-[10px] text-strata-silver/50">~3.5 hours from now (estimated)</p>
+                    </div>
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {/* Scheduled Date/Time Picker */}
+            {sendOption === "scheduled" && (
+              <div className="grid grid-cols-2 gap-3 p-4 rounded-lg bg-strata-charcoal/30 border border-strata-orange/20">
+                <div className="space-y-2">
+                  <Label htmlFor="scheduledDate" className="text-strata-silver text-xs">
+                    Date <span className="text-patriots-red">*</span>
+                  </Label>
+                  <Input
+                    id="scheduledDate"
+                    type="date"
+                    value={scheduledDate}
+                    onChange={(e) => setScheduledDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    className="bg-strata-charcoal border-patriots-silver/30 text-strata-white"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="scheduledTime" className="text-strata-silver text-xs">
+                    Time <span className="text-patriots-red">*</span>
+                  </Label>
+                  <Input
+                    id="scheduledTime"
+                    type="time"
+                    value={scheduledTime}
+                    onChange={(e) => setScheduledTime(e.target.value)}
+                    className="bg-strata-charcoal border-patriots-silver/30 text-strata-white"
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="bg-strata-charcoal/50 rounded-lg p-4 border border-patriots-silver/10">
               <div className="text-[10px] font-mono uppercase text-strata-silver/50 mb-2">Email Preview</div>
               <div className="text-sm text-strata-silver">
@@ -686,18 +816,26 @@ const ValidationReport = () => {
             </button>
             <button 
               onClick={handleSendEmail}
-              disabled={isSendingEmail || !recipientEmail}
+              disabled={isSendingEmail || !recipientEmail || (sendOption === "scheduled" && (!scheduledDate || !scheduledTime))}
               className="flex items-center gap-2 px-4 py-2 rounded bg-strata-cyan hover:bg-strata-cyan/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isSendingEmail ? (
                 <>
                   <Loader2 className="w-4 h-4 text-strata-black animate-spin" />
-                  <span className="text-sm font-medium text-strata-black">Sending...</span>
+                  <span className="text-sm font-medium text-strata-black">
+                    {sendOption === "now" ? "Sending..." : "Scheduling..."}
+                  </span>
                 </>
               ) : (
                 <>
-                  <Send className="w-4 h-4 text-strata-black" />
-                  <span className="text-sm font-medium text-strata-black">Send Email</span>
+                  {sendOption === "now" ? (
+                    <Send className="w-4 h-4 text-strata-black" />
+                  ) : (
+                    <Calendar className="w-4 h-4 text-strata-black" />
+                  )}
+                  <span className="text-sm font-medium text-strata-black">
+                    {sendOption === "now" ? "Send Email" : "Schedule Email"}
+                  </span>
                 </>
               )}
             </button>

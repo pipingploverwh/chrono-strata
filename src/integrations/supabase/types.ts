@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      scheduled_emails: {
+        Row: {
+          created_at: string
+          email_type: string
+          error_message: string | null
+          id: string
+          payload: Json
+          recipient_email: string
+          recipient_name: string | null
+          scheduled_at: string
+          sent_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email_type?: string
+          error_message?: string | null
+          id?: string
+          payload: Json
+          recipient_email: string
+          recipient_name?: string | null
+          scheduled_at: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email_type?: string
+          error_message?: string | null
+          id?: string
+          payload?: Json
+          recipient_email?: string
+          recipient_name?: string | null
+          scheduled_at?: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
