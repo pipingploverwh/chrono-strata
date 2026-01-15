@@ -36,127 +36,135 @@ interface NavItem {
   description: string;
   icon: React.ComponentType<{ className?: string }>;
   category: "main" | "industry" | "system" | "tools";
+  isPublic?: boolean;
 }
 
 const navItems: NavItem[] = [
-  // Main
+  // Main - Public
   { 
     path: "/", 
     label: "Operations Console", 
     description: "Strategic Overview & Analytics Dashboard",
     icon: Brain,
-    category: "main"
+    category: "main",
+    isPublic: true
   },
   { 
-    path: "/patriot-way", 
-    label: "Patriot Way", 
-    description: "Game Night Command Center",
-    icon: Trophy,
-    category: "main"
-  },
-  { 
-    path: "/patriots-evaluation", 
-    label: "Game Intel", 
-    description: "Clock Management & Strategy",
-    icon: Shield,
-    category: "main"
-  },
-  { 
-    path: "/validation-report", 
-    label: "Validation Report", 
-    description: "94% Accuracy Proof-of-Concept",
-    icon: FileCheck,
-    category: "main"
+    path: "/vc", 
+    label: "Investor Summary", 
+    description: "VC Investment Overview",
+    icon: Activity,
+    category: "main",
+    isPublic: true
   },
   { 
     path: "/strata", 
     label: "STRATA Instrument", 
     description: "Core Weather Intelligence Dashboard",
     icon: Gauge,
-    category: "main"
+    category: "main",
+    isPublic: true
   },
   { 
     path: "/launch", 
     label: "Location Select", 
     description: "Observation Point Initialization",
     icon: Rocket,
-    category: "main"
+    category: "main",
+    isPublic: true
   },
-  // Industry Verticals
+  // Industry Verticals - Public
   { 
-    path: "/strata-aviation", 
+    path: "/aviation", 
     label: "Aviation", 
     description: "Pilot Weather Briefing System",
     icon: Plane,
-    category: "industry"
+    category: "industry",
+    isPublic: true
   },
   { 
-    path: "/strata-marine", 
+    path: "/marine", 
     label: "Marine", 
     description: "Maritime Weather Intelligence",
     icon: Anchor,
-    category: "industry"
+    category: "industry",
+    isPublic: true
   },
   { 
-    path: "/strata-construction", 
+    path: "/construction", 
     label: "Construction", 
     description: "Jobsite Weather Monitoring",
     icon: HardHat,
-    category: "industry"
+    category: "industry",
+    isPublic: true
   },
   { 
-    path: "/strata-events", 
+    path: "/events", 
     label: "Events", 
     description: "Venue Weather Operations",
     icon: CalendarDays,
-    category: "industry"
+    category: "industry",
+    isPublic: true
   },
-  // Tools
+  // Protected Routes - Hidden from public nav
+  { 
+    path: "/validation-report", 
+    label: "Validation Report", 
+    description: "94% Accuracy Proof-of-Concept",
+    icon: FileCheck,
+    category: "main",
+    isPublic: false
+  },
   { 
     path: "/recruiter-outreach", 
     label: "Recruiter Outreach", 
     description: "Technical Recruiter Email Generator",
     icon: Mail,
-    category: "tools"
+    category: "tools",
+    isPublic: false
   },
   { 
     path: "/security", 
     label: "Security Test Suite", 
     description: "AI Security & Compliance Dashboard",
     icon: ShieldCheck,
-    category: "tools"
+    category: "tools",
+    isPublic: false
   },
   { 
     path: "/portfolio", 
     label: "Portfolio", 
     description: "Projects & Skills Showcase",
     icon: User,
-    category: "tools"
+    category: "tools",
+    isPublic: false
   },
-  // System
   { 
     path: "/logs", 
     label: "System Logs", 
     description: "Atmospheric Data History",
     icon: ScrollText,
-    category: "system"
+    category: "system",
+    isPublic: false
   },
   { 
     path: "/sitemap", 
     label: "Site Map", 
     description: "Complete Navigation Index",
     icon: Map,
-    category: "system"
+    category: "system",
+    isPublic: true
   },
 ];
 
 export const SiteNavigation = () => {
   const location = useLocation();
 
-  const mainItems = navItems.filter(item => item.category === "main");
-  const industryItems = navItems.filter(item => item.category === "industry");
-  const toolsItems = navItems.filter(item => item.category === "tools");
-  const systemItems = navItems.filter(item => item.category === "system");
+  // Only show public items in navigation
+  const mainItems = navItems.filter(item => item.category === "main" && item.isPublic !== false);
+  const industryItems = navItems.filter(item => item.category === "industry" && item.isPublic !== false);
+  const toolsItems = navItems.filter(item => item.category === "tools" && item.isPublic !== false);
+  const systemItems = navItems.filter(item => item.category === "system" && item.isPublic !== false);
 
   const currentPage = navItems.find(i => i.path === location.pathname);
 
@@ -313,55 +321,57 @@ export const SiteNavigation = () => {
             </ul>
           </section>
 
-          {/* Tools */}
-          <section aria-labelledby="nav-tools-heading">
-            <h3 
-              id="nav-tools-heading"
-              className="text-[10px] font-mono text-strata-silver/50 uppercase tracking-widest mb-3 px-2"
-            >
-              Tools
-            </h3>
-            <ul className="space-y-1" role="list">
-              {toolsItems.map((item) => {
-                const isActive = location.pathname === item.path;
-                return (
-                  <li key={item.path}>
-                    <Link
-                      to={item.path}
-                      className={`flex items-center gap-3 p-3 rounded-lg transition-all group focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-inset ${
-                        isActive
-                          ? "bg-purple-500/10 border border-purple-500/30"
-                          : "hover:bg-strata-steel/20 border border-transparent"
-                      }`}
-                      aria-current={isActive ? "page" : undefined}
-                      aria-label={`${item.label}: ${item.description}`}
-                    >
-                      <div 
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+          {/* Tools - only show if there are public tools */}
+          {toolsItems.length > 0 && (
+            <section aria-labelledby="nav-tools-heading">
+              <h3 
+                id="nav-tools-heading"
+                className="text-[10px] font-mono text-strata-silver/50 uppercase tracking-widest mb-3 px-2"
+              >
+                Tools
+              </h3>
+              <ul className="space-y-1" role="list">
+                {toolsItems.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <li key={item.path}>
+                      <Link
+                        to={item.path}
+                        className={`flex items-center gap-3 p-3 rounded-lg transition-all group focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-inset ${
                           isActive
-                            ? "bg-purple-500 text-white"
-                            : "bg-strata-steel/30 text-strata-silver group-hover:text-purple-400"
+                            ? "bg-purple-500/10 border border-purple-500/30"
+                            : "hover:bg-strata-steel/20 border border-transparent"
                         }`}
-                        aria-hidden="true"
+                        aria-current={isActive ? "page" : undefined}
+                        aria-label={`${item.label}: ${item.description}`}
                       >
-                        <item.icon className="w-4 h-4" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className={`text-sm font-semibold ${
-                          isActive ? "text-purple-400" : "text-strata-white"
-                        }`}>
-                          {item.label}
+                        <div 
+                          className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                            isActive
+                              ? "bg-purple-500 text-white"
+                              : "bg-strata-steel/30 text-strata-silver group-hover:text-purple-400"
+                          }`}
+                          aria-hidden="true"
+                        >
+                          <item.icon className="w-4 h-4" />
                         </div>
-                        <div className="text-[10px] text-strata-silver/50 truncate">
-                          {item.description}
+                        <div className="flex-1 min-w-0">
+                          <div className={`text-sm font-semibold ${
+                            isActive ? "text-purple-400" : "text-strata-white"
+                          }`}>
+                            {item.label}
+                          </div>
+                          <div className="text-[10px] text-strata-silver/50 truncate">
+                            {item.description}
+                          </div>
                         </div>
-                      </div>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
 
           {/* System */}
           <section aria-labelledby="nav-system-heading">
@@ -423,10 +433,11 @@ export const SiteNavigation = () => {
 
 // Standalone accessible sitemap page component
 export const SiteMapPage = () => {
-  const mainItems = navItems.filter(item => item.category === "main");
-  const industryItems = navItems.filter(item => item.category === "industry");
-  const toolsItems = navItems.filter(item => item.category === "tools");
-  const systemItems = navItems.filter(item => item.category === "system");
+  // Only show public items in sitemap
+  const mainItems = navItems.filter(item => item.category === "main" && item.isPublic !== false);
+  const industryItems = navItems.filter(item => item.category === "industry" && item.isPublic !== false);
+  const toolsItems = navItems.filter(item => item.category === "tools" && item.isPublic !== false);
+  const systemItems = navItems.filter(item => item.category === "system" && item.isPublic !== false);
 
   return (
     <main 
@@ -502,33 +513,36 @@ export const SiteMapPage = () => {
             </ul>
           </section>
 
-          <section aria-labelledby="sitemap-tools-heading">
-            <h2 
-              id="sitemap-tools-heading" 
-              className="font-instrument text-xl text-purple-400 mb-4 flex items-center gap-2"
-            >
-              <Mail className="w-5 h-5" aria-hidden="true" />
-              Tools
-            </h2>
-            <ul className="space-y-3" role="list">
-              {toolsItems.map((item) => (
-                <li key={item.path}>
-                  <Link 
-                    to={item.path}
-                    className="flex items-start gap-3 p-3 rounded-lg bg-strata-charcoal/50 hover:bg-strata-charcoal transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    aria-label={`${item.label}: ${item.description}`}
-                  >
-                    <item.icon className="w-5 h-5 text-purple-400 mt-0.5" aria-hidden="true" />
-                    <div>
-                      <div className="font-semibold text-strata-white">{item.label}</div>
-                      <div className="text-sm text-strata-silver/70">{item.description}</div>
-                      <code className="text-[10px] text-strata-silver/40 font-mono">{item.path}</code>
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
+          {/* Tools - only show if there are public tools */}
+          {toolsItems.length > 0 && (
+            <section aria-labelledby="sitemap-tools-heading">
+              <h2 
+                id="sitemap-tools-heading" 
+                className="font-instrument text-xl text-purple-400 mb-4 flex items-center gap-2"
+              >
+                <Mail className="w-5 h-5" aria-hidden="true" />
+                Tools
+              </h2>
+              <ul className="space-y-3" role="list">
+                {toolsItems.map((item) => (
+                  <li key={item.path}>
+                    <Link 
+                      to={item.path}
+                      className="flex items-start gap-3 p-3 rounded-lg bg-strata-charcoal/50 hover:bg-strata-charcoal transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      aria-label={`${item.label}: ${item.description}`}
+                    >
+                      <item.icon className="w-5 h-5 text-purple-400 mt-0.5" aria-hidden="true" />
+                      <div>
+                        <div className="font-semibold text-strata-white">{item.label}</div>
+                        <div className="text-sm text-strata-silver/70">{item.description}</div>
+                        <code className="text-[10px] text-strata-silver/40 font-mono">{item.path}</code>
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           <section aria-labelledby="sitemap-system-heading">
             <h2 
