@@ -35,6 +35,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import WebScraper from "./pages/WebScraper";
 import LavenderAgent from "./pages/LavenderAgent";
+import SourcedInventory from "./pages/SourcedInventory";
 
 const queryClient = new QueryClient();
 
@@ -79,6 +80,7 @@ const App = () => (
                 <Route path="/zero-lemon" element={<ProtectedRoute><ZeroLemonMobile /></ProtectedRoute>} />
                 <Route path="/web-scraper" element={<ProtectedRoute><WebScraper /></ProtectedRoute>} />
                 <Route path="/lavender-agent" element={<ProtectedRoute><LavenderAgent /></ProtectedRoute>} />
+                <Route path="/sourced-inventory" element={<ProtectedRoute><SourcedInventory /></ProtectedRoute>} />
                 <Route path="/logs" element={<ProtectedRoute><Logs /></ProtectedRoute>} />
                 
                 {/* Admin Routes */}
