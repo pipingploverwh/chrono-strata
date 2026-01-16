@@ -58,58 +58,82 @@ export type Database = {
       }
       sourced_products: {
         Row: {
+          approved_for_listing: boolean | null
           category: string | null
           cost_price: number
+          crawl_session_id: string | null
           created_at: string
           description: string
           gross_margin: number | null
           id: string
           image_urls: string[] | null
+          in_stock: boolean | null
+          lovable_margin_percent: number | null
+          notes: string | null
           original_source_url: string
           product_name: string
+          scraped_at: string | null
           scraped_raw_content: string | null
+          ships_to: string[] | null
           sourcing_confidence: number | null
           status: string | null
           stock_status: string | null
           suggested_retail_price: number
+          supplier_name: string | null
           supplier_rating: number | null
           tags: string[] | null
           updated_at: string
         }
         Insert: {
+          approved_for_listing?: boolean | null
           category?: string | null
           cost_price: number
+          crawl_session_id?: string | null
           created_at?: string
           description: string
           gross_margin?: number | null
           id?: string
           image_urls?: string[] | null
+          in_stock?: boolean | null
+          lovable_margin_percent?: number | null
+          notes?: string | null
           original_source_url: string
           product_name: string
+          scraped_at?: string | null
           scraped_raw_content?: string | null
+          ships_to?: string[] | null
           sourcing_confidence?: number | null
           status?: string | null
           stock_status?: string | null
           suggested_retail_price: number
+          supplier_name?: string | null
           supplier_rating?: number | null
           tags?: string[] | null
           updated_at?: string
         }
         Update: {
+          approved_for_listing?: boolean | null
           category?: string | null
           cost_price?: number
+          crawl_session_id?: string | null
           created_at?: string
           description?: string
           gross_margin?: number | null
           id?: string
           image_urls?: string[] | null
+          in_stock?: boolean | null
+          lovable_margin_percent?: number | null
+          notes?: string | null
           original_source_url?: string
           product_name?: string
+          scraped_at?: string | null
           scraped_raw_content?: string | null
+          ships_to?: string[] | null
           sourcing_confidence?: number | null
           status?: string | null
           stock_status?: string | null
           suggested_retail_price?: number
+          supplier_name?: string | null
           supplier_rating?: number | null
           tags?: string[] | null
           updated_at?: string
@@ -172,7 +196,90 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      lovable_listings: {
+        Row: {
+          approved_for_listing: boolean | null
+          category: string | null
+          cost_price: number | null
+          crawl_session_id: string | null
+          created_at: string | null
+          description: string | null
+          gross_margin: number | null
+          id: string | null
+          image_urls: string[] | null
+          in_stock: boolean | null
+          lovable_margin_percent: number | null
+          notes: string | null
+          original_source_url: string | null
+          product_name: string | null
+          scraped_at: string | null
+          scraped_raw_content: string | null
+          ships_to: string[] | null
+          sourcing_confidence: number | null
+          status: string | null
+          stock_status: string | null
+          suggested_retail_price: number | null
+          supplier_name: string | null
+          supplier_rating: number | null
+          tags: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          approved_for_listing?: boolean | null
+          category?: string | null
+          cost_price?: number | null
+          crawl_session_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          gross_margin?: number | null
+          id?: string | null
+          image_urls?: string[] | null
+          in_stock?: boolean | null
+          lovable_margin_percent?: number | null
+          notes?: string | null
+          original_source_url?: string | null
+          product_name?: string | null
+          scraped_at?: string | null
+          scraped_raw_content?: string | null
+          ships_to?: string[] | null
+          sourcing_confidence?: number | null
+          status?: string | null
+          stock_status?: string | null
+          suggested_retail_price?: number | null
+          supplier_name?: string | null
+          supplier_rating?: number | null
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          approved_for_listing?: boolean | null
+          category?: string | null
+          cost_price?: number | null
+          crawl_session_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          gross_margin?: number | null
+          id?: string | null
+          image_urls?: string[] | null
+          in_stock?: boolean | null
+          lovable_margin_percent?: number | null
+          notes?: string | null
+          original_source_url?: string | null
+          product_name?: string | null
+          scraped_at?: string | null
+          scraped_raw_content?: string | null
+          ships_to?: string[] | null
+          sourcing_confidence?: number | null
+          status?: string | null
+          stock_status?: string | null
+          suggested_retail_price?: number | null
+          supplier_name?: string | null
+          supplier_rating?: number | null
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
