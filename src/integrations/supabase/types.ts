@@ -56,6 +56,66 @@ export type Database = {
         }
         Relationships: []
       }
+      sourced_products: {
+        Row: {
+          category: string | null
+          cost_price: number
+          created_at: string
+          description: string
+          gross_margin: number | null
+          id: string
+          image_urls: string[] | null
+          original_source_url: string
+          product_name: string
+          scraped_raw_content: string | null
+          sourcing_confidence: number | null
+          status: string | null
+          stock_status: string | null
+          suggested_retail_price: number
+          supplier_rating: number | null
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          cost_price: number
+          created_at?: string
+          description: string
+          gross_margin?: number | null
+          id?: string
+          image_urls?: string[] | null
+          original_source_url: string
+          product_name: string
+          scraped_raw_content?: string | null
+          sourcing_confidence?: number | null
+          status?: string | null
+          stock_status?: string | null
+          suggested_retail_price: number
+          supplier_rating?: number | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          cost_price?: number
+          created_at?: string
+          description?: string
+          gross_margin?: number | null
+          id?: string
+          image_urls?: string[] | null
+          original_source_url?: string
+          product_name?: string
+          scraped_raw_content?: string | null
+          sourcing_confidence?: number | null
+          status?: string | null
+          stock_status?: string | null
+          suggested_retail_price?: number
+          supplier_rating?: number | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

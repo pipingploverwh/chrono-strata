@@ -34,6 +34,7 @@ import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import WebScraper from "./pages/WebScraper";
+import LavenderAgent from "./pages/LavenderAgent";
 
 const queryClient = new QueryClient();
 
@@ -77,6 +78,7 @@ const App = () => (
                 <Route path="/recruiter-outreach" element={<ProtectedRoute><RecruiterOutreach /></ProtectedRoute>} />
                 <Route path="/zero-lemon" element={<ProtectedRoute><ZeroLemonMobile /></ProtectedRoute>} />
                 <Route path="/web-scraper" element={<ProtectedRoute><WebScraper /></ProtectedRoute>} />
+                <Route path="/lavender-agent" element={<ProtectedRoute><LavenderAgent /></ProtectedRoute>} />
                 <Route path="/logs" element={<ProtectedRoute><Logs /></ProtectedRoute>} />
                 
                 {/* Admin Routes */}
