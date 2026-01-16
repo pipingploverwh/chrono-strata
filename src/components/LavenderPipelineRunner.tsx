@@ -2,30 +2,18 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
 import { 
   Loader2, 
-  Rocket, 
   Globe, 
-  Search, 
-  Sparkles, 
   Package, 
   Database, 
   CheckCircle,
-  AlertCircle,
-  Map,
-  Scan,
-  Brain,
-  Save,
   ExternalLink,
-  Clock
+  ArrowRight
 } from "lucide-react";
 
 interface PipelineStats {
@@ -79,20 +67,19 @@ const LavenderPipelineRunner = () => {
   const [running, setRunning] = useState(false);
   const [currentStage, setCurrentStage] = useState("");
   const [result, setResult] = useState<PipelineResult | null>(null);
+  const [activeTab, setActiveTab] = useState<"products" | "urls" | "logs">("products");
 
   const runPipeline = async () => {
     if (!domain.trim()) {
-      toast.error("Please enter a domain to scan");
+      toast.error("Enter a domain to begin");
       return;
     }
 
     setRunning(true);
     setResult(null);
-    setCurrentStage("Initializing pipeline...");
+    setCurrentStage("Mapping domain structure");
 
     try {
-      toast.info("🚀 Starting Lavender Sourcing Pipeline...");
-
       const response = await supabase.functions.invoke("lavender-pipeline", {
         body: {
           domain,
@@ -112,11 +99,11 @@ const LavenderPipelineRunner = () => {
 
       if (data.success) {
         toast.success(
-          `Pipeline complete! Found ${data.stats.products_found} products` +
-          (autoSave ? `, saved ${data.stats.products_saved}` : "")
+          `Complete. ${data.stats.products_found} products found` +
+          (autoSave ? `, ${data.stats.products_saved} saved` : "")
         );
       } else {
-        toast.error(data.error || "Pipeline failed");
+        toast.error(data.error || "Pipeline did not complete");
       }
     } catch (error) {
       console.error("Pipeline error:", error);
@@ -148,347 +135,351 @@ const LavenderPipelineRunner = () => {
       if (error) throw error;
       toast.success(`Saved: ${product.product_name}`);
     } catch (error) {
-      toast.error("Failed to save product. Check admin permissions.");
+      toast.error("Failed to save product");
     }
   };
 
-  const getStageIcon = (stage: string) => {
-    if (stage.includes("MAP")) return <Map className="h-4 w-4" />;
-    if (stage.includes("FILTER")) return <Search className="h-4 w-4" />;
-    if (stage.includes("SCRAPE")) return <Scan className="h-4 w-4" />;
-    if (stage.includes("ANALYZE")) return <Brain className="h-4 w-4" />;
-    if (stage.includes("SAVE")) return <Save className="h-4 w-4" />;
-    if (stage.includes("COMPLETE")) return <CheckCircle className="h-4 w-4 text-green-500" />;
-    if (stage.includes("ERROR")) return <AlertCircle className="h-4 w-4 text-red-500" />;
-    return <Clock className="h-4 w-4" />;
+  const getMarginClass = (margin: number) => {
+    if (margin >= 70) return "badge-margin-high";
+    if (margin >= 50) return "badge-margin-medium";
+    return "badge-margin-low";
+  };
+
+  const getStageMessage = () => {
+    if (!running) return null;
+    const stages = [
+      "Mapping domain structure",
+      "Filtering relevant URLs", 
+      "Scraping product pages",
+      "Analyzing for viable products",
+      "Saving to inventory"
+    ];
+    return currentStage || stages[0];
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
-        <Card className="bg-gray-800/50 border-purple-500/30">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-gradient-to-br from-purple-600 to-violet-600 rounded-xl">
-                <Rocket className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <CardTitle className="text-2xl text-white">
-                  Automated Sourcing Pipeline
-                </CardTitle>
-                <CardDescription className="text-gray-400">
-                  Map → Scrape → Analyze → Save • Full automation for Lavender AI Org
-                </CardDescription>
+    <div className="min-h-screen surface-0 py-12 px-6">
+      <div className="max-w-4xl mx-auto">
+        
+        {/* Header: One dominant title */}
+        <header className="section-header">
+          <h1 className="text-2xl font-medium text-dominant tracking-tight">
+            Sourcing Pipeline
+          </h1>
+          <p className="section-subtitle">
+            Automated discovery and analysis
+          </p>
+        </header>
+
+        {/* Configuration: Calm, focused inputs */}
+        <div className="lavender-card p-6 mb-8">
+          <div className="space-y-6">
+            
+            {/* Domain Input */}
+            <div>
+              <Label className="text-subordinate text-sm mb-2 block">Target Domain</Label>
+              <div className="relative">
+                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-whisper" />
+                <Input
+                  placeholder="bulkapothecary.com"
+                  value={domain}
+                  onChange={(e) => setDomain(e.target.value)}
+                  className="input-calm pl-10"
+                  disabled={running}
+                />
               </div>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Configuration */}
+
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-gray-300">Target Domain</Label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Globe className="h-4 w-4 text-gray-500" />
-                    <Input
-                      placeholder="e.g., bulkapothecary.com"
-                      value={domain}
-                      onChange={(e) => setDomain(e.target.value)}
-                      className="bg-gray-900/50 border-gray-600"
-                      disabled={running}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label className="text-gray-300">URL Filter Keywords</Label>
-                  <Input
-                    placeholder="lavender,essential,oil"
-                    value={urlFilter}
-                    onChange={(e) => setUrlFilter(e.target.value)}
-                    className="bg-gray-900/50 border-gray-600 mt-1"
-                    disabled={running}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Comma-separated terms to filter discovered URLs
-                  </p>
-                </div>
+              {/* URL Filter */}
+              <div>
+                <Label className="text-subordinate text-sm mb-2 block">Filter Keywords</Label>
+                <Input
+                  placeholder="lavender, essential, oil"
+                  value={urlFilter}
+                  onChange={(e) => setUrlFilter(e.target.value)}
+                  className="input-calm"
+                  disabled={running}
+                />
+                <p className="text-whisper text-xs mt-1.5">
+                  Comma-separated terms
+                </p>
               </div>
 
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-gray-300">
-                    URL Limit: {urlLimit} pages
-                  </Label>
-                  <Slider
-                    value={[urlLimit]}
-                    onValueChange={(v) => setUrlLimit(v[0])}
-                    min={1}
-                    max={20}
-                    step={1}
-                    className="mt-2"
-                    disabled={running}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Maximum number of product pages to analyze
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-gray-900/50 rounded-lg">
-                  <div>
-                    <Label className="text-gray-300">Auto-Save Products</Label>
-                    <p className="text-xs text-gray-500">
-                      Automatically save found products to database
-                    </p>
-                  </div>
-                  <Switch
-                    checked={autoSave}
-                    onCheckedChange={setAutoSave}
-                    disabled={running}
-                  />
-                </div>
+              {/* URL Limit */}
+              <div>
+                <Label className="text-subordinate text-sm mb-2 block">
+                  Page Limit: {urlLimit}
+                </Label>
+                <Slider
+                  value={[urlLimit]}
+                  onValueChange={(v) => setUrlLimit(v[0])}
+                  min={1}
+                  max={20}
+                  step={1}
+                  className="mt-3"
+                  disabled={running}
+                />
+                <p className="text-whisper text-xs mt-1.5">
+                  Maximum pages to analyze
+                </p>
               </div>
             </div>
 
-            {/* Run Button */}
+            <div className="divider-light" />
+
+            {/* Auto-save toggle */}
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-subordinate text-sm">Auto-save to inventory</Label>
+                <p className="text-whisper text-xs mt-0.5">
+                  Automatically save viable products
+                </p>
+              </div>
+              <Switch
+                checked={autoSave}
+                onCheckedChange={setAutoSave}
+                disabled={running}
+              />
+            </div>
+
+            <div className="divider-light" />
+
+            {/* Primary Action: One deliberate button */}
             <Button
               onClick={runPipeline}
               disabled={running || !domain.trim()}
-              className="w-full h-14 text-lg bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700"
+              className="w-full h-12 btn-primary text-sm font-medium"
             >
               {running ? (
-                <>
-                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                  {currentStage || "Running Pipeline..."}
-                </>
+                <span className="flex items-center gap-3">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>{getStageMessage()}</span>
+                </span>
               ) : (
-                <>
-                  <Sparkles className="h-5 w-5 mr-2" />
-                  Launch Sourcing Pipeline
-                </>
+                <span className="flex items-center gap-2">
+                  <span>Begin Analysis</span>
+                  <ArrowRight className="h-4 w-4" />
+                </span>
               )}
             </Button>
 
-            {/* Pipeline Stages Indicator */}
+            {/* Loading Progress: Inevitable, not anxious */}
             {running && (
-              <div className="flex items-center justify-between text-sm">
-                {["Map", "Filter", "Scrape", "Analyze", "Save"].map((stage, i) => (
-                  <div key={stage} className="flex items-center gap-2">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      i === 0 ? "bg-purple-600 animate-pulse" : "bg-gray-700"
-                    }`}>
-                      {i + 1}
-                    </div>
-                    <span className="text-gray-400 hidden md:inline">{stage}</span>
-                    {i < 4 && <div className="w-8 h-0.5 bg-gray-700 hidden md:block" />}
-                  </div>
-                ))}
+              <div className="loading-progress">
+                <div 
+                  className="loading-progress-bar" 
+                  style={{ width: "60%" }}
+                />
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Results */}
         {result && (
-          <Tabs defaultValue="products" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <TabsList className="bg-gray-800/50">
-                <TabsTrigger value="products" className="gap-2">
-                  <Package className="h-4 w-4" />
-                  Products ({result.stats.products_found})
-                </TabsTrigger>
-                <TabsTrigger value="urls" className="gap-2">
-                  <Globe className="h-4 w-4" />
-                  URLs ({result.stats.urls_filtered})
-                </TabsTrigger>
-                <TabsTrigger value="logs" className="gap-2">
-                  <Clock className="h-4 w-4" />
-                  Logs
-                </TabsTrigger>
-              </TabsList>
-
-              {/* Stats Summary */}
-              <div className="flex gap-2">
-                <Badge variant="outline" className="bg-purple-500/20 text-purple-400">
-                  {result.stats.urls_discovered} discovered
-                </Badge>
-                <Badge variant="outline" className="bg-blue-500/20 text-blue-400">
-                  {result.stats.pages_scraped} scraped
-                </Badge>
-                <Badge variant="outline" className="bg-green-500/20 text-green-400">
-                  {result.stats.products_saved} saved
-                </Badge>
-              </div>
+          <div className="animate-fade">
+            
+            {/* Stats Row: Quiet summary */}
+            <div className="flex items-center gap-6 mb-8 text-sm">
+              <span className="text-subordinate">
+                <span className="text-dominant font-medium">{result.stats.urls_discovered}</span> discovered
+              </span>
+              <span className="text-whisper">→</span>
+              <span className="text-subordinate">
+                <span className="text-dominant font-medium">{result.stats.urls_filtered}</span> filtered
+              </span>
+              <span className="text-whisper">→</span>
+              <span className="text-subordinate">
+                <span className="text-dominant font-medium">{result.stats.products_found}</span> products
+              </span>
+              {autoSave && (
+                <>
+                  <span className="text-whisper">→</span>
+                  <span className="text-margin-high">
+                    {result.stats.products_saved} saved
+                  </span>
+                </>
+              )}
             </div>
 
-            <TabsContent value="products">
-              {result.analyzed_products.length === 0 ? (
-                <Card className="bg-gray-800/50 border-gray-700">
-                  <CardContent className="py-12 text-center">
-                    <Package className="h-12 w-12 mx-auto text-gray-500 mb-4" />
-                    <p className="text-gray-400">No products found. Try a different domain or filter.</p>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="grid md:grid-cols-2 gap-4">
-                  {result.analyzed_products.map((product, idx) => (
-                    <Card key={idx} className="bg-gray-800/50 border-gray-700 hover:border-purple-500/50 transition-colors">
-                      <CardHeader className="pb-2">
-                        <div className="flex items-start justify-between gap-2">
-                          <CardTitle className="text-lg text-white line-clamp-2">
+            {/* Tab Navigation: Minimal */}
+            <div className="flex gap-6 mb-6 border-b border-border">
+              {[
+                { id: "products", label: "Products", count: result.stats.products_found },
+                { id: "urls", label: "URLs", count: result.stats.urls_filtered },
+                { id: "logs", label: "Logs", count: result.stages.length },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                  className={`pb-3 text-sm transition-colors ${
+                    activeTab === tab.id
+                      ? "text-dominant border-b-2 border-lavender"
+                      : "text-tertiary hover:text-subordinate"
+                  }`}
+                >
+                  {tab.label}
+                  {tab.count > 0 && (
+                    <span className="ml-2 text-xs text-whisper">{tab.count}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Products Tab */}
+            {activeTab === "products" && (
+              <div>
+                {result.analyzed_products.length === 0 ? (
+                  <div className="empty-state">
+                    <Package className="empty-state-icon" />
+                    <p className="empty-state-message">
+                      No products met Lovable's margin and quality standards.
+                    </p>
+                    <p className="empty-state-suggestion">
+                      Try a different domain or adjust filter keywords.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {result.analyzed_products.map((product, idx) => (
+                      <article 
+                        key={idx} 
+                        className="product-card"
+                      >
+                        {/* Header: Name + Margin (dominant metric) */}
+                        <div className="flex items-start justify-between gap-4 mb-3">
+                          <h3 className="text-base font-medium text-dominant leading-snug">
                             {product.product_name}
-                          </CardTitle>
-                          <Badge className={`shrink-0 ${
-                            product.gross_margin >= 70 
-                              ? "bg-green-500/20 text-green-400" 
-                              : product.gross_margin >= 50 
-                              ? "bg-yellow-500/20 text-yellow-400"
-                              : "bg-red-500/20 text-red-400"
-                          }`}>
-                            {product.gross_margin?.toFixed(1)}% margin
-                          </Badge>
+                          </h3>
+                          <span className={getMarginClass(product.gross_margin)}>
+                            {product.gross_margin?.toFixed(0)}%
+                          </span>
                         </div>
-                        <div className="flex gap-2 flex-wrap">
-                          <Badge variant="outline">{product.category}</Badge>
-                          <Badge variant="secondary" className="text-xs">
+
+                        {/* Description: Subordinate */}
+                        <p className="text-sm text-subordinate line-clamp-2 mb-4">
+                          {product.description}
+                        </p>
+
+                        {/* Metrics Row */}
+                        <div className="flex items-center gap-6 text-sm mb-4">
+                          <div>
+                            <span className="text-whisper">Cost </span>
+                            <span className="text-dominant">${product.cost_price?.toFixed(2)}</span>
+                          </div>
+                          <div>
+                            <span className="text-whisper">Retail </span>
+                            <span className="text-margin-high font-medium">${product.suggested_retail_price?.toFixed(2)}</span>
+                          </div>
+                          <div className="badge-confidence">
                             {product.sourcing_confidence}% confidence
-                          </Badge>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        <p className="text-sm text-gray-400 line-clamp-2">{product.description}</p>
-                        
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="bg-gray-900/50 p-2 rounded">
-                            <p className="text-xs text-gray-500">Cost</p>
-                            <p className="text-lg font-semibold text-white">${product.cost_price?.toFixed(2)}</p>
                           </div>
-                          <div className="bg-gray-900/50 p-2 rounded">
-                            <p className="text-xs text-gray-500">Retail</p>
-                            <p className="text-lg font-semibold text-emerald-400">${product.suggested_retail_price?.toFixed(2)}</p>
-                          </div>
+                          {product.category && (
+                            <div className="badge-category">
+                              {product.category}
+                            </div>
+                          )}
                         </div>
 
-                        <div className="flex flex-wrap gap-1">
-                          {product.tags?.slice(0, 4).map((tag, i) => (
-                            <Badge key={i} variant="secondary" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
+                        {/* Tags: Tertiary */}
+                        {product.tags && product.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 mb-4">
+                            {product.tags.slice(0, 4).map((tag, i) => (
+                              <span 
+                                key={i} 
+                                className="px-2 py-0.5 text-xs rounded surface-2 text-tertiary"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
 
-                        <div className="flex items-center justify-between pt-2 border-t border-gray-700">
+                        {/* Actions: Quiet, deliberate */}
+                        <div className="divider-light" />
+                        <div className="flex items-center justify-between pt-2">
                           <a
                             href={product.original_source_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs text-purple-400 hover:underline flex items-center gap-1"
+                            className="text-xs text-tertiary hover:text-subordinate flex items-center gap-1 transition-colors"
                           >
                             <ExternalLink className="h-3 w-3" />
-                            View Source
+                            Source
                           </a>
                           {!autoSave && !result.saved_products.includes(product.product_name) && (
                             <Button
                               size="sm"
-                              variant="outline"
+                              variant="ghost"
                               onClick={() => saveProduct(product)}
-                              className="border-purple-500/50 hover:bg-purple-600/20"
+                              className="text-xs text-subordinate hover:text-dominant"
                             >
-                              <Database className="h-4 w-4 mr-1" />
+                              <Database className="h-3 w-3 mr-1.5" />
                               Save
                             </Button>
                           )}
                           {result.saved_products.includes(product.product_name) && (
-                            <Badge className="bg-green-500/20 text-green-400">
-                              <CheckCircle className="h-3 w-3 mr-1" />
+                            <span className="text-xs text-margin-high flex items-center gap-1">
+                              <CheckCircle className="h-3 w-3" />
                               Saved
-                            </Badge>
+                            </span>
                           )}
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </TabsContent>
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
-            <TabsContent value="urls">
-              <Card className="bg-gray-800/50 border-gray-700">
-                <CardHeader>
-                  <CardTitle className="text-lg">Discovered & Filtered URLs</CardTitle>
-                  <CardDescription>
-                    {result.stats.urls_discovered} discovered → {result.stats.urls_filtered} filtered
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ScrollArea className="h-[400px]">
-                    <div className="space-y-2">
-                      {result.filtered_urls.map((url, idx) => (
-                        <div key={idx} className="flex items-center gap-2 p-2 bg-gray-900/50 rounded">
-                          <Badge variant="outline" className="shrink-0">{idx + 1}</Badge>
-                          <a
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-purple-400 hover:underline truncate"
-                          >
-                            {url}
-                          </a>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            </TabsContent>
+            {/* URLs Tab */}
+            {activeTab === "urls" && (
+              <div className="space-y-1">
+                {result.filtered_urls.map((url, idx) => (
+                  <div 
+                    key={idx} 
+                    className="flex items-center gap-3 py-2 px-3 surface-1 rounded text-sm"
+                  >
+                    <span className="text-whisper text-xs w-6">{idx + 1}</span>
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-subordinate hover:text-dominant truncate transition-colors"
+                    >
+                      {url}
+                    </a>
+                  </div>
+                ))}
+              </div>
+            )}
 
-            <TabsContent value="logs">
-              <Card className="bg-gray-800/50 border-gray-700">
-                <CardHeader>
-                  <CardTitle className="text-lg">Pipeline Execution Log</CardTitle>
-                  <CardDescription>Session: {result.session_id}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ScrollArea className="h-[400px]">
-                    <div className="space-y-2 font-mono text-sm">
-                      {result.stages.map((stage, idx) => (
-                        <div key={idx} className="flex items-start gap-3 p-2 bg-gray-900/50 rounded">
-                          <div className="shrink-0 mt-0.5">
-                            {getStageIcon(stage.stage)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="text-xs">
-                                {stage.stage}
-                              </Badge>
-                              <span className="text-xs text-gray-500">
-                                {new Date(stage.timestamp).toLocaleTimeString()}
-                              </span>
-                            </div>
-                            <p className="text-gray-300 mt-1">{stage.message}</p>
-                          </div>
-                        </div>
-                      ))}
-
-                      {result.errors.length > 0 && (
-                        <div className="mt-4 pt-4 border-t border-red-500/30">
-                          <p className="text-red-400 font-semibold mb-2">Errors:</p>
-                          {result.errors.map((err, idx) => (
-                            <div key={idx} className="p-2 bg-red-900/20 rounded mb-2">
-                              <Badge variant="destructive" className="text-xs">{err.stage}</Badge>
-                              <p className="text-red-300 text-sm mt-1">{err.error}</p>
-                              {err.url && <p className="text-xs text-gray-500">{err.url}</p>}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+            {/* Logs Tab: Lab notes, not alerts */}
+            {activeTab === "logs" && (
+              <div className="space-y-1">
+                {result.stages.map((stage, idx) => (
+                  <div key={idx} className="log-entry">
+                    <span className="log-entry-stage">{stage.stage}</span>
+                    <span className="mx-2 text-border">·</span>
+                    <span>{stage.message}</span>
+                  </div>
+                ))}
+                {result.errors.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <p className="text-xs text-tertiary mb-2">Errors encountered:</p>
+                    {result.errors.map((err, idx) => (
+                      <div key={idx} className="log-entry border-l-margin-low">
+                        <span className="text-margin-low">{err.stage}</span>
+                        <span className="mx-2 text-border">·</span>
+                        <span className="text-subordinate">{err.error}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

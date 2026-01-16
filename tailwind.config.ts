@@ -57,43 +57,50 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        strata: {
-          black: "hsl(var(--strata-black))",
-          charcoal: "hsl(var(--strata-charcoal))",
-          steel: "hsl(var(--strata-steel))",
-          gunmetal: "hsl(var(--strata-gunmetal))",
-          silver: "hsl(var(--strata-silver))",
-          white: "hsl(var(--strata-white))",
-          orange: "hsl(var(--strata-orange))",
-          "orange-dim": "hsl(var(--strata-orange-dim))",
-          lume: "hsl(var(--strata-lume))",
-          "lume-dim": "hsl(var(--strata-lume-dim))",
-          blue: "hsl(var(--strata-blue))",
-          cyan: "hsl(var(--strata-cyan))",
-          red: "hsl(var(--strata-red))",
+        // Semantic margin colors
+        margin: {
+          high: "hsl(var(--margin-high))",
+          medium: "hsl(var(--margin-medium))",
+          low: "hsl(var(--margin-low))",
         },
-        patriots: {
-          navy: "hsl(var(--patriots-navy))",
-          "navy-light": "hsl(var(--patriots-navy-light))",
-          red: "hsl(var(--patriots-red))",
-          "red-bright": "hsl(var(--patriots-red-bright))",
-          silver: "hsl(var(--patriots-silver))",
-          "silver-bright": "hsl(var(--patriots-silver-bright))",
-          white: "hsl(var(--patriots-white))",
+        // Semantic confidence colors
+        confidence: {
+          high: "hsl(var(--confidence-high))",
+          medium: "hsl(var(--confidence-medium))",
+          low: "hsl(var(--confidence-low))",
         },
-        chargers: {
-          gold: "hsl(var(--chargers-gold))",
-          blue: "hsl(var(--chargers-blue))",
+        // Status colors
+        status: {
+          approved: "hsl(var(--status-approved))",
+          pending: "hsl(var(--status-pending))",
+          rejected: "hsl(var(--status-rejected))",
+        },
+        // Lavender identity
+        lavender: {
+          DEFAULT: "hsl(var(--lavender))",
+          dim: "hsl(var(--lavender-dim))",
+          glow: "hsl(var(--lavender-glow))",
+        },
+        // Surface layers
+        surface: {
+          0: "hsl(var(--surface-0))",
+          1: "hsl(var(--surface-1))",
+          2: "hsl(var(--surface-2))",
+          3: "hsl(var(--surface-3))",
         },
       },
       fontFamily: {
-        instrument: ["Oswald", "sans-serif"],
-        mono: ["JetBrains Mono", "monospace"],
+        sans: ["Inter", "system-ui", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      spacing: {
+        // Generous spacing for breathing room
+        '18': '4.5rem',
+        '22': '5.5rem',
       },
       keyframes: {
         "accordion-down": {
@@ -104,20 +111,15 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "sweep-second": {
-          from: { transform: "rotate(0deg)" },
-          to: { transform: "rotate(360deg)" },
-        },
-        "pulse-glow": {
-          "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0.6" },
+        "fade-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "sweep": "sweep-second 60s linear infinite",
-        "pulse-glow": "pulse-glow 3s ease-in-out infinite",
+        "fade": "fade-in 0.3s ease",
       },
     },
   },

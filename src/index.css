@@ -2,139 +2,135 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap');
+/* Arielle-Inspired Typography: One family, two weights */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
 
-/* Smooth scrolling globally */
 html {
   scroll-behavior: smooth;
 }
 
 @layer base {
   :root {
-    /* STRATA Instrument Color System */
-    --background: 0 0% 4%;
-    --foreground: 0 0% 92%;
-
-    --card: 0 0% 7%;
-    --card-foreground: 0 0% 92%;
-
-    --popover: 0 0% 7%;
-    --popover-foreground: 0 0% 92%;
-
-    /* Doxa Professional Orange */
-    --primary: 25 100% 50%;
+    /* ═══════════════════════════════════════════════════════════════
+       LAVENDER DESIGN SYSTEM — Arielle Assouline-Lichten Philosophy
+       "Discipline, restraint, and conceptual clarity"
+       ═══════════════════════════════════════════════════════════════ */
+    
+    /* Foundation: Calm neutrals do most of the work */
+    --background: 0 0% 3%;
+    --foreground: 0 0% 88%;
+    
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 88%;
+    
+    --popover: 0 0% 5%;
+    --popover-foreground: 0 0% 88%;
+    
+    /* Identity: Lavender purple — used sparingly */
+    --primary: 270 50% 55%;
     --primary-foreground: 0 0% 100%;
-
-    /* Instrument Gray */
-    --secondary: 0 0% 12%;
-    --secondary-foreground: 0 0% 75%;
-
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 55%;
-
-    /* Lume Green */
-    --accent: 120 100% 62%;
-    --accent-foreground: 0 0% 4%;
-
-    --destructive: 0 72% 51%;
+    
+    /* Structural grays */
+    --secondary: 0 0% 8%;
+    --secondary-foreground: 0 0% 65%;
+    
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 50%;
+    
+    /* Accent: Reserved for verified states only */
+    --accent: 0 0% 10%;
+    --accent-foreground: 0 0% 75%;
+    
+    --destructive: 0 60% 45%;
     --destructive-foreground: 0 0% 100%;
-
-    --border: 0 0% 18%;
-    --input: 0 0% 15%;
-    --ring: 25 100% 50%;
-
-    --radius: 0.25rem;
-
-    /* STRATA Custom Tokens */
-    --strata-black: 0 0% 4%;
-    --strata-charcoal: 0 0% 8%;
-    --strata-steel: 0 0% 12%;
-    --strata-gunmetal: 0 0% 20%;
-    --strata-silver: 0 0% 75%;
-    --strata-white: 0 0% 95%;
     
-    --strata-orange: 25 100% 50%;
-    --strata-orange-dim: 25 80% 35%;
-    --strata-lume: 120 100% 62%;
-    --strata-lume-dim: 120 60% 30%;
-    --strata-blue: 200 100% 50%;
-    --strata-cyan: 180 100% 45%;
-    --strata-red: 0 85% 55%;
-    --strata-crimson: 348 83% 47%;
-    --strata-wine: 345 60% 35%;
-    --strata-blush: 350 100% 88%;
+    /* Borders: Whisper-quiet */
+    --border: 0 0% 12%;
+    --input: 0 0% 10%;
+    --ring: 270 50% 55%;
     
-    /* Patriots Game Night Color System */
-    --patriots-navy: 216 100% 18%;
-    --patriots-navy-light: 216 80% 25%;
-    --patriots-red: 0 100% 40%;
-    --patriots-red-bright: 0 100% 50%;
-    --patriots-silver: 220 10% 70%;
-    --patriots-silver-bright: 220 10% 85%;
-    --patriots-white: 0 0% 98%;
-    --chargers-gold: 45 100% 50%;
-    --chargers-blue: 210 100% 35%;
+    /* Architectural radius — not playful */
+    --radius: 0.375rem;
     
-    /* Gradients */
-    --gradient-dial: radial-gradient(ellipse at 30% 30%, hsl(0 0% 12%) 0%, hsl(0 0% 4%) 70%);
-    --gradient-bezel: linear-gradient(135deg, hsl(0 0% 25%) 0%, hsl(0 0% 8%) 50%, hsl(0 0% 15%) 100%);
-    --gradient-pod: linear-gradient(180deg, hsl(0 0% 10%) 0%, hsl(0 0% 6%) 100%);
-    --gradient-altitude: linear-gradient(180deg, hsl(120 100% 62%) 0%, hsl(120 60% 30%) 100%);
-    --gradient-patriots: linear-gradient(135deg, hsl(216 100% 18%) 0%, hsl(216 80% 12%) 100%);
-    --gradient-patriots-glow: linear-gradient(135deg, hsl(0 100% 40%) 0%, hsl(0 100% 30%) 100%);
+    /* ═══════════════════════════════════════════════════════════════
+       SEMANTIC TOKENS — Color encodes meaning, not decoration
+       ═══════════════════════════════════════════════════════════════ */
     
-    /* Shadows */
-    --shadow-dial: 0 0 60px rgba(0, 0, 0, 0.8), inset 0 0 40px rgba(0, 0, 0, 0.5);
-    --shadow-pod: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    --shadow-glow-orange: 0 0 20px hsla(25, 100%, 50%, 0.3);
-    --shadow-glow-lume: 0 0 15px hsla(120, 100%, 62%, 0.4);
-    --shadow-patriots-red: 0 0 30px hsla(0, 100%, 50%, 0.4);
-    --shadow-patriots-navy: 0 0 40px hsla(216, 100%, 30%, 0.5);
+    /* Margin Intelligence (the only colors that vary) */
+    --margin-high: 142 60% 45%;
+    --margin-medium: 45 80% 50%;
+    --margin-low: 0 55% 50%;
     
-    /* Night Mode Lume */
-    --lume-intensity: 0.6;
-    --lume-glow-strong: 0 0 25px hsla(120, 100%, 62%, 0.8), 0 0 50px hsla(120, 100%, 62%, 0.4);
-    --lume-glow-soft: 0 0 15px hsla(120, 100%, 62%, 0.5), 0 0 30px hsla(120, 100%, 62%, 0.25);
-    --lume-text-glow: 0 0 8px hsla(120, 100%, 62%, 0.9), 0 0 15px hsla(120, 100%, 62%, 0.6);
-
-    --sidebar-background: 0 0% 6%;
-    --sidebar-foreground: 0 0% 75%;
-    --sidebar-primary: 25 100% 50%;
+    /* Confidence States */
+    --confidence-high: 142 50% 45%;
+    --confidence-medium: 45 70% 50%;
+    --confidence-low: 0 50% 50%;
+    
+    /* Status */
+    --status-approved: 142 50% 40%;
+    --status-pending: 45 60% 50%;
+    --status-rejected: 0 50% 45%;
+    
+    /* Identity Purple (used once per screen for brand) */
+    --lavender: 270 50% 55%;
+    --lavender-dim: 270 30% 25%;
+    --lavender-glow: 270 60% 65%;
+    
+    /* Structural Layers */
+    --surface-0: 0 0% 3%;
+    --surface-1: 0 0% 5%;
+    --surface-2: 0 0% 8%;
+    --surface-3: 0 0% 12%;
+    
+    /* Text Hierarchy */
+    --text-primary: 0 0% 92%;
+    --text-secondary: 0 0% 65%;
+    --text-tertiary: 0 0% 45%;
+    --text-muted: 0 0% 35%;
+    
+    /* Shadows: Subtle, never louder than text */
+    --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.2);
+    
+    /* Sidebar */
+    --sidebar-background: 0 0% 4%;
+    --sidebar-foreground: 0 0% 65%;
+    --sidebar-primary: 270 50% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 12%;
-    --sidebar-accent-foreground: 0 0% 92%;
-    --sidebar-border: 0 0% 15%;
-    --sidebar-ring: 25 100% 50%;
+    --sidebar-accent: 0 0% 8%;
+    --sidebar-accent-foreground: 0 0% 88%;
+    --sidebar-border: 0 0% 12%;
+    --sidebar-ring: 270 50% 55%;
   }
 
   .dark {
-    --background: 0 0% 4%;
-    --foreground: 0 0% 92%;
-    --card: 0 0% 7%;
-    --card-foreground: 0 0% 92%;
-    --popover: 0 0% 7%;
-    --popover-foreground: 0 0% 92%;
-    --primary: 25 100% 50%;
+    --background: 0 0% 3%;
+    --foreground: 0 0% 88%;
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 88%;
+    --popover: 0 0% 5%;
+    --popover-foreground: 0 0% 88%;
+    --primary: 270 50% 55%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 12%;
-    --secondary-foreground: 0 0% 75%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 55%;
-    --accent: 120 100% 62%;
-    --accent-foreground: 0 0% 4%;
-    --destructive: 0 72% 51%;
+    --secondary: 0 0% 8%;
+    --secondary-foreground: 0 0% 65%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 50%;
+    --accent: 0 0% 10%;
+    --accent-foreground: 0 0% 75%;
+    --destructive: 0 60% 45%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 18%;
-    --input: 0 0% 15%;
-    --ring: 25 100% 50%;
-    --sidebar-background: 0 0% 6%;
-    --sidebar-foreground: 0 0% 75%;
-    --sidebar-primary: 25 100% 50%;
+    --border: 0 0% 12%;
+    --input: 0 0% 10%;
+    --ring: 270 50% 55%;
+    --sidebar-background: 0 0% 4%;
+    --sidebar-foreground: 0 0% 65%;
+    --sidebar-primary: 270 50% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 12%;
-    --sidebar-accent-foreground: 0 0% 92%;
-    --sidebar-border: 0 0% 15%;
-    --sidebar-ring: 25 100% 50%;
+    --sidebar-accent: 0 0% 8%;
+    --sidebar-accent-foreground: 0 0% 88%;
+    --sidebar-border: 0 0% 12%;
+    --sidebar-ring: 270 50% 55%;
   }
 }
 
@@ -145,161 +141,278 @@ html {
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'JetBrains Mono', monospace;
-  }
-}
-
-@layer components {
-  .strata-dial {
-    background: var(--gradient-dial);
-    box-shadow: var(--shadow-dial);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 400;
+    letter-spacing: -0.01em;
   }
   
-  .strata-pod {
-    background: var(--gradient-pod);
-    box-shadow: var(--shadow-pod);
-  }
-  
-  .strata-bezel {
-    background: var(--gradient-bezel);
-  }
-  
-  .strata-lume {
-    color: hsl(var(--strata-lume));
-    text-shadow: 0 0 10px hsla(120, 100%, 62%, 0.6);
-  }
-  
-  .strata-orange-glow {
-    color: hsl(var(--strata-orange));
-    text-shadow: 0 0 10px hsla(25, 100%, 50%, 0.5);
-  }
-  
-  .strata-hand-hour {
-    background: hsl(var(--strata-white));
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
-  }
-  
-  .strata-hand-minute {
-    background: hsl(var(--strata-orange));
-    box-shadow: var(--shadow-glow-orange);
-  }
-  
-  .strata-hand-second {
-    background: hsl(var(--strata-lume));
-    box-shadow: var(--shadow-glow-lume);
-  }
-  
-  /* Night Mode / Lume Mode Styles */
-  .lume-mode {
-    --background: 0 0% 2%;
-    --strata-black: 0 0% 2%;
-    --strata-charcoal: 0 0% 4%;
-  }
-  
-  .lume-mode .strata-dial {
-    background: radial-gradient(ellipse at 30% 30%, hsl(0 0% 6%) 0%, hsl(0 0% 2%) 70%);
-    box-shadow: 0 0 80px rgba(0, 0, 0, 0.95), inset 0 0 50px rgba(0, 0, 0, 0.8);
-  }
-  
-  .lume-mode .lume-marker {
-    fill: hsl(var(--strata-lume));
-    filter: drop-shadow(0 0 8px hsla(120, 100%, 62%, 0.8));
-  }
-  
-  .lume-mode .lume-hand {
-    filter: drop-shadow(0 0 6px hsla(120, 100%, 62%, 0.9));
-  }
-  
-  .lume-mode .lume-text {
-    color: hsl(var(--strata-lume));
-    text-shadow: var(--lume-text-glow);
-  }
-  
-  .lume-mode .strata-pod {
-    background: linear-gradient(180deg, hsl(0 0% 4%) 0%, hsl(0 0% 2%) 100%);
-    border-color: hsla(120, 100%, 62%, 0.15);
-  }
-  
-  .lume-mode .lume-accent {
-    color: hsl(var(--strata-lume));
-    text-shadow: 0 0 10px hsla(120, 100%, 62%, 0.6);
-  }
-  
-  .lume-mode .lume-glow-box {
-    box-shadow: 0 0 20px hsla(120, 100%, 62%, 0.2), inset 0 0 10px hsla(120, 100%, 62%, 0.05);
-  }
-
-  /* Patriots Game Night Styles */
-  .patriots-card {
-    background: var(--gradient-patriots);
-    border: 1px solid hsla(220, 10%, 70%, 0.2);
-    box-shadow: var(--shadow-patriots-navy);
-  }
-
-  .patriots-glow {
-    color: hsl(var(--patriots-red-bright));
-    text-shadow: var(--shadow-patriots-red);
-  }
-
-  .patriots-score-box {
-    background: linear-gradient(180deg, hsl(216 100% 15%) 0%, hsl(216 100% 10%) 100%);
-    border: 2px solid hsla(220, 10%, 70%, 0.3);
-    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
-  }
-
-  .chargers-accent {
-    color: hsl(var(--chargers-gold));
-    text-shadow: 0 0 10px hsla(45, 100%, 50%, 0.5);
-  }
-
-  .game-live-pulse {
-    animation: live-pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes live-pulse {
-    0%, 100% { 
-      opacity: 1; 
-      box-shadow: 0 0 20px hsla(0, 100%, 50%, 0.6);
-    }
-    50% { 
-      opacity: 0.7; 
-      box-shadow: 0 0 40px hsla(0, 100%, 50%, 0.8);
-    }
-  }
-
-  .countdown-digit {
-    background: linear-gradient(180deg, hsl(0 0% 12%) 0%, hsl(0 0% 6%) 100%);
-    border: 1px solid hsla(220, 10%, 70%, 0.2);
-    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.4);
-  }
-}
-
-@layer utilities {
-  .font-instrument {
-    font-family: 'Oswald', sans-serif;
-  }
-  
-  .font-mono-tight {
-    font-family: 'JetBrains Mono', monospace;
+  /* Typography Scale: Restrained, inevitable hierarchy */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 500;
     letter-spacing: -0.02em;
   }
 }
 
-/* Watch hand animations */
-@keyframes sweep-second {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+@layer components {
+  /* ═══════════════════════════════════════════════════════════════
+     LAVENDER COMPONENT SYSTEM
+     Each component feels like one well-crafted tool
+     ═══════════════════════════════════════════════════════════════ */
+  
+  /* Cards: Museum artifact labels, not dashboard panels */
+  .lavender-card {
+    @apply bg-card border border-border rounded-md;
+    box-shadow: var(--shadow-card);
+  }
+  
+  .lavender-card-elevated {
+    @apply bg-card border border-border rounded-md;
+    background: hsl(var(--surface-1));
+    box-shadow: var(--shadow-soft);
+  }
+  
+  /* Product Cards: Minimal, content-forward */
+  .product-card {
+    @apply bg-card border-0 rounded-md p-5;
+    background: hsl(var(--surface-1));
+    transition: background 150ms ease;
+  }
+  
+  .product-card:hover {
+    background: hsl(var(--surface-2));
+  }
+  
+  /* Metric Display: Dominant metric pattern */
+  .metric-dominant {
+    @apply text-3xl font-medium tracking-tight;
+    color: hsl(var(--text-primary));
+  }
+  
+  .metric-label {
+    @apply text-xs uppercase tracking-wider;
+    color: hsl(var(--text-tertiary));
+  }
+  
+  /* Status Badges: Semantic, not decorative */
+  .badge-margin-high {
+    @apply px-2 py-0.5 text-xs font-medium rounded;
+    background: hsl(var(--margin-high) / 0.15);
+    color: hsl(var(--margin-high));
+  }
+  
+  .badge-margin-medium {
+    @apply px-2 py-0.5 text-xs font-medium rounded;
+    background: hsl(var(--margin-medium) / 0.15);
+    color: hsl(var(--margin-medium));
+  }
+  
+  .badge-margin-low {
+    @apply px-2 py-0.5 text-xs font-medium rounded;
+    background: hsl(var(--margin-low) / 0.15);
+    color: hsl(var(--margin-low));
+  }
+  
+  .badge-confidence {
+    @apply px-2 py-0.5 text-xs rounded;
+    background: hsl(var(--surface-2));
+    color: hsl(var(--text-secondary));
+  }
+  
+  .badge-category {
+    @apply px-2 py-0.5 text-xs rounded;
+    background: hsl(var(--lavender) / 0.1);
+    color: hsl(var(--lavender));
+  }
+  
+  /* Buttons: Commitments, not decorations */
+  .btn-primary {
+    @apply px-4 py-2 text-sm font-medium rounded-md transition-colors;
+    background: hsl(var(--lavender));
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background: hsl(var(--lavender-glow));
+  }
+  
+  .btn-primary:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+  
+  .btn-secondary {
+    @apply px-4 py-2 text-sm font-medium rounded-md transition-colors;
+    background: transparent;
+    border: 1px solid hsl(var(--border));
+    color: hsl(var(--text-secondary));
+  }
+  
+  .btn-secondary:hover {
+    background: hsl(var(--surface-2));
+    color: hsl(var(--text-primary));
+  }
+  
+  /* Input: Quiet until focused */
+  .input-calm {
+    @apply w-full px-3 py-2 text-sm rounded-md transition-all;
+    background: hsl(var(--surface-2));
+    border: 1px solid transparent;
+    color: hsl(var(--text-primary));
+  }
+  
+  .input-calm::placeholder {
+    color: hsl(var(--text-muted));
+  }
+  
+  .input-calm:focus {
+    outline: none;
+    border-color: hsl(var(--lavender) / 0.5);
+  }
+  
+  /* Loading States: Process literacy, not anxiety */
+  .loading-stage {
+    @apply text-sm;
+    color: hsl(var(--text-secondary));
+  }
+  
+  .loading-progress {
+    @apply h-0.5 rounded-full overflow-hidden;
+    background: hsl(var(--surface-3));
+  }
+  
+  .loading-progress-bar {
+    @apply h-full transition-all duration-500;
+    background: hsl(var(--lavender));
+  }
+  
+  /* Empty States: Principled, not broken */
+  .empty-state {
+    @apply py-16 px-8 text-center;
+  }
+  
+  .empty-state-icon {
+    @apply mx-auto mb-4 opacity-30;
+    width: 48px;
+    height: 48px;
+    color: hsl(var(--text-tertiary));
+  }
+  
+  .empty-state-message {
+    @apply text-sm;
+    color: hsl(var(--text-secondary));
+  }
+  
+  .empty-state-suggestion {
+    @apply text-xs mt-2;
+    color: hsl(var(--text-muted));
+  }
+  
+  /* Logs: Lab notes, not alerts */
+  .log-entry {
+    @apply py-2 px-3 text-xs font-mono;
+    background: hsl(var(--surface-1));
+    color: hsl(var(--text-secondary));
+    border-left: 2px solid hsl(var(--border));
+  }
+  
+  .log-entry-stage {
+    color: hsl(var(--text-tertiary));
+  }
+  
+  /* Section Headers */
+  .section-header {
+    @apply mb-8;
+  }
+  
+  .section-title {
+    @apply text-lg font-medium;
+    color: hsl(var(--text-primary));
+  }
+  
+  .section-subtitle {
+    @apply text-sm mt-1;
+    color: hsl(var(--text-tertiary));
+  }
+  
+  /* Dividers: Architectural, not decorative */
+  .divider {
+    @apply my-6;
+    border-top: 1px solid hsl(var(--border));
+  }
+  
+  .divider-light {
+    @apply my-4;
+    border-top: 1px solid hsl(var(--surface-3));
+  }
 }
 
-@keyframes pulse-lume {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+@layer utilities {
+  /* Typography utilities */
+  .text-dominant {
+    color: hsl(var(--text-primary));
+  }
+  
+  .text-subordinate {
+    color: hsl(var(--text-secondary));
+  }
+  
+  .text-tertiary {
+    color: hsl(var(--text-tertiary));
+  }
+  
+  .text-whisper {
+    color: hsl(var(--text-muted));
+  }
+  
+  /* Surface utilities */
+  .surface-0 {
+    background: hsl(var(--surface-0));
+  }
+  
+  .surface-1 {
+    background: hsl(var(--surface-1));
+  }
+  
+  .surface-2 {
+    background: hsl(var(--surface-2));
+  }
+  
+  .surface-3 {
+    background: hsl(var(--surface-3));
+  }
+  
+  /* Lavender identity (use sparingly) */
+  .text-lavender {
+    color: hsl(var(--lavender));
+  }
+  
+  .bg-lavender {
+    background: hsl(var(--lavender));
+  }
+  
+  .border-lavender {
+    border-color: hsl(var(--lavender) / 0.3);
+  }
+  
+  /* Margin semantic colors */
+  .text-margin-high {
+    color: hsl(var(--margin-high));
+  }
+  
+  .text-margin-medium {
+    color: hsl(var(--margin-medium));
+  }
+  
+  .text-margin-low {
+    color: hsl(var(--margin-low));
+  }
 }
 
-.animate-sweep {
-  animation: sweep-second 60s linear infinite;
+/* Minimal animations: Progress should feel inevitable */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.animate-lume-pulse {
-  animation: pulse-lume 4s ease-in-out infinite;
+.animate-fade {
+  animation: fade-in 300ms ease;
 }
