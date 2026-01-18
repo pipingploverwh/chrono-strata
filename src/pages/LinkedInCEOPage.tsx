@@ -21,9 +21,282 @@ import {
   Pencil,
   ChevronDown,
   Building2,
-  CheckCircle2
+  CheckCircle2,
+  ExternalLink,
+  Search,
+  Filter,
+  Copy,
+  Check,
+  Rocket,
+  Target,
+  TrendingUp,
+  Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+
+// Career Resources Component
+const CareerResourcesSection = () => {
+  const [copiedTemplate, setCopiedTemplate] = useState<number | null>(null);
+
+  const jobSearchLinks = [
+    {
+      category: "Growth Strategy Roles",
+      icon: <TrendingUp className="w-5 h-5" />,
+      description: "Remote US growth strategy positions",
+      url: "https://www.linkedin.com/jobs/search?keywords=growth%20strategy&location=United%20States&f_WT=2&f_TPR=r86400",
+      color: "from-green-500 to-emerald-600"
+    },
+    {
+      category: "Growth Marketing & Leadership",
+      icon: <Rocket className="w-5 h-5" />,
+      description: "Remote growth marketing roles",
+      url: "https://www.linkedin.com/jobs/search?keywords=remote%20growth%20marketing&location=United%20States&f_WT=2&f_TPR=r86400",
+      color: "from-blue-500 to-indigo-600"
+    },
+    {
+      category: "Consultant / Fractional Roles",
+      icon: <Target className="w-5 h-5" />,
+      description: "Remote consultant & fractional operator positions",
+      url: "https://www.linkedin.com/jobs/search?keywords=remote%20consultant%20growth&location=United%20States&f_WT=2&f_TPR=r86400",
+      color: "from-purple-500 to-violet-600"
+    }
+  ];
+
+  const searchPhrases = [
+    '"remote" AND "trial project"',
+    '"remote" AND "work sample"',
+    '"remote" AND "contract"',
+    '"remote" AND "fractional"',
+    '"remote" AND "consultant"',
+    'remote consultant AND growth AND contract'
+  ];
+
+  const filterRecommendations = [
+    { filter: "Location", value: "United States", icon: <MapPin className="w-4 h-4" /> },
+    { filter: "Remote", value: "Remote", icon: <Globe className="w-4 h-4" /> },
+    { filter: "Date Posted", value: "Past 24h / Week", icon: <Clock className="w-4 h-4" /> },
+    { filter: "Experience Level", value: "Senior / Director", icon: <Award className="w-4 h-4" /> },
+    { filter: "Job Type", value: "Contract / Full-Time", icon: <Briefcase className="w-4 h-4" /> }
+  ];
+
+  const targetTitles = [
+    "Growth Marketing Manager (Remote)",
+    "Head of Growth (Remote)",
+    "Growth Consultant (Remote)",
+    "Strategy Consultant / Growth Strategy Director",
+    "Fractional Growth Lead",
+    "Remote Growth Strategist"
+  ];
+
+  const outreachTemplates = [
+    {
+      title: "Skills-First Introduction",
+      context: "When reaching out about a role that may allow work samples",
+      template: `Hi [Name],
+
+I'm very interested in the [Role Title] position and prefer to demonstrate fit via a practical work sample or short project.
+
+I can start immediately and would be happy to share a 30-day strategic plan or conduct a brief audit of your current growth initiatives.
+
+Would you be open to a trial-based approach?`
+    },
+    {
+      title: "Fractional/Consultant Pitch",
+      context: "For roles that might accept fractional or project work",
+      template: `Hi [Name],
+
+I noticed you're hiring for [Role]. I specialize in growth strategy and have helped companies scale from $0 to $1M+ ARR.
+
+I'm open to starting on a fractional or project basis—this often gives both sides a chance to evaluate fit before a full commitment.
+
+Would you be open to discussing a trial engagement?`
+    },
+    {
+      title: "Direct Value Proposition",
+      context: "When you have specific relevant experience",
+      template: `Hi [Name],
+
+I saw your [Role] posting and wanted to reach out directly.
+
+In my previous role, I [specific achievement relevant to role]. I'd love to bring that experience to [Company Name].
+
+I'm available for an initial call this week and can also prepare a brief strategic assessment if helpful.`
+    }
+  ];
+
+  const copyToClipboard = (text: string, index: number) => {
+    navigator.clipboard.writeText(text);
+    setCopiedTemplate(index);
+    toast.success("Template copied to clipboard!");
+    setTimeout(() => setCopiedTemplate(null), 2000);
+  };
+
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900">Career Resources</h2>
+          <p className="text-sm text-gray-500">Remote growth & strategy job search toolkit</p>
+        </div>
+        <div className="flex gap-2">
+          <button className="p-2 hover:bg-gray-100 rounded-full">
+            <Plus className="w-5 h-5 text-gray-600" />
+          </button>
+        </div>
+      </div>
+
+      {/* Job Search Links */}
+      <div className="mb-6">
+        <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <Search className="w-4 h-4 text-[#0a66c2]" />
+          Live LinkedIn Job Search Links
+        </h3>
+        <div className="grid gap-3">
+          {jobSearchLinks.map((link, idx) => (
+            <a
+              key={idx}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-[#0a66c2] hover:shadow-md transition group"
+            >
+              <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${link.color} flex items-center justify-center text-white`}>
+                {link.icon}
+              </div>
+              <div className="flex-1">
+                <h4 className="font-semibold text-gray-900 group-hover:text-[#0a66c2]">{link.category}</h4>
+                <p className="text-xs text-gray-500">{link.description}</p>
+              </div>
+              <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-[#0a66c2]" />
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {/* Search Phrases */}
+      <div className="mb-6">
+        <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <Target className="w-4 h-4 text-[#0a66c2]" />
+          Search Phrases for Skills-Test Roles
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          {searchPhrases.map((phrase, idx) => (
+            <button
+              key={idx}
+              onClick={() => {
+                navigator.clipboard.writeText(phrase);
+                toast.success("Search phrase copied!");
+              }}
+              className="px-3 py-1.5 bg-[#eef3f8] text-gray-700 rounded-full text-xs font-medium hover:bg-[#0a66c2] hover:text-white transition flex items-center gap-1"
+            >
+              <code className="font-mono">{phrase}</code>
+              <Copy className="w-3 h-3" />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Filter Recommendations */}
+      <div className="mb-6">
+        <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <Filter className="w-4 h-4 text-[#0a66c2]" />
+          Recommended LinkedIn Filters
+        </h3>
+        <div className="bg-[#f8fafc] rounded-lg p-4 border border-gray-100">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {filterRecommendations.map((rec, idx) => (
+              <div key={idx} className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[#0a66c2]">
+                  {rec.icon}
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">{rec.filter}</p>
+                  <p className="text-sm font-medium text-gray-900">{rec.value}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Target Titles */}
+      <div className="mb-6">
+        <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <Briefcase className="w-4 h-4 text-[#0a66c2]" />
+          Job Titles to Target
+        </h3>
+        <div className="grid grid-cols-2 gap-2">
+          {targetTitles.map((title, idx) => (
+            <div key={idx} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+              <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+              <span className="text-sm text-gray-700">{title}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Outreach Templates */}
+      <div>
+        <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <MessageCircle className="w-4 h-4 text-[#0a66c2]" />
+          Outreach Message Templates
+        </h3>
+        <div className="space-y-4">
+          {outreachTemplates.map((template, idx) => (
+            <div key={idx} className="border border-gray-200 rounded-lg overflow-hidden">
+              <div className="bg-gradient-to-r from-[#0a66c2]/5 to-[#0a66c2]/10 px-4 py-3 flex justify-between items-center">
+                <div>
+                  <h4 className="font-semibold text-gray-900">{template.title}</h4>
+                  <p className="text-xs text-gray-500">{template.context}</p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => copyToClipboard(template.template, idx)}
+                  className="border-[#0a66c2] text-[#0a66c2] hover:bg-[#0a66c2] hover:text-white"
+                >
+                  {copiedTemplate === idx ? (
+                    <>
+                      <Check className="w-3 h-3 mr-1" />
+                      Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3 h-3 mr-1" />
+                      Copy
+                    </>
+                  )}
+                </Button>
+              </div>
+              <div className="p-4 bg-white">
+                <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed">
+                  {template.template}
+                </pre>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Pro Tip */}
+      <div className="mt-6 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg border border-amber-200">
+        <div className="flex gap-3">
+          <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-2xl flex-shrink-0">
+            💡
+          </div>
+          <div>
+            <h4 className="font-semibold text-amber-900">Pro Tip</h4>
+            <p className="text-sm text-amber-800 mt-1">
+              When you find roles, message the poster or recruiter directly with a value-first pitch. 
+              Many remote and growth teams are open to trial-based or work-sample approaches—it de-risks hiring for both sides.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const LinkedInCEOPage = () => {
   const [activeTab, setActiveTab] = useState("posts");
@@ -507,6 +780,9 @@ Building in public. Ask me anything 👇`,
                 Show all 23 skills →
               </button>
             </div>
+
+            {/* Career Resources Section */}
+            <CareerResourcesSection />
           </div>
 
           {/* Right Sidebar */}
