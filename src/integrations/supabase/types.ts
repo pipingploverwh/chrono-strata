@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      investor_contacts: {
+        Row: {
+          created_at: string | null
+          email: string
+          firm: string | null
+          id: string
+          investment_interest: string
+          message: string | null
+          name: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          firm?: string | null
+          id?: string
+          investment_interest: string
+          message?: string | null
+          name: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          firm?: string | null
+          id?: string
+          investment_interest?: string
+          message?: string | null
+          name?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       scheduled_emails: {
         Row: {
           created_at: string
