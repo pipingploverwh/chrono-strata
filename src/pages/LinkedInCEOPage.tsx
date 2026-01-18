@@ -869,7 +869,7 @@ Building in public. Ask me anything 👇`,
               <span className="text-white font-bold text-[10px]">Linked</span>
               <span className="text-white font-bold text-[10px] bg-white/20 px-0.5 rounded">in</span>
             </div>
-            <span>© 2024</span>
+            <span>© 2026</span>
           </div>
         </div>
       </footer>
