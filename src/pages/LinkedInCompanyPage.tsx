@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import linkedInCover from '@/assets/linkedin-cover.jpg';
+import linkedInCover from '@/assets/linkedin-company-cover.jpg';
 import lavandarLogo from '@/assets/lavandar-logo.png';
 
 // LinkedIn company data
