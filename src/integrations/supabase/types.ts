@@ -161,6 +161,180 @@ export type Database = {
         }
         Relationships: []
       }
+      visa_applications: {
+        Row: {
+          application_date: string | null
+          created_at: string | null
+          current_phase: string | null
+          id: string
+          notes: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          application_date?: string | null
+          created_at?: string | null
+          current_phase?: string | null
+          id?: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          application_date?: string | null
+          created_at?: string | null
+          current_phase?: string | null
+          id?: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      visa_documents: {
+        Row: {
+          application_id: string | null
+          created_at: string | null
+          document_name: string
+          document_type: string
+          due_date: string | null
+          file_url: string | null
+          id: string
+          notes: string | null
+          status: string | null
+          submitted_date: string | null
+        }
+        Insert: {
+          application_id?: string | null
+          created_at?: string | null
+          document_name: string
+          document_type: string
+          due_date?: string | null
+          file_url?: string | null
+          id?: string
+          notes?: string | null
+          status?: string | null
+          submitted_date?: string | null
+        }
+        Update: {
+          application_id?: string | null
+          created_at?: string | null
+          document_name?: string
+          document_type?: string
+          due_date?: string | null
+          file_url?: string | null
+          id?: string
+          notes?: string | null
+          status?: string | null
+          submitted_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visa_documents_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "visa_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      visa_interviews: {
+        Row: {
+          agenda: string | null
+          application_id: string | null
+          created_at: string | null
+          id: string
+          interview_type: string | null
+          location: string | null
+          next_actions: string[] | null
+          notes: string | null
+          outcome: string | null
+          scheduled_date: string | null
+          status: string | null
+        }
+        Insert: {
+          agenda?: string | null
+          application_id?: string | null
+          created_at?: string | null
+          id?: string
+          interview_type?: string | null
+          location?: string | null
+          next_actions?: string[] | null
+          notes?: string | null
+          outcome?: string | null
+          scheduled_date?: string | null
+          status?: string | null
+        }
+        Update: {
+          agenda?: string | null
+          application_id?: string | null
+          created_at?: string | null
+          id?: string
+          interview_type?: string | null
+          location?: string | null
+          next_actions?: string[] | null
+          notes?: string | null
+          outcome?: string | null
+          scheduled_date?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visa_interviews_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "visa_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      visa_milestones: {
+        Row: {
+          application_id: string | null
+          completed_date: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          milestone_type: string
+          status: string | null
+          target_date: string | null
+          title: string
+        }
+        Insert: {
+          application_id?: string | null
+          completed_date?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          milestone_type: string
+          status?: string | null
+          target_date?: string | null
+          title: string
+        }
+        Update: {
+          application_id?: string | null
+          completed_date?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          milestone_type?: string
+          status?: string | null
+          target_date?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visa_milestones_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "visa_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       weather_coordinate_logs: {
         Row: {
           created_at: string
