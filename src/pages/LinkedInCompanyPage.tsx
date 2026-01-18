@@ -56,7 +56,7 @@ const posts = [
     id: 1,
     content: `🚀 Excited to announce our partnership with the Kraft Group for NFL stadium weather intelligence!
 
-Our STRATA Events module delivered 87.3% prediction accuracy during the 2024-2025 season at Gillette Stadium.
+Our STRATA Events module delivered 87.3% prediction accuracy during the 2025-2026 season at Gillette Stadium.
 
 Key results:
 ✅ <5 minute alert response time

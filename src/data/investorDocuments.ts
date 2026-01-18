@@ -351,7 +351,7 @@ export const INVESTOR_DOCUMENTS: InvestorDocument[] = [
         title: 'Engagement Overview',
         content: [
           'Partner: The Kraft Group (New England Patriots, Gillette Stadium)',
-          'Duration: 2024-2025 NFL Season',
+          'Duration: 2025-2026 NFL Season',
           'Scope: Weather intelligence for game-day operations',
           'Status: Active partnership'
         ]
