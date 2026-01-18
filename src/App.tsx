@@ -64,6 +64,7 @@ const App = () => (
                 {/* Public Routes */}
                 <Route path="/" element={<LavandarHome />} />
                 <Route path="/vc" element={<VCSummary />} />
+                <Route path="/vc-summary" element={<VCSummary />} />
                 <Route path="/launch" element={<Index />} />
                 <Route path="/strata" element={<Strata />} />
                 <Route path="/aviation" element={<StrataAviation />} />
