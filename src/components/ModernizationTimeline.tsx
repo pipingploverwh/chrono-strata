@@ -27,8 +27,8 @@ interface Milestone {
 
 const milestones: Milestone[] = [
   {
-    id: "q1-2025",
-    year: "2025",
+    id: "q1-2026",
+    year: "2026",
     quarter: "Q1",
     title: "Foundation Layer",
     description: "Core AI infrastructure deployment with weather intelligence integration",
@@ -38,8 +38,8 @@ const milestones: Milestone[] = [
     icon: <Zap className="w-4 h-4" />
   },
   {
-    id: "q2-2025",
-    year: "2025",
+    id: "q2-2026",
+    year: "2026",
     quarter: "Q2",
     title: "KAGR Data Unification",
     description: "Cross-property analytics consolidation across Patriots, Revolution, Patriot Place",
@@ -49,8 +49,8 @@ const milestones: Milestone[] = [
     icon: <Network className="w-4 h-4" />
   },
   {
-    id: "q3-2025",
-    year: "2025",
+    id: "q3-2026",
+    year: "2026",
     quarter: "Q3",
     title: "Football Operations AI",
     description: "Predictive play-calling and scouting synthesis deployment",
@@ -60,8 +60,8 @@ const milestones: Milestone[] = [
     icon: <Trophy className="w-4 h-4" />
   },
   {
-    id: "q4-2025",
-    year: "2025",
+    id: "q4-2026",
+    year: "2026",
     quarter: "Q4",
     title: "Fan Experience Platform",
     description: "Gillette Stadium AI-native venue transformation",
@@ -71,8 +71,8 @@ const milestones: Milestone[] = [
     icon: <Ticket className="w-4 h-4" />
   },
   {
-    id: "q2-2026",
-    year: "2026",
+    id: "q2-2027",
+    year: "2027",
     quarter: "Q2",
     title: "World Cup Readiness",
     description: "Full-scale FIFA World Cup venue operations deployment",
@@ -82,8 +82,8 @@ const milestones: Milestone[] = [
     icon: <Globe className="w-4 h-4" />
   },
   {
-    id: "q4-2026",
-    year: "2026",
+    id: "q4-2027",
+    year: "2027",
     quarter: "Q4",
     title: "Enterprise Expansion",
     description: "IFP supply chain intelligence and Kraft portfolio optimization",

@@ -238,7 +238,7 @@ const OperationalDashboard = () => {
                   <CardContent>
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-2 h-2 rounded-full bg-strata-orange animate-pulse" />
-                      <span className="font-instrument text-lg text-strata-white">Q2 2025</span>
+                      <span className="font-instrument text-lg text-strata-white">Q2 2026</span>
                     </div>
                     <p className="text-sm text-strata-silver/60">
                       KAGR Data Unification - Cross-property analytics consolidation
