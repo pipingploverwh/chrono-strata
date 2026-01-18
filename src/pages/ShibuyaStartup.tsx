@@ -470,7 +470,7 @@ const ShibuyaStartup = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            <span className="text-xs text-strata-silver/50">© 2025 Lavandar AI</span>
+            <span className="text-xs text-strata-silver/50">© 2026 Lavandar AI</span>
             <LanguageToggle variant="compact" />
           </div>
         </div>

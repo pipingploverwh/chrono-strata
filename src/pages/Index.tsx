@@ -556,7 +556,7 @@ const LandingPage = () => {
             </div>
           </div>
           <div className="mt-12 pt-8 border-t border-neutral-800 flex flex-wrap justify-between gap-4">
-            <p className="text-xs text-neutral-600">© 2025 Lavandar AI. All rights reserved.</p>
+            <p className="text-xs text-neutral-600">© 2026 Lavandar AI. All rights reserved.</p>
             <p className="text-xs text-neutral-600">Enterprise Weather Intelligence</p>
           </div>
         </div>
