@@ -39,6 +39,7 @@ import SourcedInventory from "./pages/SourcedInventory";
 import StartupVisa from "./pages/StartupVisa";
 import ShareableLinks from "./pages/ShareableLinks";
 import InvestorHub from "./pages/InvestorHub";
+import LinkedInCompanyPage from "./pages/LinkedInCompanyPage";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,7 @@ const App = () => (
                 <Route path="/sitemap" element={<SiteMapPage />} />
                 <Route path="/links" element={<ShareableLinks />} />
                 <Route path="/investor-hub" element={<InvestorHub />} />
+                <Route path="/linkedin-company" element={<LinkedInCompanyPage />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />
