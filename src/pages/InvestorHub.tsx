@@ -17,6 +17,7 @@ import {
 import { toast } from 'sonner';
 import { INVESTOR_DOCUMENTS, RUBIN_PATENTS } from '@/data/investorDocuments';
 import { useDocumentDownload } from '@/hooks/useDocumentDownload';
+import { InvestorContactForm } from '@/components/investor/InvestorContactForm';
 
 const content = {
   en: {
@@ -354,6 +355,11 @@ export default function InvestorHub() {
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Investor Contact Form */}
+          <div className="mt-12">
+            <InvestorContactForm lang={lang} />
           </div>
         </div>
       </section>
