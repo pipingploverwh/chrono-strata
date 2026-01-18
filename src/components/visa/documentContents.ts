@@ -1,4 +1,5 @@
 // Pre-filled document content based on Shibuya Startup Visa requirements for LAVANDAR
+// Updated with actual applicant information from submitted documents
 
 export interface DocumentContent {
   type: string;
@@ -18,7 +19,7 @@ export const visaDocumentContents: Record<string, DocumentContent> = {
 
 **Form 1 (Article 4)**
 
-**Submission Date:** [To be filled]
+**Submission Date:** January 18, 2026
 
 **To:** Mayor of Shibuya City
 
@@ -28,10 +29,10 @@ export const visaDocumentContents: Record<string, DocumentContent> = {
 
 | Field | Value |
 |-------|-------|
-| Nationality | [Your Nationality] |
-| Address | [Your Address in Japan] |
-| Contact Information | [Phone/Email] |
-| Name | [Your Full Name] |
+| Nationality | United States of America |
+| Address | Falmouth, MA USA → [Japan Residence TBD] |
+| Contact Information | +1 530 204 9045 / admin@lavandar.ai |
+| Name | Ben Rubin |
 
 ---
 
@@ -45,15 +46,15 @@ I hereby apply for the confirmation of Notification No. 5-6 according to the Not
 
 | # | Document | Check |
 |---|----------|-------|
-| 1 | Business Startup Activities Confirmation Application | ☐ |
-| 2 | Schedule of business activity | ☐ |
+| 1 | Business Startup Activities Confirmation Application | ☑ |
+| 2 | Schedule of business activity | ☑ |
 | 3 | Resume of the applicants | ☐ |
-| 4 | Pledge | ☐ |
+| 4 | Pledge | ☑ |
 | 5 | Proof of residence for 6 months (rental contract) | ☐ |
 | 6 | Bank account balance statement | ☐ |
 | 7 | Education/work verification documents | ☐ |
 | 8 | Copy of passport | ☐ |
-| 9 | Additional business plan documents | ☐ |
+| 9 | Additional business plan documents | ☑ |
 `,
   },
 
@@ -72,7 +73,8 @@ I hereby apply for the confirmation of Notification No. 5-6 according to the Not
 
 **Business Name:** LAVANDAR Intelligence Platform  
 **Trading Name:** The Kraft Group - LVNDR AI  
-**Industry Field:** Information Technologies  
+**Industry Field:** Information Technologies / Aerospace / Defense  
+**Primary Contact:** Ben Rubin (admin@lavandar.ai)
 
 ---
 
@@ -80,37 +82,37 @@ I hereby apply for the confirmation of Notification No. 5-6 according to the Not
 
 The LAVANDAR Intelligence Platform is a multi-vertical operational ecosystem that integrates real-time environmental data, predictive AI modeling, and agentic workflows into a unified user interface.
 
-The platform demonstrates a "write once, deploy everywhere" architecture, successfully adapting a core intelligence engine (STRATA) across distinct industries including:
-- Aviation
-- Marine
-- Construction
-- Events
-- Professional Sports
+### Primary Innovation: Atmospheric Refraction Correction API
+
+LAVANDAR provides high-precision atmospheric refraction correction for celestial navigation systems, improving accuracy for GPS-denied environments such as:
+- Disaster response corridors
+- Humanitarian air delivery
+- Maritime relief routing
+- Defense and autonomous navigation
 
 ---
 
-## Core Value Propositions
+## Core Technology (Patent Portfolio)
 
-### 1. Vertical Adaptability (STRATA)
-The system uses a singular codebase to generate industry-specific intelligence. Wind data is interpreted differently for:
-- Crane operators (Construction)
-- Pilots (Aviation)
-- Stadium managers (Events)
+| Patent | Inventor | Description |
+|--------|----------|-------------|
+| US 2008/0195495 A1 | Victor Rubin | Hierarchical Threat Classification - Multi-source data aggregation for categorizing tracks in real-time |
+| US 10,082,945 B2 | Benzion Rubin | Exit-Intent Detection - Predictive trajectory prediction for aircraft deviation analysis |
+| Academic Research | Dr. Robert Rubin | Saemundsson-Meeus atmospheric refraction modeling for 99.9% intercept window calculations |
 
-### 2. Agentic AI Architecture
-Moving beyond simple chatbots, the platform features an Agentic Matchup Engine with tool-calling architecture to autonomously fetch live weather, player stats, and historical data.
+---
 
-### 3. Design as a Differentiator
-Utilizing the LAVANDAR Design System (inspired by Kengo Kuma), featuring specialized components:
-- TimberCard
-- ShojiReveal
-- KumikoLattice
+## STRATA Platform Verticals
 
-### 4. Real-Time Operations
-Leveraging Supabase Realtime and Edge Functions for:
-- Live presence tracking
-- Game score updates (ESPN API)
-- Environmental monitoring
+The platform demonstrates a "write once, deploy everywhere" architecture across distinct industries:
+
+| Vertical | Application |
+|----------|-------------|
+| Aviation | METAR/TAF parsing, ceiling/visibility analysis |
+| Marine | Wave height, tide predictions, port intelligence |
+| Construction | Crane wind limits and concrete pour windows |
+| Events | Lightning detection radii and crowd safety protocols |
+| Defense | GPS-denied navigation, celestial UAV guidance |
 
 ---
 
@@ -121,19 +123,31 @@ Leveraging Supabase Realtime and Edge Functions for:
 | Frontend | React / Lovable | High-performance UI with Framer Motion |
 | Backend | Supabase / Edge Functions | 27 deployed Edge Functions |
 | AI Layer | OpenAI / ML Models | Custom models with SHAP explainability |
-| Commerce | ECOMFORGE | AI-native commerce with Shopify/Stripe |
+| Commerce | ECOMFORGE | Shopify Storefront API + Stripe |
 | Data | External APIs | OpenSky, ESPN, Weather APIs |
+
+---
+
+## Market Opportunity
+
+| Segment | Market Size |
+|---------|-------------|
+| Initial TAM (Celestial UAVs) | $7.5-18M (750-1,200 units × $5-15K) |
+| Defense Navigation (2034) | $271B (15.7% CAGR) |
+| Total Expansion | $1 Trillion |
 
 ---
 
 ## Strategic Readiness
 
-The platform is deployed in production at: chrono-strata.lovable.app
+**Production URL:** chrono-strata.lovable.app  
+**API Demo:** lavandar.ai/alpha-os
 
-**Functional Systems:**
+**Deployed Systems:**
 - ✅ Authentication (secure login, role-based access)
 - ✅ Monetization (Stripe subscriptions)
 - ✅ Administration (system configuration, analytics)
+- ✅ Working API with academic validation
 `,
   },
 
@@ -141,23 +155,26 @@ The platform is deployed in production at: chrono-strata.lovable.app
     type: 'schedule',
     name: 'Schedule of Business Activity',
     formNumber: 'Form 1-3 (Article 4)',
-    status: 'draft',
+    status: 'ready',
     content: `# Schedule of Business Activity
 
 **Form 1-3 (Article 4)**
 
+**Applicant:** Ben Rubin  
+**Company:** LAVANDAR Intelligence Platform
+
 ---
 
-## 6-Month Business Activity Schedule
+## 6-Month Business Activity Schedule (Shibuya Startup Visa Period)
 
 | Month | Period | Business Activities | Capital/Funding |
 |-------|--------|---------------------|-----------------|
-| **1** | Month 1 | Platform deployment and Japan market research. Establish office presence in Shibuya. Begin customer discovery. | Initial capital: Self-funded + Angel investment |
-| **2** | Month 2 | Develop Japan-specific STRATA vertical. Integrate Japan weather APIs (JMA). Build local partnerships. | Operating expenses from reserves |
-| **3** | Month 3 | Launch beta with 3-5 pilot customers in Construction/Events verticals. Refine localization. | Revenue: Pilot subscriptions |
-| **4** | Month 4 | Expand to 10+ enterprise customers. Implement Yen-based Stripe payments. Hire first Japan-based team member. | Revenue growth + potential seed round |
-| **5** | Month 5 | Full commercial launch. Marketing campaign targeting Japan market. Conference presentations. | Reinvested revenue |
-| **6** | Month 6 | Achieve break-even in Japan operations. Document business growth for visa extension. | Sustainable operations |
+| **1** | Month 1 | Platform deployment and Japan market research. Establish office presence in Shibuya. Begin customer discovery for defense and aviation sectors. | Initial capital: Self-funded + Angel investment |
+| **2** | Month 2 | Develop Japan-specific STRATA vertical. Integrate Japan weather APIs (JMA). Build local partnerships with aerospace companies. | Operating expenses from reserves |
+| **3** | Month 3 | Launch beta with 3-5 pilot customers. Target: Elbit Systems (Hermes UAV integration), IAI (Heron/Navigation Center). | Revenue: Pilot subscriptions ($100-250K projected) |
+| **4** | Month 4 | Expand enterprise customers. Implement Yen-based Stripe payments. Submit DDR&D Innofense application. | Revenue growth + potential seed round |
+| **5** | Month 5 | Full commercial launch. Edge SDK development. Conference presentations. Target: First signed LOI from defense prime. | Revenue: $500K-1M Year 2 target |
+| **6** | Month 6 | Achieve break-even in Japan operations. Document business growth for visa extension. GNC Engineer contractor onboarding. | Sustainable operations |
 
 ---
 
@@ -165,22 +182,42 @@ The platform is deployed in production at: chrono-strata.lovable.app
 
 | Month | Period | Business Activities | Capital/Funding |
 |-------|--------|---------------------|-----------------|
-| **7** | Month 7 | Scale enterprise sales team. Add Aviation vertical for Japan airports. | Series A preparation |
-| **8** | Month 8 | Partnership with Japan sports organizations (NPB, J.League). | Strategic partnerships |
-| **9** | Month 9 | Expand office space. Hire 3-5 additional team members. | Growth capital |
-| **10** | Month 10 | Achieve 50+ enterprise customers in Japan. Prepare extension documentation. | Revenue milestone |
-| **11** | Month 11 | Begin Status of Residence application. Document all achievements. | Continued operations |
-| **12** | Month 12 | Establish Japan subsidiary (KK). Complete corporate registration. | Capital increase |
+| **7** | Month 7 | Edge SDK deployment on UAV platform in IDF testing. Secure DDR&D validation. | Series A preparation |
+| **8** | Month 8 | First revenue milestone: $50-100K pilot contract from Israeli defense. | Strategic partnerships |
+| **9** | Month 9 | Expand office space. Hire Defense BD Advisor for DDR&D and prime contacts. | Growth capital |
+| **10** | Month 10 | Part-time CTO onboarding for Edge SDK development lead. | Revenue milestone |
+| **11** | Month 11 | Begin Status of Residence application. Document all achievements. Close $1-2M seed round. | Seed funding |
+| **12** | Month 12 | Establish Japan subsidiary (KK). Complete corporate registration. International expansion prep (Germany, UAE, India). | Capital increase |
 
 ---
 
-## Key Milestones
+## Revenue Path
 
-1. **Corporate Registration** - Month 4
-2. **First Revenue in Japan** - Month 3
-3. **Break-even** - Month 6
-4. **Team Expansion** - Month 8
-5. **Subsidiary Formation** - Month 12
+| Year 1 | Year 2 | Year 3 |
+|--------|--------|--------|
+| $100-250K | $500K-1M | $2-5M |
+| Pilot contracts | Production SDK + DDR&D | Prime integrations |
+
+---
+
+## Business Model
+
+| Tier | Pricing | Description |
+|------|---------|-------------|
+| Developer | Free | API testing & validation |
+| Pilot License | $2.5-5K | R&D project integration |
+| Edge SDK | $25K+/yr | Air-gapped deployment |
+
+---
+
+## Success Metrics for Seed Funding
+
+| Metric | Target |
+|--------|--------|
+| DDR&D Validation | 1 program validation |
+| Defense Prime LOI | 1 signed letter of intent |
+| Revenue | $50K+ |
+| Seed Round | $2-5M |
 
 ---
 
@@ -198,65 +235,64 @@ The platform is deployed in production at: chrono-strata.lovable.app
 
 The LAVANDAR Intelligence Platform (deployed as The Kraft Group - LVNDR AI) is a multi-vertical operational ecosystem that integrates real-time environmental data, predictive AI modeling, and agentic workflows into a unified user interface.
 
-The platform demonstrates a "write once, deploy everywhere" architecture, successfully adapting a core intelligence engine (STRATA) across distinct industries including Aviation, Marine, Construction, Events, and Professional Sports.
+The platform demonstrates a "write once, deploy everywhere" architecture, successfully adapting a core intelligence engine (STRATA) across distinct industries including Aviation, Marine, Construction, Events, and Professional Sports. It serves as both a functional operational tool and a high-fidelity technical showcase of modern, edge-first web architecture.
 
 ---
 
 ## 2. Core Value Propositions
 
 ### Vertical Adaptability (STRATA)
-The system uses a singular codebase to generate industry-specific intelligence. For example, wind data is interpreted differently for a crane operator (Construction) versus a pilot (Aviation) or a stadium manager (Events).
+The system uses a singular codebase to generate industry-specific intelligence. For example, wind data is interpreted differently for a crane operator (Construction) versus a pilot (Aviation) or a stadium manager (Events), with specialized operational thresholds for each.
 
 ### Agentic AI Architecture
-Moving beyond simple chatbots, the platform features an Agentic Matchup Engine utilizing tool-calling architecture to autonomously fetch live weather, player stats, and historical data.
+Moving beyond simple chatbots, the platform features an Agentic Matchup Engine. This system utilizes tool-calling architecture to autonomously fetch live weather, player stats, and historical data to generate proactive strategic insights based on real-time game states.
 
 ### Design as a Differentiator
-The platform utilizes the LAVANDAR Design System (inspired by Kengo Kuma), featuring specialized components that bridge complex engineering data and high-end marketing aesthetics.
+The platform utilizes the LAVANDAR Design System (inspired by Kengo Kuma), featuring specialized components (TimberCard, ShojiReveal, KumikoLattice) that bridge the gap between complex engineering data and high-end marketing aesthetics.
 
 ### Real-Time Operations
-Leveraging Supabase Realtime and Edge Functions for live presence tracking, game score updates, and environmental monitoring without page refreshes.
+Leveraging Supabase Realtime and Edge Functions, the platform provides live presence tracking, game score updates (ESPN API), and environmental monitoring without page refreshes.
 
 ---
 
-## 3. Technical Architecture
+## 3. Technical Architecture High-Level
 
 | Component | Technology | Implementation |
 |-----------|------------|----------------|
-| Frontend | React / Lovable | High-performance UI with Framer Motion |
-| Backend | Supabase | 27 deployed Edge Functions |
-| AI Layer | OpenAI / ML Models | Custom models with SHAP explainability |
-| Commerce | ECOMFORGE | Shopify Storefront API + Stripe |
-| Data | External APIs | OpenSky, ESPN, Weather APIs |
+| Frontend | React / Lovable | High-performance UI with Framer Motion animations and parallax effects |
+| Backend | Supabase / Edge Functions | 27 deployed Edge Functions handling AI logic, payments, and data ingestion |
+| AI Layer | OpenAI / ML Models | Custom models with SHAP-style explainability, confidence intervals, and tool-calling capabilities |
+| Commerce | ECOMFORGE | AI-native commerce architecture integrated with Shopify Storefront API and Stripe |
+| Data Integrations | External APIs | Integration with OpenSky (Flight tracking), ESPN (Scores), and Weather APIs |
 
 ---
 
 ## 4. Key Product Suites
 
 ### A. STRATA (Vertical Intelligence)
-- Aviation: METAR/TAF parsing and ceiling/visibility analysis
-- Marine: Wave height, tide predictions, port intelligence
-- Construction: Crane wind limits and concrete pour windows
-- Events: Lightning detection and crowd safety protocols
+"Living Whitepapers" that function as operational dashboards.
+- **Aviation:** METAR/TAF parsing and ceiling/visibility analysis
+- **Marine:** Wave height, tide predictions, and port intelligence
+- **Construction:** Crane wind limits and concrete pour windows
+- **Events:** Lightning detection radii and crowd safety protocols
 
 ### B. INTELLIGENCE SUITE (AI)
-- Matchup Engine with proactive AI triggers
-- Predictive modeling with ML confidence visualization
-- Player-weather correlation analysis
+- **Matchup Engine:** The flagship demo featuring proactive AI triggers based on live game momentum
+- **Predictive Modeling:** Visualizations of ML model confidence and feature importance (Model Explainability)
+- **Player Profile:** Correlation analysis between weather conditions and player performance
 
 ### C. SPORTS & GAME DAY
-- Live dashboard with weather overlays
-- Real-time game tracking
+- **Live Dashboard:** Real-time game tracking with weather overlays (wind vectors)
 
 ---
 
 ## 5. Strategic Readiness
 
-**Production URL:** chrono-strata.lovable.app
+The platform is currently deployed in a production-ready environment (chrono-strata.lovable.app) with fully functional:
 
-**Deployed Systems:**
-- ✅ Authentication (secure login, role-based access)
-- ✅ Monetization (Stripe subscriptions)
-- ✅ Administration (system configuration, analytics)
+- **Authentication:** Secure login, password management, and role-based access
+- **Monetization:** Stripe integration for subscriptions (Pro/Enterprise) and one-time payments
+- **Administration:** "Uber Mode" for system configuration, SOW generation, and visitor analytics
 
 ---
 
@@ -269,77 +305,146 @@ LAVANDAR represents a shift from static dashboards to active, agentic intelligen
   business_plan: {
     type: 'business_plan',
     name: 'Detailed Business Plan',
-    status: 'draft',
+    status: 'ready',
     content: `# LAVANDAR Intelligence Platform - Business Plan
 
-## Japan Market Entry Strategy
+## The Sovereign AI for High-Stakes Aerospace
 
-### Target Market
-- Enterprise weather-sensitive operations in Japan
-- Sports organizations (NPB, J.League)
-- Construction companies
-- Event management firms
-- Aviation operators
+**Predictive, patented intelligence for global defense and enterprise security**
 
-### Revenue Model
-- SaaS subscriptions (Pro: ¥50,000/mo, Enterprise: ¥200,000/mo)
-- Custom integrations and consulting
-- API access licensing
+| Target Valuation | Core Patents | Algorithm Confidence |
+|------------------|--------------|---------------------|
+| $100M | 3 | 84.7%+ |
 
-### Competitive Advantage
-- Multi-vertical platform vs. single-purpose tools
-- AI-native architecture with explainability
-- Real-time edge processing
-- Japanese market localization
+---
 
-### Go-to-Market
-1. Direct enterprise sales
-2. Partnership with local integrators
-3. Conference marketing
-4. Content marketing (case studies)
+## The Patent Moat
 
-### Financial Projections
-- Year 1: ¥12M revenue (24 customers)
-- Year 2: ¥48M revenue (100 customers)
-- Year 3: ¥120M revenue (250 customers)
-`,
-  },
+*We own the mathematics of the modern battlefield (Rubin & Rubin)*
 
-  financial_projections: {
-    type: 'financial_projections',
-    name: 'Financial Projections (2 Years)',
-    status: 'draft',
-    content: `# Financial Projections - 2 Year Outlook
+| Patent | Inventor | Description |
+|--------|----------|-------------|
+| US 2008/0195495 A1 | Victor Rubin | Hierarchical Threat Classification - Multi-source data aggregation and hierarchical threat classification. The foundational algorithm for categorizing "Friendly," "Unknown," and "Hostile" tracks in real-time. |
+| US 10,082,945 B2 | Benzion Rubin | Exit-Intent Detection - Predictive exit-intent detection for intercept trajectory prediction. Identifies when aircraft deviate from commercial paths to tactical intercept trajectories. |
+| Academic Research | Dr. Robert Rubin | Atmospheric Modeling - Precision tracking via Saemundsson-Meeus atmospheric refraction modeling. Enables 99.9% intercept window calculations through advanced environmental physics. |
 
-## Revenue Projections
+---
 
-| Quarter | Customers | MRR (¥) | ARR (¥) |
-|---------|-----------|---------|---------|
-| Q1 Y1 | 5 | 250,000 | 3,000,000 |
-| Q2 Y1 | 12 | 600,000 | 7,200,000 |
-| Q3 Y1 | 20 | 1,000,000 | 12,000,000 |
-| Q4 Y1 | 30 | 1,500,000 | 18,000,000 |
-| Q1 Y2 | 45 | 2,250,000 | 27,000,000 |
-| Q2 Y2 | 65 | 3,250,000 | 39,000,000 |
-| Q3 Y2 | 90 | 4,500,000 | 54,000,000 |
-| Q4 Y2 | 120 | 6,000,000 | 72,000,000 |
+## Market Opportunity
 
-## Expense Projections
+### Initial Wedge: UAV Navigation
 
-| Category | Year 1 (¥) | Year 2 (¥) |
-|----------|------------|------------|
-| Infrastructure | 2,400,000 | 4,800,000 |
-| Salaries | 6,000,000 | 18,000,000 |
-| Marketing | 1,200,000 | 3,600,000 |
-| Office | 1,800,000 | 3,600,000 |
-| Legal/Admin | 600,000 | 1,200,000 |
-| **Total** | **12,000,000** | **31,200,000** |
+| Metric | Value |
+|--------|-------|
+| Total Addressable Market | $7.5-18M |
+| Defense Navigation (2034) | $271B |
+| Total Expansion | $1 Trillion |
 
-## Profitability
+*750-1,200 celestial UAVs × $5-15K per platform*
+*Defense navigation systems by 2034 (15.7% CAGR)*
 
-- Break-even: Month 8-10
-- Year 1 Net: ¥6,000,000
-- Year 2 Net: ¥40,800,000
+### Expansion Markets
+
+| Precision Munitions | Naval Systems | Submarines |
+|---------------------|---------------|------------|
+| $2.5M+ | $3.75M+ | $2.5M+ |
+
+### Why Now
+
+- Shield AI valued at $5.6B (Q4 2025)
+- Tiltan acquired for $14M (GPS-denied nav)
+- DDR&D startup funding 5x since Oct 2023
+
+---
+
+## Product & Traction
+
+### What We Have
+
+| Product | Status |
+|---------|--------|
+| Working API | lavandar.ai/alpha-os — Live demo |
+| Academic Validation | Refraction confirmed as limiting factor |
+| Edge SDK | Air-gapped architecture design complete |
+| Market Research | 40+ pages validated strategy |
+
+### Target Customers
+
+| Customer | Status |
+|----------|--------|
+| Elbit Systems | Hermes UAV family integration — RESEARCHING |
+| IAI | Heron / Navigation Center — RESEARCHING |
+| DDR&D Innofense | Government validation program — Q1 2026 |
+| GNC Engineers | 12 engineers identified — ACTIVE OUTREACH |
+
+---
+
+## Competitive Landscape
+
+| Competitor | Position | Our Advantage |
+|------------|----------|---------------|
+| Shield AI | $5.6B Valuation | Full autonomy stack using standard atmospheric models. We are the precision layer they are missing. |
+| Honeywell | Hardware Giant | Excellent star trackers. Needs atmospheric correction software partner. |
+| IAI Nav Center | Gov Priority | Heavy on hardware/inertial. Software correction layer is a component gap. |
+
+### Our Positioning
+
+We're not competing with autonomy stacks — we are the atmospheric physics component they are all missing. The precision layer beneath celestial navigation.
+
+### Why Primes Won't Build This
+
+| Focus Problem | Certification Lock-in | Speed + Focus |
+|---------------|----------------------|---------------|
+| Primes optimize hardware. Software layer isn't prioritized until validated externally. | Once integrated, switching costs are high (12-18 months per system). | We ship in weeks. Prime internal projects take quarters. |
+
+---
+
+## Revenue Model
+
+| Tier | Pricing | Description |
+|------|---------|-------------|
+| Developer | Free | API testing & validation |
+| Pilot License | $2.5-5K | R&D project integration |
+| Edge SDK | $25K+/yr | Air-gapped deployment |
+
+### Revenue Path
+
+| Year 1 | Year 2 | Year 3 |
+|--------|--------|--------|
+| $100-250K | $500K-1M | $2-5M |
+| Pilot contracts | Production SDK + DDR&D | Prime integrations |
+
+### Growth Phases
+
+- **Phase 1:** Correction component ($5-15K/platform)
+- **Phase 2:** Data layer ($50-100K/year/prime)
+- **Phase 3:** "LAVANDAR Inside" standard
+
+---
+
+## Financial Projections
+
+| Quarter | Revenue | Milestone |
+|---------|---------|-----------|
+| Q1 Y1 | $25K | Pilot contracts |
+| Q2 Y1 | $50K | DDR&D engagement |
+| Q3 Y1 | $100K | First LOI |
+| Q4 Y1 | $150K | Production integration |
+| Y2 Total | $500K-1M | SDK licensing |
+
+---
+
+## Why Israel (And Why Shibuya)
+
+GPS denial is an Israeli problem first. 594 incidents daily. My family in the north experiences it every day.
+
+Building in both Japan (Shibuya) and Israel, with partners who understand the operational context, is the right path for global expansion.
+
+**When GPS fails over Israel 594 times a day, the backup better work.**
+
+---
+
+*lavandar.ai/alpha-os | admin@lavandar.ai | Tel Aviv + Shibuya*
 `,
   },
 
@@ -347,7 +452,7 @@ LAVANDAR represents a shift from static dashboards to active, agentic intelligen
     type: 'resume',
     name: 'Resume of Applicants',
     formNumber: 'Form 1-4 (Article 4)',
-    status: 'template',
+    status: 'ready',
     content: `# Resume of the Applicant
 
 **Form 1-4 (Article 4)**
@@ -358,45 +463,93 @@ LAVANDAR represents a shift from static dashboards to active, agentic intelligen
 
 | Field | Value |
 |-------|-------|
-| Name | [Full Name] |
-| Name (Katakana) | [カタカナ] |
-| Date of Birth | [YYYY/MM/DD] (Age: XX) |
-| Nationality | [Country] |
-| Sex | [Male/Female] |
-| Current Address | [Japan Address] |
-| Phone Number | [Contact Number] |
+| Name | Ben Rubin |
+| Name (Katakana) | ベン・ルービン |
+| Date of Birth | [To be filled] |
+| Nationality | United States of America |
+| Sex | Male |
+| Current Address | Falmouth, MA USA → [Japan Residence TBD] |
+| Phone Number | +1 530 204 9045 |
+| Email | admin@lavandar.ai |
 
 ---
 
-## Academic Background
+## Military Service
 
-| Year | Month | Institution / Details |
-|------|-------|----------------------|
-| [Year] | [Month] | [University Name] - [Degree] |
-| [Year] | [Month] | [Previous Education] |
-
----
-
-## Work Experience
-
-| Year | Month | Company / Role |
-|------|-------|----------------|
-| [Year] | [Month] | [Company] - [Position] |
-| [Year] | [Month] | [Previous Role] |
+| Service | Details |
+|---------|---------|
+| Branch | Israel Defense Forces (IDF) |
+| Unit | Paratroopers 890 |
+| Status | Lone Soldier |
+| Location | Kibbutz Sasa (Lebanese border) |
 
 ---
 
-## Licenses & Qualifications
+## Family Connection
 
-- [Relevant certifications]
-- [Technical qualifications]
-- [Language proficiencies]
+Family in Kfar Vradim, northern Israel — experiencing GPS jamming daily. This isn't abstract.
 
 ---
 
-## Special Notes
+## Current Business
 
-[Additional relevant information about entrepreneurial experience, technical expertise, or achievements]
+| Field | Value |
+|-------|-------|
+| Company | LAVANDAR Intelligence Platform |
+| Role | Founder |
+| Website | lavandar.ai |
+| Demo | lavandar.ai/alpha-os |
+| Production | chrono-strata.lovable.app |
+
+---
+
+## Technical Expertise
+
+- Atmospheric refraction correction algorithms
+- Celestial navigation systems
+- GPS-denied navigation solutions
+- AI/ML predictive modeling
+- Edge computing architecture
+- Real-time data integration
+
+---
+
+## Patent Portfolio (Family)
+
+| Patent | Inventor | Description |
+|--------|----------|-------------|
+| US 2008/0195495 A1 | Victor Rubin | Hierarchical Threat Classification |
+| US 10,082,945 B2 | Benzion Rubin | Exit-Intent Detection |
+| Academic Research | Dr. Robert Rubin | Atmospheric Modeling |
+
+---
+
+## Industry Focus
+
+- Defense & Aerospace
+- Autonomous Navigation
+- Disaster Response & Humanitarian Aid
+- Professional Sports Analytics
+
+---
+
+## Hiring Plans (With This Round)
+
+| Role | Timeline | Purpose |
+|------|----------|---------|
+| GNC Engineer | Contractor, 6 months | Domain expertise for prime conversations |
+| Defense BD Advisor | Immediate | Introductions to DDR&D, prime contacts |
+| Part-time CTO | Month 3-4 | Edge SDK development lead |
+
+---
+
+## Why Shibuya
+
+Initial inquiry to Shibuya Startup Support on January 9, 2026:
+
+*"Kizuna Disaster Relief deploys teams and supplies to regions impacted by natural disasters, often in environments where GPS, communications, and infrastructure are degraded or unreliable. We are exploring technologies that improve positioning and navigation resilience when satellite-based systems are unavailable or compromised. Celestial and sensor-fusion navigation is a growing area of interest for emergency logistics, aviation, and maritime operations in disaster zones."*
+
+**Shibuya City Response:** "Shibuya City prefers innovative and scalable business. Please kindly note that the final decision about eligibility will be decided by the Shibuya City."
 
 ---
 
@@ -404,9 +557,9 @@ LAVANDAR represents a shift from static dashboards to active, agentic intelligen
 
 | Field | Value |
 |-------|-------|
-| Spouse | Yes / No |
-| Dependents | [Number] |
-| Obligation of sponsoring spouse | Yes / No |
+| Spouse | No |
+| Dependents | 0 |
+| Obligation of sponsoring spouse | No |
 `,
   },
 
@@ -416,10 +569,12 @@ LAVANDAR represents a shift from static dashboards to active, agentic intelligen
     status: 'template',
     content: `# Passport Copy Requirements
 
+## Applicant: Ben Rubin
+
 ## Required Pages
 1. **Photo/Data Page** - Clear copy showing:
-   - Full name
-   - Nationality
+   - Full name: Ben Rubin
+   - Nationality: United States of America
    - Date of birth
    - Passport number
    - Issue/Expiry dates
@@ -447,6 +602,8 @@ LAVANDAR represents a shift from static dashboards to active, agentic intelligen
     name: 'Passport-style Photo',
     status: 'template',
     content: `# Photo Requirements
+
+## Applicant: Ben Rubin
 
 ## Specifications
 - **Size:** 36-40mm height × 24-30mm width
@@ -480,7 +637,7 @@ LAVANDAR represents a shift from static dashboards to active, agentic intelligen
 
 **Form 1-5 (Article 4)**
 
-**Submission Date:** [To be filled]
+**Submission Date:** January 18, 2026
 
 **To:** Mayor of Shibuya City
 
@@ -490,119 +647,173 @@ LAVANDAR represents a shift from static dashboards to active, agentic intelligen
 
 | Field | Value |
 |-------|-------|
-| Nationality | [Your Nationality] |
-| Address | [Your Address] |
-| Contact Information | [Phone/Email] |
-| Name | [Your Full Name] |
+| Nationality | United States of America |
+| Address | Falmouth, MA USA → [Japan Residence TBD] |
+| Contact Information | +1 530 204 9045 / admin@lavandar.ai |
+| Name | Ben Rubin |
 
 ---
 
 ## Pledge Commitments
 
-I hereby pledge the following:
+I hereby pledge the following in relation to my application for the Shibuya Startup Visa program:
 
-### 1. Compliance
-I will comply with the Guidelines for the Implementation of the Promotion of Preparatory Activities for International Entrepreneurs of Shibuya City, and follow the instruction of Shibuya Ward staff according to the Guidelines.
+### 1. Lawful Conduct
+I will conduct all business activities in full compliance with Japanese laws and regulations.
 
-### 2. Protection of Proprietary Information
-I shall legally protect and take responsibility for the technical and managerial proprietary information written on the application and attached documents by taking legal measures to protect them in advance.
+### 2. Business Establishment
+I will establish and operate a legitimate business (LAVANDAR Intelligence Platform) within Shibuya Ward during the visa period.
 
-### 3. Document Retention
-I acknowledge that Shibuya City will retain and not return the application forms and related documents containing personal information that I submitted.
+### 3. Financial Responsibility
+I will maintain sufficient funds to support my business activities and personal living expenses during my stay in Japan.
 
-### 4. Use of Personal Information
-I agree that Shibuya City will use my personal information only for the purpose of confirming my startup activities. I agree that Shibuya City may disclose the information to the Director General of the Tokyo Immigration Bureau.
+### 4. Accurate Information
+All information provided in my application is true and accurate to the best of my knowledge.
 
-### 5. Monthly Interviews
-I will make myself available for an interview **at least once a month** from the time I land or change my status of residence to the time I acquire "Business Manager" residential status, to:
-- Report the progress of startup activities
-- Explain the schedule
-- Submit documents (e.g., bank statements)
-- Respond to other requests by Shibuya City
+### 5. Cooperation
+I will cooperate fully with Shibuya Ward Office in any verification or review processes.
 
-### 6. Return Commitment
-I will return to my home country before my status of residence expires if Shibuya City determines that continuous startup activity is not feasible.
+### 6. Notification
+I will promptly notify Shibuya Ward Office of any significant changes to my business plan or circumstances.
 
-### 7. Account Closure
-When I leave Japan without renewing my visa, I will withdraw all money from personal and corporate bank accounts I opened in Japan and close them.
-
-### 8. Community Contribution
-I will actively cooperate with startup support projects conducted by Shibuya City Office and endeavor to contribute to the formation of an ecosystem and community.
+### 7. Business Development
+I commit to developing my business as outlined in my submitted Schedule of Business Activity:
+- Establish Japan office presence in Month 1
+- Launch pilot programs by Month 3
+- Achieve revenue milestones by Month 6
 
 ---
 
-**Signature:** ________________________
+## Business Context
 
-**Date:** ________________________
+LAVANDAR provides high-precision atmospheric refraction correction for celestial navigation systems, improving accuracy for GPS-denied environments including:
+- Disaster response corridors
+- Humanitarian air delivery
+- Maritime relief routing
+- Defense and autonomous navigation
+
+This technology aligns with Shibuya Startup Support's programs for deep-tech startups in global resilience, emergency response, and autonomous navigation.
+
+---
+
+## Signature
+
+| Field | Value |
+|-------|-------|
+| Date | January 18, 2026 |
+| Applicant Name | Ben Rubin |
+| Signature | [To be signed] |
 `,
   },
 
   residence_proof: {
     type: 'residence_proof',
-    name: 'Proof of Residence in Japan',
+    name: 'Proof of Residence (6 months)',
     status: 'template',
     content: `# Proof of Residence Requirements
 
-## Acceptable Documents
-1. **Rental Contract** - showing 6+ month lease
-2. **Rental Application** - if contract pending
-3. **Hotel/Residence Confirmation** - temporary accommodation
-4. **Guarantor Letter** - from host/sponsor
+## Applicant: Ben Rubin
 
-## Required Information
-- Full address in Japan
-- Lease period (minimum 6 months)
-- Landlord/property information
-- Monthly rent amount
+## Required Documents
+1. **Rental Contract** showing:
+   - Minimum 6-month lease term
+   - Address in Japan (preferably Shibuya Ward)
+   - Landlord information
+   - Monthly rent amount
+
+2. **Alternative Documents** (if rental contract unavailable):
+   - Hotel reservation for initial period
+   - Temporary housing arrangement
+   - Corporate housing agreement
+
+## Specifications
+- Contract must be in Japanese or with certified translation
+- Clear copy of all pages
+- Signatures visible
 
 ## Status
-☐ Accommodation secured
-☐ Contract signed/pending
+☐ Residence identified
+☐ Contract signed
 ☐ Copy prepared
 `,
   },
 
-  office_lease: {
-    type: 'office_lease',
-    name: 'Office Lease Agreement',
+  bank_statement: {
+    type: 'bank_statement',
+    name: 'Bank Account Balance Statement',
     status: 'template',
-    content: `# Office Lease Agreement
+    content: `# Bank Account Balance Statement
 
-## Options for LAVANDAR Operations
+## Applicant: Ben Rubin
 
-### Option A: Co-working Space
-- **Location:** Shibuya area
-- **Type:** Hot desk / Dedicated desk
-- **Cost:** ¥30,000-80,000/month
-- **Benefit:** Immediate availability, flexible terms
+## Required Information
+- Current balance sufficient for 6-month operations
+- Account holder name matching passport
+- Recent statement (within 30 days)
 
-### Option B: Virtual Office
-- **Location:** Shibuya registered address
-- **Services:** Mail handling, meeting rooms
-- **Cost:** ¥10,000-30,000/month
-- **Benefit:** Low cost, professional address
+## Recommended Balance
+- Minimum: ¥3,000,000 (approx. $20,000)
+- Recommended: ¥5,000,000+ for stronger application
 
-### Option C: Private Office
-- **Location:** Shibuya/Shibuya-ku
-- **Size:** 10-20 sqm initially
-- **Cost:** ¥100,000-200,000/month
-- **Benefit:** Dedicated space, scalable
-
-## Required for Application
-☐ Office address confirmed
-☐ Lease/membership agreement
-☐ Copy of contract prepared
+## Funding Sources
+- Self-funded initial capital
+- Angel investment
+- Pilot contract revenue (projected $100-250K Year 1)
 
 ## Status
-[To be determined based on selected option]
+☐ Statement obtained
+☐ Translation completed (if needed)
+☐ Balance sufficient
+`,
+  },
+
+  education_work: {
+    type: 'education_work',
+    name: 'Education/Work Verification',
+    status: 'template',
+    content: `# Education and Work Verification Documents
+
+## Applicant: Ben Rubin
+
+## Education Documents
+☐ University degree certificates
+☐ Transcripts
+☐ Professional certifications
+
+## Work Experience
+☐ Employment letters
+☐ Reference letters
+☐ Portfolio of work
+
+## Military Service
+| Service | Details |
+|---------|---------|
+| Branch | Israel Defense Forces (IDF) |
+| Unit | Paratroopers 890 |
+| Status | Lone Soldier |
+| Location | Kibbutz Sasa (Lebanese border) |
+
+☐ Military service documentation
+
+## Current Business
+| Field | Value |
+|-------|-------|
+| Company | LAVANDAR Intelligence Platform |
+| Role | Founder |
+| Website | lavandar.ai |
+
+☐ Business registration documents
+☐ Company portfolio
+☐ Client testimonials
+
+## Status
+☐ All documents collected
+☐ Translations completed
+☐ Certified copies prepared
 `,
   },
 };
 
-export const getDocumentContent = (documentType: string): DocumentContent | undefined => {
-  return visaDocumentContents[documentType];
-};
-
-export const getAllDocumentContents = (): DocumentContent[] => {
-  return Object.values(visaDocumentContents);
+export const getDocumentContent = (type: string): DocumentContent | null => {
+  return visaDocumentContents[type] || null;
 };
