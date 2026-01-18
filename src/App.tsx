@@ -37,6 +37,7 @@ import WebScraper from "./pages/WebScraper";
 import LavenderAgent from "./pages/LavenderAgent";
 import SourcedInventory from "./pages/SourcedInventory";
 import StartupVisa from "./pages/StartupVisa";
+import ShareableLinks from "./pages/ShareableLinks";
 
 const queryClient = new QueryClient();
 
@@ -68,6 +69,7 @@ const App = () => (
                 <Route path="/weather-showcase" element={<WeatherShowcase />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/sitemap" element={<SiteMapPage />} />
+                <Route path="/links" element={<ShareableLinks />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />
