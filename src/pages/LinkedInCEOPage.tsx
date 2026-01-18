@@ -32,6 +32,7 @@ import {
   TrendingUp,
   Clock
 } from "lucide-react";
+import linkedInCeoCover from "@/assets/linkedin-ceo-cover.jpg";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -497,12 +498,12 @@ Building in public. Ask me anything 👇`,
             {/* Profile Card */}
             <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
               {/* Cover Image */}
-              <div className="h-[200px] bg-gradient-to-r from-[#0a66c2] via-[#004182] to-[#0a66c2] relative">
-                <div className="absolute inset-0 opacity-30">
-                  <div className="absolute top-10 left-10 w-20 h-20 border border-white/30 rounded-full" />
-                  <div className="absolute top-20 right-20 w-32 h-32 border border-white/20 rounded-full" />
-                  <div className="absolute bottom-10 left-1/3 w-16 h-16 border border-white/25 rounded-full" />
-                </div>
+              <div className="h-[200px] relative overflow-hidden">
+                <img 
+                  src={linkedInCeoCover} 
+                  alt="Profile cover" 
+                  className="w-full h-full object-cover"
+                />
                 <button className="absolute top-4 right-4 bg-white rounded-full p-2 hover:bg-gray-100">
                   <Pencil className="w-4 h-4 text-[#0a66c2]" />
                 </button>
