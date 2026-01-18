@@ -38,6 +38,7 @@ import LavenderAgent from "./pages/LavenderAgent";
 import SourcedInventory from "./pages/SourcedInventory";
 import StartupVisa from "./pages/StartupVisa";
 import ShareableLinks from "./pages/ShareableLinks";
+import InvestorHub from "./pages/InvestorHub";
 
 const queryClient = new QueryClient();
 
@@ -70,6 +71,7 @@ const App = () => (
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/sitemap" element={<SiteMapPage />} />
                 <Route path="/links" element={<ShareableLinks />} />
+                <Route path="/investor-hub" element={<InvestorHub />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />
