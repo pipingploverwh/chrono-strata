@@ -1,4 +1,4 @@
-import { Trophy, Users, Cloud, TrendingUp, Shield, Zap, Target, BarChart3, Clock, CheckCircle2, ArrowRight, Building2, Thermometer, Wind, Droplets } from "lucide-react";
+import { Trophy, Users, Cloud, TrendingUp, Shield, Zap, Target, BarChart3, Clock, CheckCircle2, ArrowRight, Building2, Thermometer, Wind, Droplets, Globe, Calendar, MapPin, Award } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 const KraftCaseStudy = () => {
@@ -222,6 +222,101 @@ const KraftCaseStudy = () => {
             </div>
           </div>
           
+        </div>
+      </section>
+
+      {/* World Cup 2026 Section */}
+      <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-red-900 py-24">
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
+              <Globe className="w-4 h-4 text-yellow-400" />
+              <span className="text-xs font-medium text-yellow-400 uppercase tracking-wider">
+                FIFA World Cup 2026™
+              </span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-light text-white mt-4 mb-6">
+              World Cup Venue Readiness
+            </h2>
+            <p className="text-blue-200 max-w-2xl mx-auto">
+              As a selected FIFA World Cup 2026™ host venue, Gillette Stadium is leveraging 
+              STRATA to prepare for the world's largest sporting event.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            {[
+              {
+                icon: Calendar,
+                title: "Multi-Match Operations",
+                description: "Weather intelligence for 6+ scheduled matches across group and knockout stages"
+              },
+              {
+                icon: Globe,
+                title: "Global Standards",
+                description: "FIFA-compliant weather monitoring and reporting protocols"
+              },
+              {
+                icon: MapPin,
+                title: "Expanded Coverage",
+                description: "Extended sensor network covering fan zones and transportation hubs"
+              },
+              {
+                icon: Award,
+                title: "Legacy Planning",
+                description: "Infrastructure investments designed for long-term venue enhancement"
+              }
+            ].map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <div key={i} className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6">
+                  <div className="w-10 h-10 bg-yellow-400/20 rounded-lg flex items-center justify-center mb-4">
+                    <Icon className="w-5 h-5 text-yellow-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-white mb-2">{item.title}</h3>
+                  <p className="text-sm text-blue-200">{item.description}</p>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 md:p-12">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <h3 className="text-2xl font-light text-white mb-6">
+                  2026 Readiness Initiatives
+                </h3>
+                <div className="space-y-4">
+                  {[
+                    "Enhanced hyperlocal forecasting for international broadcast requirements",
+                    "Multi-language weather alerts for global fan base",
+                    "Integration with FIFA's venue operations management system",
+                    "Extended 72-hour predictive models for travel and logistics planning",
+                    "Real-time pitch condition monitoring for player safety protocols"
+                  ].map((initiative, i) => (
+                    <div key={i} className="flex items-start gap-3 text-blue-100">
+                      <CheckCircle2 className="w-4 h-4 text-green-400 mt-1 flex-shrink-0" />
+                      <span className="text-sm">{initiative}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="text-center">
+                <div className="inline-block bg-white/10 rounded-2xl p-8">
+                  <div className="text-6xl font-light text-yellow-400 mb-2">2026</div>
+                  <div className="text-white font-medium mb-1">FIFA World Cup™</div>
+                  <div className="text-sm text-blue-200">United States • Canada • Mexico</div>
+                  <div className="mt-6 pt-6 border-t border-white/10">
+                    <div className="text-3xl font-light text-white mb-1">5M+</div>
+                    <div className="text-xs text-blue-200 uppercase tracking-wider">
+                      Expected Stadium Visitors
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
