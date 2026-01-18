@@ -19,7 +19,8 @@ import {
   Keyboard,
   Mail,
   ShieldCheck,
-  User
+  User,
+  Building2
 } from "lucide-react";
 import {
   Sheet,
@@ -29,6 +30,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
+import LanguageToggle from "@/components/LanguageToggle";
 
 interface NavItem {
   path: string;
@@ -155,6 +157,14 @@ const navItems: NavItem[] = [
     category: "system",
     isPublic: true
   },
+  { 
+    path: "/shibuya", 
+    label: "渋谷 Shibuya", 
+    description: "Startup Visa Landing Page",
+    icon: Building2,
+    category: "main",
+    isPublic: true
+  },
 ];
 
 export const SiteNavigation = () => {
@@ -188,10 +198,13 @@ export const SiteNavigation = () => {
         aria-label="Site navigation"
       >
         <SheetHeader className="flex-shrink-0">
-          <SheetTitle className="font-instrument text-2xl text-strata-white tracking-wide flex items-center gap-3">
-            <Map className="w-6 h-6 text-strata-orange" aria-hidden="true" />
-            Site Navigation
-          </SheetTitle>
+          <div className="flex items-center justify-between">
+            <SheetTitle className="font-instrument text-2xl text-strata-white tracking-wide flex items-center gap-3">
+              <Map className="w-6 h-6 text-strata-orange" aria-hidden="true" />
+              Site Navigation
+            </SheetTitle>
+            <LanguageToggle variant="compact" />
+          </div>
           <p className="text-[11px] font-mono text-strata-silver/60 uppercase tracking-[0.15em]">
             Lavandar AI • Operations Platform
           </p>

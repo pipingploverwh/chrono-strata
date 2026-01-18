@@ -41,6 +41,7 @@ import ShareableLinks from "./pages/ShareableLinks";
 import InvestorHub from "./pages/InvestorHub";
 import LinkedInCompanyPage from "./pages/LinkedInCompanyPage";
 import LinkedInCEOPage from "./pages/LinkedInCEOPage";
+import ShibuyaStartup from "./pages/ShibuyaStartup";
 
 const queryClient = new QueryClient();
 
@@ -76,6 +77,7 @@ const App = () => (
                 <Route path="/investor-hub" element={<InvestorHub />} />
                 <Route path="/linkedin-company" element={<LinkedInCompanyPage />} />
                 <Route path="/linkedin-ceo" element={<LinkedInCEOPage />} />
+                <Route path="/shibuya" element={<ShibuyaStartup />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />
