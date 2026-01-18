@@ -13,7 +13,7 @@ import {
   ChevronDown,
   ChevronUp,
   Calendar,
-  ExternalLink
+  Eye
 } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 import {
@@ -21,6 +21,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { DocumentViewer } from "./DocumentViewer";
+import { getDocumentContent } from "./documentContents";
 
 interface VisaDocument {
   id: string;
@@ -107,6 +109,7 @@ const statusConfig = {
 export function DocumentChecklist({ documents, onUpdateDocument }: DocumentChecklistProps) {
   const [expandedCategories, setExpandedCategories] = useState<string[]>(['core']);
   const [editingNotes, setEditingNotes] = useState<string | null>(null);
+  const [viewingDocument, setViewingDocument] = useState<{ type: string; name: string } | null>(null);
 
   const getDocumentStatus = (type: string): VisaDocument | undefined => {
     return documents.find(d => d.document_type === type);
@@ -201,6 +204,8 @@ export function DocumentChecklist({ documents, onUpdateDocument }: DocumentCheck
                     ? differenceInDays(new Date(docData.due_date), new Date())
                     : null;
 
+                  const hasContent = !!getDocumentContent(doc.type);
+
                   return (
                     <div 
                       key={doc.type}
@@ -229,7 +234,18 @@ export function DocumentChecklist({ documents, onUpdateDocument }: DocumentCheck
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        {hasContent && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-xs"
+                            onClick={() => setViewingDocument({ type: doc.type, name: doc.name })}
+                          >
+                            <Eye className="w-3 h-3 mr-1" />
+                            View
+                          </Button>
+                        )}
                         {daysUntilDue !== null && (
                           <div className={`flex items-center gap-1 text-xs ${
                             daysUntilDue < 0 ? 'text-destructive' :
@@ -255,6 +271,16 @@ export function DocumentChecklist({ documents, onUpdateDocument }: DocumentCheck
           </Collapsible>
         ))}
       </CardContent>
+      
+      {/* Document Viewer Modal */}
+      {viewingDocument && (
+        <DocumentViewer
+          documentType={viewingDocument.type}
+          documentName={viewingDocument.name}
+          isOpen={!!viewingDocument}
+          onClose={() => setViewingDocument(null)}
+        />
+      )}
     </Card>
   );
 }
