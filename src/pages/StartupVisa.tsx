@@ -18,6 +18,7 @@ import { VisaTimeline } from "@/components/visa/VisaTimeline";
 import { DocumentChecklist } from "@/components/visa/DocumentChecklist";
 import { InterviewScheduler } from "@/components/visa/InterviewScheduler";
 import { DeadlineTracker } from "@/components/visa/DeadlineTracker";
+import { VisaPDFExport } from "@/components/visa/VisaPDFExport";
 import { useVisaApplication } from "@/hooks/useVisaApplication";
 
 export default function StartupVisa() {
@@ -66,9 +67,17 @@ export default function StartupVisa() {
               </p>
             </div>
           </div>
-          <Badge className="bg-lavender/20 text-lavender border-lavender/30">
-            Information Technologies
-          </Badge>
+          <div className="flex items-center gap-3">
+            <VisaPDFExport 
+              application={application}
+              documents={documents}
+              interviews={interviews}
+              milestones={milestones}
+            />
+            <Badge className="bg-lavender/20 text-lavender border-lavender/30">
+              Information Technologies
+            </Badge>
+          </div>
         </div>
 
         {/* Phase Indicator */}
