@@ -23,7 +23,7 @@ import {
 export interface SyncLog {
   id: string;
   timestamp: Date;
-  type: 'export' | 'webhook' | 'api';
+  type: 'export' | 'webhook' | 'api' | 'scheduled';
   modules: string[];
   recordCount: number;
   status: 'success' | 'error' | 'pending';
@@ -57,6 +57,7 @@ export const OdooSyncDashboard = ({ logs, onClearLogs, onRefresh }: OdooSyncDash
       case 'export': return 'File Export';
       case 'webhook': return 'Webhook';
       case 'api': return 'API Sync';
+      case 'scheduled': return 'Scheduled';
       default: return type;
     }
   };
@@ -66,6 +67,7 @@ export const OdooSyncDashboard = ({ logs, onClearLogs, onRefresh }: OdooSyncDash
       case 'export': return 'bg-blue-100 text-blue-700';
       case 'webhook': return 'bg-purple-100 text-purple-700';
       case 'api': return 'bg-cyan-100 text-cyan-700';
+      case 'scheduled': return 'bg-amber-100 text-amber-700';
       default: return 'bg-neutral-100 text-neutral-700';
     }
   };
