@@ -1,24 +1,23 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Upload, 
   Play, 
   Pause, 
   Maximize2, 
   Sparkles, 
   Loader2, 
   Download, 
-  Music,
   Mic,
+  MicOff,
   Radio,
-  ChevronDown
+  Waves
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { toast } from 'sonner';
 
 interface AudioIngestHubProps {
   audioFile: File | null;
-  onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onAudioStream: (stream: MediaStream) => void;
   isPlaying: boolean;
   onTogglePlayback: () => void;
   onEnterImmersive: () => void;
@@ -32,19 +31,11 @@ interface AudioIngestHubProps {
     emotionalTone: string;
     frequencyProfile: string;
   } | null;
-  // Demo tracks for quick start
-  demoTracks?: Array<{
-    id: string;
-    title: string;
-    artist: string;
-    audioUrl: string;
-  }>;
-  onDemoTrackSelect?: (audioUrl: string, title: string) => void;
 }
 
 const AudioIngestHub = ({
   audioFile,
-  onFileUpload,
+  onAudioStream,
   isPlaying,
   onTogglePlayback,
   onEnterImmersive,
@@ -55,13 +46,102 @@ const AudioIngestHub = ({
   onToggleMagic,
   onDownloadMagic,
   magicAnalysis,
-  demoTracks,
-  onDemoTrackSelect,
 }: AudioIngestHubProps) => {
-  const [isDemoOpen, setIsDemoOpen] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioLevel, setAudioLevel] = useState(0);
+  const streamRef = useRef<MediaStream | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animationRef = useRef<number>(0);
 
-  const hasAudio = !!audioFile;
+  const hasAudio = isRecording || !!audioFile;
+
+  // Monitor audio levels when recording
+  useEffect(() => {
+    if (!isRecording || !analyserRef.current) return;
+
+    const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+    
+    const updateLevel = () => {
+      if (!analyserRef.current) return;
+      analyserRef.current.getByteFrequencyData(dataArray);
+      const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+      setAudioLevel(average / 255);
+      animationRef.current = requestAnimationFrame(updateLevel);
+    };
+    
+    updateLevel();
+
+    return () => cancelAnimationFrame(animationRef.current);
+  }, [isRecording]);
+
+  const startSystemAudio = async () => {
+    try {
+      // Request system audio capture (screen share with audio)
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: true, // Required for getDisplayMedia
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+        }
+      });
+
+      // Stop video track - we only want audio
+      stream.getVideoTracks().forEach(track => track.stop());
+
+      // Check if we have audio
+      const audioTracks = stream.getAudioTracks();
+      if (audioTracks.length === 0) {
+        toast.error('No audio detected. Make sure to share a tab or window with audio.');
+        return;
+      }
+
+      // Create audio context for level monitoring
+      const audioContext = new AudioContext();
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      analyserRef.current = analyser;
+
+      streamRef.current = stream;
+      setIsRecording(true);
+      onAudioStream(stream);
+
+      // Handle stream end
+      audioTracks[0].addEventListener('ended', () => {
+        stopSystemAudio();
+      });
+
+      toast.success('🎧 System audio connected! Play your music to visualize.');
+    } catch (err) {
+      console.error('Error capturing system audio:', err);
+      if ((err as Error).name === 'NotAllowedError') {
+        toast.error('Permission denied. Please allow audio capture.');
+      } else {
+        toast.error('Failed to capture system audio. Try selecting a browser tab with audio.');
+      }
+    }
+  };
+
+  const stopSystemAudio = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    analyserRef.current = null;
+    setIsRecording(false);
+    setAudioLevel(0);
+    cancelAnimationFrame(animationRef.current);
+  };
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopSystemAudio();
+    } else {
+      startSystemAudio();
+    }
+  };
 
   return (
     <motion.div
@@ -79,42 +159,46 @@ const AudioIngestHub = ({
           backdropFilter: 'blur(20px)',
         }}
       >
-        {/* Ambient glow */}
-        <div 
+        {/* Ambient glow - reacts to audio */}
+        <motion.div 
           className="absolute inset-0 pointer-events-none"
-          style={{
-            background: hasAudio 
-              ? 'radial-gradient(circle at 50% 100%, hsl(300 60% 40% / 0.15) 0%, transparent 60%)'
+          animate={{
+            background: isRecording 
+              ? `radial-gradient(circle at 50% 100%, hsl(300 60% ${40 + audioLevel * 30}% / ${0.15 + audioLevel * 0.2}) 0%, transparent 60%)`
               : 'radial-gradient(circle at 50% 100%, hsl(280 40% 30% / 0.1) 0%, transparent 60%)',
-            transition: 'background 0.5s ease',
           }}
+          transition={{ duration: 0.1 }}
         />
 
         <div className="relative z-10 space-y-5">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div 
+              <motion.div 
                 className="w-10 h-10 rounded-xl flex items-center justify-center"
                 style={{
                   background: 'linear-gradient(135deg, hsl(280 50% 45%) 0%, hsl(320 60% 50%) 100%)',
-                  boxShadow: '0 0 20px hsl(300 60% 50% / 0.3)',
+                  boxShadow: `0 0 ${20 + audioLevel * 30}px hsl(300 60% 50% / ${0.3 + audioLevel * 0.4})`,
                 }}
+                animate={isRecording ? {
+                  scale: [1, 1 + audioLevel * 0.1, 1],
+                } : {}}
+                transition={{ duration: 0.1 }}
               >
-                <Music className="w-5 h-5 text-white" />
-              </div>
+                <Waves className="w-5 h-5 text-white" />
+              </motion.div>
               <div>
                 <h3 
                   className="text-sm font-medium tracking-wide"
                   style={{ color: 'hsl(300 60% 80%)' }}
                 >
-                  AUDIO INGEST
+                  SYSTEM AUDIO CAPTURE
                 </h3>
                 <p 
                   className="text-xs"
                   style={{ color: 'hsl(280 30% 50%)' }}
                 >
-                  Upload, analyze, transform
+                  Capture & visualize your music
                 </p>
               </div>
             </div>
@@ -123,71 +207,87 @@ const AudioIngestHub = ({
             <div 
               className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs"
               style={{
-                background: hasAudio 
+                background: isRecording 
                   ? 'hsl(300 50% 40% / 0.2)' 
                   : 'hsl(280 30% 20% / 0.5)',
-                border: hasAudio 
+                border: isRecording 
                   ? '1px solid hsl(300 50% 50% / 0.3)' 
                   : '1px solid hsl(280 20% 30%)',
-                color: hasAudio 
+                color: isRecording 
                   ? 'hsl(300 60% 70%)' 
                   : 'hsl(280 30% 50%)',
               }}
             >
-              <div 
-                className="w-1.5 h-1.5 rounded-full"
+              <motion.div 
+                className="w-2 h-2 rounded-full"
                 style={{
-                  background: hasAudio ? 'hsl(300 70% 60%)' : 'hsl(280 30% 40%)',
-                  boxShadow: hasAudio ? '0 0 6px hsl(300 70% 60%)' : 'none',
+                  background: isRecording ? 'hsl(0 70% 55%)' : 'hsl(280 30% 40%)',
                 }}
+                animate={isRecording ? {
+                  scale: [1, 1.3, 1],
+                  opacity: [1, 0.7, 1],
+                } : {}}
+                transition={{ duration: 1, repeat: Infinity }}
               />
-              {hasAudio ? 'Ready' : 'Awaiting Input'}
+              {isRecording ? 'Listening...' : 'Ready'}
             </div>
           </div>
 
+          {/* Audio Level Meter */}
+          {isRecording && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="space-y-2"
+            >
+              <div className="flex items-center justify-between text-xs" style={{ color: 'hsl(280 30% 55%)' }}>
+                <span>Audio Level</span>
+                <span>{Math.round(audioLevel * 100)}%</span>
+              </div>
+              <div 
+                className="h-2 rounded-full overflow-hidden"
+                style={{ background: 'hsl(280 25% 15%)' }}
+              >
+                <motion.div
+                  className="h-full rounded-full"
+                  style={{
+                    background: `linear-gradient(90deg, hsl(270 60% 50%) 0%, hsl(300 70% 60%) 50%, hsl(320 80% 65%) 100%)`,
+                    boxShadow: `0 0 10px hsl(300 70% 50% / 0.5)`,
+                  }}
+                  animate={{ width: `${audioLevel * 100}%` }}
+                  transition={{ duration: 0.05 }}
+                />
+              </div>
+            </motion.div>
+          )}
+
           {/* Primary Actions Row */}
           <div className="flex items-center gap-3">
-            {/* Upload Button - Primary CTA when no audio */}
-            <label 
-              className="flex-1 group cursor-pointer"
+            {/* System Audio Capture Button */}
+            <motion.button
+              onClick={toggleRecording}
+              className="flex-1 flex items-center justify-center gap-3 px-5 py-4 rounded-xl transition-all"
+              style={{
+                background: isRecording 
+                  ? 'linear-gradient(135deg, hsl(0 50% 35%) 0%, hsl(320 60% 40%) 100%)'
+                  : 'linear-gradient(135deg, hsl(280 50% 35%) 0%, hsl(320 60% 45%) 100%)',
+                border: '1px solid hsl(300 50% 50% / 0.3)',
+                boxShadow: `0 0 30px hsl(300 60% 50% / 0.25)`,
+              }}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
             >
-              <motion.div
-                className="flex items-center justify-center gap-3 px-5 py-4 rounded-xl transition-all"
-                style={{
-                  background: hasAudio 
-                    ? 'hsl(280 25% 15%)' 
-                    : 'linear-gradient(135deg, hsl(280 50% 35%) 0%, hsl(320 60% 45%) 100%)',
-                  border: hasAudio 
-                    ? '1px solid hsl(280 30% 25%)' 
-                    : '1px solid hsl(300 50% 50% / 0.3)',
-                  boxShadow: hasAudio 
-                    ? 'none' 
-                    : '0 0 30px hsl(300 60% 50% / 0.25)',
-                }}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-              >
-                <Upload 
-                  className="w-5 h-5 transition-transform group-hover:scale-110"
-                  style={{ color: hasAudio ? 'hsl(300 50% 60%)' : 'white' }}
-                />
-                <span 
-                  className="font-medium"
-                  style={{ color: hasAudio ? 'hsl(300 40% 75%)' : 'white' }}
-                >
-                  {hasAudio ? audioFile.name : 'Drop or Upload Audio'}
-                </span>
-              </motion.div>
-              <input 
-                ref={fileInputRef}
-                type="file" 
-                accept="audio/*" 
-                onChange={onFileUpload} 
-                className="hidden" 
-              />
-            </label>
+              {isRecording ? (
+                <MicOff className="w-5 h-5 text-white" />
+              ) : (
+                <Mic className="w-5 h-5 text-white" />
+              )}
+              <span className="font-medium text-white">
+                {isRecording ? 'Stop Capture' : 'Capture System Audio'}
+              </span>
+            </motion.button>
 
-            {/* Play/Pause */}
+            {/* Play/Pause for visual feedback */}
             <motion.button
               onClick={onTogglePlayback}
               disabled={!hasAudio}
@@ -197,7 +297,7 @@ const AudioIngestHub = ({
                   ? 'linear-gradient(135deg, hsl(280 60% 50%) 0%, hsl(320 70% 55%) 100%)'
                   : 'hsl(280 25% 20%)',
                 boxShadow: hasAudio 
-                  ? '0 0 25px hsl(300 70% 50% / 0.4)' 
+                  ? `0 0 ${25 + audioLevel * 20}px hsl(300 70% 50% / 0.4)` 
                   : 'none',
               }}
               whileHover={hasAudio ? { scale: 1.05 } : {}}
@@ -211,63 +311,24 @@ const AudioIngestHub = ({
             </motion.button>
           </div>
 
-          {/* Quick Start: Demo Tracks */}
-          {demoTracks && demoTracks.length > 0 && (
-            <Collapsible open={isDemoOpen} onOpenChange={setIsDemoOpen}>
-              <CollapsibleTrigger asChild>
-                <button 
-                  className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg transition-colors"
-                  style={{
-                    background: 'hsl(280 25% 12%)',
-                    border: '1px solid hsl(280 25% 20%)',
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <Radio className="w-4 h-4" style={{ color: 'hsl(300 50% 60%)' }} />
-                    <span className="text-sm" style={{ color: 'hsl(280 30% 65%)' }}>
-                      Quick Start: Demo Tracks
-                    </span>
-                  </div>
-                  <ChevronDown 
-                    className="w-4 h-4 transition-transform"
-                    style={{ 
-                      color: 'hsl(280 30% 50%)',
-                      transform: isDemoOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                    }}
-                  />
-                </button>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className="grid grid-cols-2 gap-2 pt-3">
-                  {demoTracks.slice(0, 4).map((track) => (
-                    <motion.button
-                      key={track.id}
-                      onClick={() => onDemoTrackSelect?.(track.audioUrl, track.title)}
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all"
-                      style={{
-                        background: 'hsl(280 25% 14%)',
-                        border: '1px solid hsl(280 25% 22%)',
-                      }}
-                      whileHover={{ 
-                        background: 'hsl(280 30% 18%)',
-                        borderColor: 'hsl(300 40% 35%)',
-                      }}
-                    >
-                      <Play className="w-3 h-3 flex-shrink-0" style={{ color: 'hsl(300 50% 60%)' }} />
-                      <div className="min-w-0">
-                        <div className="text-xs font-medium truncate" style={{ color: 'hsl(300 40% 75%)' }}>
-                          {track.title}
-                        </div>
-                        <div className="text-[10px] truncate" style={{ color: 'hsl(280 25% 45%)' }}>
-                          {track.artist}
-                        </div>
-                      </div>
-                    </motion.button>
-                  ))}
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
-          )}
+          {/* Instructions */}
+          <div 
+            className="px-4 py-3 rounded-lg text-center"
+            style={{
+              background: 'hsl(280 25% 12%)',
+              border: '1px solid hsl(280 25% 20%)',
+            }}
+          >
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Radio className="w-4 h-4" style={{ color: 'hsl(300 50% 60%)' }} />
+              <span className="text-sm font-medium" style={{ color: 'hsl(300 50% 70%)' }}>
+                House Vibes Mode
+              </span>
+            </div>
+            <p className="text-xs" style={{ color: 'hsl(280 25% 50%)' }}>
+              Click capture, select a browser tab playing music, and watch the thermal warmth react to your beats
+            </p>
+          </div>
 
           {/* Secondary Actions */}
           <div className="flex items-center gap-3">
@@ -297,12 +358,12 @@ const AudioIngestHub = ({
               {isGeneratingMagic ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Generating...</span>
+                  <span>Synth...</span>
                 </>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4" />
-                  <span>AI Magic</span>
+                  <span>AI House Synth</span>
                 </>
               )}
             </Button>
@@ -365,7 +426,7 @@ const AudioIngestHub = ({
                     className="font-medium text-sm truncate"
                     style={{ color: 'hsl(300 60% 80%)' }}
                   >
-                    Thermal Magic Layer
+                    House Synth Layer
                   </span>
                 </div>
                 {magicAnalysis && (

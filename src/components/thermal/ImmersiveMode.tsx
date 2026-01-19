@@ -6,6 +6,8 @@ import StrataEmbeddedDisplay from '@/components/strata/StrataEmbeddedDisplay';
 import NeonKanjiOverlay from '@/components/thermal/NeonKanjiOverlay';
 import KatakanaRain from '@/components/thermal/KatakanaRain';
 import KatakanaMarquee from '@/components/thermal/KatakanaMarquee';
+import VerticalKatakanaColumns from '@/components/thermal/VerticalKatakanaColumns';
+import BassDropParticles from '@/components/thermal/BassDropParticles';
 
 interface ThermalZone {
   id: string;
@@ -148,6 +150,26 @@ const ImmersiveMode = ({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
+      {/* Vertical Katakana Columns - Matrix style */}
+      <VerticalKatakanaColumns
+        spectralData={{
+          bass: spectralData.low / 100,
+          mid: spectralData.mid / 100,
+          treble: spectralData.high / 100
+        }}
+        isPlaying={isPlaying}
+        getThermalColor={getThermalColor}
+        temperature={globalTemp}
+      />
+      
+      {/* Bass Drop Particle Effects */}
+      <BassDropParticles
+        bassEnergy={spectralData.low / 100}
+        isPlaying={isPlaying}
+        getThermalColor={getThermalColor}
+        temperature={globalTemp}
+      />
+      
       {/* ═══ KUMA LAYERED TRANSPARENCY BACKDROP ═══ */}
       <div className="absolute inset-0">
         {/* Deep thermal gradient base */}
