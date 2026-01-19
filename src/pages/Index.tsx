@@ -1,45 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
-  ChevronRight, ArrowRight, Anchor, Wind, Waves, 
-  Shield, Zap, Globe, BarChart3, Cloud, Ship,
-  Building2, Plane, CalendarDays, Check, Loader2,
-  Ticket, Brain, Users, Sparkles
+  ArrowRight, Shield, Lock, FileCheck, 
+  CheckCircle, Clock, Package, Fingerprint,
+  BarChart3, Users, ShieldCheck, Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-
-interface MarineForecast {
-  zone: string;
-  location: string;
-  issuedAt: string;
-  warnings: string[];
-  periods: {
-    name: string;
-    wind: string;
-    seas: string;
-    conditions: string;
-  }[];
-}
-
-interface MarineZone {
-  id: string;
-  name: string;
-  description: string;
-}
-
-const MARINE_ZONES: MarineZone[] = [
-  { id: 'anz233', name: 'Vineyard Sound', description: 'Including Woods Hole and Martha\'s Vineyard' },
-  { id: 'anz230', name: 'Cape Cod Bay', description: 'Plymouth to Provincetown' },
-  { id: 'anz232', name: 'Nantucket Sound', description: 'South of Cape Cod to Nantucket' },
-  { id: 'anz231', name: 'Buzzards Bay', description: 'New Bedford to the Elizabeth Islands' },
-];
+import AllocationProtocol from "@/components/allocation/AllocationProtocol";
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const [marineForecast, setMarineForecast] = useState<MarineForecast | null>(null);
-  const [loadingForecast, setLoadingForecast] = useState(false);
-  const [selectedZone, setSelectedZone] = useState<string>('anz233');
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
@@ -48,68 +18,68 @@ const LandingPage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Fetch NOAA marine forecast
-  useEffect(() => {
-    const fetchMarine = async () => {
-      setLoadingForecast(true);
-      try {
-        const { data, error } = await supabase.functions.invoke('noaa-marine', {
-          body: { zone: selectedZone }
-        });
-        if (data?.success) {
-          setMarineForecast(data.data);
-        }
-      } catch (err) {
-        console.error('Failed to fetch marine forecast:', err);
-      } finally {
-        setLoadingForecast(false);
-      }
-    };
-    fetchMarine();
-  }, [selectedZone]);
+  const howItWorks = [
+    { 
+      step: "01", 
+      icon: FileCheck, 
+      title: "Apply", 
+      desc: "Submit your allocation request with required verification documents" 
+    },
+    { 
+      step: "02", 
+      icon: Fingerprint, 
+      title: "Verify", 
+      desc: "Identity and compliance checks ensure qualified buyers only" 
+    },
+    { 
+      step: "03", 
+      icon: ShieldCheck, 
+      title: "Approve", 
+      desc: "Receive allocation confirmation with serialized unit assignment" 
+    },
+    { 
+      step: "04", 
+      icon: Package, 
+      title: "Secure", 
+      desc: "Complete payment and receive your authenticated allocation" 
+    },
+  ];
 
   const features = [
-    { icon: Shield, title: "Enterprise Security", desc: "SOC 2 compliant infrastructure with end-to-end encryption" },
-    { icon: Zap, title: "Real-Time Data", desc: "Sub-second atmospheric updates from 50,000+ sources" },
-    { icon: Globe, title: "Global Coverage", desc: "Precision forecasting for every coordinate on Earth" },
-    { icon: BarChart3, title: "Predictive Analytics", desc: "ML-powered forecasts with 98.7% accuracy" },
+    { icon: Shield, title: "Verified Buyers", desc: "Multi-layer identity verification ensures only qualified applicants" },
+    { icon: Lock, title: "Serialized Tracking", desc: "Every unit monitored from allocation through fulfillment" },
+    { icon: BarChart3, title: "Audit-Ready", desc: "Complete transaction trail for compliance and accountability" },
+    { icon: Users, title: "Controlled Access", desc: "Invitation-only allocation protects brand exclusivity" },
   ];
 
-  const industries = [
-    { icon: Ship, title: "Maritime", desc: "Marine forecasting for commercial and recreational vessels", href: "/strata-marine" },
-    { icon: Plane, title: "Aviation", desc: "Flight-critical weather intelligence for safe operations", href: "/strata-aviation" },
-    { icon: Building2, title: "Construction", desc: "Site-specific forecasting for project planning", href: "/strata-construction" },
-    { icon: CalendarDays, title: "Events", desc: "Weather risk management for outdoor venues", href: "/strata-events" },
-  ];
-
-  const stats = [
-    { value: "50K+", label: "Data Sources" },
-    { value: "98.7%", label: "Accuracy Rate" },
-    { value: "<100ms", label: "Update Latency" },
-    { value: "24/7", label: "Global Coverage" },
+  const trustStats = [
+    { value: "$2.4M", label: "Allocated This Quarter" },
+    { value: "94.2%", label: "Approval Rate" },
+    { value: "36h", label: "Avg. Processing" },
+    { value: "100%", label: "Audit Compliance" },
   ];
 
   return (
-    <div className="min-h-screen bg-[#f8f5f1] text-neutral-900 overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Fixed Header */}
       <header 
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrollY > 50 ? 'bg-[#f8f5f1]/95 backdrop-blur-md shadow-sm' : 'bg-transparent'
+          scrollY > 50 ? 'bg-background/95 backdrop-blur-md border-b border-border' : 'bg-transparent'
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 md:px-12 py-5 flex items-center justify-between">
-          <div className="font-light text-xs tracking-[0.5em] uppercase text-neutral-600">
+          <div className="font-medium text-sm tracking-[0.3em] uppercase text-foreground">
             Lavandar
           </div>
           <nav className="hidden md:flex items-center gap-10">
-            <a href="#features" className="text-xs tracking-[0.2em] uppercase text-neutral-500 hover:text-red-600 transition-colors">Features</a>
-            <a href="#industries" className="text-xs tracking-[0.2em] uppercase text-neutral-500 hover:text-red-600 transition-colors">Industries</a>
-            <a href="#marine" className="text-xs tracking-[0.2em] uppercase text-neutral-500 hover:text-red-600 transition-colors">Live Data</a>
+            <a href="#how-it-works" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-lavender transition-colors">Process</a>
+            <a href="#features" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-lavender transition-colors">Features</a>
+            <a href="#protocol" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-lavender transition-colors">Protocol</a>
             <Button 
-              onClick={() => navigate("/strata")}
-              className="bg-red-600 hover:bg-red-700 text-white text-xs tracking-[0.2em] uppercase px-6 py-2 rounded-none"
+              onClick={() => navigate("/investor-hub")}
+              className="bg-lavender hover:bg-lavender-glow text-primary-foreground text-xs tracking-widest uppercase px-6 py-2 rounded-none"
             >
-              Launch Platform
+              Request Access
             </Button>
           </nav>
         </div>
@@ -118,52 +88,54 @@ const LandingPage = () => {
       {/* Hero Section */}
       <section className="min-h-screen flex items-center relative pt-20">
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-gradient-to-br from-red-100/40 to-transparent rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-neutral-200/30 to-transparent rounded-full blur-3xl" />
+          <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-gradient-to-br from-lavender/10 to-transparent rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-surface-2 to-transparent rounded-full blur-3xl" />
         </div>
         
         <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 grid lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 border border-red-100 rounded-full">
-              <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
-              <span className="text-xs tracking-[0.15em] uppercase text-red-700">Enterprise Weather Intelligence</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-lavender/10 border border-lavender/20 rounded-full">
+              <div className="w-2 h-2 rounded-full bg-lavender animate-pulse" />
+              <span className="text-xs tracking-widest uppercase text-lavender">Secure Allocation Gateway</span>
             </div>
             
-            <h1 className="text-[clamp(2.5rem,8vw,5.5rem)] font-extralight leading-[0.95] tracking-[-0.02em]">
-              Weather Data
+            <h1 className="text-[clamp(2.5rem,7vw,4.5rem)] font-medium leading-[1.05] tracking-tight">
+              High-Value
               <br />
-              <span className="text-red-600">Reimagined</span>
+              <span className="text-lavender">Allocation</span>
+              <br />
+              <span className="text-muted-foreground font-normal">Reimagined</span>
             </h1>
             
-            <p className="text-lg md:text-xl font-light text-neutral-500 leading-relaxed max-w-lg">
-              STRATA delivers precision atmospheric intelligence for enterprises 
-              that demand accuracy. Real-time data. Predictive analytics. 
-              <span className="text-neutral-900"> Zero compromises.</span>
+            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg">
+              LAVANDAR replaces "Buy Now" commerce with an Application-to-Purchase protocol. 
+              Verified buyers. Serialized inventory. 
+              <span className="text-foreground"> Enterprise-grade trust.</span>
             </p>
             
             <div className="flex flex-wrap gap-4">
               <Button 
-                onClick={() => navigate("/strata")}
-                className="bg-red-600 hover:bg-red-700 text-white text-xs tracking-[0.2em] uppercase px-8 py-6 rounded-none group"
+                onClick={() => navigate("/investor-hub")}
+                className="bg-lavender hover:bg-lavender-glow text-primary-foreground text-xs tracking-widest uppercase px-8 py-6 rounded-none group"
               >
-                Access Platform
+                Request Allocation
                 <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button 
                 variant="outline"
-                onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                className="border-neutral-300 text-neutral-700 hover:bg-neutral-100 text-xs tracking-[0.2em] uppercase px-8 py-6 rounded-none"
+                onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
+                className="border-border text-muted-foreground hover:bg-surface-2 hover:text-foreground text-xs tracking-widest uppercase px-8 py-6 rounded-none"
               >
-                Learn More
+                View Process
               </Button>
             </div>
 
             {/* Trust indicators */}
-            <div className="flex items-center gap-8 pt-8 border-t border-neutral-200">
-              {stats.slice(0, 3).map((stat, i) => (
+            <div className="flex items-center gap-8 pt-8 border-t border-border">
+              {trustStats.slice(0, 3).map((stat, i) => (
                 <div key={i} className="text-center">
-                  <div className="text-2xl font-light text-red-600">{stat.value}</div>
-                  <div className="text-[10px] tracking-[0.15em] uppercase text-neutral-400 mt-1">{stat.label}</div>
+                  <div className="text-2xl font-medium text-lavender">{stat.value}</div>
+                  <div className="text-[10px] tracking-widest uppercase text-muted-foreground mt-1">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -171,34 +143,34 @@ const LandingPage = () => {
 
           {/* Hero Visual */}
           <div className="relative hidden lg:block">
-            <div className="absolute -inset-8 bg-gradient-to-br from-red-50 to-neutral-50 rounded-3xl" />
-            <div className="relative bg-white border border-neutral-200 rounded-2xl p-8 shadow-2xl shadow-neutral-200/50">
+            <div className="absolute -inset-8 bg-gradient-to-br from-lavender/5 to-surface-1 rounded-lg" />
+            <div className="relative bg-surface-1 border border-border rounded-md p-8">
               <div className="flex items-center gap-3 mb-6">
-                <Cloud className="w-6 h-6 text-red-600" />
-                <span className="text-xs tracking-[0.3em] uppercase text-neutral-400">Live Atmospheric Feed</span>
+                <ShieldCheck className="w-6 h-6 text-lavender" />
+                <span className="text-xs tracking-widest uppercase text-muted-foreground">Allocation Status</span>
               </div>
               
               <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-neutral-50 rounded-lg p-4">
-                  <div className="text-3xl font-light text-neutral-900">72°F</div>
-                  <div className="text-[10px] tracking-[0.2em] uppercase text-neutral-400 mt-1">Temperature</div>
+                <div className="bg-surface-2 rounded-md p-4">
+                  <div className="text-3xl font-medium text-foreground">47</div>
+                  <div className="text-[10px] tracking-widest uppercase text-muted-foreground mt-1">Applications</div>
                 </div>
-                <div className="bg-neutral-50 rounded-lg p-4">
-                  <div className="text-3xl font-light text-neutral-900">12kt</div>
-                  <div className="text-[10px] tracking-[0.2em] uppercase text-neutral-400 mt-1">Wind Speed</div>
+                <div className="bg-surface-2 rounded-md p-4">
+                  <div className="text-3xl font-medium text-foreground">12</div>
+                  <div className="text-[10px] tracking-widest uppercase text-muted-foreground mt-1">Units Available</div>
                 </div>
-                <div className="bg-neutral-50 rounded-lg p-4">
-                  <div className="text-3xl font-light text-neutral-900">98%</div>
-                  <div className="text-[10px] tracking-[0.2em] uppercase text-neutral-400 mt-1">Confidence</div>
+                <div className="bg-surface-2 rounded-md p-4">
+                  <div className="text-3xl font-medium text-status-approved">94%</div>
+                  <div className="text-[10px] tracking-widest uppercase text-muted-foreground mt-1">Verified</div>
                 </div>
-                <div className="bg-neutral-50 rounded-lg p-4">
-                  <div className="text-3xl font-light text-red-600">Clear</div>
-                  <div className="text-[10px] tracking-[0.2em] uppercase text-neutral-400 mt-1">Conditions</div>
+                <div className="bg-surface-2 rounded-md p-4">
+                  <div className="text-3xl font-medium text-lavender">Secure</div>
+                  <div className="text-[10px] tracking-widest uppercase text-muted-foreground mt-1">Status</div>
                 </div>
               </div>
               
-              <div className="h-24 bg-gradient-to-r from-red-50 via-red-100 to-red-50 rounded-lg flex items-center justify-center">
-                <span className="text-xs tracking-[0.2em] uppercase text-red-600">72-Hour Forecast Visualization</span>
+              <div className="h-16 bg-gradient-to-r from-lavender/10 via-lavender/20 to-lavender/10 rounded-md flex items-center justify-center">
+                <span className="text-xs tracking-widest uppercase text-lavender">Pipeline Active</span>
               </div>
             </div>
           </div>
@@ -206,13 +178,47 @@ const LandingPage = () => {
       </section>
 
       {/* Stats Bar */}
-      <section className="bg-neutral-900 py-16">
+      <section className="bg-surface-1 border-y border-border py-16">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, i) => (
+            {trustStats.map((stat, i) => (
               <div key={i} className="text-center">
-                <div className="text-4xl md:text-5xl font-extralight text-white">{stat.value}</div>
-                <div className="text-xs tracking-[0.2em] uppercase text-neutral-500 mt-2">{stat.label}</div>
+                <div className="text-4xl md:text-5xl font-medium text-foreground">{stat.value}</div>
+                <div className="text-xs tracking-widest uppercase text-muted-foreground mt-2">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="how-it-works" className="py-32 bg-background">
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+          <div className="max-w-3xl mb-20">
+            <div className="text-xs tracking-widest uppercase text-lavender mb-4">Application-to-Purchase</div>
+            <h2 className="text-4xl md:text-5xl font-medium leading-tight mb-6">
+              Four steps to
+              <br />
+              <span className="text-lavender">secure allocation</span>
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Every transaction follows a controlled protocol. 
+              From application to fulfillment, each stage is verified, tracked, and auditable.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {howItWorks.map((item, i) => (
+              <div 
+                key={i} 
+                className="group relative p-8 bg-surface-1 border border-border hover:border-lavender/30 transition-all duration-300"
+              >
+                <div className="absolute top-4 right-4 text-4xl font-medium text-surface-3 group-hover:text-lavender/20 transition-colors">
+                  {item.step}
+                </div>
+                <item.icon className="w-10 h-10 text-lavender mb-6" />
+                <h3 className="text-xl font-medium mb-3 text-foreground">{item.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -220,350 +226,147 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-32 bg-white">
+      <section id="features" className="py-32 bg-surface-1 border-y border-border">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="max-w-3xl mb-20">
-            <div className="text-xs tracking-[0.3em] uppercase text-red-600 mb-4">Platform Features</div>
-            <h2 className="text-4xl md:text-5xl font-extralight leading-tight mb-6">
-              Built for enterprises that
-              <br />
-              <span className="text-red-600">demand precision</span>
-            </h2>
-            <p className="text-lg text-neutral-500 font-light">
-              STRATA combines real-time data ingestion, machine learning, and 
-              intuitive visualization to deliver weather intelligence at scale.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, i) => (
-              <div 
-                key={i} 
-                className="group p-8 bg-neutral-50 hover:bg-red-50 border border-transparent hover:border-red-100 transition-all duration-300"
-              >
-                <feature.icon className="w-10 h-10 text-red-600 mb-6" />
-                <h3 className="text-xl font-light mb-3">{feature.title}</h3>
-                <p className="text-sm text-neutral-500 leading-relaxed">{feature.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Fan Experience Section */}
-      <section id="fan-experience" className="py-32 bg-neutral-900 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-bl from-red-900/20 to-transparent rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gradient-to-tr from-red-950/30 to-transparent rounded-full blur-3xl" />
-        </div>
-        
-        <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
-          <div className="text-center max-w-3xl mx-auto mb-20">
-            <div className="text-xs tracking-[0.3em] uppercase text-red-500 mb-4">Fan Experience Intelligence</div>
-            <h2 className="text-4xl md:text-5xl font-extralight leading-tight mb-6 text-white">
-              Transform every
-              <span className="text-red-500"> touchpoint</span>
-            </h2>
-            <p className="text-lg text-neutral-400 font-light">
-              AI-powered fan experience optimization that drives 25% increase in per-fan spend 
-              and 40% faster response times.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Frictionless Monetization */}
-            <div className="group relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-red-600/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative p-10 bg-neutral-800/50 backdrop-blur border border-neutral-700 hover:border-red-600/50 rounded-2xl transition-all duration-500">
-                <div className="w-14 h-14 bg-red-600/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-red-600/20 transition-colors">
-                  <Ticket className="w-7 h-7 text-red-500" />
-                </div>
-                <h3 className="text-2xl font-light text-white mb-4">Frictionless Monetization</h3>
-                <p className="text-neutral-400 leading-relaxed mb-6">
-                  Ticketless entry and seamless payment systems that eliminate friction 
-                  from wayfinding to checkout.
-                </p>
-                <ul className="space-y-3">
-                  <li className="flex items-center gap-3 text-sm text-neutral-300">
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                    Mobile-first ticketless entry
-                  </li>
-                  <li className="flex items-center gap-3 text-sm text-neutral-300">
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                    Integrated wayfinding navigation
-                  </li>
-                  <li className="flex items-center gap-3 text-sm text-neutral-300">
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                    Tap-to-pay everywhere
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Predictive Personalization */}
-            <div className="group relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-red-600/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative p-10 bg-neutral-800/50 backdrop-blur border border-neutral-700 hover:border-red-600/50 rounded-2xl transition-all duration-500">
-                <div className="w-14 h-14 bg-red-600/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-red-600/20 transition-colors">
-                  <Brain className="w-7 h-7 text-red-500" />
-                </div>
-                <h3 className="text-2xl font-light text-white mb-4">Predictive Personalization</h3>
-                <p className="text-neutral-400 leading-relaxed mb-6">
-                  ML-driven hyper-personalized offers based on behavior patterns, 
-                  betting activity, and retail history.
-                </p>
-                <ul className="space-y-3">
-                  <li className="flex items-center gap-3 text-sm text-neutral-300">
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                    Real-time behavior analysis
-                  </li>
-                  <li className="flex items-center gap-3 text-sm text-neutral-300">
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                    Dynamic offer optimization
-                  </li>
-                  <li className="flex items-center gap-3 text-sm text-neutral-300">
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                    Cross-property insights
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Crowd Sentiment */}
-            <div className="group relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-red-600/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative p-10 bg-neutral-800/50 backdrop-blur border border-neutral-700 hover:border-red-600/50 rounded-2xl transition-all duration-500">
-                <div className="w-14 h-14 bg-red-600/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-red-600/20 transition-colors">
-                  <Users className="w-7 h-7 text-red-500" />
-                </div>
-                <h3 className="text-2xl font-light text-white mb-4">Crowd Sentiment</h3>
-                <p className="text-neutral-400 leading-relaxed mb-6">
-                  Real-time crowd intelligence for experience optimization 
-                  and proactive guest services.
-                </p>
-                <ul className="space-y-3">
-                  <li className="flex items-center gap-3 text-sm text-neutral-300">
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                    Live sentiment monitoring
-                  </li>
-                  <li className="flex items-center gap-3 text-sm text-neutral-300">
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                    Predictive crowd flow
-                  </li>
-                  <li className="flex items-center gap-3 text-sm text-neutral-300">
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                    40% faster response time
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          {/* Impact Metrics */}
-          <div className="mt-20 grid grid-cols-3 gap-8 max-w-3xl mx-auto">
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-extralight text-red-500 mb-2">25%</div>
-              <div className="text-xs tracking-[0.2em] uppercase text-neutral-500">Spend Increase</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-extralight text-red-500 mb-2">40%</div>
-              <div className="text-xs tracking-[0.2em] uppercase text-neutral-500">Faster Response</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-extralight text-red-500 mb-2">3x</div>
-              <div className="text-xs tracking-[0.2em] uppercase text-neutral-500">Fan Engagement</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Industries Section */}
-      <section id="industries" className="py-32 bg-[#f8f5f1]">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="text-center max-w-3xl mx-auto mb-20">
-            <div className="text-xs tracking-[0.3em] uppercase text-red-600 mb-4">Industry Solutions</div>
-            <h2 className="text-4xl md:text-5xl font-extralight leading-tight mb-6">
-              Tailored for your
-              <span className="text-red-600"> industry</span>
-            </h2>
-            <p className="text-lg text-neutral-500 font-light">
-              Purpose-built dashboards with industry-specific metrics and integrations.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-6">
-            {industries.map((industry, i) => (
-              <button
-                key={i}
-                onClick={() => navigate(industry.href)}
-                className="group text-left p-10 bg-white hover:bg-neutral-900 border border-neutral-200 hover:border-neutral-900 transition-all duration-500"
-              >
-                <div className="flex items-start justify-between mb-8">
-                  <industry.icon className="w-12 h-12 text-red-600" />
-                  <ArrowRight className="w-6 h-6 text-neutral-300 group-hover:text-red-600 group-hover:translate-x-2 transition-all" />
-                </div>
-                <h3 className="text-2xl font-light mb-3 group-hover:text-white transition-colors">{industry.title}</h3>
-                <p className="text-neutral-500 group-hover:text-neutral-400 transition-colors">{industry.desc}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Live Marine Data Section */}
-      <section id="marine" className="py-32 bg-neutral-900">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="grid lg:grid-cols-2 gap-16 items-start">
-            <div className="space-y-8">
-              <div className="text-xs tracking-[0.3em] uppercase text-red-500 mb-4">Live NOAA Data</div>
-              <h2 className="text-4xl md:text-5xl font-extralight leading-tight text-white">
-                Real-time marine
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <div className="text-xs tracking-widest uppercase text-lavender mb-4">Enterprise Trust</div>
+              <h2 className="text-4xl md:text-5xl font-medium leading-tight mb-6">
+                Built for
                 <br />
-                <span className="text-red-500">forecasts</span>
+                <span className="text-lavender">high-stakes</span> transactions
               </h2>
-              <p className="text-lg text-neutral-400 font-light max-w-md">
-                Direct integration with NOAA's marine forecast network. 
-                Select your zone for live wind, sea, and weather conditions.
+              <p className="text-lg text-muted-foreground mb-8">
+                Traditional e-commerce lacks the verification and allocation controls 
+                needed for tens-of-thousands-dollar transactions. LAVANDAR provides 
+                the protocol luxury and limited-run products demand.
               </p>
               
-              {/* Zone Selector */}
-              <div className="space-y-3">
-                <div className="text-xs tracking-[0.2em] uppercase text-neutral-500">Select Zone</div>
-                <div className="grid grid-cols-2 gap-2">
-                  {MARINE_ZONES.map((zone) => (
-                    <button
-                      key={zone.id}
-                      onClick={() => setSelectedZone(zone.id)}
-                      className={`text-left p-4 border transition-all ${
-                        selectedZone === zone.id 
-                          ? 'bg-red-600 border-red-600 text-white' 
-                          : 'bg-neutral-800 border-neutral-700 text-neutral-300 hover:border-red-600'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        {selectedZone === zone.id && <Check className="w-4 h-4" />}
-                        <span className="text-sm font-medium">{zone.name}</span>
-                      </div>
-                      <span className="text-xs text-neutral-400">{zone.id.toUpperCase()}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Forecast Card */}
-            <div className="bg-neutral-800 border border-neutral-700 rounded-lg p-8">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <Anchor className="w-5 h-5 text-red-500" />
-                  <span className="text-xs tracking-[0.3em] uppercase text-neutral-400">Marine Forecast</span>
-                </div>
-                {loadingForecast && <Loader2 className="w-4 h-4 text-red-500 animate-spin" />}
-              </div>
-              
-              <div className="mb-6">
-                <h3 className="text-2xl font-light text-white">
-                  {marineForecast?.location || MARINE_ZONES.find(z => z.id === selectedZone)?.name}
-                </h3>
-                <p className="text-xs tracking-[0.2em] uppercase text-neutral-500 mt-1">
-                  Zone {marineForecast?.zone || selectedZone.toUpperCase()}
-                </p>
-              </div>
-
-              {marineForecast?.warnings.length ? (
-                <div className="mb-6 p-3 bg-red-900/30 border border-red-800 rounded">
-                  <span className="text-xs tracking-[0.2em] uppercase text-red-400">
-                    ⚠️ {marineForecast.warnings.join(' • ')}
-                  </span>
-                </div>
-              ) : null}
-
-              <div className="space-y-4">
-                {loadingForecast ? (
-                  <div className="flex items-center justify-center py-12">
-                    <Loader2 className="w-8 h-8 text-red-500 animate-spin" />
-                  </div>
-                ) : marineForecast?.periods.slice(0, 4).map((period, i) => (
-                  <div key={i} className="border-t border-neutral-700 pt-4">
-                    <div className="text-xs tracking-[0.2em] uppercase text-red-500 mb-3">{period.name}</div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex items-start gap-2">
-                        <Wind className="w-4 h-4 text-neutral-500 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-neutral-300">{period.wind || 'Variable'}</span>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <Waves className="w-4 h-4 text-neutral-500 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-neutral-300">{period.seas || 'Light'}</span>
-                      </div>
+              <div className="space-y-6">
+                {features.map((feature, i) => (
+                  <div key={i} className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-md bg-lavender/10 flex items-center justify-center shrink-0">
+                      <feature.icon className="w-5 h-5 text-lavender" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-foreground mb-1">{feature.title}</h3>
+                      <p className="text-sm text-muted-foreground">{feature.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
+            </div>
+            
+            <div className="bg-surface-2 border border-border rounded-md p-8">
+              <div className="text-center mb-8">
+                <div className="text-xs tracking-widest uppercase text-muted-foreground mb-2">Problem Solved</div>
+                <h3 className="text-2xl font-medium text-foreground">Why This Exists</h3>
+              </div>
               
-              <div className="mt-6 pt-6 border-t border-neutral-700">
-                <p className="text-[10px] text-neutral-500">
-                  Source: NOAA NWS • Updated: {marineForecast?.issuedAt || 'Loading...'}
-                </p>
+              <div className="space-y-6">
+                <div className="p-4 bg-background rounded-md border border-border">
+                  <div className="text-xs tracking-widest uppercase text-status-rejected mb-2">Problem</div>
+                  <p className="text-sm text-muted-foreground">
+                    Luxury and high-ticket limited-run products face fraud, overselling, and chargebacks. 
+                    Traditional e-commerce lacks verification and allocation controls.
+                  </p>
+                </div>
+                
+                <div className="p-4 bg-background rounded-md border border-lavender/30">
+                  <div className="text-xs tracking-widest uppercase text-lavender mb-2">Solution</div>
+                  <p className="text-sm text-muted-foreground">
+                    Application-to-Purchase protocol with built-in verification, allocation tracking, 
+                    and post-approval payment sequencing. Sellers maintain exclusivity; buyers gain access only when vetted.
+                  </p>
+                </div>
+                
+                <div className="p-4 bg-background rounded-md border border-status-approved/30">
+                  <div className="text-xs tracking-widest uppercase text-status-approved mb-2">Outcome</div>
+                  <p className="text-sm text-muted-foreground">
+                    Controlled allocation ensures inventory integrity, reduces financial risk, and reinforces brand prestige. 
+                    Every transaction traceable, every unit accounted for, every buyer verified.
+                  </p>
+                </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Protocol Section */}
+      <section id="protocol" className="py-32 bg-background">
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <div className="text-xs tracking-widest uppercase text-lavender mb-4">The Protocol</div>
+            <h2 className="text-4xl md:text-5xl font-medium leading-tight mb-6">
+              S.H.O.W.S. Workflow
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Secure High-value Order Workflow System. A five-stage protocol 
+              ensuring verified allocation from application to fulfillment.
+            </p>
+          </div>
+          
+          <div className="max-w-4xl mx-auto">
+            <AllocationProtocol />
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 bg-red-600">
+      <section className="py-32 bg-surface-1 border-t border-border">
         <div className="max-w-4xl mx-auto px-6 md:px-12 text-center">
-          <h2 className="text-4xl md:text-5xl font-extralight text-white leading-tight mb-6">
-            Ready to transform your
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-lavender/10 border border-lavender/20 rounded-full mb-8">
+            <Sparkles className="w-4 h-4 text-lavender" />
+            <span className="text-xs tracking-widest uppercase text-lavender">Invitation Only</span>
+          </div>
+          
+          <h2 className="text-4xl md:text-5xl font-medium leading-tight mb-6">
+            Ready for
             <br />
-            weather intelligence?
+            <span className="text-lavender">controlled allocation?</span>
           </h2>
-          <p className="text-lg text-red-100 font-light mb-10 max-w-xl mx-auto">
-            Join enterprises worldwide who rely on STRATA for mission-critical 
-            atmospheric intelligence.
+          
+          <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
+            LAVANDAR transforms high-value, limited-supply sales into a fully auditable, 
+            secure, and exclusive allocation experience.
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
+          
+          <div className="flex flex-wrap gap-4 justify-center">
             <Button 
-              onClick={() => navigate("/strata")}
-              className="bg-white hover:bg-neutral-100 text-red-600 text-xs tracking-[0.2em] uppercase px-10 py-6 rounded-none group"
+              onClick={() => navigate("/investor-hub")}
+              className="bg-lavender hover:bg-lavender-glow text-primary-foreground text-xs tracking-widest uppercase px-10 py-6 rounded-none group"
             >
-              Launch Platform
-              <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              Request Access
+              <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button 
               variant="outline"
-              onClick={() => window.open('mailto:brubin@lavandar.ai', '_blank')}
-              className="border-white/30 text-white hover:bg-white/10 text-xs tracking-[0.2em] uppercase px-10 py-6 rounded-none"
+              onClick={() => navigate("/portfolio")}
+              className="border-border text-muted-foreground hover:bg-surface-2 hover:text-foreground text-xs tracking-widest uppercase px-10 py-6 rounded-none"
             >
-              Contact Sales
+              View Portfolio
             </Button>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-neutral-900 py-16">
+      <footer className="py-16 bg-background border-t border-border">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="flex flex-wrap items-center justify-between gap-8">
-            <div>
-              <div className="font-light text-xs tracking-[0.5em] uppercase text-neutral-500 mb-2">Lavandar</div>
-              <p className="text-sm text-neutral-600">Built in Woods Hole by Piping Plover</p>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="font-medium text-sm tracking-[0.3em] uppercase text-foreground">
+              Lavandar
             </div>
-            <div className="flex items-center gap-8">
-              <a href="/strata" className="text-xs tracking-[0.2em] uppercase text-neutral-500 hover:text-red-500 transition-colors">Platform</a>
-              <a href="/portfolio" className="text-xs tracking-[0.2em] uppercase text-neutral-500 hover:text-red-500 transition-colors">Portfolio</a>
-              <a href="/validation-report" className="text-xs tracking-[0.2em] uppercase text-neutral-500 hover:text-red-500 transition-colors">Validation</a>
+            <p className="text-sm text-muted-foreground text-center">
+              Secure Allocation Gateway for High-Value Transactions
+            </p>
+            <div className="text-xs text-muted-foreground">
+              © 2026 Lavandar. All rights reserved.
             </div>
-          </div>
-          <div className="mt-12 pt-8 border-t border-neutral-800 flex flex-wrap justify-between gap-4">
-            <p className="text-xs text-neutral-600">© 2026 Lavandar AI. All rights reserved.</p>
-            <p className="text-xs text-neutral-600">Enterprise Weather Intelligence</p>
           </div>
         </div>
       </footer>
-
-      {/* Fixed bottom accent */}
-      <div className="fixed bottom-0 left-0 right-0 h-1 bg-red-600 z-40" />
     </div>
   );
 };

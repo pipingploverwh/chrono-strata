@@ -7,7 +7,7 @@ import MetricPod from "./MetricPod";
 import LayersSidebar from "./LayersSidebar";
 import ForecastStrip from "./ForecastStrip";
 import ControlToggles from "./ControlToggles";
-import HalftimeDistribution from "./HalftimeDistribution";
+import AllocationProtocol from "@/components/allocation/AllocationProtocol";
 import AtlasLayers from "./AtlasLayers";
 // Falmouth, MA data for January 11, 2026, 6:41 PM
 const weatherData = {
@@ -138,8 +138,10 @@ const StrataInstrument = () => {
           <ForecastStrip />
         </div>
 
-        {/* Halftime Distribution Analysis */}
-        <HalftimeDistribution />
+        {/* Allocation Protocol */}
+        <div className="mt-8">
+          <AllocationProtocol />
+        </div>
 
         {/* Atlas Layers Visualization */}
         <AtlasLayers />
