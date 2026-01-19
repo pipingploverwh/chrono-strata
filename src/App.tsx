@@ -59,6 +59,7 @@ import BeenaRedTeam from "./pages/BeenaRedTeam";
 import AIShowcase from "./pages/AIShowcase";
 import TalentRecruitment from "./pages/TalentRecruitment";
 import ProjectSummary from "./pages/ProjectSummary";
+import ExecutiveSummary from "./pages/ExecutiveSummary";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -110,6 +111,7 @@ const App = () => (
                 <Route path="/ai" element={<AIShowcase />} />
                 <Route path="/careers" element={<TalentRecruitment />} />
                 <Route path="/summary" element={<ProjectSummary />} />
+                <Route path="/exec" element={<ExecutiveSummary />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />
