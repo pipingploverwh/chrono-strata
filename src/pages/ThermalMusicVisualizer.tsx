@@ -8,9 +8,11 @@ import StrataEmbeddedDisplay from '@/components/strata/StrataEmbeddedDisplay';
 import WaveformVisualization from '@/components/strata/WaveformVisualization';
 import PsychoacousticVisualization from '@/components/PsychoacousticVisualization';
 import PsychoacousticPresetSelector, { PSYCHOACOUSTIC_PRESETS, type PsychoacousticPreset } from '@/components/PsychoacousticPresets';
+import AudioIngestHub from '@/components/AudioIngestHub';
 import LavandarBackground from '@/components/LavandarBackground';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { VINYL_COLLECTION } from '@/components/SpatialAudioCAD';
 // ═══════════════════════════════════════════════════════════════════════════
 // REIMAGINED THERMAL ALGORITHM v2.0
 // First-Principles Audio-Thermal Physics Engine
@@ -307,6 +309,7 @@ const ThermalMusicVisualizer = () => {
   }, []);
 
   // Multi-band spectral analysis with psychoacoustic weighting
+  // NOW APPLIES ACTIVE PRESET BAND WEIGHTS
   const analyzeSpectralBands = useCallback((
     frequencyData: Uint8Array, 
     sampleRate: number = 44100
@@ -316,6 +319,10 @@ const ThermalMusicVisualizer = () => {
     const bands: Record<string, number> = {};
     let totalWeightedEnergy = 0;
     let totalWeight = 0;
+    
+    // Get active preset for band weight modulation
+    const preset = PSYCHOACOUSTIC_PRESETS.find(p => p.id === activePreset) || PSYCHOACOUSTIC_PRESETS[0];
+    const presetWeights = preset.bandWeights;
     
     Object.entries(SPECTRAL.BANDS).forEach(([name, [lowHz, highHz]]) => {
       const lowBin = Math.floor(lowHz / binWidth);
@@ -327,24 +334,41 @@ const ThermalMusicVisualizer = () => {
       }
       
       const normalizedEnergy = bandEnergy / (highBin - lowBin + 1);
-      const weight = SPECTRAL.THERMAL_WEIGHTS[name as keyof typeof SPECTRAL.THERMAL_WEIGHTS];
+      const baseWeight = SPECTRAL.THERMAL_WEIGHTS[name as keyof typeof SPECTRAL.THERMAL_WEIGHTS];
       
-      bands[name] = normalizedEnergy;
-      totalWeightedEnergy += normalizedEnergy * weight;
-      totalWeight += weight;
+      // Apply preset band weight modifier
+      let presetModifier = 1.0;
+      switch (name) {
+        case 'SUB_BASS': presetModifier = presetWeights.subBass; break;
+        case 'BASS': presetModifier = presetWeights.bass; break;
+        case 'LOW_MID': presetModifier = presetWeights.lowMid; break;
+        case 'MID': presetModifier = presetWeights.mid; break;
+        case 'HIGH_MID': presetModifier = presetWeights.highMid; break;
+        case 'PRESENCE': presetModifier = presetWeights.presence; break;
+        case 'BRILLIANCE': presetModifier = presetWeights.brilliance; break;
+      }
+      
+      const modifiedWeight = baseWeight * presetModifier;
+      bands[name] = normalizedEnergy * presetModifier; // Apply preset to band value
+      totalWeightedEnergy += normalizedEnergy * modifiedWeight;
+      totalWeight += modifiedWeight;
     });
     
     return { 
       bands, 
       weightedEnergy: totalWeight > 0 ? totalWeightedEnergy / totalWeight : 0 
     };
-  }, []);
+  }, [activePreset]);
 
   // MAIN THERMAL RESPONSE ALGORITHM
+  // NOW INTEGRATES PRESET EFFECTS FOR REAL-TIME MODULATION
   const calculateThermalResponse = useCallback((
     frequencyData: Uint8Array,
     timeDomainData: Uint8Array
   ): SpectralBand => {
+    // Get active preset for thermal modulation
+    const preset = PSYCHOACOUSTIC_PRESETS.find(p => p.id === activePreset) || PSYCHOACOUSTIC_PRESETS[0];
+    
     // 1. Calculate acoustic pressure level
     const spl = calculateSPL(frequencyData);
     
@@ -355,16 +379,18 @@ const ThermalMusicVisualizer = () => {
     }
     
     // 3. Calculate spectral flux (rate of change)
-    const spectralFlux = calculateSpectralFlux(floatSpectrum);
+    let spectralFlux = calculateSpectralFlux(floatSpectrum);
     
-    // 4. Analyze frequency bands with psychoacoustic weighting
+    // 4. Analyze frequency bands with psychoacoustic weighting (now preset-aware)
     const { bands, weightedEnergy } = analyzeSpectralBands(frequencyData);
     
-    // 5. Calculate harmonic complexity
-    const harmonicComplexity = calculateHarmonicComplexity(frequencyData);
+    // 5. Calculate harmonic complexity - modulated by preset
+    let harmonicComplexity = calculateHarmonicComplexity(frequencyData);
+    harmonicComplexity *= (0.7 + preset.harmonicEnhancement * 0.6); // Preset harmonic boost
     
-    // 6. Detect transients
-    const transientSharpness = calculateTransientSharpness(spectralFlux);
+    // 6. Detect transients - modulated by preset
+    let transientSharpness = calculateTransientSharpness(spectralFlux);
+    transientSharpness *= preset.transientPreservation; // Preset transient control
     
     // 7. Calculate crest factor
     const crestFactor = calculateCrestFactor(frequencyData);
@@ -372,33 +398,41 @@ const ThermalMusicVisualizer = () => {
     // 8. Calculate zero-crossing rate
     const zeroCrossingRate = calculateZeroCrossingRate(timeDomainData);
     
-    // 9. Combine into simplified bands for display
+    // 9. Combine into simplified bands for display (preset-weighted)
     const low = ((bands.SUB_BASS || 0) * 0.4 + (bands.BASS || 0) * 0.6) * 100;
     const mid = ((bands.LOW_MID || 0) * 0.3 + (bands.MID || 0) * 0.5 + (bands.HIGH_MID || 0) * 0.2) * 100;
     const high = ((bands.PRESENCE || 0) * 0.5 + (bands.BRILLIANCE || 0) * 0.5) * 100;
     
-    // 10. Calculate composite thermal energy
+    // 10. Calculate composite thermal energy with PRESET TEMPERATURE BIAS
     // Formula: E = (SPL/MAX_SPL) × (1 + flux) × (1 + transient×0.5) × harmonicMod
     const normalizedSPL = spl / PHYSICS.MAX_SPL;
-    const fluxBoost = 1 + spectralFlux * 2;
+    
+    // Apply spatial diffusion from preset (affects flux perception)
+    const diffusedFlux = spectralFlux * (1 - preset.spatialDiffusion * 0.3);
+    const fluxBoost = 1 + diffusedFlux * 2;
+    
     const transientBoost = 1 + transientSharpness * 0.5;
     const harmonicMod = 0.7 + harmonicComplexity * 0.6;
     
     const rawEnergy = normalizedSPL * fluxBoost * transientBoost * harmonicMod;
-    const energy = Math.min(1, rawEnergy * PHYSICS.ENERGY_TO_HEAT * 1000);
+    
+    // Apply temperature bias from preset (-1 to 1 range)
+    // Positive bias = warmer response, negative = cooler
+    const tempBiasMultiplier = 1 + (preset.temperatureBias * 0.25);
+    const biasedEnergy = Math.min(1, rawEnergy * PHYSICS.ENERGY_TO_HEAT * 1000 * tempBiasMultiplier);
     
     return {
       low: Math.min(100, low),
       mid: Math.min(100, mid),
       high: Math.min(100, high),
-      energy,
-      spectralFlux,
+      energy: biasedEnergy,
+      spectralFlux: diffusedFlux,
       harmonicComplexity,
       transientSharpness,
       crestFactor,
       zeroCrossingRate,
     };
-  }, [calculateSPL, calculateSpectralFlux, analyzeSpectralBands, calculateHarmonicComplexity, calculateTransientSharpness, calculateCrestFactor, calculateZeroCrossingRate]);
+  }, [activePreset, calculateSPL, calculateSpectralFlux, analyzeSpectralBands, calculateHarmonicComplexity, calculateTransientSharpness, calculateCrestFactor, calculateZeroCrossingRate]);
 
   // THERMAL DIFFUSION MODEL
   // Based on Newton's law of cooling with thermal mass
@@ -603,6 +637,40 @@ const ThermalMusicVisualizer = () => {
       setIsMagicPlaying(false);
     }
   };
+
+  // Handle demo track selection
+  const handleDemoTrackSelect = async (audioUrl: string, title: string) => {
+    // Stop any current playback
+    if (isPlaying) {
+      togglePlayback();
+    }
+    
+    // Create a synthetic file for display purposes
+    const syntheticFile = new File([], `${title}.mp3`, { type: 'audio/mpeg' });
+    setAudioFile(syntheticFile);
+    
+    // Set up audio element with demo URL
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+    }
+    audioRef.current.src = audioUrl;
+    audioRef.current.crossOrigin = 'anonymous';
+    
+    // Reset magic state
+    setMagicAudio(null);
+    setMagicAnalysis(null);
+    setIsMagicPlaying(false);
+    
+    toast.success(`Loaded: ${title}`);
+  };
+
+  // Demo tracks for quick start (derived from VINYL_COLLECTION)
+  const demoTracks = VINYL_COLLECTION.map(v => ({
+    id: v.id,
+    title: v.title,
+    artist: v.artist,
+    audioUrl: v.audioUrl,
+  }));
 
   // Generate magic based on thermal analysis
   const generateMagic = async () => {
@@ -1113,120 +1181,30 @@ const ThermalMusicVisualizer = () => {
                 </p>
               </div>
 
-              {/* Controls */}
-              <div className="flex flex-col items-center gap-6 mb-12">
-                <div className="flex items-center gap-4">
-                  <label 
-                    className="flex items-center gap-2 px-6 py-3 rounded-lg cursor-pointer transition-all hover:opacity-90"
-                    style={{ 
-                      background: 'hsl(280 30% 15%)', 
-                      border: '1px solid hsl(280 30% 30%)',
-                    }}
-                  >
-                    <Upload className="w-5 h-5" style={{ color: 'hsl(300 70% 70%)' }} />
-                    <span style={{ color: 'hsl(300 40% 80%)' }}>{audioFile ? audioFile.name : 'Upload Audio File'}</span>
-                    <input type="file" accept="audio/*" onChange={handleFileUpload} className="hidden" />
-                  </label>
-                  <Button
-                    onClick={togglePlayback}
-                    disabled={!audioFile}
-                    className="w-14 h-14 rounded-full disabled:opacity-50"
-                    style={{ 
-                      background: 'linear-gradient(135deg, hsl(280 60% 45%) 0%, hsl(320 70% 55%) 100%)',
-                      boxShadow: '0 0 25px hsl(300 70% 50% / 0.4)'
-                    }}
-                  >
-                    {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-1" />}
-                  </Button>
-                  <Button
-                    onClick={() => setIsFullscreen(true)}
-                    variant="outline"
-                    className="flex items-center gap-2 hover:opacity-90"
-                    style={{ 
-                      borderColor: 'hsl(300 50% 45% / 0.5)', 
-                      color: 'hsl(300 60% 65%)',
-                      background: 'transparent'
-                    }}
-                  >
-                    <Maximize2 className="w-4 h-4" />
-                    <span>Immersive Mode</span>
-                  </Button>
-                  
-                  {/* Magic Generation Button */}
-                  <Button
-                    onClick={generateMagic}
-                    disabled={!audioFile || isGeneratingMagic}
-                    className="flex items-center gap-2 disabled:opacity-50"
-                    style={{ 
-                      background: 'linear-gradient(135deg, hsl(280 70% 45%) 0%, hsl(320 80% 55%) 100%)',
-                      boxShadow: '0 0 20px hsl(300 70% 50% / 0.4)',
-                    }}
-                  >
-                    {isGeneratingMagic ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Generating...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-4 h-4" />
-                        <span>Generate Magic</span>
-                      </>
-                    )}
-                  </Button>
-                </div>
-                
-                {/* Magic Audio Controls */}
-                {magicAudio && (
-                  <div 
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl"
-                    style={{ 
-                      background: 'linear-gradient(135deg, hsl(280 40% 15% / 0.8) 0%, hsl(320 40% 15% / 0.8) 100%)',
-                      border: '1px solid hsl(300 50% 35% / 0.5)',
-                    }}
-                  >
-                    <Button
-                      onClick={toggleMagicPlayback}
-                      size="sm"
-                      className="w-10 h-10 rounded-full flex-shrink-0"
-                      style={{ 
-                        background: 'linear-gradient(135deg, hsl(280 70% 50%) 0%, hsl(320 80% 60%) 100%)',
-                      }}
-                    >
-                      {isMagicPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
-                    </Button>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 text-sm" style={{ color: 'hsl(300 50% 75%)' }}>
-                        <Sparkles className="w-3 h-3 flex-shrink-0" />
-                        <span className="font-medium truncate">Thermal Magic Layer</span>
-                      </div>
-                      {magicAnalysis && (
-                        <div className="text-xs mt-1 truncate" style={{ color: 'hsl(300 30% 55%)' }}>
-                          {magicAnalysis.emotionalTone} • {magicAnalysis.frequencyProfile}
-                        </div>
-                      )}
-                    </div>
-                    <Button
-                      onClick={downloadMagicAudio}
-                      size="sm"
-                      variant="outline"
-                      className="flex items-center gap-2 flex-shrink-0"
-                      style={{ 
-                        borderColor: 'hsl(300 50% 45% / 0.5)',
-                        color: 'hsl(300 50% 75%)',
-                        background: 'hsl(300 30% 20% / 0.5)',
-                      }}
-                    >
-                      <Download className="w-4 h-4" />
-                      <span className="hidden sm:inline">Save MP3</span>
-                    </Button>
-                  </div>
-                )}
-                
-                <p className="text-xs" style={{ color: 'hsl(280 20% 45%)' }}>Press <kbd className="px-1.5 py-0.5 rounded" style={{ background: 'hsl(280 25% 18%)', color: 'hsl(300 40% 70%)' }}>F</kbd> for fullscreen</p>
-              </div>
+              {/* Audio Ingest Hub - Redesigned CTA */}
+              <AudioIngestHub
+                audioFile={audioFile}
+                onFileUpload={handleFileUpload}
+                isPlaying={isPlaying}
+                onTogglePlayback={togglePlayback}
+                onEnterImmersive={() => setIsFullscreen(true)}
+                onGenerateMagic={generateMagic}
+                isGeneratingMagic={isGeneratingMagic}
+                magicAudio={magicAudio}
+                isMagicPlaying={isMagicPlaying}
+                onToggleMagic={toggleMagicPlayback}
+                onDownloadMagic={downloadMagicAudio}
+                magicAnalysis={magicAnalysis ? {
+                  emotionalTone: magicAnalysis.emotionalTone,
+                  frequencyProfile: magicAnalysis.frequencyProfile,
+                } : null}
+                demoTracks={demoTracks}
+                onDemoTrackSelect={handleDemoTrackSelect}
+              />
 
-          {/* Main Visualization */}
+              <div className="mb-12" />
+
+              {/* Main Visualization */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* DJ Console Thermal View */}
             <div className="lg:col-span-2">
