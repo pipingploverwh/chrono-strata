@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Play, 
+  Pause,
   Zap, 
   Music, 
   Thermometer, 
@@ -14,13 +15,33 @@ import {
   BarChart3,
   Monitor,
   Smartphone,
-  Globe
+  Globe,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
+
+// Demo audio URL - using a free sample track
+const DEMO_AUDIO_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
 
 const ThermalVisualizerLanding = () => {
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const [temperature, setTemperature] = useState(35);
+  
+  // Audio demo state
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [demoTemperature, setDemoTemperature] = useState(25);
+  const [spectralData, setSpectralData] = useState({ low: 0, mid: 0, high: 0 });
+  const [volume, setVolume] = useState(0.7);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isAudioLoaded, setIsAudioLoaded] = useState(false);
+  
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -28,13 +49,115 @@ const ThermalVisualizerLanding = () => {
         x: (e.clientX / window.innerWidth) * 100,
         y: (e.clientY / window.innerHeight) * 100,
       });
-      // Temperature responds to mouse position
-      const newTemp = 20 + (e.clientX / window.innerWidth) * 50;
-      setTemperature(newTemp);
+      // Temperature responds to mouse position (only when not playing)
+      if (!isPlaying) {
+        const newTemp = 20 + (e.clientX / window.innerWidth) * 50;
+        setTemperature(newTemp);
+      }
     };
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [isPlaying]);
+
+  // Initialize audio
+  useEffect(() => {
+    audioRef.current = new Audio(DEMO_AUDIO_URL);
+    audioRef.current.crossOrigin = 'anonymous';
+    audioRef.current.volume = volume;
+    
+    audioRef.current.addEventListener('canplaythrough', () => {
+      setIsAudioLoaded(true);
+    });
+    
+    audioRef.current.addEventListener('ended', () => {
+      setIsPlaying(false);
+      setDemoTemperature(25);
+      setSpectralData({ low: 0, mid: 0, high: 0 });
+    });
+    
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+      }
+    };
   }, []);
+
+  // Volume control
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume;
+    }
+  }, [volume, isMuted]);
+
+  const analyzeAudio = useCallback(() => {
+    if (!analyserRef.current) return;
+    
+    const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+    analyserRef.current.getByteFrequencyData(dataArray);
+    
+    // Split frequency data into bands
+    const bassEnd = Math.floor(dataArray.length * 0.1);
+    const midEnd = Math.floor(dataArray.length * 0.5);
+    
+    let bass = 0, mid = 0, high = 0;
+    for (let i = 0; i < bassEnd; i++) bass += dataArray[i];
+    for (let i = bassEnd; i < midEnd; i++) mid += dataArray[i];
+    for (let i = midEnd; i < dataArray.length; i++) high += dataArray[i];
+    
+    bass /= bassEnd;
+    mid /= (midEnd - bassEnd);
+    high /= (dataArray.length - midEnd);
+    
+    // Normalize and set spectral data
+    const normalizedBass = bass / 255;
+    const normalizedMid = mid / 255;
+    const normalizedHigh = high / 255;
+    
+    setSpectralData({ low: normalizedBass, mid: normalizedMid, high: normalizedHigh });
+    
+    // Calculate temperature from audio energy
+    const energy = (normalizedBass * 0.5 + normalizedMid * 0.3 + normalizedHigh * 0.2);
+    const newTemp = 25 + energy * 45;
+    setDemoTemperature(prev => prev + (newTemp - prev) * 0.15); // Smooth transition
+    setTemperature(prev => prev + (newTemp - prev) * 0.15);
+    
+    if (isPlaying) {
+      animationRef.current = requestAnimationFrame(analyzeAudio);
+    }
+  }, [isPlaying]);
+
+  const togglePlayback = async () => {
+    if (!audioRef.current) return;
+    
+    if (isPlaying) {
+      audioRef.current.pause();
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      setIsPlaying(false);
+    } else {
+      // Initialize audio context on first play (user interaction required)
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioContext();
+        analyserRef.current = audioContextRef.current.createAnalyser();
+        analyserRef.current.fftSize = 256;
+        sourceRef.current = audioContextRef.current.createMediaElementSource(audioRef.current);
+        sourceRef.current.connect(analyserRef.current);
+        analyserRef.current.connect(audioContextRef.current.destination);
+      }
+      
+      await audioRef.current.play();
+      setIsPlaying(true);
+      analyzeAudio();
+    }
+  };
 
   const getThermalColor = (temp: number): string => {
     const normalized = (temp - 20) / 50;
@@ -230,6 +353,174 @@ const ThermalVisualizerLanding = () => {
               className="w-1 h-2 rounded-full animate-pulse"
               style={{ background: 'hsl(24 100% 50%)' }}
             />
+          </div>
+        </div>
+      </section>
+
+      {/* Live Audio Demo Section */}
+      <section className="relative py-24 px-6" style={{ background: 'linear-gradient(180deg, hsl(15 30% 4%) 0%, hsl(15 35% 6%) 50%, hsl(15 30% 4%) 100%)' }}>
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extralight mb-4" style={{ color: 'hsl(40 30% 85%)' }}>
+              <span style={{ color: 'hsl(24 100% 55%)' }}>Hear</span> the Heat
+            </h2>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: 'hsl(30 20% 55%)' }}>
+              Press play and watch the visualization respond to the music in real-time
+            </p>
+          </div>
+
+          {/* Demo Visualizer */}
+          <div 
+            className="relative rounded-3xl overflow-hidden p-8 transition-all duration-300"
+            style={{ 
+              background: 'hsl(20 25% 6%)', 
+              border: `2px solid ${isPlaying ? getThermalColor(demoTemperature) : 'hsl(30 30% 18%)'}`,
+              boxShadow: isPlaying ? `0 0 60px ${getThermalColor(demoTemperature)}40` : 'none',
+            }}
+          >
+            {/* Thermal glow effect */}
+            <div 
+              className="absolute inset-0 pointer-events-none transition-opacity duration-500"
+              style={{
+                background: `radial-gradient(circle at 50% 50%, ${getThermalColor(demoTemperature)}30 0%, transparent 70%)`,
+                opacity: isPlaying ? 1 : 0.3,
+              }}
+            />
+
+            {/* Spectral bars visualization */}
+            <div className="relative z-10 flex items-end justify-center gap-4 h-48 mb-8">
+              {/* Bass bar */}
+              <div className="flex flex-col items-center gap-2">
+                <div 
+                  className="w-16 sm:w-24 rounded-t-lg transition-all duration-75"
+                  style={{ 
+                    height: `${20 + spectralData.low * 150}px`,
+                    background: `linear-gradient(180deg, hsl(0 70% 50%) 0%, hsl(15 80% 35%) 100%)`,
+                    boxShadow: isPlaying ? `0 0 20px hsl(0 70% 50% / ${spectralData.low})` : 'none',
+                  }}
+                />
+                <span className="text-xs" style={{ color: 'hsl(30 20% 50%)' }}>BASS</span>
+              </div>
+              
+              {/* Mid bar */}
+              <div className="flex flex-col items-center gap-2">
+                <div 
+                  className="w-16 sm:w-24 rounded-t-lg transition-all duration-75"
+                  style={{ 
+                    height: `${20 + spectralData.mid * 150}px`,
+                    background: `linear-gradient(180deg, hsl(24 100% 55%) 0%, hsl(20 90% 40%) 100%)`,
+                    boxShadow: isPlaying ? `0 0 20px hsl(24 100% 55% / ${spectralData.mid})` : 'none',
+                  }}
+                />
+                <span className="text-xs" style={{ color: 'hsl(30 20% 50%)' }}>MID</span>
+              </div>
+              
+              {/* High bar */}
+              <div className="flex flex-col items-center gap-2">
+                <div 
+                  className="w-16 sm:w-24 rounded-t-lg transition-all duration-75"
+                  style={{ 
+                    height: `${20 + spectralData.high * 150}px`,
+                    background: `linear-gradient(180deg, hsl(45 100% 70%) 0%, hsl(35 95% 55%) 100%)`,
+                    boxShadow: isPlaying ? `0 0 20px hsl(45 100% 70% / ${spectralData.high})` : 'none',
+                  }}
+                />
+                <span className="text-xs" style={{ color: 'hsl(30 20% 50%)' }}>HIGH</span>
+              </div>
+            </div>
+
+            {/* Temperature display */}
+            <div className="relative z-10 flex items-center justify-center gap-6 mb-8">
+              <div 
+                className="flex items-center gap-3 px-6 py-3 rounded-full"
+                style={{ 
+                  background: 'hsl(20 25% 10% / 0.8)', 
+                  border: `1px solid ${getThermalColor(demoTemperature)}50`,
+                }}
+              >
+                <Thermometer className="w-5 h-5" style={{ color: getThermalColor(demoTemperature) }} />
+                <span 
+                  className="font-mono text-3xl font-bold transition-colors duration-150"
+                  style={{ color: getThermalColor(demoTemperature) }}
+                >
+                  {demoTemperature.toFixed(1)}°C
+                </span>
+              </div>
+            </div>
+
+            {/* Controls */}
+            <div className="relative z-10 flex flex-col items-center gap-6">
+              {/* Play button */}
+              <Button
+                size="lg"
+                onClick={togglePlayback}
+                disabled={!isAudioLoaded}
+                className="text-lg px-10 py-7 rounded-full group transition-all duration-300"
+                style={{ 
+                  background: isPlaying 
+                    ? `linear-gradient(135deg, ${getThermalColor(demoTemperature)} 0%, hsl(24 100% 40%) 100%)`
+                    : 'linear-gradient(135deg, hsl(0 70% 45%) 0%, hsl(24 100% 50%) 100%)',
+                  boxShadow: isPlaying 
+                    ? `0 0 50px ${getThermalColor(demoTemperature)}60`
+                    : '0 0 30px hsl(24 100% 50% / 0.3)',
+                }}
+              >
+                {isPlaying ? (
+                  <>
+                    <Pause className="w-6 h-6 mr-2" />
+                    Pause Demo
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-6 h-6 mr-2 group-hover:scale-110 transition-transform" />
+                    {isAudioLoaded ? 'Play Demo' : 'Loading...'}
+                  </>
+                )}
+              </Button>
+
+              {/* Volume control */}
+              <div className="flex items-center gap-4 w-full max-w-xs">
+                <button 
+                  onClick={() => setIsMuted(!isMuted)}
+                  className="p-2 rounded-full transition-colors"
+                  style={{ color: 'hsl(30 20% 55%)' }}
+                >
+                  {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                </button>
+                <Slider
+                  value={[isMuted ? 0 : volume * 100]}
+                  onValueChange={(v) => {
+                    setVolume(v[0] / 100);
+                    if (v[0] > 0) setIsMuted(false);
+                  }}
+                  max={100}
+                  step={1}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Call to action after demo */}
+          <div className="text-center mt-10">
+            <p className="mb-4" style={{ color: 'hsl(30 20% 55%)' }}>
+              Want to visualize your own music?
+            </p>
+            <Link to="/thermal-visualizer">
+              <Button
+                variant="outline"
+                size="lg"
+                className="rounded-full group"
+                style={{ 
+                  borderColor: 'hsl(24 100% 50% / 0.5)', 
+                  color: 'hsl(24 100% 55%)',
+                  background: 'transparent',
+                }}
+              >
+                Try with Your Audio
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
