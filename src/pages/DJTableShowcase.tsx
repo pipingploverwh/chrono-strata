@@ -1,11 +1,30 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Volume2, Disc3, Gauge, Zap, Shield, Award } from "lucide-react";
+import { ArrowLeft, Volume2, Disc3, Gauge, Zap, Shield, Award, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+// Import gallery images
+import heroImage from "@/assets/dj-table-hero.jpg";
+import turntableImage from "@/assets/dj-table-turntable.jpg";
+import mixerImage from "@/assets/dj-table-mixer.jpg";
+import topImage from "@/assets/dj-table-top.jpg";
+import frameImage from "@/assets/dj-table-frame.jpg";
+import lifestyleImage from "@/assets/dj-table-lifestyle.jpg";
 
 const DJTableShowcase = () => {
   const [activeView, setActiveView] = useState<'front' | 'top' | 'side'>('front');
   const [isHovered, setIsHovered] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  const galleryImages = [
+    { src: heroImage, title: "APEX-1 Overview", description: "3/4 angle showcasing the complete console" },
+    { src: topImage, title: "Top View", description: "Dual turntable layout with central mixer" },
+    { src: turntableImage, title: "Turntable Mount", description: "Precision-machined vibration isolation system" },
+    { src: mixerImage, title: "Mixer Detail", description: "LED-illuminated control surface" },
+    { src: frameImage, title: "Frame Construction", description: "Aircraft-grade aluminum framework" },
+    { src: lifestyleImage, title: "In Performance", description: "Professional venue deployment" },
+  ];
 
   const specs = [
     { label: "Dimensions", value: '72" × 36" × 34"' },
@@ -48,6 +67,19 @@ const DJTableShowcase = () => {
       description: "Each unit is numbered and registered. Only 50 units manufactured annually.",
     },
   ];
+
+  const openLightbox = (index: number) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
+
+  const navigateLightbox = (direction: 'prev' | 'next') => {
+    if (direction === 'prev') {
+      setLightboxIndex((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1));
+    } else {
+      setLightboxIndex((prev) => (prev === galleryImages.length - 1 ? 0 : prev + 1));
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -198,6 +230,99 @@ const DJTableShowcase = () => {
           </div>
         </div>
       </section>
+
+      {/* Image Gallery */}
+      <section className="py-24 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase mb-4">Product Gallery</p>
+            <h2 className="text-3xl md:text-4xl font-extralight tracking-tight">Every Angle, Every Detail</h2>
+          </div>
+
+          {/* Gallery Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {galleryImages.map((image, index) => (
+              <button
+                key={index}
+                onClick={() => openLightbox(index)}
+                className={`relative overflow-hidden group cursor-pointer ${
+                  index === 0 ? 'col-span-2 row-span-2' : ''
+                }`}
+              >
+                <div className={`relative ${index === 0 ? 'aspect-[4/3]' : 'aspect-square'}`}>
+                  <img 
+                    src={image.src} 
+                    alt={image.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
+                      <p className="text-xs tracking-[0.2em] text-muted-foreground uppercase mb-1">{image.title}</p>
+                      <p className="text-sm text-foreground/80">{image.description}</p>
+                    </div>
+                  </div>
+                  {/* Border */}
+                  <div className="absolute inset-0 border border-border/30 group-hover:border-border/60 transition-colors" />
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Lightbox Modal */}
+      {lightboxOpen && (
+        <div 
+          className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-xl flex items-center justify-center"
+          onClick={() => setLightboxOpen(false)}
+        >
+          {/* Close Button */}
+          <button 
+            className="absolute top-6 right-6 p-3 text-muted-foreground hover:text-foreground transition-colors z-10"
+            onClick={() => setLightboxOpen(false)}
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          {/* Navigation */}
+          <button 
+            className="absolute left-4 md:left-8 p-3 text-muted-foreground hover:text-foreground transition-colors z-10"
+            onClick={(e) => { e.stopPropagation(); navigateLightbox('prev'); }}
+          >
+            <ChevronLeft className="w-8 h-8" />
+          </button>
+          <button 
+            className="absolute right-4 md:right-8 p-3 text-muted-foreground hover:text-foreground transition-colors z-10"
+            onClick={(e) => { e.stopPropagation(); navigateLightbox('next'); }}
+          >
+            <ChevronRight className="w-8 h-8" />
+          </button>
+
+          {/* Image */}
+          <div 
+            className="max-w-5xl max-h-[80vh] mx-4 md:mx-16"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img 
+              src={galleryImages[lightboxIndex].src} 
+              alt={galleryImages[lightboxIndex].title}
+              className="max-w-full max-h-[70vh] object-contain mx-auto"
+            />
+            <div className="text-center mt-6">
+              <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase mb-2">
+                {galleryImages[lightboxIndex].title}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {galleryImages[lightboxIndex].description}
+              </p>
+              <p className="text-xs text-muted-foreground/60 mt-4">
+                {lightboxIndex + 1} / {galleryImages.length}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Features Grid */}
       <section className="py-24 px-6 bg-muted/20 border-y border-border/30">
