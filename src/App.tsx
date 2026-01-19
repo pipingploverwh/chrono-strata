@@ -42,6 +42,7 @@ import InvestorHub from "./pages/InvestorHub";
 import LinkedInCompanyPage from "./pages/LinkedInCompanyPage";
 import LinkedInCEOPage from "./pages/LinkedInCEOPage";
 import ShibuyaStartup from "./pages/ShibuyaStartup";
+import OdooTransferPortal from "./pages/OdooTransferPortal";
 
 const queryClient = new QueryClient();
 
@@ -94,6 +95,7 @@ const App = () => (
                 <Route path="/lavender-agent" element={<ProtectedRoute><LavenderAgent /></ProtectedRoute>} />
                 <Route path="/sourced-inventory" element={<ProtectedRoute><SourcedInventory /></ProtectedRoute>} />
                 <Route path="/startup-visa" element={<ProtectedRoute><StartupVisa /></ProtectedRoute>} />
+                <Route path="/odoo" element={<ProtectedRoute><OdooTransferPortal /></ProtectedRoute>} />
                 <Route path="/logs" element={<ProtectedRoute><Logs /></ProtectedRoute>} />
                 
                 {/* Admin Routes */}
