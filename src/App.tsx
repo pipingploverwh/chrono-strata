@@ -53,6 +53,8 @@ import Apex1Landing from "./pages/Apex1Landing";
 import ChronoStrataClub from "./pages/ChronoStrataClub";
 import ThermalMusicVisualizer from "./pages/ThermalMusicVisualizer";
 import ThermalVisualizerLanding from "./pages/ThermalVisualizerLanding";
+import ThermalLandingSlash from "./pages/ThermalLandingSlash";
+import ThermalLandingAnti from "./pages/ThermalLandingAnti";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -98,6 +100,8 @@ const App = () => (
                 <Route path="/chrono-strata" element={<ChronoStrataClub />} />
                 <Route path="/thermal-visualizer" element={<ThermalMusicVisualizer />} />
                 <Route path="/thermal" element={<ThermalVisualizerLanding />} />
+                <Route path="/thermal-slash" element={<ThermalLandingSlash />} />
+                <Route path="/thermal-anti" element={<ThermalLandingAnti />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />
