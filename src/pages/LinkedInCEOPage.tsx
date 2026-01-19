@@ -782,6 +782,123 @@ Building in public. Ask me anything 👇`,
               </button>
             </div>
 
+            {/* Weather Intelligence Enterprise Operations Section */}
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">Weather Intelligence Data</h2>
+                  <p className="text-sm text-gray-500">How we think about modern enterprise operations</p>
+                </div>
+                <div className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                  LIVE DATA
+                </div>
+              </div>
+
+              {/* Forbes Article Reference */}
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 mb-6 border border-blue-100">
+                <div className="flex items-start gap-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg flex items-center justify-center text-3xl flex-shrink-0">
+                    📰
+                  </div>
+                  <div>
+                    <p className="text-xs text-blue-600 font-semibold mb-1">Article</p>
+                    <h3 className="font-semibold text-gray-900">How Weather Intelligence is Transforming Enterprise Operations</h3>
+                    <p className="text-sm text-gray-500">Forbes</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Enterprise Philosophy */}
+              <div className="space-y-4 mb-6">
+                <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <span className="w-8 h-8 bg-[#0a66c2] rounded-full flex items-center justify-center text-white text-sm">💡</span>
+                  Our Philosophy
+                </h3>
+                <div className="pl-10 space-y-3">
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    <strong>Weather isn't just data—it's operational intelligence.</strong> Every enterprise decision, from construction scheduling to maritime routing, is fundamentally weather-dependent.
+                  </p>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    We believe the modern enterprise needs three things from weather data:
+                  </p>
+                  <div className="grid gap-3 mt-3">
+                    {[
+                      { icon: "🎯", title: "Precision", desc: "Hyperlocal coordinates, not regional approximations" },
+                      { icon: "⚡", title: "Real-time", desc: "Sub-minute latency for operational decisions" },
+                      { icon: "🔗", title: "Integration", desc: "Native connectivity to existing workflows" }
+                    ].map((item, idx) => (
+                      <div key={idx} className="flex items-start gap-3 bg-gray-50 rounded-lg p-3">
+                        <span className="text-xl">{item.icon}</span>
+                        <div>
+                          <h4 className="font-semibold text-gray-900 text-sm">{item.title}</h4>
+                          <p className="text-xs text-gray-500">{item.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Live Platform Metrics */}
+              <div className="border-t border-gray-100 pt-6">
+                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <span className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-sm">📊</span>
+                  Platform Telemetry (Live)
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    { label: "Total Queries", value: "3", subtext: "Weather API calls" },
+                    { label: "Unique Sessions", value: "2", subtext: "Anonymous users" },
+                    { label: "Integrated Pages", value: "1", subtext: "Active modules" },
+                    { label: "Coordinates Tracked", value: "Cape Cod", subtext: "41.55°N, -70.61°W" }
+                  ].map((metric, idx) => (
+                    <div key={idx} className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 text-center">
+                      <p className="text-2xl font-bold text-gray-900">{metric.value}</p>
+                      <p className="text-xs font-semibold text-gray-700">{metric.label}</p>
+                      <p className="text-xs text-gray-500 mt-1">{metric.subtext}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Database Query Example */}
+              <div className="mt-6 bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className="text-xs text-gray-400 ml-2">weather_intelligence.sql</span>
+                </div>
+                <pre className="text-xs text-green-400 font-mono leading-relaxed">
+{`-- Enterprise Weather Coordinate Logging
+SELECT 
+  page_source,
+  latitude,
+  longitude,
+  created_at
+FROM weather_coordinate_logs
+ORDER BY created_at DESC;
+
+-- Result: 3 queries from /weather-intelligence
+-- Location: Cape Cod, MA (41.55°N, -70.61°W)
+-- Use case: Maritime operations intelligence`}
+                </pre>
+              </div>
+
+              {/* CTA */}
+              <div className="mt-6 p-4 bg-gradient-to-r from-[#0a66c2]/5 to-[#0a66c2]/10 rounded-lg border border-[#0a66c2]/20">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-semibold text-gray-900">Interested in weather-intelligent infrastructure?</h4>
+                    <p className="text-sm text-gray-500">Let's discuss how LAVANDAR can transform your operations.</p>
+                  </div>
+                  <Button className="bg-[#0a66c2] hover:bg-[#004182] text-white rounded-full">
+                    Schedule Demo
+                  </Button>
+                </div>
+              </div>
+            </div>
+
             {/* Career Resources Section */}
             <CareerResourcesSection />
           </div>
