@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import thermalDemoVideo from '@/assets/thermal-demo.mp4';
-
-const DEMO_AUDIO_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+import { SpatialAudioCAD, VINYL_COLLECTION, VinylRecord } from '@/components/SpatialAudioCAD';
 
 const ThermalLandingAnti = () => {
   const [temperature, setTemperature] = useState(35);
