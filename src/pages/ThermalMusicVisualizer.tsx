@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import StrataEmbeddedDisplay from '@/components/strata/StrataEmbeddedDisplay';
 import WaveformVisualization from '@/components/strata/WaveformVisualization';
+import PsychoacousticVisualization from '@/components/PsychoacousticVisualization';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1365,51 +1366,13 @@ const ThermalMusicVisualizer = () => {
 
             {/* Metrics Panel */}
             <div className="space-y-6">
-              {/* Spectral Analysis */}
-              <div className="rounded-2xl p-6 backdrop-blur-xl" style={{ background: 'hsl(20 25% 8% / 0.5)', border: '1px solid hsl(30 30% 20%)' }}>
-                <h3 className="text-sm font-medium mb-4 flex items-center gap-2" style={{ color: 'hsl(40 30% 65%)' }}>
-                  <Activity className="w-4 h-4" style={{ color: 'hsl(24 100% 50%)' }} />
-                  SPECTRAL ENERGY ANALYSIS
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span style={{ color: 'hsl(30 20% 50%)' }}>LOW (Bass)</span>
-                      <span style={{ color: 'hsl(40 30% 65%)' }}>{spectralData.low.toFixed(1)}%</span>
-                    </div>
-                    <div className="h-3 rounded-full overflow-hidden" style={{ background: 'hsl(20 25% 15%)' }}>
-                      <div 
-                        className="h-full transition-all duration-75"
-                        style={{ width: `${spectralData.low}%`, background: 'linear-gradient(to right, hsl(0 70% 45%), hsl(24 100% 50%))' }}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span style={{ color: 'hsl(30 20% 50%)' }}>MID (Vocals)</span>
-                      <span style={{ color: 'hsl(40 30% 65%)' }}>{spectralData.mid.toFixed(1)}%</span>
-                    </div>
-                    <div className="h-3 rounded-full overflow-hidden" style={{ background: 'hsl(20 25% 15%)' }}>
-                      <div 
-                        className="h-full transition-all duration-75"
-                        style={{ width: `${spectralData.mid}%`, background: 'linear-gradient(to right, hsl(24 100% 50%), hsl(40 100% 50%))' }}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span style={{ color: 'hsl(30 20% 50%)' }}>HIGH (Treble)</span>
-                      <span style={{ color: 'hsl(40 30% 65%)' }}>{spectralData.high.toFixed(1)}%</span>
-                    </div>
-                    <div className="h-3 rounded-full overflow-hidden" style={{ background: 'hsl(20 25% 15%)' }}>
-                      <div 
-                        className="h-full transition-all duration-75"
-                        style={{ width: `${spectralData.high}%`, background: 'linear-gradient(to right, hsl(40 100% 50%), hsl(45 100% 85%))' }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Bose Psychoacoustic Visualization */}
+              <PsychoacousticVisualization
+                spectralData={spectralData}
+                temperature={globalTemp}
+                isPlaying={isPlaying}
+                getThermalColor={getThermalColor}
+              />
 
               {/* Energy Metrics */}
               <div className="rounded-2xl p-6 backdrop-blur-xl" style={{ background: 'hsl(20 25% 8% / 0.5)', border: '1px solid hsl(30 30% 20%)' }}>
