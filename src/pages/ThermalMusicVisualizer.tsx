@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, Pause, Upload, Thermometer, Volume2, Activity, Disc, ArrowLeft, Monitor } from 'lucide-react';
+import { Play, Pause, Upload, Thermometer, Volume2, Activity, Disc, ArrowLeft, Monitor, Maximize2, Minimize2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import StrataEmbeddedDisplay from '@/components/strata/StrataEmbeddedDisplay';
@@ -50,6 +50,26 @@ const ThermalMusicVisualizer = () => {
   ]);
   const [bpm, setBpm] = useState(0);
   const [peakEnergy, setPeakEnergy] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Fullscreen keyboard controls
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'f' || e.key === 'F') {
+        setIsFullscreen(prev => !prev);
+      }
+      if (e.key === 'Escape') {
+        setIsFullscreen(false);
+      }
+      if (e.key === ' ' && audioFile) {
+        e.preventDefault();
+        togglePlayback();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [audioFile]);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -235,57 +255,275 @@ const ThermalMusicVisualizer = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white overflow-hidden">
+    <div className={`min-h-screen bg-zinc-950 text-white overflow-hidden transition-all duration-500 ${isFullscreen ? 'fixed inset-0 z-[100]' : ''}`}>
       <audio ref={audioRef} />
       
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-800/50">
-        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link to="/" className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
-              <ArrowLeft className="w-4 h-4" />
-              <span className="text-sm">Back</span>
-            </Link>
-            <div className="h-4 w-px bg-zinc-700" />
-            <span className="text-sm font-light tracking-[0.3em] text-emerald-400">THERMAL RESONANCE</span>
-          </div>
-          <div className="flex items-center gap-6 text-sm text-zinc-400">
-            <span className="font-mono">PATENT PENDING: TRS-2024</span>
-          </div>
-        </div>
-      </header>
-
-      <main className="pt-24 px-6 pb-12">
-        <div className="max-w-7xl mx-auto">
-          {/* Title Section */}
-          <div className="text-center mb-12">
-            <h1 className="text-5xl md:text-6xl font-extralight tracking-wide mb-4">
-              Music <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-emerald-400 to-orange-500">Temperature</span> Visualizer
-            </h1>
-            <p className="text-zinc-400 max-w-2xl mx-auto">
-              Proprietary thermal mapping algorithm converts audio spectral energy into 
-              real-time material temperature response. Watch the console adapt from cryogenic 
-              blues to incandescent oranges based on your music's energy.
-            </p>
-          </div>
-
-          {/* Controls */}
-          <div className="flex flex-col items-center gap-6 mb-12">
-            <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 px-6 py-3 bg-zinc-900/80 border border-zinc-700 rounded-lg cursor-pointer hover:border-emerald-500/50 transition-colors">
-                <Upload className="w-5 h-5 text-emerald-400" />
-                <span>{audioFile ? audioFile.name : 'Upload Audio File'}</span>
-                <input type="file" accept="audio/*" onChange={handleFileUpload} className="hidden" />
-              </label>
+      {/* Fullscreen Immersive Mode */}
+      {isFullscreen ? (
+        <div className="relative w-full h-full flex flex-col">
+          {/* Minimal floating controls */}
+          <div className="absolute top-4 left-4 right-4 z-50 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={() => setIsFullscreen(false)}
+                variant="ghost"
+                size="icon"
+                className="w-10 h-10 rounded-full bg-zinc-900/80 backdrop-blur-xl border border-zinc-700 hover:bg-zinc-800"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+              <span className="text-sm font-light tracking-[0.3em] text-emerald-400 opacity-60">THERMAL RESONANCE</span>
+            </div>
+            <div className="flex items-center gap-3">
               <Button
                 onClick={togglePlayback}
                 disabled={!audioFile}
-                className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50"
+                className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50"
               >
-                {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-1" />}
+                {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
               </Button>
+              <div 
+                className="px-4 py-2 bg-zinc-900/80 backdrop-blur-xl rounded-lg border border-zinc-700 font-mono text-lg font-bold"
+                style={{ color: getThermalColor(globalTemp) }}
+              >
+                {globalTemp.toFixed(1)}°C
+              </div>
             </div>
           </div>
+
+          {/* Immersive Thermal Visualization */}
+          <div 
+            className="flex-1 relative"
+            style={{
+              background: `radial-gradient(ellipse at center, ${getThermalColor(globalTemp)} 0%, ${getThermalColor(globalTemp - 20)} 50%, hsl(0, 0%, 5%) 100%)`,
+              transition: 'background 0.15s ease-out',
+            }}
+          >
+            {/* Ambient thermal particles */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              {Array.from({ length: 30 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute rounded-full animate-pulse"
+                  style={{
+                    left: `${10 + (i * 3) % 80}%`,
+                    top: `${15 + (i * 7) % 70}%`,
+                    width: `${4 + spectralData.energy * 20}px`,
+                    height: `${4 + spectralData.energy * 20}px`,
+                    background: getThermalColor(globalTemp + (i % 10) - 5),
+                    boxShadow: `0 0 ${20 + spectralData.energy * 30}px ${getThermalColor(globalTemp)}`,
+                    opacity: 0.3 + spectralData.energy * 0.5,
+                    animationDelay: `${i * 100}ms`,
+                    animationDuration: `${1500 + i * 50}ms`,
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Central console visualization */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="relative w-full max-w-6xl aspect-[2.5/1] mx-8">
+                {/* Console glow backdrop */}
+                <div 
+                  className="absolute inset-0 rounded-3xl blur-3xl opacity-50"
+                  style={{ background: getThermalColor(globalTemp) }}
+                />
+                
+                {/* Console body */}
+                <div 
+                  className="relative h-full rounded-3xl border-2 overflow-hidden"
+                  style={{
+                    background: `linear-gradient(180deg, rgba(20,20,20,0.9) 0%, rgba(10,10,10,0.95) 100%)`,
+                    borderColor: `${getThermalColor(globalTemp)}60`,
+                    boxShadow: `
+                      0 0 60px ${getThermalColor(globalTemp)}40,
+                      inset 0 0 100px rgba(0,0,0,0.8)
+                    `,
+                  }}
+                >
+                  {/* Thermal zones */}
+                  {thermalZones.map(zone => (
+                    <div
+                      key={zone.id}
+                      className="absolute rounded-xl transition-all duration-150 flex items-center justify-center"
+                      style={{
+                        left: `${zone.x}%`,
+                        top: `${zone.y}%`,
+                        width: `${zone.width}%`,
+                        height: `${zone.height}%`,
+                        background: `linear-gradient(135deg, ${getThermalColor(zone.temperature)} 0%, ${getThermalColor(zone.temperature - 10)} 100%)`,
+                        boxShadow: `0 0 ${30 + zone.temperature / 2}px ${getThermalColor(zone.temperature)}`,
+                      }}
+                    >
+                      {zone.id.includes('deck') && (
+                        <Disc 
+                          className="w-16 h-16 text-white/80" 
+                          style={{ 
+                            animation: isPlaying ? 'spin 1.5s linear infinite' : 'none',
+                            filter: `drop-shadow(0 0 10px ${getThermalColor(zone.temperature)})`,
+                          }} 
+                        />
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Embedded STRATA Displays - Larger in fullscreen */}
+                  <div className="absolute top-[3%] left-[3%] w-[28%]">
+                    <StrataEmbeddedDisplay
+                      temperature={thermalZones.find(z => z.id === 'left-deck')?.temperature || globalTemp}
+                      spectralEnergy={spectralData.energy}
+                      bpm={bpm}
+                      isPlaying={isPlaying}
+                      displayId="left"
+                    />
+                  </div>
+                  <div className="absolute top-[3%] left-[36%] w-[28%]">
+                    <StrataEmbeddedDisplay
+                      temperature={thermalZones.find(z => z.id === 'mixer')?.temperature || globalTemp}
+                      spectralEnergy={spectralData.energy}
+                      bpm={bpm}
+                      isPlaying={isPlaying}
+                      displayId="center"
+                    />
+                  </div>
+                  <div className="absolute top-[3%] right-[3%] w-[28%]">
+                    <StrataEmbeddedDisplay
+                      temperature={thermalZones.find(z => z.id === 'right-deck')?.temperature || globalTemp}
+                      spectralEnergy={spectralData.energy}
+                      bpm={bpm}
+                      isPlaying={isPlaying}
+                      displayId="right"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom metrics bar */}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent pt-16 pb-6 px-8">
+              <div className="max-w-6xl mx-auto">
+                {/* Spectral bars */}
+                <div className="flex items-end justify-center gap-1 h-24 mb-4">
+                  {Array.from({ length: 64 }).map((_, i) => {
+                    const segment = i < 20 ? 'low' : i < 45 ? 'mid' : 'high';
+                    const value = segment === 'low' ? spectralData.low : segment === 'mid' ? spectralData.mid : spectralData.high;
+                    const height = Math.max(4, value * (0.8 + Math.sin(i * 0.3 + Date.now() * 0.005) * 0.2));
+                    return (
+                      <div
+                        key={i}
+                        className="w-1.5 rounded-full transition-all duration-75"
+                        style={{
+                          height: `${height}%`,
+                          background: getThermalColor(globalTemp - 10 + (i / 64) * 30),
+                          boxShadow: `0 0 8px ${getThermalColor(globalTemp)}`,
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+                
+                {/* Metrics row */}
+                <div className="flex items-center justify-between text-sm font-mono">
+                  <div className="flex items-center gap-8">
+                    <div>
+                      <span className="text-zinc-500">BPM</span>
+                      <span className="ml-2 text-lg font-bold" style={{ color: getThermalColor(globalTemp) }}>{bpm || '---'}</span>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">ENERGY</span>
+                      <span className="ml-2 text-lg font-bold" style={{ color: getThermalColor(globalTemp) }}>{(spectralData.energy * 100).toFixed(0)}%</span>
+                    </div>
+                  </div>
+                  <div className="text-zinc-600 text-xs">
+                    Press <kbd className="px-2 py-0.5 bg-zinc-800 rounded mx-1">ESC</kbd> to exit • <kbd className="px-2 py-0.5 bg-zinc-800 rounded mx-1">SPACE</kbd> to play/pause
+                  </div>
+                  <div className="flex items-center gap-8">
+                    <div>
+                      <span className="text-zinc-500">LOW</span>
+                      <span className="ml-2 text-lg font-bold text-red-400">{spectralData.low.toFixed(0)}%</span>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">MID</span>
+                      <span className="ml-2 text-lg font-bold text-yellow-400">{spectralData.mid.toFixed(0)}%</span>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">HIGH</span>
+                      <span className="ml-2 text-lg font-bold text-cyan-400">{spectralData.high.toFixed(0)}%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Header */}
+          <header className="fixed top-0 left-0 right-0 z-50 bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-800/50">
+            <div className="container mx-auto px-6 h-16 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Link to="/" className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
+                  <ArrowLeft className="w-4 h-4" />
+                  <span className="text-sm">Back</span>
+                </Link>
+                <div className="h-4 w-px bg-zinc-700" />
+                <span className="text-sm font-light tracking-[0.3em] text-emerald-400">THERMAL RESONANCE</span>
+              </div>
+              <div className="flex items-center gap-6 text-sm text-zinc-400">
+                <Button
+                  onClick={() => setIsFullscreen(true)}
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center gap-2 hover:text-emerald-400"
+                >
+                  <Maximize2 className="w-4 h-4" />
+                  <span>Immersive Mode</span>
+                </Button>
+                <span className="font-mono">PATENT PENDING: TRS-2024</span>
+              </div>
+            </div>
+          </header>
+
+          <main className="pt-24 px-6 pb-12">
+            <div className="max-w-7xl mx-auto">
+              {/* Title Section */}
+              <div className="text-center mb-12">
+                <h1 className="text-5xl md:text-6xl font-extralight tracking-wide mb-4">
+                  Music <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-emerald-400 to-orange-500">Temperature</span> Visualizer
+                </h1>
+                <p className="text-zinc-400 max-w-2xl mx-auto">
+                  Proprietary thermal mapping algorithm converts audio spectral energy into 
+                  real-time material temperature response. Watch the console adapt from cryogenic 
+                  blues to incandescent oranges based on your music's energy.
+                </p>
+              </div>
+
+              {/* Controls */}
+              <div className="flex flex-col items-center gap-6 mb-12">
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2 px-6 py-3 bg-zinc-900/80 border border-zinc-700 rounded-lg cursor-pointer hover:border-emerald-500/50 transition-colors">
+                    <Upload className="w-5 h-5 text-emerald-400" />
+                    <span>{audioFile ? audioFile.name : 'Upload Audio File'}</span>
+                    <input type="file" accept="audio/*" onChange={handleFileUpload} className="hidden" />
+                  </label>
+                  <Button
+                    onClick={togglePlayback}
+                    disabled={!audioFile}
+                    className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50"
+                  >
+                    {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-1" />}
+                  </Button>
+                  <Button
+                    onClick={() => setIsFullscreen(true)}
+                    variant="outline"
+                    className="flex items-center gap-2 border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10"
+                  >
+                    <Maximize2 className="w-4 h-4" />
+                    <span>Immersive Mode</span>
+                  </Button>
+                </div>
+                <p className="text-xs text-zinc-500">Press <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded text-zinc-400">F</kbd> for fullscreen</p>
+              </div>
 
           {/* Main Visualization */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -564,6 +802,8 @@ const ThermalMusicVisualizer = () => {
           </div>
         </div>
       </main>
+        </>
+      )}
 
       <style>{`
         @keyframes spin {
