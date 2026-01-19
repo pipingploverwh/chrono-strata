@@ -52,6 +52,7 @@ import DJTableShowcase from "./pages/DJTableShowcase";
 import Apex1Landing from "./pages/Apex1Landing";
 import ChronoStrataClub from "./pages/ChronoStrataClub";
 import ThermalMusicVisualizer from "./pages/ThermalMusicVisualizer";
+import ThermalVisualizerLanding from "./pages/ThermalVisualizerLanding";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -96,6 +97,7 @@ const App = () => (
                 <Route path="/apex-1" element={<Apex1Landing />} />
                 <Route path="/chrono-strata" element={<ChronoStrataClub />} />
                 <Route path="/thermal-visualizer" element={<ThermalMusicVisualizer />} />
+                <Route path="/thermal" element={<ThermalVisualizerLanding />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />
