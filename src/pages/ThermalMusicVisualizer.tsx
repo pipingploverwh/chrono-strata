@@ -11,6 +11,7 @@ import PsychoacousticPresetSelector, { PSYCHOACOUSTIC_PRESETS, type Psychoacoust
 import AudioIngestHub from '@/components/AudioIngestHub';
 import LavandarBackground from '@/components/LavandarBackground';
 import ImmersiveMode from '@/components/thermal/ImmersiveMode';
+import NeonKanjiOverlay from '@/components/thermal/NeonKanjiOverlay';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { VINYL_COLLECTION } from '@/components/SpatialAudioCAD';
@@ -905,6 +906,14 @@ const ThermalMusicVisualizer = () => {
                     transition: 'background 0.1s ease-out',
                   }}
                 >
+                  {/* Neon Kanji Overlay - Tokyo nightclub atmosphere */}
+                  <NeonKanjiOverlay
+                    spectralData={spectralData}
+                    isPlaying={isPlaying}
+                    getThermalColor={getThermalColor}
+                    temperature={globalTemp}
+                  />
+                  
                   {/* Waveform Visualization - Behind thermal zones */}
                   <WaveformVisualization
                     waveformData={waveformData}
