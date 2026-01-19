@@ -3,6 +3,7 @@ import { X, Play, Pause, Disc } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import WaveformVisualization from '@/components/strata/WaveformVisualization';
 import StrataEmbeddedDisplay from '@/components/strata/StrataEmbeddedDisplay';
+import NeonKanjiOverlay from '@/components/thermal/NeonKanjiOverlay';
 
 interface ThermalZone {
   id: string;
@@ -174,6 +175,14 @@ const ImmersiveMode = ({
             getThermalColor={getThermalColor}
           />
         </div>
+        
+        {/* Neon Kanji Overlay - Tokyo nightclub atmosphere */}
+        <NeonKanjiOverlay
+          spectralData={spectralData}
+          isPlaying={isPlaying}
+          getThermalColor={getThermalColor}
+          temperature={globalTemp}
+        />
         
         {/* Ambient thermal particles with glass blur */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
