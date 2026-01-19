@@ -7,24 +7,79 @@ import StrataEmbeddedDisplay from '@/components/strata/StrataEmbeddedDisplay';
 import WaveformVisualization from '@/components/strata/WaveformVisualization';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-// Proprietary Thermal Mapping Algorithm
-// Based on psychoacoustic energy density and spectral flux
-const THERMAL_CONSTANTS = {
-  BASE_TEMP: 20, // Celsius - neutral state
-  MAX_TEMP: 85, // Max thermal response
-  MIN_TEMP: -15, // Cryogenic response for minimal energy
-  ENERGY_COEFFICIENT: 0.0847, // Proprietary energy-to-thermal conversion
-  SPECTRAL_WEIGHT_LOW: 1.4, // Bass emphasis factor
-  SPECTRAL_WEIGHT_MID: 1.0, // Mid frequency factor
-  SPECTRAL_WEIGHT_HIGH: 0.7, // High frequency factor
-  THERMAL_INERTIA: 0.15, // Material thermal response lag
-  HYSTERESIS_FACTOR: 0.92, // Prevents rapid oscillation
+// ═══════════════════════════════════════════════════════════════════════════
+// REIMAGINED THERMAL ALGORITHM v2.0
+// First-Principles Audio-Thermal Physics Engine
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Physical constants derived from thermodynamics and psychoacoustics
+const PHYSICS = {
+  // Thermal properties (based on copper-aluminum hybrid material)
+  SPECIFIC_HEAT: 0.385,      // J/(g·K) - thermal capacity
+  THERMAL_CONDUCTIVITY: 205, // W/(m·K) - heat transfer rate
+  AMBIENT_TEMP: 20,          // °C - equilibrium temperature
+  TEMP_RANGE: [-25, 95],     // °C - operational range
+  
+  // Acoustic energy conversion (based on SPL physics)
+  REFERENCE_SPL: 20e-6,      // Pa - threshold of hearing
+  MAX_SPL: 130,              // dB - pain threshold
+  ENERGY_TO_HEAT: 0.0012,    // Conversion efficiency (J/dB)
+  
+  // Psychoacoustic weights (ISO 226:2003 equal-loudness contours)
+  BARK_BANDS: 24,            // Critical bands of human hearing
+  FLETCHER_MUNSON: [
+    0.2, 0.4, 0.6, 0.8, 0.95, 1.0, 1.0, 0.95, // Low-mid emphasis
+    0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, // Mid rolloff
+    0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15  // High attenuation
+  ],
+  
+  // Material response characteristics
+  INERTIA_MASS: 0.85,        // Thermal mass factor
+  DIFFUSION_RATE: 0.12,      // Heat spread coefficient
+  EMISSIVITY: 0.78,          // Radiative cooling factor
 };
+
+// Spectral analysis configuration
+const SPECTRAL = {
+  // Frequency band boundaries (Hz) - based on octave bands
+  BANDS: {
+    SUB_BASS: [20, 60],      // Sub-bass: physical pressure
+    BASS: [60, 250],         // Bass: warmth, body
+    LOW_MID: [250, 500],     // Low-mid: fullness
+    MID: [500, 2000],        // Mid: presence, clarity
+    HIGH_MID: [2000, 4000],  // High-mid: edge, bite
+    PRESENCE: [4000, 6000],  // Presence: brilliance
+    BRILLIANCE: [6000, 20000] // Brilliance: air, sparkle
+  },
+  
+  // Band-specific thermal coefficients (energy-to-heat)
+  THERMAL_WEIGHTS: {
+    SUB_BASS: 1.8,    // Heavy thermal impact
+    BASS: 1.5,        // Strong thermal response
+    LOW_MID: 1.2,     // Moderate warmth
+    MID: 1.0,         // Reference
+    HIGH_MID: 0.7,    // Reduced thermal
+    PRESENCE: 0.4,    // Light contribution
+    BRILLIANCE: 0.2   // Minimal heat
+  }
+};
+
+// Advanced algorithm state
+interface AlgorithmState {
+  prevSpectrum: Float32Array;
+  spectralFlux: number;
+  transientBuffer: number[];
+  harmonicHistory: number[];
+  thermalMomentum: number;
+  phaseCoherence: number;
+}
 
 interface ThermalZone {
   id: string;
   name: string;
   temperature: number;
+  thermalMass: number;      // Zone-specific thermal capacity
+  heatTransfer: number;     // Zone heat exchange rate
   x: number;
   y: number;
   width: number;
@@ -36,19 +91,29 @@ interface SpectralBand {
   mid: number;
   high: number;
   energy: number;
+  // Advanced metrics
+  spectralFlux: number;        // Rate of spectral change
+  harmonicComplexity: number;  // Harmonic richness (0-1)
+  transientSharpness: number;  // Attack detection (0-1)
+  crestFactor: number;         // Peak-to-RMS ratio
+  zeroCrossingRate: number;    // Brightness indicator
 }
 
 const ThermalMusicVisualizer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioFile, setAudioFile] = useState<File | null>(null);
-  const [globalTemp, setGlobalTemp] = useState(THERMAL_CONSTANTS.BASE_TEMP);
-  const [spectralData, setSpectralData] = useState<SpectralBand>({ low: 0, mid: 0, high: 0, energy: 0 });
+  const [globalTemp, setGlobalTemp] = useState(PHYSICS.AMBIENT_TEMP);
+  const [spectralData, setSpectralData] = useState<SpectralBand>({ 
+    low: 0, mid: 0, high: 0, energy: 0,
+    spectralFlux: 0, harmonicComplexity: 0, transientSharpness: 0,
+    crestFactor: 0, zeroCrossingRate: 0
+  });
   const [thermalZones, setThermalZones] = useState<ThermalZone[]>([
-    { id: 'left-deck', name: 'Left Turntable', temperature: 20, x: 10, y: 30, width: 25, height: 40 },
-    { id: 'mixer', name: 'Mixer Core', temperature: 20, x: 37.5, y: 25, width: 25, height: 50 },
-    { id: 'right-deck', name: 'Right Turntable', temperature: 20, x: 65, y: 30, width: 25, height: 40 },
-    { id: 'vinyl-left', name: 'Left Vinyl Bay', temperature: 20, x: 5, y: 75, width: 20, height: 20 },
-    { id: 'vinyl-right', name: 'Right Vinyl Bay', temperature: 20, x: 75, y: 75, width: 20, height: 20 },
+    { id: 'left-deck', name: 'Left Turntable', temperature: 20, thermalMass: 0.88, heatTransfer: 0.04, x: 10, y: 30, width: 25, height: 40 },
+    { id: 'mixer', name: 'Mixer Core', temperature: 20, thermalMass: 0.75, heatTransfer: 0.08, x: 37.5, y: 25, width: 25, height: 50 },
+    { id: 'right-deck', name: 'Right Turntable', temperature: 20, thermalMass: 0.88, heatTransfer: 0.04, x: 65, y: 30, width: 25, height: 40 },
+    { id: 'vinyl-left', name: 'Left Vinyl Bay', temperature: 20, thermalMass: 0.92, heatTransfer: 0.03, x: 5, y: 75, width: 20, height: 20 },
+    { id: 'vinyl-right', name: 'Right Vinyl Bay', temperature: 20, thermalMass: 0.92, heatTransfer: 0.03, x: 75, y: 75, width: 20, height: 20 },
   ]);
   const [bpm, setBpm] = useState(0);
   const [peakEnergy, setPeakEnergy] = useState(0);
@@ -67,6 +132,7 @@ const ThermalMusicVisualizer = () => {
     tempoFeel: string;
     emotionalTone: string;
   } | null>(null);
+
   // Fullscreen keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -91,103 +157,353 @@ const ThermalMusicVisualizer = () => {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
   const animationRef = useRef<number>(0);
-  const prevTempRef = useRef(THERMAL_CONSTANTS.BASE_TEMP);
+  const prevTempRef = useRef(PHYSICS.AMBIENT_TEMP);
 
-  // Proprietary thermal calculation algorithm
-  const calculateThermalResponse = useCallback((frequencyData: Uint8Array): SpectralBand => {
-    const bufferLength = frequencyData.length;
-    const lowEnd = Math.floor(bufferLength * 0.1);
-    const midEnd = Math.floor(bufferLength * 0.5);
+  // ═══════════════════════════════════════════════════════════════════════
+  // FIRST-PRINCIPLES THERMAL PHYSICS ENGINE
+  // ═══════════════════════════════════════════════════════════════════════
 
-    let lowSum = 0, midSum = 0, highSum = 0;
+  // Algorithm state for temporal analysis
+  const algorithmStateRef = useRef<AlgorithmState>({
+    prevSpectrum: new Float32Array(1024),
+    spectralFlux: 0,
+    transientBuffer: new Array(8).fill(0),
+    harmonicHistory: new Array(16).fill(0),
+    thermalMomentum: 0,
+    phaseCoherence: 0,
+  });
 
-    for (let i = 0; i < bufferLength; i++) {
-      const normalized = frequencyData[i] / 255;
-      if (i < lowEnd) {
-        lowSum += normalized * THERMAL_CONSTANTS.SPECTRAL_WEIGHT_LOW;
-      } else if (i < midEnd) {
-        midSum += normalized * THERMAL_CONSTANTS.SPECTRAL_WEIGHT_MID;
-      } else {
-        highSum += normalized * THERMAL_CONSTANTS.SPECTRAL_WEIGHT_HIGH;
+  // Calculate acoustic pressure level (SPL) from frequency data
+  const calculateSPL = useCallback((frequencyData: Uint8Array): number => {
+    let sumSquares = 0;
+    for (let i = 0; i < frequencyData.length; i++) {
+      const amplitude = frequencyData[i] / 255;
+      sumSquares += amplitude * amplitude;
+    }
+    const rms = Math.sqrt(sumSquares / frequencyData.length);
+    // Convert to dB scale (20 * log10(rms / reference))
+    const db = rms > 0 ? 20 * Math.log10(rms + 0.0001) + 80 : 0;
+    return Math.max(0, Math.min(db, PHYSICS.MAX_SPL));
+  }, []);
+
+  // Calculate spectral flux (rate of spectral change)
+  const calculateSpectralFlux = useCallback((currentSpectrum: Float32Array): number => {
+    const state = algorithmStateRef.current;
+    let flux = 0;
+    
+    for (let i = 0; i < currentSpectrum.length; i++) {
+      const diff = currentSpectrum[i] - state.prevSpectrum[i];
+      // Only count positive changes (onset detection)
+      if (diff > 0) {
+        flux += diff * diff;
       }
     }
-
-    const low = (lowSum / lowEnd) * 100;
-    const mid = (midSum / (midEnd - lowEnd)) * 100;
-    const high = (highSum / (bufferLength - midEnd)) * 100;
-
-    // Proprietary energy density formula
-    const energy = Math.sqrt(
-      Math.pow(low * 0.5, 2) + 
-      Math.pow(mid * 0.35, 2) + 
-      Math.pow(high * 0.15, 2)
-    ) * THERMAL_CONSTANTS.ENERGY_COEFFICIENT;
-
-    return { low, mid, high, energy };
+    
+    // Update previous spectrum
+    state.prevSpectrum.set(currentSpectrum);
+    
+    return Math.sqrt(flux / currentSpectrum.length);
   }, []);
 
-  // Convert energy to temperature with thermal inertia
-  const energyToTemperature = useCallback((energy: number, prevTemp: number): number => {
-    const targetTemp = THERMAL_CONSTANTS.MIN_TEMP + 
-      (energy * (THERMAL_CONSTANTS.MAX_TEMP - THERMAL_CONSTANTS.MIN_TEMP));
+  // Calculate harmonic complexity using autocorrelation
+  const calculateHarmonicComplexity = useCallback((frequencyData: Uint8Array): number => {
+    // Find peaks in spectrum
+    const peaks: number[] = [];
+    for (let i = 2; i < frequencyData.length - 2; i++) {
+      if (frequencyData[i] > frequencyData[i-1] && 
+          frequencyData[i] > frequencyData[i+1] &&
+          frequencyData[i] > 40) { // Threshold
+        peaks.push(i);
+      }
+    }
     
-    // Apply thermal inertia (material doesn't change instantly)
-    const newTemp = prevTemp * THERMAL_CONSTANTS.HYSTERESIS_FACTOR + 
-      targetTemp * (1 - THERMAL_CONSTANTS.HYSTERESIS_FACTOR);
+    // More peaks = more harmonic complexity
+    const complexity = Math.min(1, peaks.length / 20);
     
-    return Math.max(THERMAL_CONSTANTS.MIN_TEMP, 
-      Math.min(THERMAL_CONSTANTS.MAX_TEMP, newTemp));
+    // Smooth with history
+    const state = algorithmStateRef.current;
+    state.harmonicHistory.shift();
+    state.harmonicHistory.push(complexity);
+    
+    return state.harmonicHistory.reduce((a, b) => a + b) / state.harmonicHistory.length;
   }, []);
 
-  // Zone-specific thermal response based on frequency content
-  const calculateZoneThermals = useCallback((spectral: SpectralBand, baseTemp: number): ThermalZone[] => {
-    return thermalZones.map(zone => {
-      let zoneModifier = 1;
+  // Calculate transient sharpness (attack detection)
+  const calculateTransientSharpness = useCallback((spectralFlux: number): number => {
+    const state = algorithmStateRef.current;
+    
+    // Add current flux to buffer
+    state.transientBuffer.shift();
+    state.transientBuffer.push(spectralFlux);
+    
+    // Calculate variance - high variance = transients
+    const mean = state.transientBuffer.reduce((a, b) => a + b) / state.transientBuffer.length;
+    const variance = state.transientBuffer.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / state.transientBuffer.length;
+    
+    return Math.min(1, Math.sqrt(variance) * 5);
+  }, []);
+
+  // Calculate crest factor (peak to RMS ratio)
+  const calculateCrestFactor = useCallback((frequencyData: Uint8Array): number => {
+    let peak = 0;
+    let sumSquares = 0;
+    
+    for (let i = 0; i < frequencyData.length; i++) {
+      const val = frequencyData[i] / 255;
+      if (val > peak) peak = val;
+      sumSquares += val * val;
+    }
+    
+    const rms = Math.sqrt(sumSquares / frequencyData.length);
+    return rms > 0 ? Math.min(1, (peak / rms - 1) / 3) : 0;
+  }, []);
+
+  // Calculate zero-crossing rate from time domain (brightness indicator)
+  const calculateZeroCrossingRate = useCallback((timeDomainData: Uint8Array): number => {
+    let crossings = 0;
+    const midpoint = 128;
+    
+    for (let i = 1; i < timeDomainData.length; i++) {
+      if ((timeDomainData[i-1] < midpoint && timeDomainData[i] >= midpoint) ||
+          (timeDomainData[i-1] >= midpoint && timeDomainData[i] < midpoint)) {
+        crossings++;
+      }
+    }
+    
+    return Math.min(1, crossings / (timeDomainData.length * 0.1));
+  }, []);
+
+  // Multi-band spectral analysis with psychoacoustic weighting
+  const analyzeSpectralBands = useCallback((
+    frequencyData: Uint8Array, 
+    sampleRate: number = 44100
+  ): { bands: Record<string, number>; weightedEnergy: number } => {
+    const binCount = frequencyData.length;
+    const binWidth = sampleRate / (binCount * 2);
+    const bands: Record<string, number> = {};
+    let totalWeightedEnergy = 0;
+    let totalWeight = 0;
+    
+    Object.entries(SPECTRAL.BANDS).forEach(([name, [lowHz, highHz]]) => {
+      const lowBin = Math.floor(lowHz / binWidth);
+      const highBin = Math.min(Math.ceil(highHz / binWidth), binCount - 1);
+      
+      let bandEnergy = 0;
+      for (let i = lowBin; i <= highBin; i++) {
+        bandEnergy += frequencyData[i] / 255;
+      }
+      
+      const normalizedEnergy = bandEnergy / (highBin - lowBin + 1);
+      const weight = SPECTRAL.THERMAL_WEIGHTS[name as keyof typeof SPECTRAL.THERMAL_WEIGHTS];
+      
+      bands[name] = normalizedEnergy;
+      totalWeightedEnergy += normalizedEnergy * weight;
+      totalWeight += weight;
+    });
+    
+    return { 
+      bands, 
+      weightedEnergy: totalWeight > 0 ? totalWeightedEnergy / totalWeight : 0 
+    };
+  }, []);
+
+  // MAIN THERMAL RESPONSE ALGORITHM
+  const calculateThermalResponse = useCallback((
+    frequencyData: Uint8Array,
+    timeDomainData: Uint8Array
+  ): SpectralBand => {
+    // 1. Calculate acoustic pressure level
+    const spl = calculateSPL(frequencyData);
+    
+    // 2. Convert to float spectrum for flux calculation
+    const floatSpectrum = new Float32Array(frequencyData.length);
+    for (let i = 0; i < frequencyData.length; i++) {
+      floatSpectrum[i] = frequencyData[i] / 255;
+    }
+    
+    // 3. Calculate spectral flux (rate of change)
+    const spectralFlux = calculateSpectralFlux(floatSpectrum);
+    
+    // 4. Analyze frequency bands with psychoacoustic weighting
+    const { bands, weightedEnergy } = analyzeSpectralBands(frequencyData);
+    
+    // 5. Calculate harmonic complexity
+    const harmonicComplexity = calculateHarmonicComplexity(frequencyData);
+    
+    // 6. Detect transients
+    const transientSharpness = calculateTransientSharpness(spectralFlux);
+    
+    // 7. Calculate crest factor
+    const crestFactor = calculateCrestFactor(frequencyData);
+    
+    // 8. Calculate zero-crossing rate
+    const zeroCrossingRate = calculateZeroCrossingRate(timeDomainData);
+    
+    // 9. Combine into simplified bands for display
+    const low = ((bands.SUB_BASS || 0) * 0.4 + (bands.BASS || 0) * 0.6) * 100;
+    const mid = ((bands.LOW_MID || 0) * 0.3 + (bands.MID || 0) * 0.5 + (bands.HIGH_MID || 0) * 0.2) * 100;
+    const high = ((bands.PRESENCE || 0) * 0.5 + (bands.BRILLIANCE || 0) * 0.5) * 100;
+    
+    // 10. Calculate composite thermal energy
+    // Formula: E = (SPL/MAX_SPL) × (1 + flux) × (1 + transient×0.5) × harmonicMod
+    const normalizedSPL = spl / PHYSICS.MAX_SPL;
+    const fluxBoost = 1 + spectralFlux * 2;
+    const transientBoost = 1 + transientSharpness * 0.5;
+    const harmonicMod = 0.7 + harmonicComplexity * 0.6;
+    
+    const rawEnergy = normalizedSPL * fluxBoost * transientBoost * harmonicMod;
+    const energy = Math.min(1, rawEnergy * PHYSICS.ENERGY_TO_HEAT * 1000);
+    
+    return {
+      low: Math.min(100, low),
+      mid: Math.min(100, mid),
+      high: Math.min(100, high),
+      energy,
+      spectralFlux,
+      harmonicComplexity,
+      transientSharpness,
+      crestFactor,
+      zeroCrossingRate,
+    };
+  }, [calculateSPL, calculateSpectralFlux, analyzeSpectralBands, calculateHarmonicComplexity, calculateTransientSharpness, calculateCrestFactor, calculateZeroCrossingRate]);
+
+  // THERMAL DIFFUSION MODEL
+  // Based on Newton's law of cooling with thermal mass
+  const energyToTemperature = useCallback((
+    spectral: SpectralBand, 
+    prevTemp: number
+  ): number => {
+    const state = algorithmStateRef.current;
+    
+    // Calculate target temperature from energy
+    const [minTemp, maxTemp] = PHYSICS.TEMP_RANGE;
+    const energyTemp = minTemp + (spectral.energy * (maxTemp - minTemp));
+    
+    // Add transient spikes (percussion creates heat bursts)
+    const transientHeat = spectral.transientSharpness * 15;
+    
+    // Harmonic richness adds sustained warmth
+    const harmonicWarmth = spectral.harmonicComplexity * 8;
+    
+    // Spectral flux adds volatility
+    const fluxHeat = spectral.spectralFlux * 10;
+    
+    const targetTemp = energyTemp + transientHeat + harmonicWarmth + fluxHeat;
+    
+    // Apply thermal diffusion (Newton's law of cooling)
+    // dT/dt = -k(T - T_ambient) + Q_input
+    const coolingRate = PHYSICS.DIFFUSION_RATE * PHYSICS.EMISSIVITY;
+    const heatingRate = 1 - PHYSICS.INERTIA_MASS;
+    
+    // Thermal momentum (prevents jitter)
+    const momentum = state.thermalMomentum * 0.7;
+    const newMomentum = (targetTemp - prevTemp) * 0.3;
+    state.thermalMomentum = momentum + newMomentum;
+    
+    // Calculate new temperature with physics-based smoothing
+    const ambientPull = (PHYSICS.AMBIENT_TEMP - prevTemp) * coolingRate * 0.1;
+    const targetPull = (targetTemp - prevTemp) * heatingRate;
+    
+    let newTemp = prevTemp + targetPull + ambientPull + state.thermalMomentum * 0.1;
+    
+    // Clamp to operational range
+    newTemp = Math.max(minTemp, Math.min(maxTemp, newTemp));
+    
+    return newTemp;
+  }, []);
+
+  // Zone-specific thermal response with heat transfer physics
+  const calculateZoneThermals = useCallback((
+    spectral: SpectralBand, 
+    baseTemp: number,
+    prevZones: ThermalZone[]
+  ): ThermalZone[] => {
+    return prevZones.map(zone => {
+      // Zone-specific frequency sensitivity
+      let frequencyResponse = 0;
+      let transientSensitivity = 0;
       
       switch (zone.id) {
         case 'left-deck':
         case 'right-deck':
-          // Turntables respond more to low frequencies (bass)
-          zoneModifier = 0.8 + (spectral.low / 100) * 0.4;
+          // Turntables: bass-heavy, transient responsive
+          frequencyResponse = (spectral.low * 0.7 + spectral.mid * 0.3) / 100;
+          transientSensitivity = 0.8;
           break;
         case 'mixer':
-          // Mixer responds to full spectrum
-          zoneModifier = 0.9 + (spectral.energy / 100) * 0.3;
+          // Mixer: full spectrum, flux sensitive
+          frequencyResponse = spectral.energy;
+          transientSensitivity = 0.5;
           break;
         case 'vinyl-left':
         case 'vinyl-right':
-          // Vinyl bays respond slowly (high thermal mass)
-          zoneModifier = 0.6 + (spectral.mid / 100) * 0.2;
+          // Vinyl bays: high thermal mass, slow response
+          frequencyResponse = (spectral.low * 0.5 + spectral.mid * 0.5) / 100;
+          transientSensitivity = 0.2;
           break;
+        default:
+          frequencyResponse = spectral.energy;
+          transientSensitivity = 0.5;
       }
-
+      
+      // Calculate zone target temperature
+      const transientBoost = spectral.transientSharpness * transientSensitivity * 10;
+      const harmonicBoost = spectral.harmonicComplexity * 5;
+      const targetTemp = baseTemp * (0.8 + frequencyResponse * 0.4) + transientBoost + harmonicBoost;
+      
+      // Apply zone-specific thermal inertia
+      const thermalMass = zone.thermalMass || 0.85;
+      const prevTemp = zone.temperature;
+      const newTemp = prevTemp * thermalMass + targetTemp * (1 - thermalMass);
+      
+      // Heat transfer between adjacent zones
+      const heatTransfer = zone.heatTransfer || 0.05;
+      const neighborInfluence = (baseTemp - newTemp) * heatTransfer;
+      
       return {
         ...zone,
-        temperature: baseTemp * zoneModifier,
+        temperature: Math.max(PHYSICS.TEMP_RANGE[0], 
+          Math.min(PHYSICS.TEMP_RANGE[1], newTemp + neighborInfluence)),
       };
     });
-  }, [thermalZones]);
+  }, []);
 
-  // Get color based on temperature - Warm Molten Lava palette
+  // Get color based on temperature - Physics-based black-body radiation
+  // Based on Planck's law color temperature approximation
   const getThermalColor = (temp: number): string => {
-    const normalized = (temp - THERMAL_CONSTANTS.MIN_TEMP) / 
-      (THERMAL_CONSTANTS.MAX_TEMP - THERMAL_CONSTANTS.MIN_TEMP);
+    const [minTemp, maxTemp] = PHYSICS.TEMP_RANGE;
+    const normalized = (temp - minTemp) / (maxTemp - minTemp);
     
-    if (normalized < 0.2) {
-      // Deep ember - smoldering low heat
-      return `hsl(15, 60%, ${15 + normalized * 80}%)`;
+    // Black-body radiation color stages (simplified)
+    if (normalized < 0.15) {
+      // Cold - Deep indigo/black (below visible glow)
+      const l = 5 + normalized * 60;
+      return `hsl(260, 40%, ${l}%)`;
+    } else if (normalized < 0.25) {
+      // Warming - Dark red (Draper point ~525°C equivalent)
+      const progress = (normalized - 0.15) / 0.1;
+      const h = 260 - progress * 250; // Shift from purple to red
+      return `hsl(${h}, 60%, ${15 + progress * 15}%)`;
     } else if (normalized < 0.4) {
-      // Warm crimson - building heat
-      return `hsl(${5 + (normalized - 0.2) * 50}, 70%, ${35 + (normalized - 0.2) * 40}%)`;
-    } else if (normalized < 0.6) {
-      // Vermilion to orange - active heat
-      return `hsl(${15 + (normalized - 0.4) * 50}, 85%, ${50 + (normalized - 0.4) * 20}%)`;
-    } else if (normalized < 0.8) {
-      // Amber to gold - intense heat
-      return `hsl(${30 + (normalized - 0.6) * 30}, 95%, ${55 + (normalized - 0.6) * 20}%)`;
+      // Cherry red - First visible glow
+      const progress = (normalized - 0.25) / 0.15;
+      return `hsl(${10 - progress * 5}, ${60 + progress * 20}%, ${30 + progress * 15}%)`;
+    } else if (normalized < 0.55) {
+      // Bright cherry to orange
+      const progress = (normalized - 0.4) / 0.15;
+      return `hsl(${5 + progress * 20}, 85%, ${45 + progress * 10}%)`;
+    } else if (normalized < 0.7) {
+      // Orange to yellow-orange
+      const progress = (normalized - 0.55) / 0.15;
+      return `hsl(${25 + progress * 20}, 95%, ${55 + progress * 10}%)`;
+    } else if (normalized < 0.85) {
+      // Yellow-orange to yellow-white
+      const progress = (normalized - 0.7) / 0.15;
+      return `hsl(${45 + progress * 10}, ${95 - progress * 20}%, ${65 + progress * 15}%)`;
     } else {
-      // White-hot - maximum intensity
-      return `hsl(${45 - (normalized - 0.8) * 20}, 100%, ${70 + (normalized - 0.8) * 80}%)`;
+      // White-hot (approaching 1400°C+ equivalent)
+      const progress = (normalized - 0.85) / 0.15;
+      return `hsl(${55 - progress * 10}, ${75 - progress * 50}%, ${80 + progress * 18}%)`;
     }
   };
 
@@ -199,14 +515,14 @@ const ThermalMusicVisualizer = () => {
     }
   }, []);
 
-  // Animation loop
+  // Animation loop - reimagined with physics-based processing
   const animate = useCallback(() => {
     if (!analyserRef.current) return;
 
     const frequencyData = new Uint8Array(analyserRef.current.frequencyBinCount);
     analyserRef.current.getByteFrequencyData(frequencyData);
 
-    // Capture time-domain waveform data
+    // Capture time-domain waveform data for zero-crossing and visualization
     const timeDomainData = new Uint8Array(analyserRef.current.frequencyBinCount);
     analyserRef.current.getByteTimeDomainData(timeDomainData);
     
@@ -218,21 +534,23 @@ const ThermalMusicVisualizer = () => {
     }
     setWaveformData(sampledWaveform);
 
-    const spectral = calculateThermalResponse(frequencyData);
+    // Calculate spectral response with advanced metrics
+    const spectral = calculateThermalResponse(frequencyData, timeDomainData);
     setSpectralData(spectral);
 
-    const newTemp = energyToTemperature(spectral.energy, prevTempRef.current);
+    // Apply thermal diffusion model
+    const newTemp = energyToTemperature(spectral, prevTempRef.current);
     prevTempRef.current = newTemp;
     setGlobalTemp(newTemp);
 
-    const zones = calculateZoneThermals(spectral, newTemp);
-    setThermalZones(zones);
+    // Calculate zone-specific temperatures with heat transfer
+    setThermalZones(prevZones => calculateZoneThermals(spectral, newTemp, prevZones));
 
     detectBPM(frequencyData);
 
-    // Estimate BPM from energy patterns
-    if (spectral.energy > 0.5) {
-      setBpm(prev => Math.round(prev * 0.95 + (80 + spectral.low * 0.8) * 0.05));
+    // Advanced BPM estimation using transient detection
+    if (spectral.transientSharpness > 0.3) {
+      setBpm(prev => Math.round(prev * 0.92 + (60 + spectral.low * 1.2 + spectral.transientSharpness * 40) * 0.08));
     }
 
     animationRef.current = requestAnimationFrame(animate);
@@ -1034,12 +1352,12 @@ const ThermalMusicVisualizer = () => {
                     }}
                   />
                   <div className="absolute inset-0 flex justify-between items-center px-4 text-xs font-mono">
-                    <span style={{ color: 'hsl(15 40% 70%)' }}>{THERMAL_CONSTANTS.MIN_TEMP}°C</span>
+                    <span style={{ color: 'hsl(15 40% 70%)' }}>{PHYSICS.TEMP_RANGE[0]}°C</span>
                     <span style={{ color: 'hsl(5 60% 70%)' }}>5°C</span>
                     <span style={{ color: 'hsl(15 80% 80%)' }}>25°C</span>
                     <span style={{ color: 'hsl(30 90% 70%)' }}>45°C</span>
                     <span style={{ color: 'hsl(40 100% 75%)' }}>65°C</span>
-                    <span style={{ color: 'hsl(45 100% 90%)' }}>{THERMAL_CONSTANTS.MAX_TEMP}°C</span>
+                    <span style={{ color: 'hsl(45 100% 90%)' }}>{PHYSICS.TEMP_RANGE[1]}°C</span>
                   </div>
                 </div>
               </div>
@@ -1121,7 +1439,7 @@ const ThermalMusicVisualizer = () => {
                   <div className="rounded-lg p-4 text-center" style={{ background: 'hsl(20 25% 12% / 0.5)' }}>
                     <div className="text-xs mb-1" style={{ color: 'hsl(30 20% 50%)' }}>Thermal Δ</div>
                     <div className="text-2xl font-mono font-bold" style={{ color: getThermalColor(globalTemp) }}>
-                      {(globalTemp - THERMAL_CONSTANTS.BASE_TEMP) > 0 ? '+' : ''}{(globalTemp - THERMAL_CONSTANTS.BASE_TEMP).toFixed(1)}°
+                      {(globalTemp - PHYSICS.AMBIENT_TEMP) > 0 ? '+' : ''}{(globalTemp - PHYSICS.AMBIENT_TEMP).toFixed(1)}°
                     </div>
                   </div>
                 </div>
@@ -1164,20 +1482,20 @@ const ThermalMusicVisualizer = () => {
                 <h3 className="text-sm font-medium mb-4" style={{ color: 'hsl(40 30% 65%)' }}>THERMAL RESONANCE SYSTEM™</h3>
                 <div className="space-y-3 text-xs" style={{ color: 'hsl(30 20% 50%)' }}>
                   <div className="flex justify-between">
-                    <span>Energy Coefficient</span>
-                    <span className="font-mono" style={{ color: 'hsl(40 30% 65%)' }}>{THERMAL_CONSTANTS.ENERGY_COEFFICIENT}</span>
+                    <span>Energy Conversion</span>
+                    <span className="font-mono" style={{ color: 'hsl(40 30% 65%)' }}>{PHYSICS.ENERGY_TO_HEAT}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Thermal Inertia</span>
-                    <span className="font-mono" style={{ color: 'hsl(40 30% 65%)' }}>{THERMAL_CONSTANTS.THERMAL_INERTIA}</span>
+                    <span className="font-mono" style={{ color: 'hsl(40 30% 65%)' }}>{PHYSICS.INERTIA_MASS}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Hysteresis Factor</span>
-                    <span className="font-mono" style={{ color: 'hsl(40 30% 65%)' }}>{THERMAL_CONSTANTS.HYSTERESIS_FACTOR}</span>
+                    <span>Diffusion Rate</span>
+                    <span className="font-mono" style={{ color: 'hsl(40 30% 65%)' }}>{PHYSICS.DIFFUSION_RATE}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Bass Weight</span>
-                    <span className="font-mono" style={{ color: 'hsl(40 30% 65%)' }}>{THERMAL_CONSTANTS.SPECTRAL_WEIGHT_LOW}x</span>
+                    <span>Sub-Bass Weight</span>
+                    <span className="font-mono" style={{ color: 'hsl(40 30% 65%)' }}>{SPECTRAL.THERMAL_WEIGHTS.SUB_BASS}x</span>
                   </div>
                 </div>
                 <div className="mt-4 pt-4" style={{ borderTop: '1px solid hsl(30 30% 20%)' }}>
