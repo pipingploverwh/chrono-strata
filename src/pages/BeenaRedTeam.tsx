@@ -3,10 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Shield, AlertTriangle, CheckCircle, XCircle, ChevronDown, ChevronRight,
   Users, GitBranch, Target, Zap, Clock, ArrowRight, FileText, Brain,
-  TrendingUp, TrendingDown, AlertCircle, Eye, Layers, BarChart3, Upload
+  TrendingUp, TrendingDown, AlertCircle, Eye, Layers, BarChart3, Upload, Download
 } from 'lucide-react';
 import LavandarBackground from '@/components/LavandarBackground';
 import DocumentUploader from '@/components/DocumentUploader';
+import BeenaReportExport from '@/components/BeenaReportExport';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -202,13 +203,17 @@ const BeenaRedTeam: React.FC = () => {
                 animate={{ opacity: 1 }}
                 className="space-y-8"
               >
-                {/* Source Documents */}
-                <div className="flex flex-wrap gap-2">
-                  {analysis.sourceDocuments?.map((doc, i) => (
-                    <Badge key={i} className="bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                      {doc}
-                    </Badge>
-                  ))}
+                {/* Action Bar with Export */}
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <div className="flex flex-wrap gap-2">
+                    {analysis.sourceDocuments?.map((doc, i) => (
+                      <Badge key={i} className="bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                        {doc}
+                      </Badge>
+                    ))}
+                  </div>
+                  
+                  <BeenaReportExport analysis={analysis} />
                 </div>
 
                 {/* One-Sentence Verdict */}
