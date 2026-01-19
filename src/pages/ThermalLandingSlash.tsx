@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowUpRight, Volume2, VolumeX, Zap, Waves, Thermometer, Music, Play, Sparkles, ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowUpRight, Volume2, VolumeX, Zap, Waves, Thermometer, Music, Play, Sparkles, ChevronDown, Check, Star, Quote, Mail, ArrowRight } from 'lucide-react';
 import thermalDemoVideo from '@/assets/thermal-demo.mp4';
 import SpatialAudioCAD, { VINYL_COLLECTION, VinylRecord } from '@/components/SpatialAudioCAD';
 import ThermalNavigation from '@/components/ThermalNavigation';
 import ThermalFooter from '@/components/ThermalFooter';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 const VALUE_PROPS = [
   {
@@ -39,6 +42,84 @@ const STATS = [
   { value: '60', label: 'FPS Render' },
   { value: '5', label: 'Presets' },
   { value: '∞', label: 'Tracks' },
+];
+
+const PRICING_TIERS = [
+  {
+    name: 'Explorer',
+    price: 'Free',
+    period: '',
+    description: 'Perfect for trying out thermal visualization',
+    features: [
+      'Basic thermal visualization',
+      '3 psychoacoustic presets',
+      'Standard waveform display',
+      'Community support',
+    ],
+    cta: 'Start Free',
+    highlighted: false,
+  },
+  {
+    name: 'Creator',
+    price: '$19',
+    period: '/mo',
+    description: 'For artists and content creators',
+    features: [
+      'All Explorer features',
+      'Unlimited presets',
+      '3D spatial audio engine',
+      'AI ambient generation',
+      'HD export (1080p)',
+      'Priority support',
+    ],
+    cta: 'Go Creator',
+    highlighted: true,
+  },
+  {
+    name: 'Studio',
+    price: '$49',
+    period: '/mo',
+    description: 'Professional production suite',
+    features: [
+      'All Creator features',
+      '4K export quality',
+      'Custom thermal algorithms',
+      'API access',
+      'White-label options',
+      'Dedicated support',
+    ],
+    cta: 'Go Studio',
+    highlighted: false,
+  },
+];
+
+const TESTIMONIALS = [
+  {
+    quote: "Thermal Resonance transformed how I present my sets. The crowd literally gasps when they see the heat build with the bass.",
+    author: 'DJ Lumina',
+    role: 'Electronic Producer',
+    avatar: 'L',
+  },
+  {
+    quote: "Finally, a visualization tool that actually understands music physics. The thermal mapping is scientifically gorgeous.",
+    author: 'Marcus Chen',
+    role: 'Audio Engineer, Skyline Studios',
+    avatar: 'M',
+  },
+  {
+    quote: "We use this for every live stream. Engagement went up 340% since we added thermal overlays.",
+    author: 'Sarah Wave',
+    role: 'Content Creator',
+    avatar: 'S',
+  },
+];
+
+const TRUSTED_BY = [
+  'Skyline Studios',
+  'WaveForm Labs',
+  'Sonic Academy',
+  'BeatCloud',
+  'Resonance FM',
 ];
 
 const ThermalLandingSlash = () => {
@@ -497,7 +578,22 @@ const ThermalLandingSlash = () => {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════════
-          SECTION 7: FINAL CTA - Close the Deal
+          SECTION 7: EMAIL CAPTURE - Lead Magnet
+      ═══════════════════════════════════════════════════════════════════ */}
+      <EmailCaptureSection getThermalColor={getThermalColor} temperature={temperature} />
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          SECTION 8: PRICING TIERS - Animated Comparison
+      ═══════════════════════════════════════════════════════════════════ */}
+      <PricingSection getThermalColor={getThermalColor} temperature={temperature} />
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          SECTION 9: SOCIAL PROOF - Testimonials & Logos
+      ═══════════════════════════════════════════════════════════════════ */}
+      <TestimonialsSection />
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          SECTION 10: FINAL CTA - Close the Deal
       ═══════════════════════════════════════════════════════════════════ */}
       <section className="min-h-screen flex items-center justify-center relative px-6">
         {/* Ambient glow */}
@@ -553,6 +649,306 @@ const ThermalLandingSlash = () => {
 
       <ThermalFooter />
     </div>
+  );
+};
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EMAIL CAPTURE COMPONENT
+═══════════════════════════════════════════════════════════════════════════ */
+const EmailCaptureSection = ({ getThermalColor, temperature }: { getThermalColor: (t: number) => string; temperature: number }) => {
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    
+    setIsSubmitting(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsSubscribed(true);
+    setIsSubmitting(false);
+    toast.success('Welcome to early access! Check your inbox.');
+  };
+
+  return (
+    <section className="py-32 px-6 relative overflow-hidden">
+      {/* Animated thermal background */}
+      <motion.div 
+        className="absolute inset-0"
+        animate={{ 
+          background: [
+            `radial-gradient(ellipse 80% 60% at 30% 50%, ${getThermalColor(temperature)}10 0%, transparent 50%)`,
+            `radial-gradient(ellipse 80% 60% at 70% 50%, ${getThermalColor(temperature)}10 0%, transparent 50%)`,
+          ]
+        }}
+        transition={{ duration: 8, repeat: Infinity, repeatType: 'reverse' }}
+      />
+      
+      <div className="max-w-3xl mx-auto relative z-10">
+        <motion.div
+          className="text-center p-12 border border-white/10 bg-white/[0.02] backdrop-blur-sm"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.div
+            className="w-16 h-16 mx-auto mb-6 rounded-full border border-primary/30 flex items-center justify-center"
+            animate={{ boxShadow: [`0 0 20px ${getThermalColor(temperature)}20`, `0 0 40px ${getThermalColor(temperature)}40`] }}
+            transition={{ duration: 2, repeat: Infinity, repeatType: 'reverse' }}
+          >
+            <Mail className="w-7 h-7 text-primary" />
+          </motion.div>
+          
+          <p className="text-xs tracking-[0.5em] text-primary/60 mb-4 font-mono">EARLY ACCESS</p>
+          <h2 className="text-3xl sm:text-4xl font-extralight tracking-tight mb-4">
+            Get Beta Features First
+          </h2>
+          <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
+            Join 2,400+ audio pioneers. Get early access to new presets, AI features, and exclusive thermal algorithms.
+          </p>
+
+          <AnimatePresence mode="wait">
+            {isSubscribed ? (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex items-center justify-center gap-3 py-4 text-primary"
+              >
+                <Check className="w-5 h-5" />
+                <span className="font-medium">You&apos;re on the list!</span>
+              </motion.div>
+            ) : (
+              <motion.form
+                key="form"
+                onSubmit={handleSubmit}
+                className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="flex-1 bg-white/5 border-white/20 focus:border-primary/50 text-white placeholder:text-white/30"
+                  required
+                />
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="bg-foreground text-background hover:bg-foreground/90 px-6"
+                >
+                  {isSubmitting ? (
+                    <motion.span
+                      animate={{ opacity: [1, 0.5] }}
+                      transition={{ duration: 0.5, repeat: Infinity, repeatType: 'reverse' }}
+                    >
+                      Joining...
+                    </motion.span>
+                  ) : (
+                    <>
+                      Join Waitlist
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </>
+                  )}
+                </Button>
+              </motion.form>
+            )}
+          </AnimatePresence>
+
+          <p className="text-xs text-muted-foreground mt-6">
+            No spam, ever. Unsubscribe anytime.
+          </p>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PRICING SECTION COMPONENT
+═══════════════════════════════════════════════════════════════════════════ */
+const PricingSection = ({ getThermalColor, temperature }: { getThermalColor: (t: number) => string; temperature: number }) => {
+  const [hoveredTier, setHoveredTier] = useState<number | null>(1);
+
+  return (
+    <section className="py-32 px-6 relative">
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <p className="text-xs tracking-[0.5em] text-primary/60 mb-4 font-mono">PRICING</p>
+          <h2 className="text-4xl sm:text-5xl font-extralight tracking-tight mb-4">
+            Choose Your Heat Level
+          </h2>
+          <p className="text-muted-foreground max-w-lg mx-auto">
+            Start free, scale as you grow. All plans include core thermal visualization.
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {PRICING_TIERS.map((tier, i) => (
+            <motion.div
+              key={tier.name}
+              className={`relative p-8 border transition-all duration-500 ${
+                tier.highlighted 
+                  ? 'border-primary/50 bg-primary/[0.05]' 
+                  : 'border-white/10 bg-white/[0.02]'
+              } ${hoveredTier === i ? 'scale-[1.02]' : ''}`}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+              onMouseEnter={() => setHoveredTier(i)}
+              onMouseLeave={() => setHoveredTier(1)}
+            >
+              {tier.highlighted && (
+                <motion.div
+                  className="absolute -top-px left-0 right-0 h-px"
+                  style={{ background: `linear-gradient(90deg, transparent, ${getThermalColor(temperature)}, transparent)` }}
+                  animate={{ opacity: [0.5, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatType: 'reverse' }}
+                />
+              )}
+              
+              {tier.highlighted && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-xs tracking-wider font-medium">
+                  MOST POPULAR
+                </span>
+              )}
+
+              <h3 className="text-xl font-light mb-2">{tier.name}</h3>
+              <div className="flex items-baseline gap-1 mb-2">
+                <span className="text-4xl font-extralight" style={tier.highlighted ? { color: getThermalColor(temperature) } : {}}>
+                  {tier.price}
+                </span>
+                {tier.period && <span className="text-muted-foreground text-sm">{tier.period}</span>}
+              </div>
+              <p className="text-sm text-muted-foreground mb-6">{tier.description}</p>
+
+              <ul className="space-y-3 mb-8">
+                {tier.features.map((feature, fi) => (
+                  <motion.li 
+                    key={feature}
+                    className="flex items-start gap-3 text-sm"
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.3, delay: i * 0.1 + fi * 0.05 }}
+                  >
+                    <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                    <span className="text-white/70">{feature}</span>
+                  </motion.li>
+                ))}
+              </ul>
+
+              <Button
+                className={`w-full ${
+                  tier.highlighted 
+                    ? 'bg-foreground text-background hover:bg-foreground/90' 
+                    : 'bg-white/10 hover:bg-white/20 text-white'
+                }`}
+              >
+                {tier.cta}
+              </Button>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TESTIMONIALS SECTION COMPONENT
+═══════════════════════════════════════════════════════════════════════════ */
+const TestimonialsSection = () => {
+  return (
+    <section className="py-32 px-6 border-y border-white/10 bg-white/[0.01]">
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <p className="text-xs tracking-[0.5em] text-primary/60 mb-4 font-mono">SOCIAL PROOF</p>
+          <h2 className="text-4xl sm:text-5xl font-extralight tracking-tight">
+            Loved by Creators
+          </h2>
+        </motion.div>
+
+        {/* Testimonial Cards */}
+        <div className="grid md:grid-cols-3 gap-8 mb-20">
+          {TESTIMONIALS.map((testimonial, i) => (
+            <motion.div
+              key={testimonial.author}
+              className="relative p-8 border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+            >
+              <Quote className="w-8 h-8 text-primary/30 mb-4" />
+              <p className="text-white/70 leading-relaxed mb-6 italic">
+                &ldquo;{testimonial.quote}&rdquo;
+              </p>
+              
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-medium">
+                  {testimonial.avatar}
+                </div>
+                <div>
+                  <p className="font-medium text-sm">{testimonial.author}</p>
+                  <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                </div>
+              </div>
+
+              {/* Star rating */}
+              <div className="absolute top-8 right-8 flex gap-0.5">
+                {[...Array(5)].map((_, si) => (
+                  <Star key={si} className="w-3 h-3 fill-primary text-primary" />
+                ))}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Trusted By Logos */}
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <p className="text-xs tracking-[0.3em] text-white/30 mb-8">TRUSTED BY</p>
+          <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
+            {TRUSTED_BY.map((company, i) => (
+              <motion.span
+                key={company}
+                className="text-lg font-light text-white/20 hover:text-white/40 transition-colors tracking-wide"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+              >
+                {company}
+              </motion.span>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </section>
   );
 };
 
