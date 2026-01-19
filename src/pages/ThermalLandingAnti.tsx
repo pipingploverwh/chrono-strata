@@ -135,8 +135,56 @@ const ThermalLandingAnti = () => {
         fontFamily: 'ui-monospace, "SF Mono", Monaco, monospace',
       }}
     >
+      {/* Kengo Kuma - Layered transparency panels */}
+      <div className="fixed inset-0 pointer-events-none z-[1]">
+        {/* Vertical slat rhythm - timber screen inspiration */}
+        <div 
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            background: 'repeating-linear-gradient(90deg, transparent, transparent 60px, hsl(var(--kuma-slat)) 60px, hsl(var(--kuma-slat)) 61px)',
+          }}
+        />
+        {/* Horizontal strata - geological layering */}
+        <div 
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            background: 'repeating-linear-gradient(0deg, transparent, transparent 120px, hsl(var(--kuma-slat)) 120px, hsl(var(--kuma-slat)) 121px)',
+          }}
+        />
+      </div>
+
+      {/* AAL - Ruled surface lines (geometric precision) */}
+      <div className="fixed inset-0 pointer-events-none z-[2] opacity-[0.04]">
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(135deg, transparent 49.5%, hsl(var(--aal-line)) 49.5%, hsl(var(--aal-line)) 50.5%, transparent 50.5%)',
+            backgroundSize: '200px 200px',
+          }}
+        />
+      </div>
+
+      {/* Kuma - Floating glass panels (depth layering) */}
+      <div className="fixed top-[8%] right-[5%] w-48 h-64 pointer-events-none z-[3] opacity-60">
+        <div 
+          className="absolute inset-0 border border-white/[0.03] rounded-sm"
+          style={{ 
+            background: 'linear-gradient(145deg, hsl(var(--kuma-glass-1)) 0%, transparent 100%)',
+            backdropFilter: 'blur(1px)',
+          }}
+        />
+      </div>
+      <div className="fixed bottom-[12%] left-[3%] w-32 h-80 pointer-events-none z-[3] opacity-40 -rotate-2">
+        <div 
+          className="absolute inset-0 border border-white/[0.02]"
+          style={{ 
+            background: 'linear-gradient(180deg, transparent 0%, hsl(var(--kuma-glass-2)) 100%)',
+          }}
+        />
+      </div>
+
       {/* CAD Grid - Blueprint style */}
-      <svg className="fixed inset-0 w-full h-full pointer-events-none z-0" style={{ opacity: 0.15 }}>
+      <svg className="fixed inset-0 w-full h-full pointer-events-none z-0" style={{ opacity: 0.12 }}>
         <defs>
           <pattern id="smallGrid" width="20" height="20" patternUnits="userSpaceOnUse">
             <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1a3a5c" strokeWidth="0.5"/>
@@ -167,13 +215,23 @@ const ThermalLandingAnti = () => {
         </svg>
       </div>
 
-      {/* Technical HUD - Top */}
-      <header className="fixed top-0 left-0 right-0 z-40 p-4 flex justify-between items-start">
+      {/* Technical HUD - Top with AAL geometric separator */}
+      <header className="fixed top-0 left-0 right-0 z-40 p-6 flex justify-between items-start">
         <div className="space-y-1">
+          {/* AAL geometric accent */}
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-6 h-px bg-cyan-500/40" />
+            <div className="w-1 h-1 rotate-45 border border-cyan-500/40" />
+          </div>
           <div className="text-[9px] tracking-[0.4em] text-cyan-500/60">THERMAL RESONANCE SYSTEM</div>
           <div className="text-[8px] text-white/30">REV.2024.01 | SPATIAL AUDIO ENGINE</div>
         </div>
         <div className="text-right space-y-1">
+          {/* AAL geometric accent - mirrored */}
+          <div className="flex items-center justify-end gap-3 mb-2">
+            <div className="w-1 h-1 rotate-45 border border-white/20" />
+            <div className="w-6 h-px bg-white/20" />
+          </div>
           <div className="text-[9px] text-white/40">COORDINATES</div>
           <div className="text-[10px] font-mono text-cyan-400/80">
             X:{mousePos.x.toString().padStart(4, '0')} Y:{mousePos.y.toString().padStart(4, '0')}
@@ -507,36 +565,83 @@ const ThermalLandingAnti = () => {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="px-8 py-24">
+        {/* CTA Section - Kuma/AAL refined */}
+        <section className="px-8 py-24 relative">
+          {/* AAL geometric frame lines */}
+          <div className="absolute inset-x-8 top-16 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+          <div className="absolute inset-x-8 bottom-16 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+          
           <div className="max-w-6xl mx-auto text-center">
-            <div className="inline-block border border-white/10 p-8" style={{ background: 'rgba(10, 20, 30, 0.5)' }}>
-              <div className="text-[9px] tracking-[0.5em] text-white/30 mb-4">INITIALIZE FULL INTERFACE</div>
-              <Link 
-                to="/thermal-visualizer"
-                className="inline-block"
+            {/* Kuma-inspired layered container */}
+            <div className="relative inline-block">
+              {/* Background shadow layer */}
+              <div className="absolute inset-0 translate-x-2 translate-y-2 border border-white/[0.02] bg-white/[0.01]" />
+              
+              {/* Main container */}
+              <div 
+                className="relative border border-white/10 p-10"
+                style={{ 
+                  background: 'linear-gradient(135deg, rgba(10, 20, 30, 0.6) 0%, rgba(5, 10, 15, 0.8) 100%)',
+                  backdropFilter: 'blur(8px)',
+                }}
               >
-                <div className="text-4xl font-mono tracking-tight text-transparent hover:text-orange-500 transition-colors duration-300"
-                  style={{ WebkitTextStroke: '1px #ff6b35' }}
-                >
-                  LAUNCH →
+                {/* AAL corner accents */}
+                <div className="absolute -top-px -left-px w-8 h-px bg-gradient-to-r from-cyan-500/60 to-transparent" />
+                <div className="absolute -top-px -left-px h-8 w-px bg-gradient-to-b from-cyan-500/60 to-transparent" />
+                <div className="absolute -bottom-px -right-px w-8 h-px bg-gradient-to-l from-orange-500/40 to-transparent" />
+                <div className="absolute -bottom-px -right-px h-8 w-px bg-gradient-to-t from-orange-500/40 to-transparent" />
+                
+                {/* AAL geometric separator */}
+                <div className="flex items-center justify-center gap-3 mb-6">
+                  <div className="w-12 h-px bg-white/10" />
+                  <div className="w-1.5 h-1.5 rotate-45 border border-white/20" />
+                  <div className="w-12 h-px bg-white/10" />
                 </div>
-              </Link>
-              <div className="text-[8px] text-white/30 mt-4">THERMAL.VISUALIZER.EXE</div>
+                
+                <div className="text-[9px] tracking-[0.5em] text-white/30 mb-6">INITIALIZE FULL INTERFACE</div>
+                <Link 
+                  to="/thermal-visualizer"
+                  className="inline-block group"
+                >
+                  <div className="text-4xl font-mono tracking-tight text-transparent hover:text-orange-500 transition-colors duration-500"
+                    style={{ WebkitTextStroke: '1px #ff6b35' }}
+                  >
+                    LAUNCH →
+                  </div>
+                  {/* Hover underline - AAL precision */}
+                  <div className="h-px w-0 group-hover:w-full bg-gradient-to-r from-orange-500/60 to-cyan-500/40 transition-all duration-500 mt-2" />
+                </Link>
+                <div className="text-[8px] text-white/30 mt-6">THERMAL.VISUALIZER.EXE</div>
+              </div>
             </div>
           </div>
         </section>
       </main>
 
-      {/* Technical Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 z-40 p-4 flex justify-between items-end">
-        <div className="text-[8px] text-white/30">
-          <div>BUILD: 2024.01.19</div>
-          <div>ENGINE: WEB AUDIO API</div>
-        </div>
-        <div className="text-[8px] text-right text-white/30">
-          <div>SCALE: 1:1</div>
-          <div>UNITS: SI</div>
+      {/* Technical Footer with Kuma layering */}
+      <footer className="fixed bottom-0 left-0 right-0 z-40">
+        {/* Kuma horizontal strata line */}
+        <div className="h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+        
+        <div className="p-4 flex justify-between items-end backdrop-blur-sm bg-black/20">
+          <div className="text-[8px] text-white/30">
+            {/* AAL geometric prefix */}
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-4 h-px bg-cyan-500/30" />
+              <div className="w-0.5 h-0.5 rotate-45 bg-cyan-500/40" />
+            </div>
+            <div>BUILD: 2024.01.19</div>
+            <div>ENGINE: WEB AUDIO API</div>
+          </div>
+          <div className="text-[8px] text-right text-white/30">
+            {/* AAL geometric suffix */}
+            <div className="flex items-center justify-end gap-2 mb-1">
+              <div className="w-0.5 h-0.5 rotate-45 bg-white/20" />
+              <div className="w-4 h-px bg-white/20" />
+            </div>
+            <div>SCALE: 1:1</div>
+            <div>UNITS: SI</div>
+          </div>
         </div>
       </footer>
     </div>
