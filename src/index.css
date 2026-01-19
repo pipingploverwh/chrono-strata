@@ -45,6 +45,36 @@ html {
   /* Glass Effects */
   --apex-glass: 0 0% 100% / 0.05;
   --apex-glass-border: 0 0% 100% / 0.08;
+  
+  /* ═══════════════════════════════════════════════════════════════
+     THERMAL RESONANCE — Molten Lava Design System
+     Analog heat aesthetic: embers, sunset tones, organic warmth
+     ═══════════════════════════════════════════════════════════════ */
+  
+  /* Warm Background Tones */
+  --thermal-bg: 15 30% 6%;
+  --thermal-bg-warm: 20 25% 8%;
+  --thermal-surface: 18 20% 10%;
+  --thermal-surface-elevated: 20 18% 12%;
+  
+  /* Primary Heat Accents */
+  --thermal-ember: 24 100% 50%;
+  --thermal-amber: 40 100% 50%;
+  --thermal-vermilion: 12 80% 55%;
+  --thermal-magma: 18 90% 45%;
+  
+  /* Secondary Warm Tones */
+  --thermal-gold: 45 70% 55%;
+  --thermal-cream: 40 30% 85%;
+  --thermal-mahogany: 15 40% 15%;
+  
+  /* Heat Gradient Endpoints */
+  --thermal-crimson: 0 70% 45%;
+  --thermal-white-hot: 45 100% 85%;
+  
+  /* Border & Glow Effects */
+  --thermal-border: 30 30% 25%;
+  --thermal-glow: 25 100% 50%;
 }
 
 @layer base {
