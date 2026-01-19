@@ -1,7 +1,6 @@
 import { MapPin, Clock, Phone, Shield, Globe, Leaf, Flower2, Sparkles, Package, Bird } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AgeGate from "@/components/AgeGate";
-import PloverGuide from "@/components/PloverGuide";
 import { useLanguageState } from "@/hooks/useLanguage";
 
 // Product data with translations
@@ -122,16 +121,10 @@ export default function WellfleetDispensary() {
             </div>
             
             {/* CTA */}
-            <button
-              onClick={() => {
-                const chatBtn = document.querySelector('[data-chat-toggle]') as HTMLButtonElement;
-                chatBtn?.click();
-              }}
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-plover-sage text-plover-cream font-medium hover:bg-plover-sage/90 transition-all"
-            >
+            <Button className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-plover-sage text-plover-cream font-medium hover:bg-plover-sage/90 transition-all h-auto">
               <Bird className="w-5 h-5" />
-              {t('plover.chatWithPiper')}
-            </button>
+              {t('plover.viewFullMenu')}
+            </Button>
           </div>
         </section>
 
@@ -250,9 +243,6 @@ export default function WellfleetDispensary() {
             </p>
           </div>
         </footer>
-
-        {/* Piper Chat */}
-        <PloverGuide />
       </div>
     </AgeGate>
   );
