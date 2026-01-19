@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowUpRight, Volume2, VolumeX } from 'lucide-react';
 import thermalDemoVideo from '@/assets/thermal-demo.mp4';
 import SpatialAudioCAD, { VINYL_COLLECTION, VinylRecord } from '@/components/SpatialAudioCAD';
+import ThermalNavigation from '@/components/ThermalNavigation';
 
 const ThermalLandingSlash = () => {
   const [temperature, setTemperature] = useState(35);
@@ -131,16 +132,8 @@ const ThermalLandingSlash = () => {
         }}
       />
       
-      {/* Minimal nav - AAL geometric precision */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-8 py-6">
-        <span className="text-xs tracking-[0.3em] opacity-50 font-light">THERMAL</span>
-        <Link 
-          to="/thermal-visualizer"
-          className="text-xs tracking-[0.2em] opacity-50 hover:opacity-100 transition-opacity flex items-center gap-1 font-light"
-        >
-          OPEN <ArrowUpRight className="w-3 h-3" />
-        </Link>
-      </nav>
+      {/* Unified Thermal Navigation */}
+      <ThermalNavigation />
 
       {/* Hero - Full screen with Kuma depth layering */}
       <section className="h-screen flex items-center justify-center relative">

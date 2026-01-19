@@ -23,6 +23,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import thermalDemoVideo from '@/assets/thermal-demo.mp4';
+import ThermalNavigation from '@/components/ThermalNavigation';
 
 // Demo audio URL - using a free sample track
 const DEMO_AUDIO_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
@@ -267,6 +268,9 @@ const ThermalVisualizerLanding = () => {
 
   return (
     <div className="min-h-screen text-white overflow-hidden" style={{ background: 'hsl(15 30% 4%)' }}>
+      {/* Unified Thermal Navigation */}
+      <ThermalNavigation />
+
       {/* Kengo Kuma - Layered transparency panels */}
       <motion.div 
         className="fixed inset-0 pointer-events-none z-[1]"
