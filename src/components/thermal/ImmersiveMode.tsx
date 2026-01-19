@@ -5,6 +5,7 @@ import WaveformVisualization from '@/components/strata/WaveformVisualization';
 import StrataEmbeddedDisplay from '@/components/strata/StrataEmbeddedDisplay';
 import NeonKanjiOverlay from '@/components/thermal/NeonKanjiOverlay';
 import KatakanaRain from '@/components/thermal/KatakanaRain';
+import KatakanaMarquee from '@/components/thermal/KatakanaMarquee';
 
 interface ThermalZone {
   id: string;
@@ -578,6 +579,15 @@ const ImmersiveMode = ({
           </div>
         </div>
       </GlassPanel>
+      
+      {/* BPM-synced Katakana Marquee */}
+      <KatakanaMarquee
+        bpm={bpm}
+        spectralEnergy={spectralData.energy}
+        isPlaying={isPlaying}
+        getThermalColor={getThermalColor}
+        temperature={globalTemp}
+      />
     </motion.div>
   );
 };
