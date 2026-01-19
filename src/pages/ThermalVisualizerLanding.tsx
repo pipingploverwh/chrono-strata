@@ -266,9 +266,57 @@ const ThermalVisualizerLanding = () => {
 
   return (
     <div className="min-h-screen text-white overflow-hidden" style={{ background: 'hsl(15 30% 4%)' }}>
+      {/* Kengo Kuma - Layered transparency panels */}
+      <div className="fixed inset-0 pointer-events-none z-[1]">
+        {/* Vertical slat rhythm - timber screen inspiration */}
+        <div 
+          className="absolute inset-0 opacity-[0.025]"
+          style={{
+            background: 'repeating-linear-gradient(90deg, transparent, transparent 80px, hsl(var(--kuma-slat)) 80px, hsl(var(--kuma-slat)) 81px)',
+          }}
+        />
+        {/* Horizontal strata - geological layering */}
+        <div 
+          className="absolute inset-0 opacity-[0.015]"
+          style={{
+            background: 'repeating-linear-gradient(0deg, transparent, transparent 150px, hsl(var(--kuma-slat)) 150px, hsl(var(--kuma-slat)) 151px)',
+          }}
+        />
+      </div>
+
+      {/* AAL - Ruled surface lines (geometric precision) */}
+      <div className="fixed inset-0 pointer-events-none z-[2] opacity-[0.03]">
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(135deg, transparent 49.5%, hsl(var(--aal-line)) 49.5%, hsl(var(--aal-line)) 50.5%, transparent 50.5%)',
+            backgroundSize: '250px 250px',
+          }}
+        />
+      </div>
+
+      {/* Kuma - Floating glass panels (depth layering) */}
+      <div className="fixed top-[10%] right-[4%] w-40 h-56 pointer-events-none z-[3] opacity-50">
+        <div 
+          className="absolute inset-0 border border-white/[0.02] rounded-sm"
+          style={{ 
+            background: 'linear-gradient(145deg, hsl(var(--kuma-glass-1)) 0%, transparent 100%)',
+            backdropFilter: 'blur(1px)',
+          }}
+        />
+      </div>
+      <div className="fixed bottom-[15%] left-[2%] w-28 h-72 pointer-events-none z-[3] opacity-35 rotate-1">
+        <div 
+          className="absolute inset-0 border border-white/[0.015]"
+          style={{ 
+            background: 'linear-gradient(180deg, transparent 0%, hsl(var(--kuma-glass-2)) 100%)',
+          }}
+        />
+      </div>
+
       {/* Dynamic thermal background */}
       <div 
-        className="fixed inset-0 pointer-events-none transition-all duration-300"
+        className="fixed inset-0 pointer-events-none transition-all duration-300 z-[4]"
         style={{
           background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, ${getThermalColor(temperature)} 0%, transparent 50%)`,
           opacity: 0.3,
@@ -277,7 +325,7 @@ const ThermalVisualizerLanding = () => {
 
       {/* Animated grid pattern */}
       <div 
-        className="fixed inset-0 pointer-events-none opacity-10"
+        className="fixed inset-0 pointer-events-none opacity-[0.08] z-[5]"
         style={{
           backgroundImage: `
             linear-gradient(hsl(24 100% 50% / 0.1) 1px, transparent 1px),
@@ -310,12 +358,20 @@ const ThermalVisualizerLanding = () => {
 
         {/* Main content */}
         <div className="relative z-10 max-w-5xl mx-auto text-center">
+          {/* AAL geometric separator above badge */}
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <div className="w-16 h-px bg-gradient-to-r from-transparent to-white/10" />
+            <div className="w-1.5 h-1.5 rotate-45 border border-white/20" />
+            <div className="w-16 h-px bg-gradient-to-l from-transparent to-white/10" />
+          </div>
+
           {/* Badge */}
           <div 
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8"
             style={{ 
               background: 'hsl(20 40% 12% / 0.8)', 
               border: '1px solid hsl(24 100% 50% / 0.3)',
+              backdropFilter: 'blur(8px)',
             }}
           >
             <Flame className="w-4 h-4" style={{ color: 'hsl(24 100% 50%)' }} />
@@ -422,10 +478,19 @@ const ThermalVisualizerLanding = () => {
         </div>
       </section>
 
-      {/* Video Preview Section */}
+      {/* Video Preview Section - Kuma layering */}
       <section className="relative py-20 px-6" style={{ background: 'hsl(15 30% 4%)' }}>
+        {/* Kuma horizontal strata accent */}
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+        
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
+            {/* AAL geometric frame */}
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="w-8 h-px bg-orange-500/30" />
+              <div className="w-1 h-1 rotate-45 border border-orange-500/40" />
+              <div className="w-8 h-px bg-orange-500/30" />
+            </div>
             <span 
               className="inline-block px-4 py-1 rounded-full text-sm mb-4"
               style={{ 
@@ -659,10 +724,19 @@ const ThermalVisualizerLanding = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Section - AAL geometric precision */}
       <section className="relative py-24 px-6">
+        {/* AAL ruled surface accent */}
+        <div className="absolute top-12 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
+        
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
+            {/* AAL geometric separator */}
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <div className="w-12 h-px bg-white/10" />
+              <div className="w-1.5 h-1.5 rotate-45 border border-orange-500/40" />
+              <div className="w-12 h-px bg-white/10" />
+            </div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-extralight mb-4" style={{ color: 'hsl(40 30% 85%)' }}>
               Powered by <span style={{ color: 'hsl(24 100% 55%)' }}>Innovation</span>
             </h2>
@@ -785,8 +859,12 @@ const ThermalVisualizerLanding = () => {
         </div>
       </section>
 
-      {/* Final CTA */}
+      {/* Final CTA - Kuma/AAL refined */}
       <section className="relative py-32 px-6">
+        {/* Kuma horizontal layers */}
+        <div className="absolute top-16 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+        <div className="absolute bottom-16 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+        
         <div 
           className="absolute inset-0"
           style={{
@@ -794,6 +872,13 @@ const ThermalVisualizerLanding = () => {
           }}
         />
         <div className="relative z-10 max-w-3xl mx-auto text-center">
+          {/* AAL geometric frame */}
+          <div className="flex items-center justify-center gap-4 mb-8">
+            <div className="w-16 h-px bg-gradient-to-r from-transparent to-orange-500/30" />
+            <div className="w-2 h-2 rotate-45 border border-orange-500/50" />
+            <div className="w-16 h-px bg-gradient-to-l from-transparent to-orange-500/30" />
+          </div>
+          
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-extralight mb-6" style={{ color: 'hsl(40 30% 85%)' }}>
             Ready to <span style={{ color: 'hsl(24 100% 55%)' }}>Feel the Heat</span>?
           </h2>
@@ -803,7 +888,7 @@ const ThermalVisualizerLanding = () => {
           <Link to="/thermal-visualizer">
             <Button
               size="lg"
-              className="text-xl px-12 py-8 rounded-full group"
+              className="text-xl px-12 py-8 rounded-full group relative overflow-hidden"
               style={{ 
                 background: 'linear-gradient(135deg, hsl(0 70% 45%) 0%, hsl(24 100% 50%) 100%)',
                 boxShadow: '0 0 60px hsl(24 100% 50% / 0.5)',
@@ -814,11 +899,26 @@ const ThermalVisualizerLanding = () => {
               <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-2 transition-transform" />
             </Button>
           </Link>
+          
+          {/* AAL geometric accent below button */}
+          <div className="flex items-center justify-center gap-3 mt-10">
+            <div className="w-6 h-px bg-white/10" />
+            <div className="w-1 h-1 rotate-45 bg-orange-500/40" />
+            <div className="w-6 h-px bg-white/10" />
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 px-6 text-center" style={{ borderTop: '1px solid hsl(30 30% 15%)' }}>
+      {/* Footer - Kuma layered */}
+      <footer className="relative py-8 px-6 text-center">
+        {/* Kuma strata line */}
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.05] to-transparent" />
+        
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <div className="w-4 h-px bg-orange-500/20" />
+          <div className="w-0.5 h-0.5 rotate-45 bg-orange-500/30" />
+          <div className="w-4 h-px bg-orange-500/20" />
+        </div>
         <p className="text-sm" style={{ color: 'hsl(30 15% 40%)' }}>
           THERMAL RESONANCE SYSTEM™ • Patent Pending: TRS-2024
         </p>
