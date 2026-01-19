@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, Pause, Upload, Thermometer, Volume2, Activity, Disc, ArrowLeft } from 'lucide-react';
+import { Play, Pause, Upload, Thermometer, Volume2, Activity, Disc, ArrowLeft, Monitor } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
+import StrataEmbeddedDisplay from '@/components/strata/StrataEmbeddedDisplay';
 
 // Proprietary Thermal Mapping Algorithm
 // Based on psychoacoustic energy density and spectral flux
@@ -330,6 +331,35 @@ const ThermalMusicVisualizer = () => {
                         )}
                       </div>
                     ))}
+
+                    {/* Embedded STRATA Displays */}
+                    <div className="absolute top-[5%] left-[5%] w-[22%]">
+                      <StrataEmbeddedDisplay
+                        temperature={thermalZones.find(z => z.id === 'left-deck')?.temperature || globalTemp}
+                        spectralEnergy={spectralData.energy}
+                        bpm={bpm}
+                        isPlaying={isPlaying}
+                        displayId="left"
+                      />
+                    </div>
+                    <div className="absolute top-[5%] left-[39%] w-[22%]">
+                      <StrataEmbeddedDisplay
+                        temperature={thermalZones.find(z => z.id === 'mixer')?.temperature || globalTemp}
+                        spectralEnergy={spectralData.energy}
+                        bpm={bpm}
+                        isPlaying={isPlaying}
+                        displayId="center"
+                      />
+                    </div>
+                    <div className="absolute top-[5%] right-[5%] w-[22%]">
+                      <StrataEmbeddedDisplay
+                        temperature={thermalZones.find(z => z.id === 'right-deck')?.temperature || globalTemp}
+                        spectralEnergy={spectralData.energy}
+                        bpm={bpm}
+                        isPlaying={isPlaying}
+                        displayId="right"
+                      />
+                    </div>
                   </div>
 
                   {/* Temperature overlay */}
@@ -359,6 +389,40 @@ const ThermalMusicVisualizer = () => {
                       </div>
                     ))}
                   </div>
+                </div>
+
+                {/* STRATA Display Section */}
+                <div className="mt-6">
+                  <h4 className="text-sm font-medium text-zinc-400 mb-4 flex items-center gap-2">
+                    <Monitor className="w-4 h-4" />
+                    STRATA EMBEDDED DISPLAYS — Live Thermal Response
+                  </h4>
+                  <div className="grid grid-cols-3 gap-4">
+                    <StrataEmbeddedDisplay
+                      temperature={thermalZones.find(z => z.id === 'left-deck')?.temperature || globalTemp}
+                      spectralEnergy={spectralData.energy}
+                      bpm={bpm}
+                      isPlaying={isPlaying}
+                      displayId="left"
+                    />
+                    <StrataEmbeddedDisplay
+                      temperature={thermalZones.find(z => z.id === 'mixer')?.temperature || globalTemp}
+                      spectralEnergy={spectralData.energy}
+                      bpm={bpm}
+                      isPlaying={isPlaying}
+                      displayId="center"
+                    />
+                    <StrataEmbeddedDisplay
+                      temperature={thermalZones.find(z => z.id === 'right-deck')?.temperature || globalTemp}
+                      spectralEnergy={spectralData.energy}
+                      bpm={bpm}
+                      isPlaying={isPlaying}
+                      displayId="right"
+                    />
+                  </div>
+                  <p className="text-xs text-zinc-500 mt-3 text-center">
+                    STRATA displays adapt color temperature and glow intensity based on real-time audio spectral analysis
+                  </p>
                 </div>
 
                 {/* Temperature Scale */}
