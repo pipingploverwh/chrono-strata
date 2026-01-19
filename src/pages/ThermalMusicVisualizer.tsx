@@ -13,6 +13,7 @@ import LavandarBackground from '@/components/LavandarBackground';
 import ImmersiveMode from '@/components/thermal/ImmersiveMode';
 import NeonKanjiOverlay from '@/components/thermal/NeonKanjiOverlay';
 import KatakanaRain from '@/components/thermal/KatakanaRain';
+import KatakanaMarquee from '@/components/thermal/KatakanaMarquee';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { VINYL_COLLECTION } from '@/components/SpatialAudioCAD';
@@ -1020,6 +1021,15 @@ const ThermalMusicVisualizer = () => {
                       </div>
                     ))}
                   </div>
+                  
+                  {/* BPM-synced Katakana Marquee */}
+                  <KatakanaMarquee
+                    bpm={bpm}
+                    spectralEnergy={spectralData.energy}
+                    isPlaying={isPlaying}
+                    getThermalColor={getThermalColor}
+                    temperature={globalTemp}
+                  />
                 </div>
 
                 {/* STRATA Display Section */}
