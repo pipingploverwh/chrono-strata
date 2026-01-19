@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { 
   ArrowLeft, 
-  Upload, 
   Download, 
   Webhook, 
   Database, 
@@ -16,7 +15,15 @@ import {
   FileJson,
   FileSpreadsheet,
   Send,
-  RefreshCw
+  RefreshCw,
+  Anchor,
+  Ship,
+  Wind,
+  Waves,
+  FileText,
+  Briefcase,
+  Calendar,
+  History
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,10 +34,21 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { OdooSyncDashboard, SyncLog } from "@/components/odoo/OdooSyncDashboard";
 
 interface TransferStatus {
   status: 'idle' | 'loading' | 'success' | 'error';
   message?: string;
+}
+
+interface DataModule {
+  id: string;
+  name: string;
+  icon: any;
+  description: string;
+  odooModule: string;
+  category: 'core' | 'marine' | 'hr';
+  count: number;
 }
 
 const OdooTransferPortal = () => {
@@ -45,24 +63,81 @@ const OdooTransferPortal = () => {
   // Webhook Configuration
   const [webhookUrl, setWebhookUrl] = useState("");
   
-  // Data Selection
+  // Data Selection - expanded with new modules
   const [selectedData, setSelectedData] = useState({
     leads: true,
     products: true,
-    weather: false
+    weather: false,
+    marine: false,
+    visaApplications: false,
+    visaDocuments: false,
+    visaMilestones: false
   });
   
   // Transfer Status
   const [transferStatus, setTransferStatus] = useState<TransferStatus>({ status: 'idle' });
+  
+  // Sync History
+  const [syncLogs, setSyncLogs] = useState<SyncLog[]>([]);
+  
+  // API Connection Status
+  const [apiConnected, setApiConnected] = useState(false);
+  const [apiTestLoading, setApiTestLoading] = useState(false);
 
-  const dataModules = [
+  // Data counts
+  const [dataCounts, setDataCounts] = useState<Record<string, number>>({});
+
+  // Fetch data counts on mount
+  useEffect(() => {
+    fetchDataCounts();
+  }, []);
+
+  const fetchDataCounts = async () => {
+    const counts: Record<string, number> = {};
+    
+    const { count: leadsCount } = await supabase
+      .from('investor_contacts')
+      .select('*', { count: 'exact', head: true });
+    counts.leads = leadsCount || 0;
+
+    const { count: productsCount } = await supabase
+      .from('sourced_products')
+      .select('*', { count: 'exact', head: true });
+    counts.products = productsCount || 0;
+
+    const { count: weatherCount } = await supabase
+      .from('weather_coordinate_logs')
+      .select('*', { count: 'exact', head: true });
+    counts.weather = weatherCount || 0;
+
+    const { count: visaAppsCount } = await supabase
+      .from('visa_applications')
+      .select('*', { count: 'exact', head: true });
+    counts.visaApplications = visaAppsCount || 0;
+
+    const { count: visaDocsCount } = await supabase
+      .from('visa_documents')
+      .select('*', { count: 'exact', head: true });
+    counts.visaDocuments = visaDocsCount || 0;
+
+    const { count: visaMilestonesCount } = await supabase
+      .from('visa_milestones')
+      .select('*', { count: 'exact', head: true });
+    counts.visaMilestones = visaMilestonesCount || 0;
+
+    setDataCounts(counts);
+  };
+
+  const dataModules: DataModule[] = [
+    // Core Business
     {
       id: 'leads',
       name: 'Leads & Contacts',
       icon: Users,
       description: 'Investor contacts and lead information',
       odooModule: 'crm.lead',
-      count: 0
+      category: 'core',
+      count: dataCounts.leads || 0
     },
     {
       id: 'products',
@@ -70,21 +145,77 @@ const OdooTransferPortal = () => {
       icon: Package,
       description: 'Sourced products and inventory data',
       odooModule: 'product.product',
-      count: 0
+      category: 'core',
+      count: dataCounts.products || 0
     },
+    // Weather & Marine
     {
       id: 'weather',
       name: 'Weather Intelligence',
       icon: Cloud,
       description: 'Weather coordinate logs and forecasts',
       odooModule: 'custom.weather',
-      count: 0
+      category: 'marine',
+      count: dataCounts.weather || 0
+    },
+    {
+      id: 'marine',
+      name: 'Marine Forecasts',
+      icon: Anchor,
+      description: 'NOAA coastal conditions and maritime data',
+      odooModule: 'custom.marine_forecast',
+      category: 'marine',
+      count: 0 // Dynamic from API
+    },
+    // HR & Visa
+    {
+      id: 'visaApplications',
+      name: 'Visa Applications',
+      icon: Briefcase,
+      description: 'Startup visa applications and status',
+      odooModule: 'hr.employee.visa',
+      category: 'hr',
+      count: dataCounts.visaApplications || 0
+    },
+    {
+      id: 'visaDocuments',
+      name: 'Visa Documents',
+      icon: FileText,
+      description: 'Document submissions and requirements',
+      odooModule: 'hr.document',
+      category: 'hr',
+      count: dataCounts.visaDocuments || 0
+    },
+    {
+      id: 'visaMilestones',
+      name: 'Visa Milestones',
+      icon: Calendar,
+      description: 'Timeline milestones and deadlines',
+      odooModule: 'project.task',
+      category: 'hr',
+      count: dataCounts.visaMilestones || 0
     }
   ];
+
+  const categoryLabels: Record<string, { label: string; color: string }> = {
+    core: { label: 'Core Business', color: 'bg-purple-500' },
+    marine: { label: 'Marine & Weather', color: 'bg-cyan-500' },
+    hr: { label: 'HR & Visa', color: 'bg-amber-500' }
+  };
+
+  // Add sync log helper
+  const addSyncLog = (log: Omit<SyncLog, 'id' | 'timestamp'>) => {
+    setSyncLogs(prev => [{
+      ...log,
+      id: crypto.randomUUID(),
+      timestamp: new Date()
+    }, ...prev].slice(0, 50)); // Keep last 50 logs
+  };
 
   // Fetch data from Supabase for export
   const fetchExportData = async () => {
     const exportData: Record<string, any[]> = {};
+    const startTime = Date.now();
 
     if (selectedData.leads) {
       const { data: contacts } = await supabase
@@ -96,7 +227,7 @@ const OdooTransferPortal = () => {
         company: c.firm,
         description: c.message,
         type: 'lead',
-        source: 'Lovable Portal',
+        source: 'LAVANDAR Tech Portal',
         investment_interest: c.investment_interest
       })) || [];
     }
@@ -132,7 +263,71 @@ const OdooTransferPortal = () => {
       })) || [];
     }
 
-    return exportData;
+    // Marine forecast data (fetch from NOAA edge function)
+    if (selectedData.marine) {
+      try {
+        const { data: marineData } = await supabase.functions.invoke('noaa-marine', {
+          body: { zone: 'anz233' } // Vineyard Sound default
+        });
+        
+        exportData.marine = [{
+          zone_id: 'anz233',
+          zone_name: 'Vineyard Sound',
+          forecast_date: new Date().toISOString(),
+          wind_conditions: marineData?.wind || '',
+          sea_conditions: marineData?.seas || '',
+          warnings: marineData?.warnings || [],
+          raw_forecast: marineData?.rawForecast || ''
+        }];
+      } catch (e) {
+        exportData.marine = [];
+      }
+    }
+
+    // Visa Application data
+    if (selectedData.visaApplications) {
+      const { data: visaApps } = await supabase
+        .from('visa_applications')
+        .select('*');
+      exportData.visaApplications = visaApps?.map(v => ({
+        employee_name: v.user_id,
+        visa_type: 'Startup Visa',
+        application_date: v.application_date,
+        current_phase: v.current_phase,
+        status: v.status,
+        notes: v.notes
+      })) || [];
+    }
+
+    if (selectedData.visaDocuments) {
+      const { data: visaDocs } = await supabase
+        .from('visa_documents')
+        .select('*');
+      exportData.visaDocuments = visaDocs?.map(d => ({
+        name: d.document_name,
+        document_type: d.document_type,
+        status: d.status,
+        due_date: d.due_date,
+        submitted_date: d.submitted_date,
+        file_url: d.file_url
+      })) || [];
+    }
+
+    if (selectedData.visaMilestones) {
+      const { data: milestones } = await supabase
+        .from('visa_milestones')
+        .select('*');
+      exportData.visaMilestones = milestones?.map(m => ({
+        name: m.title,
+        description: m.description,
+        milestone_type: m.milestone_type,
+        target_date: m.target_date,
+        completed_date: m.completed_date,
+        status: m.status
+      })) || [];
+    }
+
+    return { data: exportData, duration: Date.now() - startTime };
   };
 
   // Manual Export - Download as JSON
@@ -140,7 +335,12 @@ const OdooTransferPortal = () => {
     setTransferStatus({ status: 'loading', message: 'Preparing JSON export...' });
     
     try {
-      const data = await fetchExportData();
+      const { data, duration } = await fetchExportData();
+      const totalRecords = Object.values(data).flat().length;
+      const selectedModules = Object.entries(selectedData)
+        .filter(([_, selected]) => selected)
+        .map(([key]) => key);
+
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -152,12 +352,28 @@ const OdooTransferPortal = () => {
       URL.revokeObjectURL(url);
       
       setTransferStatus({ status: 'success', message: 'JSON file downloaded successfully!' });
+      addSyncLog({
+        type: 'export',
+        modules: selectedModules,
+        recordCount: totalRecords,
+        status: 'success',
+        message: 'JSON export completed',
+        duration
+      });
+      
       toast({
         title: "Export Complete",
-        description: "Your data has been exported to JSON format for Odoo import."
+        description: `Exported ${totalRecords} records to JSON format.`
       });
     } catch (error) {
       setTransferStatus({ status: 'error', message: 'Failed to export data' });
+      addSyncLog({
+        type: 'export',
+        modules: [],
+        recordCount: 0,
+        status: 'error',
+        message: `Export failed: ${error}`
+      });
       toast({
         title: "Export Failed",
         description: "There was an error exporting your data.",
@@ -171,11 +387,15 @@ const OdooTransferPortal = () => {
     setTransferStatus({ status: 'loading', message: 'Preparing CSV export...' });
     
     try {
-      const data = await fetchExportData();
+      const { data, duration } = await fetchExportData();
+      const selectedModules = Object.entries(selectedData)
+        .filter(([_, selected]) => selected)
+        .map(([key]) => key);
+      let totalRecords = 0;
       
-      // Create separate CSV files for each data type
       Object.entries(data).forEach(([key, records]) => {
         if (records.length === 0) return;
+        totalRecords += records.length;
         
         const headers = Object.keys(records[0]);
         const csvContent = [
@@ -184,7 +404,9 @@ const OdooTransferPortal = () => {
             headers.map(h => {
               const value = record[h];
               if (value === null || value === undefined) return '';
-              if (typeof value === 'string' && value.includes(',')) return `"${value}"`;
+              if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+                return `"${value.replace(/"/g, '""')}"`;
+              }
               return value;
             }).join(',')
           )
@@ -202,12 +424,28 @@ const OdooTransferPortal = () => {
       });
       
       setTransferStatus({ status: 'success', message: 'CSV files downloaded successfully!' });
+      addSyncLog({
+        type: 'export',
+        modules: selectedModules,
+        recordCount: totalRecords,
+        status: 'success',
+        message: 'CSV export completed',
+        duration
+      });
+      
       toast({
         title: "Export Complete",
-        description: "Your data has been exported to CSV format for Odoo import."
+        description: `Exported ${totalRecords} records to CSV format.`
       });
     } catch (error) {
       setTransferStatus({ status: 'error', message: 'Failed to export data' });
+      addSyncLog({
+        type: 'export',
+        modules: [],
+        recordCount: 0,
+        status: 'error',
+        message: `CSV export failed: ${error}`
+      });
       toast({
         title: "Export Failed",
         description: "There was an error exporting your data.",
@@ -230,9 +468,13 @@ const OdooTransferPortal = () => {
     setTransferStatus({ status: 'loading', message: 'Sending data to webhook...' });
     
     try {
-      const data = await fetchExportData();
+      const { data, duration } = await fetchExportData();
+      const selectedModules = Object.entries(selectedData)
+        .filter(([_, selected]) => selected)
+        .map(([key]) => key);
+      const totalRecords = Object.values(data).flat().length;
       
-      const response = await fetch(webhookUrl, {
+      await fetch(webhookUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -246,17 +488,84 @@ const OdooTransferPortal = () => {
       });
       
       setTransferStatus({ status: 'success', message: 'Data sent to webhook successfully!' });
+      addSyncLog({
+        type: 'webhook',
+        modules: selectedModules,
+        recordCount: totalRecords,
+        status: 'success',
+        message: 'Webhook triggered successfully',
+        duration
+      });
+      
       toast({
         title: "Webhook Triggered",
-        description: "Data has been sent to your Odoo webhook. Check your Odoo instance for incoming data."
+        description: `Sent ${totalRecords} records to webhook.`
       });
     } catch (error) {
       setTransferStatus({ status: 'error', message: 'Failed to send to webhook' });
+      addSyncLog({
+        type: 'webhook',
+        modules: [],
+        recordCount: 0,
+        status: 'error',
+        message: `Webhook failed: ${error}`
+      });
       toast({
         title: "Webhook Failed",
         description: "There was an error sending data to the webhook.",
         variant: "destructive"
       });
+    }
+  };
+
+  // Test API Connection
+  const handleTestConnection = async () => {
+    if (!odooUrl || !odooDb || !odooUsername || !odooApiKey) {
+      toast({
+        title: "Missing Credentials",
+        description: "Please fill in all API configuration fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setApiTestLoading(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('odoo-sync', {
+        body: {
+          config: {
+            url: odooUrl,
+            db: odooDb,
+            username: odooUsername,
+            apiKey: odooApiKey
+          },
+          model: 'res.partner',
+          method: 'search_count',
+          data: []
+        }
+      });
+
+      if (error) throw error;
+      
+      if (data?.success) {
+        setApiConnected(true);
+        toast({
+          title: "Connection Successful",
+          description: `Connected to Odoo as UID ${data.uid}`
+        });
+      } else {
+        throw new Error(data?.error || 'Connection failed');
+      }
+    } catch (error: any) {
+      setApiConnected(false);
+      toast({
+        title: "Connection Failed",
+        description: error.message || "Could not connect to Odoo API.",
+        variant: "destructive"
+      });
+    } finally {
+      setApiTestLoading(false);
     }
   };
 
@@ -271,29 +580,79 @@ const OdooTransferPortal = () => {
       return;
     }
 
-    setTransferStatus({ status: 'loading', message: 'Connecting to Odoo API...' });
+    setTransferStatus({ status: 'loading', message: 'Syncing with Odoo API...' });
     
     try {
-      const data = await fetchExportData();
-      
-      // Note: Direct Odoo XML-RPC calls require a backend proxy
-      // This would typically call an edge function
-      toast({
-        title: "API Integration",
-        description: "Direct API integration requires server-side processing. Use the webhook method or export files for now.",
-        variant: "default"
+      const { data, duration } = await fetchExportData();
+      const selectedModules = Object.entries(selectedData)
+        .filter(([_, selected]) => selected)
+        .map(([key]) => key);
+      let totalRecords = 0;
+      const results: any[] = [];
+
+      // Sync each data type to appropriate Odoo model
+      for (const [key, records] of Object.entries(data)) {
+        if (records.length === 0) continue;
+        
+        const module = dataModules.find(m => m.id === key);
+        if (!module) continue;
+
+        const { data: syncResult, error } = await supabase.functions.invoke('odoo-sync', {
+          body: {
+            config: {
+              url: odooUrl,
+              db: odooDb,
+              username: odooUsername,
+              apiKey: odooApiKey
+            },
+            model: module.odooModule,
+            method: 'create',
+            data: records
+          }
+        });
+
+        if (error) throw error;
+        
+        totalRecords += records.length;
+        results.push({ module: key, result: syncResult });
+      }
+
+      setTransferStatus({ status: 'success', message: 'Data synced with Odoo!' });
+      addSyncLog({
+        type: 'api',
+        modules: selectedModules,
+        recordCount: totalRecords,
+        status: 'success',
+        message: `API sync completed: ${totalRecords} records created`,
+        duration
       });
       
-      setTransferStatus({ status: 'idle' });
-    } catch (error) {
-      setTransferStatus({ status: 'error', message: 'API connection failed' });
       toast({
-        title: "API Error",
-        description: "Failed to connect to Odoo API.",
+        title: "Sync Complete",
+        description: `Created ${totalRecords} records in Odoo.`
+      });
+    } catch (error: any) {
+      setTransferStatus({ status: 'error', message: 'API sync failed' });
+      addSyncLog({
+        type: 'api',
+        modules: [],
+        recordCount: 0,
+        status: 'error',
+        message: `API sync failed: ${error.message}`
+      });
+      toast({
+        title: "Sync Failed",
+        description: error.message || "Failed to sync with Odoo API.",
         variant: "destructive"
       });
     }
   };
+
+  const groupedModules = dataModules.reduce((acc, module) => {
+    if (!acc[module.category]) acc[module.category] = [];
+    acc[module.category].push(module);
+    return acc;
+  }, {} as Record<string, DataModule[]>);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
@@ -315,9 +674,17 @@ const OdooTransferPortal = () => {
               <span className="font-semibold text-neutral-900">Odoo Transfer Portal</span>
             </div>
           </div>
-          <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-            ERP Integration
-          </Badge>
+          <div className="flex items-center gap-2">
+            {apiConnected && (
+              <Badge className="bg-green-100 text-green-700">
+                <CheckCircle2 className="w-3 h-3 mr-1" />
+                API Connected
+              </Badge>
+            )}
+            <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+              ERP Integration
+            </Badge>
+          </div>
         </div>
       </header>
 
@@ -328,12 +695,12 @@ const OdooTransferPortal = () => {
             Odoo Data Transfer Portal
           </h1>
           <p className="text-neutral-600 max-w-2xl mx-auto">
-            Export and sync your data with Odoo ERP. Choose from manual exports, 
-            webhook triggers, or direct API integration.
+            Export and sync your data with Odoo ERP. Includes marine forecasts, 
+            visa applications, and real-time API synchronization.
           </p>
         </div>
 
-        {/* Data Selection */}
+        {/* Data Selection - Grouped by Category */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -344,51 +711,70 @@ const OdooTransferPortal = () => {
               Choose which data modules you want to export to Odoo
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-3 gap-4">
-              {dataModules.map((module) => {
-                const Icon = module.icon;
-                const isSelected = selectedData[module.id as keyof typeof selectedData];
-                
-                return (
-                  <div
-                    key={module.id}
-                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      isSelected 
-                        ? 'border-purple-500 bg-purple-50' 
-                        : 'border-neutral-200 hover:border-neutral-300'
-                    }`}
-                    onClick={() => setSelectedData(prev => ({
-                      ...prev,
-                      [module.id]: !prev[module.id as keyof typeof prev]
-                    }))}
-                  >
-                    <div className="flex items-start gap-3">
-                      <Checkbox checked={isSelected} />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Icon className="w-4 h-4 text-purple-600" />
-                          <span className="font-medium text-neutral-900">{module.name}</span>
+          <CardContent className="space-y-6">
+            {Object.entries(groupedModules).map(([category, modules]) => (
+              <div key={category}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className={`w-2 h-2 rounded-full ${categoryLabels[category].color}`} />
+                  <span className="text-sm font-medium text-neutral-700">
+                    {categoryLabels[category].label}
+                  </span>
+                </div>
+                <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {modules.map((module) => {
+                    const Icon = module.icon;
+                    const isSelected = selectedData[module.id as keyof typeof selectedData];
+                    
+                    return (
+                      <div
+                        key={module.id}
+                        className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                          isSelected 
+                            ? 'border-purple-500 bg-purple-50' 
+                            : 'border-neutral-200 hover:border-neutral-300'
+                        }`}
+                        onClick={() => setSelectedData(prev => ({
+                          ...prev,
+                          [module.id]: !prev[module.id as keyof typeof prev]
+                        }))}
+                      >
+                        <div className="flex items-start gap-3">
+                          <Checkbox checked={isSelected} className="mt-0.5" />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Icon className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                              <span className="font-medium text-neutral-900 text-sm truncate">
+                                {module.name}
+                              </span>
+                            </div>
+                            <p className="text-xs text-neutral-500 line-clamp-2">{module.description}</p>
+                            <div className="flex items-center gap-2 mt-2">
+                              <code className="text-xs text-purple-600 truncate">
+                                {module.odooModule}
+                              </code>
+                              {module.count > 0 && (
+                                <Badge variant="secondary" className="text-xs">
+                                  {module.count}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        <p className="text-sm text-neutral-500">{module.description}</p>
-                        <code className="text-xs text-purple-600 mt-2 block">
-                          → {module.odooModule}
-                        </code>
                       </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </CardContent>
         </Card>
 
         {/* Transfer Methods */}
         <Tabs defaultValue="export" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="export" className="flex items-center gap-2">
               <Download className="w-4 h-4" />
-              Manual Export
+              Export
             </TabsTrigger>
             <TabsTrigger value="webhook" className="flex items-center gap-2">
               <Webhook className="w-4 h-4" />
@@ -396,7 +782,11 @@ const OdooTransferPortal = () => {
             </TabsTrigger>
             <TabsTrigger value="api" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
-              API Integration
+              API
+            </TabsTrigger>
+            <TabsTrigger value="history" className="flex items-center gap-2">
+              <History className="w-4 h-4" />
+              History
             </TabsTrigger>
           </TabsList>
 
@@ -504,7 +894,15 @@ const OdooTransferPortal = () => {
           <TabsContent value="api">
             <Card>
               <CardHeader>
-                <CardTitle>Direct API Integration</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  Direct API Integration
+                  {apiConnected && (
+                    <Badge className="bg-green-100 text-green-700 ml-2">
+                      <CheckCircle2 className="w-3 h-3 mr-1" />
+                      Connected
+                    </Badge>
+                  )}
+                </CardTitle>
                 <CardDescription>
                   Connect directly to Odoo's XML-RPC API for real-time synchronization
                 </CardDescription>
@@ -550,18 +948,34 @@ const OdooTransferPortal = () => {
                   </div>
                 </div>
 
-                <Button 
-                  onClick={handleApiTransfer}
-                  className="w-full"
-                  disabled={transferStatus.status === 'loading'}
-                >
-                  {transferStatus.status === 'loading' ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                  )}
-                  Sync with Odoo
-                </Button>
+                <div className="flex gap-3">
+                  <Button 
+                    variant="outline"
+                    onClick={handleTestConnection}
+                    disabled={apiTestLoading}
+                    className="flex-1"
+                  >
+                    {apiTestLoading ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Database className="w-4 h-4 mr-2" />
+                    )}
+                    Test Connection
+                  </Button>
+                  
+                  <Button 
+                    onClick={handleApiTransfer}
+                    className="flex-1"
+                    disabled={transferStatus.status === 'loading' || !apiConnected}
+                  >
+                    {transferStatus.status === 'loading' ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                    )}
+                    Sync with Odoo
+                  </Button>
+                </div>
 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <h4 className="font-medium text-blue-800 mb-2">Getting Your API Key</h4>
@@ -575,6 +989,15 @@ const OdooTransferPortal = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* History Tab */}
+          <TabsContent value="history">
+            <OdooSyncDashboard 
+              logs={syncLogs}
+              onClearLogs={() => setSyncLogs([])}
+              onRefresh={fetchDataCounts}
+            />
           </TabsContent>
         </Tabs>
 
