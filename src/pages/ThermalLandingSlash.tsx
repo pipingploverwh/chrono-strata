@@ -5,6 +5,7 @@ import { ArrowUpRight, Volume2, VolumeX } from 'lucide-react';
 import thermalDemoVideo from '@/assets/thermal-demo.mp4';
 import SpatialAudioCAD, { VINYL_COLLECTION, VinylRecord } from '@/components/SpatialAudioCAD';
 import ThermalNavigation from '@/components/ThermalNavigation';
+import ThermalFooter from '@/components/ThermalFooter';
 
 const ThermalLandingSlash = () => {
   const [temperature, setTemperature] = useState(35);
@@ -368,11 +369,8 @@ const ThermalLandingSlash = () => {
         </Link>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 px-8 flex justify-between items-center border-t border-white/5">
-        <span className="text-xs opacity-30 font-mono">© 2024</span>
-        <span className="text-xs opacity-30 font-mono">THERMAL RESONANCE SYSTEM</span>
-      </footer>
+      {/* Unified Thermal Footer */}
+      <ThermalFooter />
     </div>
   );
 };

@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import thermalDemoVideo from '@/assets/thermal-demo.mp4';
 import ThermalNavigation from '@/components/ThermalNavigation';
+import ThermalFooter from '@/components/ThermalFooter';
 
 // Demo audio URL - using a free sample track
 const DEMO_AUDIO_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
@@ -950,20 +951,8 @@ const ThermalVisualizerLanding = () => {
         </div>
       </section>
 
-      {/* Footer - Kuma layered */}
-      <footer className="relative py-8 px-6 text-center">
-        {/* Kuma strata line */}
-        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.05] to-transparent" />
-        
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <div className="w-4 h-px bg-orange-500/20" />
-          <div className="w-0.5 h-0.5 rotate-45 bg-orange-500/30" />
-          <div className="w-4 h-px bg-orange-500/20" />
-        </div>
-        <p className="text-sm" style={{ color: 'hsl(30 15% 40%)' }}>
-          THERMAL RESONANCE SYSTEM™ • Patent Pending: TRS-2024
-        </p>
-      </footer>
+      {/* Unified Thermal Footer */}
+      <ThermalFooter />
     </div>
   );
 };
