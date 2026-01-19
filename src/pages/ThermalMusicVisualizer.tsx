@@ -7,6 +7,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import StrataEmbeddedDisplay from '@/components/strata/StrataEmbeddedDisplay';
 import WaveformVisualization from '@/components/strata/WaveformVisualization';
 import PsychoacousticVisualization from '@/components/PsychoacousticVisualization';
+import LavandarBackground from '@/components/LavandarBackground';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 // ═══════════════════════════════════════════════════════════════════════════
@@ -496,42 +497,42 @@ const ThermalMusicVisualizer = () => {
     });
   }, []);
 
-  // Get color based on temperature - Physics-based black-body radiation
-  // Based on Planck's law color temperature approximation
+  // Get color based on temperature - Lavandar palette (purple/violet hues)
+  // Matches the landing page aesthetic
   const getThermalColor = (temp: number): string => {
     const [minTemp, maxTemp] = PHYSICS.TEMP_RANGE;
     const normalized = (temp - minTemp) / (maxTemp - minTemp);
     
-    // Black-body radiation color stages (simplified)
+    // Lavandar color stages (cool purples to warm magentas)
     if (normalized < 0.15) {
-      // Cold - Deep indigo/black (below visible glow)
-      const l = 5 + normalized * 60;
-      return `hsl(260, 40%, ${l}%)`;
+      // Cold - Deep violet/purple
+      const l = 15 + normalized * 40;
+      return `hsl(270, 50%, ${l}%)`;
     } else if (normalized < 0.25) {
-      // Warming - Dark red (Draper point ~525°C equivalent)
+      // Warming - Richer purple
       const progress = (normalized - 0.15) / 0.1;
-      const h = 260 - progress * 250; // Shift from purple to red
-      return `hsl(${h}, 60%, ${15 + progress * 15}%)`;
+      const h = 270 + progress * 10;
+      return `hsl(${h}, ${50 + progress * 15}%, ${20 + progress * 15}%)`;
     } else if (normalized < 0.4) {
-      // Cherry red - First visible glow
+      // Purple to violet
       const progress = (normalized - 0.25) / 0.15;
-      return `hsl(${10 - progress * 5}, ${60 + progress * 20}%, ${30 + progress * 15}%)`;
+      return `hsl(${280 + progress * 10}, ${65 + progress * 10}%, ${35 + progress * 15}%)`;
     } else if (normalized < 0.55) {
-      // Bright cherry to orange
+      // Violet to magenta
       const progress = (normalized - 0.4) / 0.15;
-      return `hsl(${5 + progress * 20}, 85%, ${45 + progress * 10}%)`;
+      return `hsl(${290 + progress * 15}, 75%, ${50 + progress * 10}%)`;
     } else if (normalized < 0.7) {
-      // Orange to yellow-orange
+      // Magenta to pink-magenta
       const progress = (normalized - 0.55) / 0.15;
-      return `hsl(${25 + progress * 20}, 95%, ${55 + progress * 10}%)`;
+      return `hsl(${305 + progress * 10}, ${75 + progress * 10}%, ${60 + progress * 10}%)`;
     } else if (normalized < 0.85) {
-      // Yellow-orange to yellow-white
+      // Pink-magenta to bright pink
       const progress = (normalized - 0.7) / 0.15;
-      return `hsl(${45 + progress * 10}, ${95 - progress * 20}%, ${65 + progress * 15}%)`;
+      return `hsl(${315 + progress * 5}, ${85 - progress * 10}%, ${70 + progress * 10}%)`;
     } else {
-      // White-hot (approaching 1400°C+ equivalent)
+      // Bright pink to luminous white-pink
       const progress = (normalized - 0.85) / 0.15;
-      return `hsl(${55 - progress * 10}, ${75 - progress * 50}%, ${80 + progress * 18}%)`;
+      return `hsl(${320 - progress * 10}, ${75 - progress * 30}%, ${80 + progress * 15}%)`;
     }
   };
 
@@ -729,7 +730,8 @@ const ThermalMusicVisualizer = () => {
   }, []);
 
   return (
-    <div className={`min-h-screen text-white overflow-hidden transition-all duration-500 ${isFullscreen ? 'fixed inset-0 z-[100]' : ''}`} style={{ background: 'hsl(15 30% 6%)' }}>
+    <div className={`min-h-screen text-white overflow-hidden transition-all duration-500 ${isFullscreen ? 'fixed inset-0 z-[100]' : ''}`} style={{ background: 'hsl(270 30% 6%)' }}>
+      <LavandarBackground variant="dark" showWaves={true} showPolygons={true} intensity={0.7} />
       <audio ref={audioRef} />
       
       {/* Fullscreen Immersive Mode */}
@@ -744,11 +746,11 @@ const ThermalMusicVisualizer = () => {
                 variant="ghost"
                 size="icon"
                 className="w-8 h-8 sm:w-10 sm:h-10 rounded-full backdrop-blur-xl border hover:opacity-80"
-                style={{ background: 'hsl(20 25% 8% / 0.9)', borderColor: 'hsl(30 30% 25%)' }}
+                style={{ background: 'hsl(280 25% 12% / 0.9)', borderColor: 'hsl(280 30% 30%)' }}
               >
-                <X className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: 'hsl(40 30% 85%)' }} />
+                <X className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: 'hsl(300 40% 85%)' }} />
               </Button>
-              <span className="hidden sm:block text-xs sm:text-sm font-light tracking-[0.2em] sm:tracking-[0.3em] opacity-80" style={{ color: 'hsl(24 100% 50%)' }}>
+              <span className="hidden sm:block text-xs sm:text-sm font-light tracking-[0.2em] sm:tracking-[0.3em] opacity-80" style={{ color: 'hsl(300 70% 70%)' }}>
                 THERMAL RESONANCE
               </span>
             </div>
@@ -760,8 +762,8 @@ const ThermalMusicVisualizer = () => {
                 disabled={!audioFile}
                 className="w-10 h-10 sm:w-12 sm:h-12 rounded-full disabled:opacity-50"
                 style={{ 
-                  background: 'linear-gradient(135deg, hsl(0 70% 45%) 0%, hsl(24 100% 50%) 100%)',
-                  boxShadow: '0 0 20px hsl(24 100% 50% / 0.4)'
+                  background: 'linear-gradient(135deg, hsl(280 60% 45%) 0%, hsl(320 70% 55%) 100%)',
+                  boxShadow: '0 0 20px hsl(300 70% 50% / 0.4)'
                 }}
               >
                 {isPlaying ? <Pause className="w-4 h-4 sm:w-5 sm:h-5" /> : <Play className="w-4 h-4 sm:w-5 sm:h-5 ml-0.5" />}
@@ -769,9 +771,9 @@ const ThermalMusicVisualizer = () => {
               <div 
                 className="px-2 sm:px-4 py-1.5 sm:py-2 backdrop-blur-xl rounded-lg font-mono text-sm sm:text-lg font-bold"
                 style={{ 
-                  background: 'hsl(20 25% 8% / 0.9)', 
+                  background: 'hsl(280 25% 12% / 0.9)', 
                   borderWidth: '1px',
-                  borderColor: 'hsl(30 30% 25%)',
+                  borderColor: 'hsl(280 30% 30%)',
                   color: getThermalColor(globalTemp) 
                 }}
               >
@@ -1001,7 +1003,7 @@ const ThermalMusicVisualizer = () => {
             </div>
 
             {/* Bottom metrics bar - responsive */}
-            <div className="absolute bottom-0 left-0 right-0 pt-8 sm:pt-16 pb-3 sm:pb-6 px-3 sm:px-8" style={{ background: 'linear-gradient(to top, hsl(15 30% 6%) 0%, hsl(15 30% 6% / 0.8) 50%, transparent 100%)' }}>
+            <div className="absolute bottom-0 left-0 right-0 pt-8 sm:pt-16 pb-3 sm:pb-6 px-3 sm:px-8" style={{ background: 'linear-gradient(to top, hsl(270 30% 6%) 0%, hsl(270 30% 6% / 0.8) 50%, transparent 100%)' }}>
               <div className="max-w-6xl mx-auto">
                 {/* Spectral bars - responsive count and size */}
                 <div className="hidden sm:flex items-end justify-center gap-0.5 sm:gap-1 h-16 sm:h-24 mb-2 sm:mb-4">
@@ -1024,39 +1026,39 @@ const ThermalMusicVisualizer = () => {
                 </div>
                 
                 {/* Metrics row - responsive layout */}
-                <div className="flex items-center justify-between text-xs sm:text-sm font-mono" style={{ color: 'hsl(40 30% 85%)' }}>
+                <div className="flex items-center justify-between text-xs sm:text-sm font-mono" style={{ color: 'hsl(300 40% 85%)' }}>
                   {/* Left metrics */}
                   <div className="flex items-center gap-3 sm:gap-8">
                     <div>
-                      <span style={{ color: 'hsl(30 20% 50%)' }} className="text-[10px] sm:text-sm">BPM</span>
+                      <span style={{ color: 'hsl(280 30% 55%)' }} className="text-[10px] sm:text-sm">BPM</span>
                       <span className="ml-1 sm:ml-2 text-sm sm:text-lg font-bold" style={{ color: getThermalColor(globalTemp) }}>{bpm || '---'}</span>
                     </div>
                     <div className="hidden sm:block">
-                      <span style={{ color: 'hsl(30 20% 50%)' }}>ENERGY</span>
+                      <span style={{ color: 'hsl(280 30% 55%)' }}>ENERGY</span>
                       <span className="ml-2 text-lg font-bold" style={{ color: getThermalColor(globalTemp) }}>{(spectralData.energy * 100).toFixed(0)}%</span>
                     </div>
                   </div>
                   
                   {/* Center hint - desktop only */}
-                  <div className="hidden md:block text-xs" style={{ color: 'hsl(30 15% 40%)' }}>
-                    <kbd className="px-1.5 py-0.5 rounded mx-1" style={{ background: 'hsl(20 25% 15%)' }}>ESC</kbd> exit
+                  <div className="hidden md:block text-xs" style={{ color: 'hsl(280 20% 45%)' }}>
+                    <kbd className="px-1.5 py-0.5 rounded mx-1" style={{ background: 'hsl(280 25% 18%)' }}>ESC</kbd> exit
                     <span className="mx-2">•</span>
-                    <kbd className="px-1.5 py-0.5 rounded mx-1" style={{ background: 'hsl(20 25% 15%)' }}>SPACE</kbd> play
+                    <kbd className="px-1.5 py-0.5 rounded mx-1" style={{ background: 'hsl(280 25% 18%)' }}>SPACE</kbd> play
                   </div>
                   
                   {/* Right metrics */}
                   <div className="flex items-center gap-2 sm:gap-8">
                     <div>
-                      <span style={{ color: 'hsl(30 20% 50%)' }} className="text-[10px] sm:text-sm">LOW</span>
-                      <span className="ml-1 sm:ml-2 text-sm sm:text-lg font-bold" style={{ color: 'hsl(0 70% 55%)' }}>{spectralData.low.toFixed(0)}%</span>
+                      <span style={{ color: 'hsl(280 30% 55%)' }} className="text-[10px] sm:text-sm">LOW</span>
+                      <span className="ml-1 sm:ml-2 text-sm sm:text-lg font-bold" style={{ color: 'hsl(270 70% 60%)' }}>{spectralData.low.toFixed(0)}%</span>
                     </div>
                     <div className="hidden xs:block">
-                      <span style={{ color: 'hsl(30 20% 50%)' }} className="text-[10px] sm:text-sm">MID</span>
-                      <span className="ml-1 sm:ml-2 text-sm sm:text-lg font-bold" style={{ color: 'hsl(40 100% 50%)' }}>{spectralData.mid.toFixed(0)}%</span>
+                      <span style={{ color: 'hsl(280 30% 55%)' }} className="text-[10px] sm:text-sm">MID</span>
+                      <span className="ml-1 sm:ml-2 text-sm sm:text-lg font-bold" style={{ color: 'hsl(300 70% 65%)' }}>{spectralData.mid.toFixed(0)}%</span>
                     </div>
                     <div>
-                      <span style={{ color: 'hsl(30 20% 50%)' }} className="text-[10px] sm:text-sm">HIGH</span>
-                      <span className="ml-1 sm:ml-2 text-sm sm:text-lg font-bold" style={{ color: 'hsl(45 100% 85%)' }}>{spectralData.high.toFixed(0)}%</span>
+                      <span style={{ color: 'hsl(280 30% 55%)' }} className="text-[10px] sm:text-sm">HIGH</span>
+                      <span className="ml-1 sm:ml-2 text-sm sm:text-lg font-bold" style={{ color: 'hsl(320 70% 80%)' }}>{spectralData.high.toFixed(0)}%</span>
                     </div>
                   </div>
                 </div>
@@ -1067,23 +1069,23 @@ const ThermalMusicVisualizer = () => {
       ) : (
         <>
           {/* Header */}
-          <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl" style={{ background: 'hsl(15 30% 6% / 0.9)', borderBottom: '1px solid hsl(30 30% 15% / 0.5)' }}>
+          <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl" style={{ background: 'hsl(270 30% 8% / 0.9)', borderBottom: '1px solid hsl(280 30% 20% / 0.5)' }}>
             <div className="container mx-auto px-6 h-16 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <Link to="/" className="flex items-center gap-2 transition-colors hover:opacity-80" style={{ color: 'hsl(40 30% 65%)' }}>
+                <Link to="/" className="flex items-center gap-2 transition-colors hover:opacity-80" style={{ color: 'hsl(300 30% 70%)' }}>
                   <ArrowLeft className="w-4 h-4" />
                   <span className="text-sm">Back</span>
                 </Link>
-                <div className="h-4 w-px" style={{ background: 'hsl(30 30% 25%)' }} />
-                <span className="text-sm font-light tracking-[0.3em]" style={{ color: 'hsl(24 100% 50%)' }}>THERMAL RESONANCE</span>
+                <div className="h-4 w-px" style={{ background: 'hsl(280 30% 30%)' }} />
+                <span className="text-sm font-light tracking-[0.3em]" style={{ color: 'hsl(300 70% 70%)' }}>THERMAL RESONANCE</span>
               </div>
-              <div className="flex items-center gap-6 text-sm" style={{ color: 'hsl(40 30% 65%)' }}>
+              <div className="flex items-center gap-6 text-sm" style={{ color: 'hsl(300 30% 70%)' }}>
                 <Button
                   onClick={() => setIsFullscreen(true)}
                   variant="ghost"
                   size="sm"
                   className="flex items-center gap-2 hover:opacity-80"
-                  style={{ color: 'hsl(45 70% 55%)' }}
+                  style={{ color: 'hsl(320 70% 65%)' }}
                 >
                   <Maximize2 className="w-4 h-4" />
                   <span>Immersive Mode</span>
@@ -1097,13 +1099,13 @@ const ThermalMusicVisualizer = () => {
             <div className="max-w-7xl mx-auto">
               {/* Title Section */}
               <div className="text-center mb-12">
-                <h1 className="text-5xl md:text-6xl font-extralight tracking-wide mb-4" style={{ color: 'hsl(40 30% 85%)' }}>
-                  Music <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(to right, hsl(0 70% 45%), hsl(24 100% 50%), hsl(45 100% 85%))' }}>Temperature</span> Visualizer
+                <h1 className="text-5xl md:text-6xl font-extralight tracking-wide mb-4" style={{ color: 'hsl(300 40% 90%)' }}>
+                  Music <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(to right, hsl(280 60% 55%), hsl(300 70% 70%), hsl(320 70% 85%))' }}>Temperature</span> Visualizer
                 </h1>
-                <p className="max-w-2xl mx-auto" style={{ color: 'hsl(30 20% 55%)' }}>
+                <p className="max-w-2xl mx-auto" style={{ color: 'hsl(280 25% 60%)' }}>
                   Proprietary thermal mapping algorithm converts audio spectral energy into 
-                  real-time material temperature response. Watch the console ignite from simmering 
-                  embers to blazing white-hot intensity based on your music's energy.
+                  real-time material temperature response. Watch the console shift from deep 
+                  violet to luminous magenta based on your music's energy.
                 </p>
               </div>
 
@@ -1113,12 +1115,12 @@ const ThermalMusicVisualizer = () => {
                   <label 
                     className="flex items-center gap-2 px-6 py-3 rounded-lg cursor-pointer transition-all hover:opacity-90"
                     style={{ 
-                      background: 'hsl(15 40% 12%)', 
-                      border: '1px solid hsl(30 30% 25%)',
+                      background: 'hsl(280 30% 15%)', 
+                      border: '1px solid hsl(280 30% 30%)',
                     }}
                   >
-                    <Upload className="w-5 h-5" style={{ color: 'hsl(24 100% 50%)' }} />
-                    <span style={{ color: 'hsl(40 30% 75%)' }}>{audioFile ? audioFile.name : 'Upload Audio File'}</span>
+                    <Upload className="w-5 h-5" style={{ color: 'hsl(300 70% 70%)' }} />
+                    <span style={{ color: 'hsl(300 40% 80%)' }}>{audioFile ? audioFile.name : 'Upload Audio File'}</span>
                     <input type="file" accept="audio/*" onChange={handleFileUpload} className="hidden" />
                   </label>
                   <Button
@@ -1126,8 +1128,8 @@ const ThermalMusicVisualizer = () => {
                     disabled={!audioFile}
                     className="w-14 h-14 rounded-full disabled:opacity-50"
                     style={{ 
-                      background: 'linear-gradient(135deg, hsl(0 70% 45%) 0%, hsl(24 100% 50%) 100%)',
-                      boxShadow: '0 0 25px hsl(24 100% 50% / 0.4)'
+                      background: 'linear-gradient(135deg, hsl(280 60% 45%) 0%, hsl(320 70% 55%) 100%)',
+                      boxShadow: '0 0 25px hsl(300 70% 50% / 0.4)'
                     }}
                   >
                     {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-1" />}
@@ -1137,8 +1139,8 @@ const ThermalMusicVisualizer = () => {
                     variant="outline"
                     className="flex items-center gap-2 hover:opacity-90"
                     style={{ 
-                      borderColor: 'hsl(45 70% 45% / 0.5)', 
-                      color: 'hsl(45 70% 55%)',
+                      borderColor: 'hsl(300 50% 45% / 0.5)', 
+                      color: 'hsl(300 60% 65%)',
                       background: 'transparent'
                     }}
                   >
@@ -1217,16 +1219,16 @@ const ThermalMusicVisualizer = () => {
                   </div>
                 )}
                 
-                <p className="text-xs" style={{ color: 'hsl(30 15% 40%)' }}>Press <kbd className="px-1.5 py-0.5 rounded" style={{ background: 'hsl(20 25% 15%)', color: 'hsl(40 30% 65%)' }}>F</kbd> for fullscreen</p>
+                <p className="text-xs" style={{ color: 'hsl(280 20% 45%)' }}>Press <kbd className="px-1.5 py-0.5 rounded" style={{ background: 'hsl(280 25% 18%)', color: 'hsl(300 40% 70%)' }}>F</kbd> for fullscreen</p>
               </div>
 
           {/* Main Visualization */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* DJ Console Thermal View */}
             <div className="lg:col-span-2">
-              <div className="rounded-2xl p-6 backdrop-blur-xl" style={{ background: 'hsl(20 25% 8% / 0.5)', border: '1px solid hsl(30 30% 20%)' }}>
-                <h3 className="text-sm font-medium mb-4 flex items-center gap-2" style={{ color: 'hsl(40 30% 65%)' }}>
-                  <Thermometer className="w-4 h-4" style={{ color: 'hsl(24 100% 50%)' }} />
+              <div className="rounded-2xl p-6 backdrop-blur-xl" style={{ background: 'hsl(280 25% 10% / 0.5)', border: '1px solid hsl(280 30% 25%)' }}>
+                <h3 className="text-sm font-medium mb-4 flex items-center gap-2" style={{ color: 'hsl(300 40% 70%)' }}>
+                  <Thermometer className="w-4 h-4" style={{ color: 'hsl(300 70% 70%)' }} />
                   THERMAL MATERIAL RESPONSE
                 </h3>
                 
@@ -1247,7 +1249,7 @@ const ThermalMusicVisualizer = () => {
                   />
                   
                   {/* Console body outline */}
-                  <div className="absolute inset-4 rounded-2xl border-2 backdrop-blur-sm" style={{ borderColor: 'hsl(40 30% 85% / 0.2)', background: 'hsl(15 30% 6% / 0.3)' }}>
+                  <div className="absolute inset-4 rounded-2xl border-2 backdrop-blur-sm" style={{ borderColor: 'hsl(300 40% 85% / 0.2)', background: 'hsl(270 30% 8% / 0.3)' }}>
                     {/* Thermal zones */}
                     {thermalZones.map(zone => (
                       <div
@@ -1304,9 +1306,9 @@ const ThermalMusicVisualizer = () => {
                   </div>
 
                   {/* Temperature overlay */}
-                  <div className="absolute top-4 right-4 backdrop-blur-xl rounded-lg px-4 py-2" style={{ background: 'hsl(15 30% 6% / 0.8)', border: '1px solid hsl(30 30% 25%)' }}>
+                  <div className="absolute top-4 right-4 backdrop-blur-xl rounded-lg px-4 py-2" style={{ background: 'hsl(280 30% 10% / 0.8)', border: '1px solid hsl(280 30% 30%)' }}>
                     <div className="flex items-center gap-3">
-                      <Thermometer className="w-5 h-5" style={{ color: 'hsl(24 100% 50%)' }} />
+                      <Thermometer className="w-5 h-5" style={{ color: 'hsl(300 70% 70%)' }} />
                       <span 
                         className="text-2xl font-mono font-bold"
                         style={{ color: getThermalColor(globalTemp) }}
@@ -1320,7 +1322,7 @@ const ThermalMusicVisualizer = () => {
                   <div className="absolute bottom-4 left-4 right-4 flex justify-around">
                     {thermalZones.slice(0, 3).map(zone => (
                       <div key={zone.id} className="text-center">
-                        <div className="text-xs mb-1" style={{ color: 'hsl(40 30% 85% / 0.6)' }}>{zone.name}</div>
+                        <div className="text-xs mb-1" style={{ color: 'hsl(300 40% 85% / 0.6)' }}>{zone.name}</div>
                         <div 
                           className="text-sm font-mono font-bold"
                           style={{ color: getThermalColor(zone.temperature) }}
@@ -1334,8 +1336,8 @@ const ThermalMusicVisualizer = () => {
 
                 {/* STRATA Display Section */}
                 <div className="mt-6">
-                  <h4 className="text-sm font-medium mb-4 flex items-center gap-2" style={{ color: 'hsl(40 30% 65%)' }}>
-                    <Monitor className="w-4 h-4" style={{ color: 'hsl(24 100% 50%)' }} />
+                  <h4 className="text-sm font-medium mb-4 flex items-center gap-2" style={{ color: 'hsl(300 40% 70%)' }}>
+                    <Monitor className="w-4 h-4" style={{ color: 'hsl(300 70% 70%)' }} />
                     STRATA EMBEDDED DISPLAYS — Live Thermal Response
                   </h4>
                   <div className="grid grid-cols-3 gap-4">
@@ -1361,31 +1363,31 @@ const ThermalMusicVisualizer = () => {
                       displayId="right"
                     />
                   </div>
-                  <p className="text-xs mt-3 text-center" style={{ color: 'hsl(30 20% 45%)' }}>
+                  <p className="text-xs mt-3 text-center" style={{ color: 'hsl(280 25% 50%)' }}>
                     STRATA displays adapt color temperature and glow intensity based on real-time audio spectral analysis
                   </p>
                 </div>
 
-                {/* Temperature Scale - Updated to warm palette */}
+                {/* Temperature Scale - Updated to Lavandar palette */}
                 <div className="mt-4 relative h-6">
                   <div 
                     className="absolute inset-0 rounded-full"
                     style={{
                       background: `linear-gradient(to right, 
-                        hsl(15, 60%, 20%) 0%, 
-                        hsl(5, 70%, 40%) 25%, 
-                        hsl(18, 85%, 50%) 50%, 
-                        hsl(35, 95%, 55%) 75%, 
-                        hsl(45, 100%, 85%) 100%)`
+                        hsl(270, 50%, 20%) 0%, 
+                        hsl(280, 60%, 40%) 25%, 
+                        hsl(295, 70%, 55%) 50%, 
+                        hsl(310, 75%, 65%) 75%, 
+                        hsl(320, 70%, 85%) 100%)`
                     }}
                   />
                   <div className="absolute inset-0 flex justify-between items-center px-4 text-xs font-mono">
-                    <span style={{ color: 'hsl(15 40% 70%)' }}>{PHYSICS.TEMP_RANGE[0]}°C</span>
-                    <span style={{ color: 'hsl(5 60% 70%)' }}>5°C</span>
-                    <span style={{ color: 'hsl(15 80% 80%)' }}>25°C</span>
-                    <span style={{ color: 'hsl(30 90% 70%)' }}>45°C</span>
-                    <span style={{ color: 'hsl(40 100% 75%)' }}>65°C</span>
-                    <span style={{ color: 'hsl(45 100% 90%)' }}>{PHYSICS.TEMP_RANGE[1]}°C</span>
+                    <span style={{ color: 'hsl(270 50% 70%)' }}>{PHYSICS.TEMP_RANGE[0]}°C</span>
+                    <span style={{ color: 'hsl(280 60% 70%)' }}>5°C</span>
+                    <span style={{ color: 'hsl(295 70% 80%)' }}>25°C</span>
+                    <span style={{ color: 'hsl(310 70% 75%)' }}>45°C</span>
+                    <span style={{ color: 'hsl(315 70% 80%)' }}>65°C</span>
+                    <span style={{ color: 'hsl(320 70% 90%)' }}>{PHYSICS.TEMP_RANGE[1]}°C</span>
                   </div>
                 </div>
               </div>
@@ -1402,32 +1404,32 @@ const ThermalMusicVisualizer = () => {
               />
 
               {/* Energy Metrics */}
-              <div className="rounded-2xl p-6 backdrop-blur-xl" style={{ background: 'hsl(20 25% 8% / 0.5)', border: '1px solid hsl(30 30% 20%)' }}>
-                <h3 className="text-sm font-medium mb-4 flex items-center gap-2" style={{ color: 'hsl(40 30% 65%)' }}>
-                  <Volume2 className="w-4 h-4" style={{ color: 'hsl(24 100% 50%)' }} />
+              <div className="rounded-2xl p-6 backdrop-blur-xl" style={{ background: 'hsl(280 25% 10% / 0.5)', border: '1px solid hsl(280 30% 25%)' }}>
+                <h3 className="text-sm font-medium mb-4 flex items-center gap-2" style={{ color: 'hsl(300 40% 70%)' }}>
+                  <Volume2 className="w-4 h-4" style={{ color: 'hsl(300 70% 70%)' }} />
                   PROPRIETARY METRICS
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="rounded-lg p-4 text-center" style={{ background: 'hsl(20 25% 12% / 0.5)' }}>
-                    <div className="text-xs mb-1" style={{ color: 'hsl(30 20% 50%)' }}>Energy Density</div>
-                    <div className="text-2xl font-mono font-bold" style={{ color: 'hsl(24 100% 50%)' }}>
+                  <div className="rounded-lg p-4 text-center" style={{ background: 'hsl(280 25% 15% / 0.5)' }}>
+                    <div className="text-xs mb-1" style={{ color: 'hsl(280 30% 55%)' }}>Energy Density</div>
+                    <div className="text-2xl font-mono font-bold" style={{ color: 'hsl(300 70% 70%)' }}>
                       {(spectralData.energy * 100).toFixed(1)}
                     </div>
                   </div>
-                  <div className="rounded-lg p-4 text-center" style={{ background: 'hsl(20 25% 12% / 0.5)' }}>
-                    <div className="text-xs mb-1" style={{ color: 'hsl(30 20% 50%)' }}>Est. BPM</div>
-                    <div className="text-2xl font-mono font-bold" style={{ color: 'hsl(40 100% 50%)' }}>
+                  <div className="rounded-lg p-4 text-center" style={{ background: 'hsl(280 25% 15% / 0.5)' }}>
+                    <div className="text-xs mb-1" style={{ color: 'hsl(280 30% 55%)' }}>Est. BPM</div>
+                    <div className="text-2xl font-mono font-bold" style={{ color: 'hsl(310 70% 65%)' }}>
                       {bpm || '---'}
                     </div>
                   </div>
-                  <div className="rounded-lg p-4 text-center" style={{ background: 'hsl(20 25% 12% / 0.5)' }}>
-                    <div className="text-xs mb-1" style={{ color: 'hsl(30 20% 50%)' }}>Peak Energy</div>
-                    <div className="text-2xl font-mono font-bold" style={{ color: 'hsl(45 100% 75%)' }}>
+                  <div className="rounded-lg p-4 text-center" style={{ background: 'hsl(280 25% 15% / 0.5)' }}>
+                    <div className="text-xs mb-1" style={{ color: 'hsl(280 30% 55%)' }}>Peak Energy</div>
+                    <div className="text-2xl font-mono font-bold" style={{ color: 'hsl(320 70% 80%)' }}>
                       {(peakEnergy * 100).toFixed(1)}%
                     </div>
                   </div>
-                  <div className="rounded-lg p-4 text-center" style={{ background: 'hsl(20 25% 12% / 0.5)' }}>
-                    <div className="text-xs mb-1" style={{ color: 'hsl(30 20% 50%)' }}>Thermal Δ</div>
+                  <div className="rounded-lg p-4 text-center" style={{ background: 'hsl(280 25% 15% / 0.5)' }}>
+                    <div className="text-xs mb-1" style={{ color: 'hsl(280 30% 55%)' }}>Thermal Δ</div>
                     <div className="text-2xl font-mono font-bold" style={{ color: getThermalColor(globalTemp) }}>
                       {(globalTemp - PHYSICS.AMBIENT_TEMP) > 0 ? '+' : ''}{(globalTemp - PHYSICS.AMBIENT_TEMP).toFixed(1)}°
                     </div>
@@ -1625,28 +1627,28 @@ const ThermalMusicVisualizer = () => {
               )}
 
               {/* Algorithm Info */}
-              <div className="rounded-2xl p-6 backdrop-blur-xl" style={{ background: 'hsl(20 25% 8% / 0.5)', border: '1px solid hsl(30 30% 20%)' }}>
-                <h3 className="text-sm font-medium mb-4" style={{ color: 'hsl(40 30% 65%)' }}>THERMAL RESONANCE SYSTEM™</h3>
-                <div className="space-y-3 text-xs" style={{ color: 'hsl(30 20% 50%)' }}>
+              <div className="rounded-2xl p-6 backdrop-blur-xl" style={{ background: 'hsl(280 25% 10% / 0.5)', border: '1px solid hsl(280 30% 25%)' }}>
+                <h3 className="text-sm font-medium mb-4" style={{ color: 'hsl(300 40% 70%)' }}>THERMAL RESONANCE SYSTEM™</h3>
+                <div className="space-y-3 text-xs" style={{ color: 'hsl(280 30% 55%)' }}>
                   <div className="flex justify-between">
                     <span>Energy Conversion</span>
-                    <span className="font-mono" style={{ color: 'hsl(40 30% 65%)' }}>{PHYSICS.ENERGY_TO_HEAT}</span>
+                    <span className="font-mono" style={{ color: 'hsl(300 40% 70%)' }}>{PHYSICS.ENERGY_TO_HEAT}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Thermal Inertia</span>
-                    <span className="font-mono" style={{ color: 'hsl(40 30% 65%)' }}>{PHYSICS.INERTIA_MASS}</span>
+                    <span className="font-mono" style={{ color: 'hsl(300 40% 70%)' }}>{PHYSICS.INERTIA_MASS}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Diffusion Rate</span>
-                    <span className="font-mono" style={{ color: 'hsl(40 30% 65%)' }}>{PHYSICS.DIFFUSION_RATE}</span>
+                    <span className="font-mono" style={{ color: 'hsl(300 40% 70%)' }}>{PHYSICS.DIFFUSION_RATE}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Sub-Bass Weight</span>
-                    <span className="font-mono" style={{ color: 'hsl(40 30% 65%)' }}>{SPECTRAL.THERMAL_WEIGHTS.SUB_BASS}x</span>
+                    <span className="font-mono" style={{ color: 'hsl(300 40% 70%)' }}>{SPECTRAL.THERMAL_WEIGHTS.SUB_BASS}x</span>
                   </div>
                 </div>
-                <div className="mt-4 pt-4" style={{ borderTop: '1px solid hsl(30 30% 20%)' }}>
-                  <p className="text-xs italic" style={{ color: 'hsl(30 15% 40%)' }}>
+                <div className="mt-4 pt-4" style={{ borderTop: '1px solid hsl(280 30% 25%)' }}>
+                  <p className="text-xs italic" style={{ color: 'hsl(280 25% 45%)' }}>
                     Material thermal response simulates phase-change alloy behavior 
                     in future STRATA-equipped consoles.
                   </p>
