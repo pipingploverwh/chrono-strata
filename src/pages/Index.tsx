@@ -1,12 +1,110 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { 
   ArrowRight, Shield, Lock, FileCheck, 
   CheckCircle, Clock, Package, Fingerprint,
-  BarChart3, Users, ShieldCheck, Sparkles
+  BarChart3, Users, ShieldCheck, Sparkles,
+  Linkedin, Building2, Zap, Brain, ExternalLink,
+  Timer, DollarSign, Cpu, TrendingUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import AllocationProtocol from "@/components/allocation/AllocationProtocol";
+import lavandarLogo from "@/assets/lavandar-logo.png";
+
+// AI Model Benchmarking Data
+interface ModelBenchmark {
+  id: string;
+  name: string;
+  provider: string;
+  responseTime: string;
+  tokensPerSecond: number;
+  inputCost: string;
+  outputCost: string;
+  tier: 'economy' | 'balanced' | 'premium';
+  bestFor: string[];
+}
+
+const AI_MODELS: ModelBenchmark[] = [
+  {
+    id: 'gemini-3-flash',
+    name: 'Gemini 3 Flash Preview',
+    provider: 'Google',
+    responseTime: '~180ms',
+    tokensPerSecond: 320,
+    inputCost: '$0.10/1M',
+    outputCost: '$0.40/1M',
+    tier: 'balanced',
+    bestFor: ['Chat', 'Fast inference', 'General tasks']
+  },
+  {
+    id: 'gemini-2.5-flash',
+    name: 'Gemini 2.5 Flash',
+    provider: 'Google',
+    responseTime: '~220ms',
+    tokensPerSecond: 280,
+    inputCost: '$0.075/1M',
+    outputCost: '$0.30/1M',
+    tier: 'economy',
+    bestFor: ['OCR', 'Image analysis', 'Multimodal']
+  },
+  {
+    id: 'gemini-2.5-flash-lite',
+    name: 'Gemini 2.5 Flash Lite',
+    provider: 'Google',
+    responseTime: '~120ms',
+    tokensPerSecond: 450,
+    inputCost: '$0.02/1M',
+    outputCost: '$0.08/1M',
+    tier: 'economy',
+    bestFor: ['Classification', 'High-volume', 'Simple tasks']
+  },
+  {
+    id: 'gemini-2.5-pro',
+    name: 'Gemini 2.5 Pro',
+    provider: 'Google',
+    responseTime: '~450ms',
+    tokensPerSecond: 150,
+    inputCost: '$1.25/1M',
+    outputCost: '$5.00/1M',
+    tier: 'premium',
+    bestFor: ['Complex reasoning', 'Large context', 'Analysis']
+  },
+  {
+    id: 'gpt-5',
+    name: 'GPT-5',
+    provider: 'OpenAI',
+    responseTime: '~380ms',
+    tokensPerSecond: 180,
+    inputCost: '$2.00/1M',
+    outputCost: '$8.00/1M',
+    tier: 'premium',
+    bestFor: ['Advanced reasoning', 'Code generation', 'Long context']
+  },
+  {
+    id: 'gpt-5-mini',
+    name: 'GPT-5 Mini',
+    provider: 'OpenAI',
+    responseTime: '~200ms',
+    tokensPerSecond: 260,
+    inputCost: '$0.40/1M',
+    outputCost: '$1.60/1M',
+    tier: 'balanced',
+    bestFor: ['Strong performance', 'Cost-effective', 'Multimodal']
+  },
+  {
+    id: 'gpt-5-nano',
+    name: 'GPT-5 Nano',
+    provider: 'OpenAI',
+    responseTime: '~100ms',
+    tokensPerSecond: 500,
+    inputCost: '$0.10/1M',
+    outputCost: '$0.40/1M',
+    tier: 'economy',
+    bestFor: ['Speed', 'High-volume', 'Efficient tasks']
+  },
+];
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -59,6 +157,14 @@ const LandingPage = () => {
     { value: "100%", label: "Audit Compliance" },
   ];
 
+  const getTierColor = (tier: ModelBenchmark['tier']) => {
+    switch (tier) {
+      case 'economy': return 'bg-status-approved/20 text-status-approved border-status-approved/30';
+      case 'balanced': return 'bg-lavender/20 text-lavender border-lavender/30';
+      case 'premium': return 'bg-primary/20 text-primary border-primary/30';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Fixed Header */}
@@ -68,13 +174,34 @@ const LandingPage = () => {
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 md:px-12 py-5 flex items-center justify-between">
-          <div className="font-medium text-sm tracking-[0.3em] uppercase text-foreground">
-            Lavandar
+          <div className="flex items-center gap-3">
+            <img src={lavandarLogo} alt="LAVANDAR" className="w-8 h-8 rounded-lg" />
+            <div>
+              <span className="font-medium text-sm tracking-[0.2em] uppercase text-foreground">LAVANDAR</span>
+              <span className="hidden md:block text-[9px] font-mono uppercase tracking-[0.15em] text-lavender/60">Enterprise AI Platform</span>
+            </div>
           </div>
-          <nav className="hidden md:flex items-center gap-10">
+          <nav className="hidden md:flex items-center gap-8">
             <a href="#how-it-works" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-lavender transition-colors">Process</a>
             <a href="#features" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-lavender transition-colors">Features</a>
+            <a href="#ai-models" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-lavender transition-colors">AI Models</a>
             <a href="#protocol" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-lavender transition-colors">Protocol</a>
+            <div className="flex items-center gap-3 border-l border-border pl-6">
+              <Link
+                to="/linkedin-company"
+                className="text-muted-foreground hover:text-[#0A66C2] transition-colors"
+                title="Company Page"
+              >
+                <Building2 className="w-4 h-4" />
+              </Link>
+              <Link
+                to="/linkedin-ceo"
+                className="text-muted-foreground hover:text-[#0A66C2] transition-colors"
+                title="CEO Profile"
+              >
+                <Linkedin className="w-4 h-4" />
+              </Link>
+            </div>
             <Button 
               onClick={() => navigate("/investor-hub")}
               className="bg-lavender hover:bg-lavender-glow text-primary-foreground text-xs tracking-widest uppercase px-6 py-2 rounded-none"
@@ -94,9 +221,15 @@ const LandingPage = () => {
         
         <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 grid lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-lavender/10 border border-lavender/20 rounded-full">
-              <div className="w-2 h-2 rounded-full bg-lavender animate-pulse" />
-              <span className="text-xs tracking-widest uppercase text-lavender">Secure Allocation Gateway</span>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-lavender/10 border border-lavender/20 rounded-full">
+                <div className="w-2 h-2 rounded-full bg-lavender animate-pulse" />
+                <span className="text-xs tracking-widest uppercase text-lavender">Enterprise AI Platform</span>
+              </div>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-status-approved/10 border border-status-approved/20 rounded-full">
+                <Zap className="w-3 h-3 text-status-approved" />
+                <span className="text-[10px] tracking-widest uppercase text-status-approved">7 AI Models</span>
+              </div>
             </div>
             
             <h1 className="text-[clamp(2.5rem,7vw,4.5rem)] font-medium leading-[1.05] tracking-tight">
@@ -108,13 +241,22 @@ const LandingPage = () => {
             </h1>
             
             <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg">
-              LAVANDAR replaces "Buy Now" commerce with an Application-to-Purchase protocol. 
-              Verified buyers. Serialized inventory. 
+              <span className="text-foreground font-medium">LAVANDAR</span> replaces "Buy Now" commerce with an Application-to-Purchase protocol. 
+              AI-powered verification. Serialized inventory. 
               <span className="text-foreground"> Enterprise-grade trust.</span>
             </p>
+
+            {/* Company Introduction */}
+            <div className="p-4 bg-surface-1/50 border border-border rounded-lg">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                <span className="text-lavender font-medium">LAVANDAR Technology</span> is an enterprise AI platform 
+                providing secure allocation protocols, weather intelligence, and operational automation. 
+                Our multi-model AI gateway powers mission-critical decisions across industries.
+              </p>
+            </div>
             
             <div className="flex flex-wrap gap-4">
-            <Button 
+            <Button
               onClick={() => navigate("/allocation-checkout")}
               className="bg-lavender hover:bg-lavender-glow text-primary-foreground text-xs tracking-widest uppercase px-8 py-6 rounded-none group"
             >
@@ -313,6 +455,114 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* AI Model Benchmarking Section */}
+      <section id="ai-models" className="py-32 bg-surface-1 border-y border-border">
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+          <div className="max-w-3xl mb-16">
+            <div className="flex items-center gap-2 mb-4">
+              <Brain className="w-5 h-5 text-lavender" />
+              <span className="text-xs tracking-widest uppercase text-lavender">AI Infrastructure</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-medium leading-tight mb-6">
+              Model
+              <br />
+              <span className="text-lavender">Benchmarks</span>
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              LAVANDAR's AI Gateway provides unified access to industry-leading models 
+              with automatic rate limiting, usage tracking, and cost optimization.
+            </p>
+          </div>
+
+          {/* Model Tier Legend */}
+          <div className="flex flex-wrap gap-4 mb-8">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-status-approved/50" />
+              <span className="text-xs text-muted-foreground">Economy — High-volume, cost-effective</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-lavender/50" />
+              <span className="text-xs text-muted-foreground">Balanced — Best price/performance</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-primary/50" />
+              <span className="text-xs text-muted-foreground">Premium — Maximum capability</span>
+            </div>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {AI_MODELS.map((model) => (
+              <Card 
+                key={model.id}
+                className="p-5 bg-card/50 backdrop-blur border-border hover:border-lavender/30 transition-all"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <Badge className={getTierColor(model.tier)}>
+                    {model.tier.charAt(0).toUpperCase() + model.tier.slice(1)}
+                  </Badge>
+                  <span className="text-[10px] text-muted-foreground font-mono">{model.provider}</span>
+                </div>
+                
+                <h3 className="font-medium text-foreground text-sm mb-3">{model.name}</h3>
+                
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-1.5 text-muted-foreground">
+                      <Timer className="w-3 h-3" />
+                      Response
+                    </span>
+                    <span className="text-foreground font-mono">{model.responseTime}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-1.5 text-muted-foreground">
+                      <TrendingUp className="w-3 h-3" />
+                      Tokens/sec
+                    </span>
+                    <span className="text-foreground font-mono">{model.tokensPerSecond}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-1.5 text-muted-foreground">
+                      <DollarSign className="w-3 h-3" />
+                      Input
+                    </span>
+                    <span className="text-foreground font-mono">{model.inputCost}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-1.5 text-muted-foreground">
+                      <DollarSign className="w-3 h-3" />
+                      Output
+                    </span>
+                    <span className="text-foreground font-mono">{model.outputCost}</span>
+                  </div>
+                </div>
+                
+                <div className="pt-3 border-t border-border">
+                  <div className="flex flex-wrap gap-1">
+                    {model.bestFor.map((use) => (
+                      <span key={use} className="text-[9px] px-1.5 py-0.5 rounded bg-surface-2 text-muted-foreground">
+                        {use}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          <div className="mt-8 text-center">
+            <Button
+              onClick={() => navigate("/ai")}
+              variant="outline"
+              className="border-lavender/30 text-lavender hover:bg-lavender/10 text-xs tracking-widest uppercase"
+            >
+              <Cpu className="w-4 h-4 mr-2" />
+              View AI Showcase
+              <ExternalLink className="w-3 h-3 ml-2" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-32 bg-surface-1 border-t border-border">
         <div className="max-w-4xl mx-auto px-6 md:px-12 text-center">
@@ -354,15 +604,60 @@ const LandingPage = () => {
       {/* Footer */}
       <footer className="py-16 bg-background border-t border-border">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="font-medium text-sm tracking-[0.3em] uppercase text-foreground">
-              Lavandar
+          <div className="grid md:grid-cols-4 gap-8 mb-12">
+            <div className="md:col-span-2">
+              <div className="flex items-center gap-3 mb-4">
+                <img src={lavandarLogo} alt="LAVANDAR" className="w-8 h-8 rounded-lg" />
+                <div>
+                  <span className="font-medium text-sm tracking-[0.2em] uppercase text-foreground">LAVANDAR</span>
+                  <span className="block text-[9px] font-mono uppercase tracking-[0.15em] text-lavender/60">Technology</span>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
+                Enterprise AI platform for secure allocation protocols, weather intelligence, 
+                and operational automation. Powering mission-critical decisions.
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground text-center">
+            
+            <div>
+              <h4 className="text-xs tracking-widest uppercase text-foreground mb-4">Platform</h4>
+              <div className="space-y-2">
+                <Link to="/strata" className="block text-sm text-muted-foreground hover:text-lavender transition-colors">STRATA Command</Link>
+                <Link to="/ai" className="block text-sm text-muted-foreground hover:text-lavender transition-colors">AI Showcase</Link>
+                <Link to="/lavandar-home" className="block text-sm text-muted-foreground hover:text-lavender transition-colors">Weather Intelligence</Link>
+                <Link to="/portfolio" className="block text-sm text-muted-foreground hover:text-lavender transition-colors">Portfolio</Link>
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="text-xs tracking-widest uppercase text-foreground mb-4">Connect</h4>
+              <div className="space-y-2">
+                <Link to="/linkedin-company" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-[#0A66C2] transition-colors">
+                  <Building2 className="w-4 h-4" />
+                  Company Page
+                </Link>
+                <Link to="/linkedin-ceo" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-[#0A66C2] transition-colors">
+                  <Linkedin className="w-4 h-4" />
+                  CEO Profile
+                </Link>
+                <Link to="/investor-hub" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-lavender transition-colors">
+                  <Users className="w-4 h-4" />
+                  Investor Hub
+                </Link>
+                <Link to="/shareable-links" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-lavender transition-colors">
+                  <ExternalLink className="w-4 h-4" />
+                  All Links
+                </Link>
+              </div>
+            </div>
+          </div>
+          
+          <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-muted-foreground">
               Secure Allocation Gateway for High-Value Transactions
             </p>
             <div className="text-xs text-muted-foreground">
-              © 2026 Lavandar. All rights reserved.
+              © 2026 LAVANDAR Technology. All rights reserved.
             </div>
           </div>
         </div>
