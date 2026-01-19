@@ -98,6 +98,21 @@ export default {
           sage: "hsl(var(--plover-sage))",
           earth: "hsl(var(--plover-earth))",
         },
+        // APEX-1 DJ Table Design System
+        apex: {
+          glow: "hsl(var(--apex-glow))",
+          "glow-bright": "hsl(var(--apex-glow-bright))",
+          "glow-dim": "hsl(var(--apex-glow-dim))",
+          "glow-subtle": "hsl(var(--apex-glow-subtle))",
+          carbon: "hsl(var(--apex-carbon))",
+          titanium: "hsl(var(--apex-titanium))",
+          marble: "hsl(var(--apex-marble))",
+          walnut: "hsl(var(--apex-walnut))",
+          brass: "hsl(var(--apex-brass))",
+          go: "hsl(var(--apex-go))",
+          hold: "hsl(var(--apex-hold))",
+          stop: "hsl(var(--apex-stop))",
+        },
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
