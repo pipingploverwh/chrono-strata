@@ -1,11 +1,45 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowUpRight, Volume2, VolumeX } from 'lucide-react';
+import { ArrowUpRight, Volume2, VolumeX, Zap, Waves, Thermometer, Music, Play, Sparkles, ChevronDown } from 'lucide-react';
 import thermalDemoVideo from '@/assets/thermal-demo.mp4';
 import SpatialAudioCAD, { VINYL_COLLECTION, VinylRecord } from '@/components/SpatialAudioCAD';
 import ThermalNavigation from '@/components/ThermalNavigation';
 import ThermalFooter from '@/components/ThermalFooter';
+
+const VALUE_PROPS = [
+  {
+    icon: Thermometer,
+    title: 'Thermal Physics Engine',
+    desc: 'First-principles heat transfer modeling converts audio energy to visual temperature',
+  },
+  {
+    icon: Waves,
+    title: 'Multi-Band Spectral Analysis',
+    desc: 'Real-time FFT processing isolates bass, mid, and high frequencies',
+  },
+  {
+    icon: Zap,
+    title: 'Psychoacoustic Mapping',
+    desc: 'Scientifically calibrated presets for analog warmth to crystalline clarity',
+  },
+];
+
+const FEATURES = [
+  { label: '3D Spatial Audio', desc: 'Immersive sound positioning' },
+  { label: 'AI Magic Generation', desc: 'ElevenLabs ambient layers' },
+  { label: 'Vinyl Crate Selection', desc: 'Curated track library' },
+  { label: 'Fullscreen Immersive', desc: 'Performance-ready mode' },
+  { label: 'Waveform Visualization', desc: 'Oscilloscope display' },
+  { label: 'Thermal Diffusion', desc: "Newton's law cooling" },
+];
+
+const STATS = [
+  { value: '256', label: 'FFT Bins' },
+  { value: '60', label: 'FPS Render' },
+  { value: '5', label: 'Presets' },
+  { value: '∞', label: 'Tracks' },
+];
 
 const ThermalLandingSlash = () => {
   const [temperature, setTemperature] = useState(35);
@@ -133,26 +167,27 @@ const ThermalLandingSlash = () => {
         }}
       />
       
-      {/* Unified Thermal Navigation */}
       <ThermalNavigation />
 
-      {/* Hero - Full screen with Kuma depth layering */}
-      <section className="h-screen flex items-center justify-center relative">
-        {/* Layer 1: Deep background blur (far) */}
+      {/* ═══════════════════════════════════════════════════════════════════
+          SECTION 1: HERO - Immediate Impact & Primary CTA
+      ═══════════════════════════════════════════════════════════════════ */}
+      <section className="min-h-screen flex flex-col items-center justify-center relative px-6">
+        {/* Thermal glow background */}
         <motion.div 
           className="absolute inset-0 transition-all duration-700"
           initial={{ opacity: 0, scale: 1.1 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.8, ease: "easeOut" }}
           style={{
-            background: `radial-gradient(ellipse 80% 60% at 50% 50%, ${getThermalColor(temperature)}15 0%, transparent 70%)`,
-            filter: 'blur(40px)',
+            background: `radial-gradient(ellipse 80% 60% at 50% 50%, ${getThermalColor(temperature)}20 0%, transparent 70%)`,
+            filter: 'blur(60px)',
           }}
         />
         
-        {/* Layer 2: Mid-ground glass panels (Kuma layering) */}
+        {/* Kuma glass layers */}
         <motion.div 
-          className="absolute inset-20 border border-white/5 rounded-sm"
+          className="absolute inset-16 sm:inset-24 border border-white/5 rounded-sm"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.5, ease: "easeOut", delay: 0.3 }}
@@ -161,97 +196,171 @@ const ThermalLandingSlash = () => {
             backdropFilter: 'blur(1px)',
           }}
         />
-        
-        {/* Layer 3: Inner frame with AAL geometric shadow */}
-        <motion.div 
-          className="absolute inset-32 border border-white/8"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.2, ease: "easeOut", delay: 0.5 }}
-          style={{ 
-            background: 'hsl(var(--kuma-glass-2))',
-            boxShadow: 'inset 0 0 100px 20px hsl(0 0% 0% / 0.3)',
-          }}
-        />
-        
-        {/* Thermal glow - near layer */}
-        <div 
-          className="absolute inset-0 transition-all duration-500"
-          style={{
-            background: `radial-gradient(circle at 50% 50%, ${getThermalColor(temperature)}25 0%, transparent 40%)`,
-          }}
-        />
 
-        {/* Content - sharp foreground */}
-        <motion.div 
-          className="relative z-20 text-center px-8"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: "easeOut", delay: 0.7 }}
-        >
-          {/* AAL - Ruled surface accent lines */}
+        <div className="relative z-20 text-center max-w-5xl">
+          {/* Eyebrow */}
           <motion.div 
-            className="absolute -top-8 left-1/2 -translate-x-1/2 w-px h-16 bg-gradient-to-b from-transparent to-white/10"
-            initial={{ scaleY: 0 }}
-            animate={{ scaleY: 1 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 1.0 }}
-            style={{ originY: 0 }}
-          />
-          
-          <h1 
-            className="text-[15vw] leading-[0.85] font-extralight tracking-tighter transition-colors duration-300"
-            style={{ 
-              color: getThermalColor(temperature),
-              textShadow: `0 0 120px ${getThermalColor(temperature)}40`,
-            }}
+            className="flex items-center justify-center gap-3 mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
           >
-            {temperature.toFixed(0)}°
-          </h1>
-          
-          {/* AAL - Geometric separator */}
-          <motion.div 
-            className="mt-6 flex items-center justify-center gap-3"
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 1, scaleX: 1 }}
-            transition={{ duration: 0.6, ease: "easeOut", delay: 1.2 }}
-          >
-            <div className="w-8 h-px bg-white/20" />
-            <motion.div 
-              className="w-1.5 h-1.5 rotate-45 border border-white/30"
-              initial={{ scale: 0, rotate: 0 }}
-              animate={{ scale: 1, rotate: 45 }}
-              transition={{ duration: 0.4, ease: "easeOut", delay: 1.4 }}
-            />
-            <div className="w-8 h-px bg-white/20" />
+            <Sparkles className="w-4 h-4 text-primary" />
+            <span className="text-xs tracking-[0.4em] text-primary/80 font-medium">THERMAL RESONANCE</span>
+            <Sparkles className="w-4 h-4 text-primary" />
           </motion.div>
-          
-          <motion.p 
-            className="mt-6 text-[10px] tracking-[0.5em] opacity-40 font-light"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.4 }}
-            transition={{ duration: 0.8, delay: 1.5 }}
-          >
-            MUSIC → HEAT
-          </motion.p>
-          
-          {/* AAL - Bottom ruled line */}
-          <motion.div 
-            className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-px h-20 bg-gradient-to-b from-white/10 to-transparent"
-            initial={{ scaleY: 0 }}
-            animate={{ scaleY: 1 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 1.6 }}
-            style={{ originY: 0 }}
-          />
-        </motion.div>
 
-        {/* Scroll line - AAL geometric precision */}
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-          <div className="w-px h-16 bg-gradient-to-b from-transparent via-white/20 to-white/5" />
-          <div className="w-1 h-1 rounded-full bg-white/30" />
+          {/* Headline */}
+          <motion.h1 
+            className="text-5xl sm:text-7xl lg:text-8xl font-extralight tracking-tight leading-[0.95] mb-6"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
+          >
+            <span className="text-white/90">See Your Music</span>
+            <br />
+            <span 
+              className="transition-colors duration-300"
+              style={{ color: getThermalColor(temperature) }}
+            >
+              As Heat
+            </span>
+          </motion.h1>
+
+          {/* Subheadline */}
+          <motion.p 
+            className="text-lg sm:text-xl text-white/50 max-w-2xl mx-auto mb-10 font-light"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 1 }}
+          >
+            The world's first audio-thermal physics engine. Transform sound energy 
+            into stunning heat visualizations with scientific precision.
+          </motion.p>
+
+          {/* Primary CTA */}
+          <motion.div 
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.2 }}
+          >
+            <Link 
+              to="/thermal-visualizer"
+              className="group relative px-8 py-4 bg-foreground text-background font-medium tracking-wide overflow-hidden transition-all hover:shadow-[0_0_40px_hsl(var(--foreground)/0.3)]"
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                <Play className="w-4 h-4" />
+                Launch Visualizer
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+            </Link>
+            
+            <button
+              onClick={toggleAudio}
+              className="px-8 py-4 border border-white/20 font-medium tracking-wide hover:border-white/40 hover:bg-white/5 transition-all flex items-center gap-2"
+            >
+              {isPlaying ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+              {isPlaying ? 'Stop Demo' : 'Hear It Live'}
+            </button>
+          </motion.div>
+
+          {/* Live temperature display */}
+          <motion.div 
+            className="mt-12 inline-flex items-center gap-4 px-6 py-3 border border-white/10 bg-white/5 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 1.5 }}
+          >
+            <Thermometer className="w-5 h-5 opacity-50" />
+            <span 
+              className="text-4xl font-extralight tabular-nums transition-colors duration-300"
+              style={{ color: getThermalColor(temperature) }}
+            >
+              {temperature.toFixed(1)}°
+            </span>
+            <span className="text-xs opacity-40 tracking-wider">LIVE</span>
+          </motion.div>
+        </div>
+
+        {/* Scroll indicator */}
+        <motion.div 
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.5 }}
+          transition={{ duration: 0.6, delay: 2 }}
+        >
+          <span className="text-[10px] tracking-[0.3em]">SCROLL</span>
+          <ChevronDown className="w-4 h-4 animate-bounce" />
+        </motion.div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          SECTION 2: VALUE PROPOSITIONS - Why This Matters
+      ═══════════════════════════════════════════════════════════════════ */}
+      <section className="py-32 px-6 relative">
+        <div className="max-w-6xl mx-auto">
+          <motion.div 
+            className="text-center mb-20"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <p className="text-xs tracking-[0.5em] text-primary/60 mb-4 font-mono">THE TECHNOLOGY</p>
+            <h2 className="text-4xl sm:text-5xl font-extralight tracking-tight">
+              Built on Science,<br />
+              <span className="text-muted-foreground">Not Gimmicks</span>
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {VALUE_PROPS.map((prop, i) => (
+              <motion.div
+                key={prop.title}
+                className="group p-8 border border-white/10 hover:border-white/20 bg-white/[0.02] hover:bg-white/[0.04] transition-all"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.15 }}
+              >
+                <prop.icon className="w-8 h-8 mb-6 text-primary/70 group-hover:text-primary transition-colors" />
+                <h3 className="text-xl font-light mb-3 tracking-wide">{prop.title}</h3>
+                <p className="text-sm text-white/40 leading-relaxed">{prop.desc}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* 3D Spatial Audio CAD Section */}
+      {/* ═══════════════════════════════════════════════════════════════════
+          SECTION 3: STATS BAR - Quick Credibility
+      ═══════════════════════════════════════════════════════════════════ */}
+      <section className="py-16 border-y border-white/10 bg-white/[0.01]">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {STATS.map((stat, i) => (
+              <motion.div 
+                key={stat.label}
+                className="text-center"
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+              >
+                <div className="text-4xl sm:text-5xl font-extralight text-primary/80 mb-2 tabular-nums">
+                  {stat.value}
+                </div>
+                <div className="text-xs tracking-[0.3em] text-white/30">{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          SECTION 4: 3D SPATIAL AUDIO - Interactive Demo
+      ═══════════════════════════════════════════════════════════════════ */}
       <section className="h-screen relative bg-black">
         <div className="absolute inset-0 border border-white/10">
           <SpatialAudioCAD 
@@ -264,33 +373,57 @@ const ThermalLandingSlash = () => {
         </div>
         
         {/* Section label */}
-        <div className="absolute bottom-8 left-8 z-10">
-          <p className="text-xs tracking-[0.3em] opacity-40 mb-2 font-mono">01</p>
-          <p className="text-xl font-extralight tracking-wide">SPATIAL AUDIO</p>
-          <p className="text-xs opacity-40 mt-1 font-mono">3D SOUND POSITIONING</p>
+        <div className="absolute top-8 left-8 z-10">
+          <p className="text-xs tracking-[0.3em] text-primary/60 mb-2 font-mono">INTERACTIVE DEMO</p>
+          <p className="text-2xl font-extralight tracking-wide">3D Spatial Audio</p>
+          <p className="text-sm text-muted-foreground mt-2 max-w-xs">
+            Explore the sound field. Select vinyl from the crate to change tracks.
+          </p>
         </div>
         
         {/* Audio control overlay */}
         <div className="absolute bottom-8 right-8 z-10">
           <button
             onClick={toggleAudio}
-            className="group flex items-center gap-3"
+            className="group flex items-center gap-3 px-5 py-3 border border-border hover:border-primary/50 bg-background/80 backdrop-blur transition-all"
           >
-            <span className="text-xs tracking-[0.3em] opacity-40 group-hover:opacity-60 transition-opacity font-mono">
-              {isPlaying ? 'STOP' : 'PLAY'}
-            </span>
-            <span className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center group-hover:border-white/40 transition-colors bg-black/50 backdrop-blur">
+            <span className="w-10 h-10 rounded-full border border-border flex items-center justify-center group-hover:border-primary/50 transition-colors">
               {isPlaying ? (
                 <VolumeX className="w-4 h-4 opacity-60" />
               ) : (
                 <Volume2 className="w-4 h-4 opacity-60" />
               )}
             </span>
+            <span className="text-sm tracking-wider font-mono">
+              {isPlaying ? 'STOP' : 'PLAY AUDIO'}
+            </span>
           </button>
+        </div>
+
+        {/* Spectral readout */}
+        <div className="absolute bottom-8 left-8 z-10 flex items-end gap-3">
+          {['LOW', 'MID', 'HIGH'].map((label, i) => {
+            const val = i === 0 ? spectralData.low : i === 1 ? spectralData.mid : spectralData.high;
+            return (
+              <div key={label} className="flex flex-col items-center gap-1">
+                <div
+                  className="w-3 rounded-full transition-all duration-75"
+                  style={{ 
+                    height: `${8 + val * 60}px`,
+                    background: getThermalColor(25 + val * 40),
+                    opacity: 0.5 + val * 0.5,
+                  }}
+                />
+                <span className="text-[8px] font-mono text-white/30">{label}</span>
+              </div>
+            );
+          })}
         </div>
       </section>
 
-      {/* Video section - full bleed */}
+      {/* ═══════════════════════════════════════════════════════════════════
+          SECTION 5: VIDEO SHOWCASE - Visual Impact
+      ═══════════════════════════════════════════════════════════════════ */}
       <section className="relative h-screen">
         <video
           src={thermalDemoVideo}
@@ -299,77 +432,125 @@ const ThermalLandingSlash = () => {
           muted
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ filter: 'brightness(0.8)' }}
+          style={{ filter: 'brightness(0.7) contrast(1.1)' }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
         
-        <div className="absolute bottom-12 left-8 right-8 flex justify-between items-end">
-          <div>
-            <p className="text-xs tracking-[0.3em] opacity-40 mb-2 font-mono">02</p>
-            <p className="text-2xl font-extralight">Thermal Vision</p>
-          </div>
-          <p className="text-xs tracking-[0.2em] opacity-40 max-w-xs text-right font-mono">
-            REAL-TIME RESPONSE
-          </p>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <motion.div 
+            className="text-center px-6"
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <p className="text-xs tracking-[0.5em] text-primary/60 mb-6 font-mono">REAL-TIME VISUALIZATION</p>
+            <h2 className="text-5xl sm:text-7xl font-extralight tracking-tight mb-4">
+              Thermal Vision
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-lg mx-auto">
+              Every beat, every frequency, every sonic texture transformed into living heat
+            </p>
+          </motion.div>
         </div>
       </section>
 
-      {/* Interactive audio section */}
-      <section className="min-h-screen flex flex-col items-center justify-center px-8 py-24 relative">
+      {/* ═══════════════════════════════════════════════════════════════════
+          SECTION 6: FEATURE GRID - Comprehensive Capabilities
+      ═══════════════════════════════════════════════════════════════════ */}
+      <section className="py-32 px-6">
+        <div className="max-w-6xl mx-auto">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <p className="text-xs tracking-[0.5em] text-primary/60 mb-4 font-mono">CAPABILITIES</p>
+            <h2 className="text-4xl sm:text-5xl font-extralight tracking-tight">
+              Full Feature Set
+            </h2>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/10">
+            {FEATURES.map((feature, i) => (
+              <motion.div
+                key={feature.label}
+                className="p-8 bg-black hover:bg-white/[0.03] transition-colors"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.08 }}
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-2 h-2 mt-2 bg-primary/60 rounded-full" />
+                  <div>
+                    <h3 className="text-lg font-light mb-1">{feature.label}</h3>
+                    <p className="text-sm text-muted-foreground">{feature.desc}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          SECTION 7: FINAL CTA - Close the Deal
+      ═══════════════════════════════════════════════════════════════════ */}
+      <section className="min-h-screen flex items-center justify-center relative px-6">
+        {/* Ambient glow */}
         <div 
-          className="absolute inset-0 transition-opacity duration-500"
+          className="absolute inset-0"
           style={{
-            background: `radial-gradient(circle at 50% 50%, ${getThermalColor(temperature)}15 0%, transparent 60%)`,
-            opacity: isPlaying ? 1 : 0,
+            background: `radial-gradient(ellipse 60% 50% at 50% 50%, ${getThermalColor(temperature)}15 0%, transparent 60%)`,
           }}
         />
 
-        <div className="relative z-10 text-center">
-          <p className="text-xs tracking-[0.3em] opacity-40 mb-8 font-mono">03</p>
-          
-          {/* Spectral bars */}
-          <div className="flex items-end justify-center gap-2 h-40 mb-12">
-            {['LOW', 'MID', 'HIGH'].map((label, i) => {
-              const val = i === 0 ? spectralData.low : i === 1 ? spectralData.mid : spectralData.high;
-              return (
-                <div key={i} className="flex flex-col items-center gap-2">
-                  <div
-                    className="w-2 bg-white/80 transition-all duration-75 rounded-full"
-                    style={{ 
-                      height: `${10 + val * 130}px`,
-                      opacity: 0.4 + val * 0.6,
-                    }}
-                  />
-                  <span className="text-[8px] font-mono opacity-30">{label}</span>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="font-mono text-xs opacity-30 mb-8">
-            FREQUENCY ANALYSIS
-          </div>
-        </div>
-      </section>
-
-      {/* CTA section */}
-      <section className="h-screen flex items-center justify-center relative">
-        <Link 
-          to="/thermal-visualizer"
-          className="group text-center"
+        <motion.div 
+          className="relative z-10 text-center max-w-3xl"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
         >
-          <p className="text-xs tracking-[0.3em] opacity-40 mb-6 font-mono">04</p>
-          <h2 className="text-6xl sm:text-8xl font-extralight tracking-tight group-hover:tracking-normal transition-all duration-500">
-            Launch
+          <Music className="w-12 h-12 mx-auto mb-8 text-primary/50" />
+          
+          <h2 className="text-5xl sm:text-7xl font-extralight tracking-tight mb-6">
+            Ready to<br />
+            <span 
+              className="transition-colors duration-300"
+              style={{ color: getThermalColor(temperature) }}
+            >
+              Feel the Heat?
+            </span>
           </h2>
-          <div className="mt-8 flex items-center justify-center gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
-            <span className="text-xs tracking-[0.2em] font-mono">OPEN VISUALIZER</span>
-            <ArrowUpRight className="w-4 h-4" />
+          
+          <p className="text-lg text-muted-foreground mb-12 max-w-xl mx-auto">
+            Upload your tracks. Watch them burn. Experience audio like never before.
+          </p>
+
+          <Link 
+            to="/thermal-visualizer"
+            className="group inline-flex items-center gap-3 px-10 py-5 bg-foreground text-background font-medium text-lg tracking-wide overflow-hidden transition-all hover:shadow-[0_0_60px_hsl(var(--foreground)/0.4)]"
+          >
+            <Play className="w-5 h-5" />
+            <span>Launch Thermal Resonance</span>
+            <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+          </Link>
+
+          <div className="mt-12 flex items-center justify-center gap-8 text-xs text-muted-foreground">
+            <span className="flex items-center gap-2">
+              <span className="w-2 h-2 bg-accent rounded-full animate-pulse" />
+              Free to use
+            </span>
+            <span>No signup required</span>
+            <span>Works in browser</span>
           </div>
-        </Link>
+        </motion.div>
       </section>
 
-      {/* Unified Thermal Footer */}
       <ThermalFooter />
     </div>
   );
