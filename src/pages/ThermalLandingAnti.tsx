@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import thermalDemoVideo from '@/assets/thermal-demo.mp4';
 import { SpatialAudioCAD, VINYL_COLLECTION, VinylRecord } from '@/components/SpatialAudioCAD';
 import ThermalNavigation from '@/components/ThermalNavigation';
+import ThermalFooter from '@/components/ThermalFooter';
 
 const ThermalLandingAnti = () => {
   const [temperature, setTemperature] = useState(35);
@@ -625,32 +626,8 @@ const ThermalLandingAnti = () => {
         </section>
       </main>
 
-      {/* Technical Footer with Kuma layering */}
-      <footer className="fixed bottom-0 left-0 right-0 z-40">
-        {/* Kuma horizontal strata line */}
-        <div className="h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-        
-        <div className="p-4 flex justify-between items-end backdrop-blur-sm bg-black/20">
-          <div className="text-[8px] text-white/30">
-            {/* AAL geometric prefix */}
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-4 h-px bg-cyan-500/30" />
-              <div className="w-0.5 h-0.5 rotate-45 bg-cyan-500/40" />
-            </div>
-            <div>BUILD: 2024.01.19</div>
-            <div>ENGINE: WEB AUDIO API</div>
-          </div>
-          <div className="text-[8px] text-right text-white/30">
-            {/* AAL geometric suffix */}
-            <div className="flex items-center justify-end gap-2 mb-1">
-              <div className="w-0.5 h-0.5 rotate-45 bg-white/20" />
-              <div className="w-4 h-px bg-white/20" />
-            </div>
-            <div>SCALE: 1:1</div>
-            <div>UNITS: SI</div>
-          </div>
-        </div>
-      </footer>
+      {/* Unified Thermal Footer */}
+      <ThermalFooter />
     </div>
   );
 };
