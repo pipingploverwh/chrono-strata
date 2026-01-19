@@ -43,6 +43,70 @@ const ThermalVisualizerLanding = () => {
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
   const animationRef = useRef<number | null>(null);
 
+  // Set meta tags for social sharing
+  useEffect(() => {
+    const originalTitle = document.title;
+    const originalDescription = document.querySelector('meta[name="description"]')?.getAttribute('content');
+    
+    // Update page title
+    document.title = 'Thermal Music Visualizer | See Your Music Come Alive';
+    
+    // Update/create meta description
+    let descMeta = document.querySelector('meta[name="description"]');
+    if (descMeta) {
+      descMeta.setAttribute('content', 'Transform any audio into a living thermal landscape. Watch temperatures rise with the beat, generate AI magic, and experience music like never before.');
+    }
+    
+    // Open Graph tags
+    const ogTags = [
+      { property: 'og:title', content: 'Thermal Music Visualizer | See Your Music Come Alive' },
+      { property: 'og:description', content: 'Transform any audio into a living thermal landscape. Watch temperatures rise with the beat, generate AI magic.' },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:image', content: `${window.location.origin}/og-thermal.jpg` },
+      { property: 'og:image:width', content: '1200' },
+      { property: 'og:image:height', content: '630' },
+      { property: 'og:url', content: window.location.href },
+    ];
+    
+    // Twitter Card tags
+    const twitterTags = [
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: 'Thermal Music Visualizer | See Your Music Come Alive' },
+      { name: 'twitter:description', content: 'Transform any audio into a living thermal landscape. Watch temperatures rise with the beat.' },
+      { name: 'twitter:image', content: `${window.location.origin}/og-thermal.jpg` },
+    ];
+    
+    // Create or update OG tags
+    ogTags.forEach(({ property, content }) => {
+      let meta = document.querySelector(`meta[property="${property}"]`);
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute('property', property);
+        document.head.appendChild(meta);
+      }
+      meta.setAttribute('content', content);
+    });
+    
+    // Create or update Twitter tags
+    twitterTags.forEach(({ name, content }) => {
+      let meta = document.querySelector(`meta[name="${name}"]`);
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute('name', name);
+        document.head.appendChild(meta);
+      }
+      meta.setAttribute('content', content);
+    });
+    
+    // Cleanup on unmount
+    return () => {
+      document.title = originalTitle;
+      if (descMeta && originalDescription) {
+        descMeta.setAttribute('content', originalDescription);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({
