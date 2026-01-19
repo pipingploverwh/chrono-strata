@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
+import thermalDemoVideo from '@/assets/thermal-demo.mp4';
 
 // Demo audio URL - using a free sample track
 const DEMO_AUDIO_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
@@ -418,6 +419,75 @@ const ThermalVisualizerLanding = () => {
               style={{ background: 'hsl(24 100% 50%)' }}
             />
           </div>
+        </div>
+      </section>
+
+      {/* Video Preview Section */}
+      <section className="relative py-20 px-6" style={{ background: 'hsl(15 30% 4%)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <span 
+              className="inline-block px-4 py-1 rounded-full text-sm mb-4"
+              style={{ 
+                background: 'hsl(24 100% 50% / 0.15)', 
+                color: 'hsl(24 100% 60%)',
+                border: '1px solid hsl(24 100% 50% / 0.3)',
+              }}
+            >
+              INSTANT PREVIEW
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extralight" style={{ color: 'hsl(40 30% 85%)' }}>
+              Watch It <span style={{ color: 'hsl(24 100% 55%)' }}>In Action</span>
+            </h2>
+          </div>
+
+          {/* Video container */}
+          <div 
+            className="relative rounded-3xl overflow-hidden mx-auto max-w-4xl"
+            style={{ 
+              border: '2px solid hsl(24 100% 50% / 0.3)',
+              boxShadow: '0 0 80px hsl(24 100% 50% / 0.2)',
+            }}
+          >
+            {/* Glow effect */}
+            <div 
+              className="absolute inset-0 pointer-events-none z-10"
+              style={{
+                background: 'radial-gradient(ellipse at center, transparent 60%, hsl(15 30% 4%) 100%)',
+              }}
+            />
+            
+            <video
+              src={thermalDemoVideo}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full aspect-video object-cover"
+              style={{ filter: 'brightness(1.1) saturate(1.2)' }}
+            />
+
+            {/* Overlay label */}
+            <div 
+              className="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full z-20"
+              style={{ 
+                background: 'hsl(15 30% 6% / 0.9)', 
+                border: '1px solid hsl(30 30% 25%)',
+              }}
+            >
+              <div 
+                className="w-2 h-2 rounded-full animate-pulse"
+                style={{ background: 'hsl(0 70% 50%)' }}
+              />
+              <span className="text-xs" style={{ color: 'hsl(30 20% 60%)' }}>
+                Live Demo Preview
+              </span>
+            </div>
+          </div>
+
+          <p className="text-center mt-6 text-sm" style={{ color: 'hsl(30 20% 50%)' }}>
+            Sound off • Scroll down to try the interactive demo with audio
+          </p>
         </div>
       </section>
 
