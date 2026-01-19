@@ -23,7 +23,11 @@ import {
   FileText,
   Briefcase,
   Calendar,
-  History
+  History,
+  Clock,
+  Timer,
+  Play,
+  Pause
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -771,7 +775,7 @@ const OdooTransferPortal = () => {
 
         {/* Transfer Methods */}
         <Tabs defaultValue="export" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="export" className="flex items-center gap-2">
               <Download className="w-4 h-4" />
               Export
@@ -783,6 +787,10 @@ const OdooTransferPortal = () => {
             <TabsTrigger value="api" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
               API
+            </TabsTrigger>
+            <TabsTrigger value="schedule" className="flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              Schedule
             </TabsTrigger>
             <TabsTrigger value="history" className="flex items-center gap-2">
               <History className="w-4 h-4" />
@@ -986,6 +994,158 @@ const OdooTransferPortal = () => {
                     <li>Under "API Keys", create a new key</li>
                     <li>Copy and paste the key above</li>
                   </ol>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Schedule Tab */}
+          <TabsContent value="schedule">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Timer className="w-5 h-5" />
+                  Scheduled Automatic Sync
+                </CardTitle>
+                <CardDescription>
+                  Configure automatic data synchronization with Odoo on a schedule
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="bg-gradient-to-r from-purple-50 to-cyan-50 border border-purple-200 rounded-xl p-6">
+                  <h4 className="font-semibold text-neutral-900 mb-3 flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-purple-600" />
+                    Cron Schedule Configuration
+                  </h4>
+                  <p className="text-sm text-neutral-600 mb-4">
+                    Automatic syncs run via a backend cron job. Configure the schedule and credentials below.
+                  </p>
+                  
+                  <div className="grid md:grid-cols-2 gap-4 mb-6">
+                    <div className="bg-white rounded-lg p-4 border">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                          <Timer className="w-5 h-5 text-amber-600" />
+                        </div>
+                        <div>
+                          <h5 className="font-medium text-neutral-900">Hourly Sync</h5>
+                          <p className="text-xs text-neutral-500">Runs every hour at :00</p>
+                        </div>
+                      </div>
+                      <code className="text-xs bg-neutral-100 px-2 py-1 rounded text-neutral-600">
+                        0 * * * *
+                      </code>
+                    </div>
+                    
+                    <div className="bg-white rounded-lg p-4 border">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 bg-cyan-100 rounded-lg flex items-center justify-center">
+                          <Calendar className="w-5 h-5 text-cyan-600" />
+                        </div>
+                        <div>
+                          <h5 className="font-medium text-neutral-900">Daily Sync</h5>
+                          <p className="text-xs text-neutral-500">Runs daily at midnight UTC</p>
+                        </div>
+                      </div>
+                      <code className="text-xs bg-neutral-100 px-2 py-1 rounded text-neutral-600">
+                        0 0 * * *
+                      </code>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h4 className="font-medium text-neutral-900">Required Environment Secrets</h4>
+                  <p className="text-sm text-neutral-600">
+                    To enable scheduled syncs, configure these secrets in your backend:
+                  </p>
+                  
+                  <div className="grid gap-3">
+                    {[
+                      { name: 'ODOO_URL', desc: 'Your Odoo instance URL', example: 'https://company.odoo.com' },
+                      { name: 'ODOO_DB', desc: 'Odoo database name', example: 'production' },
+                      { name: 'ODOO_USERNAME', desc: 'Odoo username/email', example: 'admin@company.com' },
+                      { name: 'ODOO_API_KEY', desc: 'Odoo API key', example: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' },
+                      { name: 'ODOO_SYNC_MODULES', desc: 'Comma-separated modules to sync', example: 'leads,products,weather' }
+                    ].map(secret => (
+                      <div key={secret.name} className="flex items-start gap-3 p-3 bg-neutral-50 rounded-lg border">
+                        <code className="text-sm font-mono bg-purple-100 text-purple-700 px-2 py-0.5 rounded">
+                          {secret.name}
+                        </code>
+                        <div className="flex-1">
+                          <p className="text-sm text-neutral-700">{secret.desc}</p>
+                          <p className="text-xs text-neutral-500 mt-0.5">Example: {secret.example}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="font-medium text-blue-800 mb-2">Setting Up Scheduled Syncs</h4>
+                  <ol className="text-sm text-blue-700 space-y-2 list-decimal list-inside">
+                    <li>Configure the required secrets in your Lovable Cloud backend settings</li>
+                    <li>The cron job will automatically call the <code className="bg-blue-100 px-1 rounded">odoo-scheduled-sync</code> function</li>
+                    <li>Sync results are logged and can be viewed in the History tab</li>
+                    <li>Failed syncs will be retried on the next scheduled run</li>
+                  </ol>
+                </div>
+
+                <div className="flex gap-3">
+                  <Button 
+                    variant="outline"
+                    onClick={async () => {
+                      setTransferStatus({ status: 'loading', message: 'Testing scheduled sync...' });
+                      try {
+                        const { data, error } = await supabase.functions.invoke('odoo-scheduled-sync', {
+                          body: {
+                            config: {
+                              url: odooUrl,
+                              db: odooDb,
+                              username: odooUsername,
+                              apiKey: odooApiKey
+                            },
+                            modules: Object.entries(selectedData)
+                              .filter(([_, selected]) => selected)
+                              .map(([key]) => key),
+                            scheduleType: 'manual'
+                          }
+                        });
+                        
+                        if (error) throw error;
+                        
+                        if (data?.success) {
+                          setTransferStatus({ status: 'success', message: `Manual sync completed: ${data.totalRecords} records synced` });
+                          addSyncLog({
+                            type: 'scheduled',
+                            modules: Object.entries(selectedData).filter(([_, s]) => s).map(([k]) => k),
+                            recordCount: data.totalRecords,
+                            status: 'success',
+                            message: 'Manual scheduled sync test',
+                            duration: data.duration
+                          });
+                          toast({
+                            title: "Sync Complete",
+                            description: `Synced ${data.totalRecords} records to Odoo.`
+                          });
+                        } else {
+                          throw new Error(data?.error || 'Sync failed');
+                        }
+                      } catch (error: any) {
+                        setTransferStatus({ status: 'error', message: error.message });
+                        toast({
+                          title: "Sync Failed",
+                          description: error.message,
+                          variant: "destructive"
+                        });
+                      }
+                    }}
+                    disabled={!odooUrl || !odooDb || !odooUsername || !odooApiKey || transferStatus.status === 'loading'}
+                    className="flex-1"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Run Manual Sync Now
+                  </Button>
                 </div>
               </CardContent>
             </Card>
