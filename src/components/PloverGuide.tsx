@@ -52,8 +52,8 @@ export default function PloverGuide() {
           setMessages((prev) => [
             ...prev,
             { role: "assistant", content: language === 'ja' 
-              ? "今たくさんの質問を受けています！少し待ってからもう一度お試しください。🐦" 
-              : "I'm getting a lot of questions right now! Please try again in a moment. 🐦" },
+              ? "今たくさんの質問を受けています！少し待ってからもう一度お試しください。" 
+              : "I'm getting a lot of questions right now! Please try again in a moment." },
           ]);
           setIsLoading(false);
           return;
@@ -108,8 +108,8 @@ export default function PloverGuide() {
       setMessages((prev) => [
         ...prev.filter((m) => m.content !== ""),
         { role: "assistant", content: language === 'ja' 
-          ? "おっと！予期せぬ潮が来たようです。もう一度お試しください！🌊" 
-          : "Oops! Looks like the tide came in unexpectedly. Please try again! 🌊" },
+          ? "おっと！予期せぬ問題が発生しました。もう一度お試しください。" 
+          : "Oops! Something unexpected happened. Please try again." },
       ]);
     } finally {
       setIsLoading(false);
@@ -133,7 +133,7 @@ export default function PloverGuide() {
       <button
         onClick={() => setIsOpen(true)}
         data-chat-toggle
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all hover:scale-105"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3 rounded-full bg-plover-sage text-plover-cream shadow-lg hover:bg-plover-sage/90 transition-all hover:scale-105"
       >
         <Bird className="w-5 h-5" />
         <span className="font-medium">{t('plover.chatWithPiper')}</span>
@@ -144,27 +144,29 @@ export default function PloverGuide() {
   return (
     <div
       className={cn(
-        "fixed z-50 flex flex-col bg-card border border-border shadow-2xl transition-all duration-300",
+        "fixed z-50 flex flex-col bg-plover-cream border border-plover-dune/30 shadow-2xl transition-all duration-300",
         isExpanded
-          ? "inset-4 rounded-lg"
+          ? "inset-4 rounded-2xl"
           : isMinimized
           ? "bottom-6 right-6 w-72 h-14 rounded-full"
-          : "bottom-6 right-6 w-96 h-[32rem] rounded-lg"
+          : "bottom-6 right-6 w-96 h-[32rem] rounded-2xl"
       )}
     >
       {/* Header */}
       <div
         className={cn(
-          "flex items-center justify-between px-4 border-b border-border",
+          "flex items-center justify-between px-4 border-b border-plover-dune/20",
           isMinimized ? "py-2" : "py-3"
         )}
       >
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">🐦</span>
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-plover-sage/20 flex items-center justify-center">
+            <Bird className="w-5 h-5 text-plover-sage" />
+          </div>
           <div>
-            <h3 className="font-medium text-foreground text-sm">Piper</h3>
+            <h3 className="font-medium text-plover-earth text-sm">Piper</h3>
             {!isMinimized && (
-              <p className="text-xs text-muted-foreground">{t('plover.chat.yourGuide')}</p>
+              <p className="text-xs text-plover-earth/50">{t('plover.chat.yourGuide')}</p>
             )}
           </div>
         </div>
@@ -172,7 +174,7 @@ export default function PloverGuide() {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted"
+            className="h-8 w-8 text-plover-earth/50 hover:text-plover-earth hover:bg-plover-dune/20"
             onClick={() => setIsMinimized(!isMinimized)}
           >
             <Minimize2 className="h-4 w-4" />
@@ -181,7 +183,7 @@ export default function PloverGuide() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted"
+              className="h-8 w-8 text-plover-earth/50 hover:text-plover-earth hover:bg-plover-dune/20"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               <Maximize2 className="h-4 w-4" />
@@ -190,7 +192,7 @@ export default function PloverGuide() {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted"
+            className="h-8 w-8 text-plover-earth/50 hover:text-plover-earth hover:bg-plover-dune/20"
             onClick={() => setIsOpen(false)}
           >
             <X className="h-4 w-4" />
@@ -201,14 +203,16 @@ export default function PloverGuide() {
       {/* Chat Content */}
       {!isMinimized && (
         <>
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-plover-sand">
             {messages.length === 0 ? (
               <div className="text-center py-8">
-                <div className="text-5xl mb-4">🐦</div>
-                <h4 className="font-medium text-foreground mb-2">
+                <div className="w-16 h-16 mx-auto rounded-full bg-plover-sage/20 flex items-center justify-center mb-4">
+                  <Bird className="w-8 h-8 text-plover-sage" />
+                </div>
+                <h4 className="font-medium text-plover-earth mb-2">
                   {t('plover.chat.welcomeFlock')}
                 </h4>
-                <p className="text-sm text-muted-foreground mb-6">
+                <p className="text-sm text-plover-earth/60 mb-6">
                   {t('plover.chat.intro')}
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center">
@@ -216,7 +220,7 @@ export default function PloverGuide() {
                     <button
                       key={action.label}
                       onClick={() => handleQuickAction(action.message)}
-                      className="px-3 py-1.5 text-xs rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                      className="px-3 py-1.5 text-xs rounded-full bg-plover-cream border border-plover-dune/30 text-plover-earth hover:border-plover-sage/50 transition-colors"
                     >
                       {action.label}
                     </button>
@@ -234,14 +238,14 @@ export default function PloverGuide() {
                 >
                   <div
                     className={cn(
-                      "max-w-[85%] rounded-lg px-4 py-2.5 text-sm",
+                      "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm",
                       msg.role === "user"
-                        ? "bg-primary text-primary-foreground rounded-br-sm"
-                        : "bg-muted text-foreground rounded-bl-sm"
+                        ? "bg-plover-sage text-plover-cream rounded-br-md"
+                        : "bg-plover-cream text-plover-earth rounded-bl-md border border-plover-dune/20"
                     )}
                   >
                     {msg.role === "assistant" && (
-                      <span className="mr-1">🐦</span>
+                      <Bird className="inline w-3.5 h-3.5 mr-1.5 text-plover-sage" />
                     )}
                     <span className="whitespace-pre-wrap">{msg.content}</span>
                   </div>
@@ -250,8 +254,8 @@ export default function PloverGuide() {
             )}
             {isLoading && messages[messages.length - 1]?.content === "" && (
               <div className="flex justify-start">
-                <div className="bg-muted text-foreground rounded-lg rounded-bl-sm px-4 py-2.5 text-sm">
-                  <span className="mr-1">🐦</span>
+                <div className="bg-plover-cream text-plover-earth rounded-2xl rounded-bl-md px-4 py-2.5 text-sm border border-plover-dune/20">
+                  <Bird className="inline w-3.5 h-3.5 mr-1.5 text-plover-sage" />
                   <span className="animate-pulse">{t('plover.chat.thinking')}</span>
                 </div>
               </div>
@@ -260,21 +264,21 @@ export default function PloverGuide() {
           </div>
 
           {/* Input */}
-          <form onSubmit={handleSubmit} className="p-4 border-t border-border">
+          <form onSubmit={handleSubmit} className="p-4 border-t border-plover-dune/20 bg-plover-cream">
             <div className="flex gap-2">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={t('plover.chat.placeholder')}
-                className="flex-1 px-4 py-2.5 rounded-full bg-muted text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm"
+                className="flex-1 px-4 py-2.5 rounded-full bg-plover-sand text-plover-earth placeholder:text-plover-earth/40 focus:outline-none focus:ring-2 focus:ring-plover-sage/30 text-sm border border-plover-dune/20"
                 disabled={isLoading}
               />
               <Button
                 type="submit"
                 size="icon"
                 disabled={isLoading || !input.trim()}
-                className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground h-10 w-10"
+                className="rounded-full bg-plover-sage hover:bg-plover-sage/90 text-plover-cream h-10 w-10"
               >
                 <Send className="h-4 w-4" />
               </Button>
