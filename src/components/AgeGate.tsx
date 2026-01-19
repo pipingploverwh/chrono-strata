@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useLanguageState } from "@/hooks/useLanguage";
 
 const AGE_VERIFIED_KEY = "plover-dispensary-age-verified";
 
@@ -17,6 +18,7 @@ interface AgeGateProps {
 export default function AgeGate({ children }: AgeGateProps) {
   const [isVerified, setIsVerified] = useState<boolean | null>(null);
   const [showDialog, setShowDialog] = useState(false);
+  const { t } = useLanguageState();
 
   useEffect(() => {
     const verified = localStorage.getItem(AGE_VERIFIED_KEY);
@@ -41,8 +43,8 @@ export default function AgeGate({ children }: AgeGateProps) {
   // Still loading
   if (isVerified === null) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-plover-dune">
-        <div className="animate-pulse text-plover-ocean">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-pulse text-muted-foreground">Loading...</div>
       </div>
     );
   }
@@ -51,40 +53,39 @@ export default function AgeGate({ children }: AgeGateProps) {
     <>
       <Dialog open={showDialog} onOpenChange={() => {}}>
         <DialogContent 
-          className="sm:max-w-md border-plover-ocean/20 bg-plover-dune"
+          className="sm:max-w-md border-border bg-card"
           onPointerDownOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
         >
           <DialogHeader className="text-center">
             <div className="text-5xl mb-4">🐦</div>
-            <DialogTitle className="text-2xl font-medium text-plover-driftwood">
-              Welcome to The Piping Plover
+            <DialogTitle className="text-2xl font-medium text-foreground">
+              {t('plover.ageGate.welcome')}
             </DialogTitle>
-            <DialogDescription className="text-plover-driftwood/70 mt-2">
-              You must be 21 years of age or older to enter this site.
+            <DialogDescription className="text-muted-foreground mt-2">
+              {t('plover.ageGate.description')}
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 mt-6">
             <Button
               onClick={handleVerify}
-              className="w-full bg-plover-ocean hover:bg-plover-ocean/90 text-white py-6 text-lg"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-lg"
             >
-              I am 21 or older
+              {t('plover.ageGate.confirm')}
             </Button>
             
             <Button
               onClick={handleExit}
               variant="outline"
-              className="w-full border-plover-ocean/30 text-plover-driftwood hover:bg-plover-sand/50 py-6"
+              className="w-full border-border text-foreground hover:bg-muted py-6"
             >
-              Exit
+              {t('plover.ageGate.exit')}
             </Button>
           </div>
           
-          <p className="text-xs text-center text-plover-driftwood/50 mt-4">
-            By entering this site, you confirm that you are of legal age to consume cannabis 
-            products in Massachusetts and agree to our terms of service.
+          <p className="text-xs text-center text-muted-foreground mt-4">
+            {t('plover.ageGate.legal')}
           </p>
         </DialogContent>
       </Dialog>
