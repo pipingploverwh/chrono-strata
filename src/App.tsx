@@ -48,6 +48,7 @@ import WellfleetDispensary from "./pages/WellfleetDispensary";
 import AllocationCheckout from "./pages/AllocationCheckout";
 import AllocationSuccess from "./pages/AllocationSuccess";
 import AllocationCanceled from "./pages/AllocationCanceled";
+import DJTableShowcase from "./pages/DJTableShowcase";
 
 const queryClient = new QueryClient();
 
@@ -89,6 +90,7 @@ const App = () => (
                 <Route path="/allocation-checkout" element={<AllocationCheckout />} />
                 <Route path="/allocation-success" element={<AllocationSuccess />} />
                 <Route path="/allocation-canceled" element={<AllocationCanceled />} />
+                <Route path="/dj-table" element={<DJTableShowcase />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />
