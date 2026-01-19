@@ -7,6 +7,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import StrataEmbeddedDisplay from '@/components/strata/StrataEmbeddedDisplay';
 import WaveformVisualization from '@/components/strata/WaveformVisualization';
 import PsychoacousticVisualization from '@/components/PsychoacousticVisualization';
+import PsychoacousticPresetSelector, { PSYCHOACOUSTIC_PRESETS, type PsychoacousticPreset } from '@/components/PsychoacousticPresets';
 import LavandarBackground from '@/components/LavandarBackground';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -134,7 +135,7 @@ const ThermalMusicVisualizer = () => {
     frequencyProfile: string;
     tempoFeel: string;
     emotionalTone: string;
-    boseEngineering?: {
+    psychoacousticProfile?: {
       soundstage: {
         stereoWidth: string;
         depthPlacement: string;
@@ -161,6 +162,9 @@ const ThermalMusicVisualizer = () => {
     };
   } | null>(null);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
+  
+  // Psychoacoustic preset state
+  const [activePreset, setActivePreset] = useState<string>('neutral');
 
   // Fullscreen keyboard controls
   useEffect(() => {
@@ -1395,7 +1399,13 @@ const ThermalMusicVisualizer = () => {
 
             {/* Metrics Panel */}
             <div className="space-y-6">
-              {/* Bose Psychoacoustic Visualization */}
+              {/* Psychoacoustic Preset Selector */}
+              <PsychoacousticPresetSelector
+                activePreset={activePreset}
+                onPresetChange={setActivePreset}
+              />
+              
+              {/* Psychoacoustic Visualization */}
               <PsychoacousticVisualization
                 spectralData={spectralData}
                 temperature={globalTemp}
@@ -1467,8 +1477,8 @@ const ThermalMusicVisualizer = () => {
                     </div>
                   </div>
 
-                  {/* Collapsible Advanced Bose Engineering Metrics */}
-                  {magicAnalysis.boseEngineering && (
+                  {/* Collapsible Advanced Psychoacoustic Metrics */}
+                  {magicAnalysis.psychoacousticProfile && (
                     <Collapsible open={isAdvancedOpen} onOpenChange={setIsAdvancedOpen} className="mt-4">
                       <CollapsibleTrigger asChild>
                         <button 
@@ -1476,7 +1486,7 @@ const ThermalMusicVisualizer = () => {
                           style={{ border: '1px solid hsl(300 30% 25%)' }}
                         >
                           <span className="text-[10px] tracking-[0.15em] uppercase" style={{ color: 'hsl(300 40% 60%)' }}>
-                            Advanced Bose Engineering
+                            Advanced Psychoacoustic Analysis
                           </span>
                           {isAdvancedOpen ? (
                             <ChevronUp className="w-4 h-4" style={{ color: 'hsl(300 40% 60%)' }} />
@@ -1498,32 +1508,32 @@ const ThermalMusicVisualizer = () => {
                             <div className="flex justify-between text-[10px]">
                               <span style={{ color: 'hsl(280 30% 50%)' }}>Stereo Width</span>
                               <span className="font-mono text-right max-w-[60%] truncate" style={{ color: 'hsl(280 50% 75%)' }}>
-                                {magicAnalysis.boseEngineering.soundstage.stereoWidth}
+                                {magicAnalysis.psychoacousticProfile.soundstage.stereoWidth}
                               </span>
                             </div>
                             <div className="flex justify-between text-[10px]">
                               <span style={{ color: 'hsl(280 30% 50%)' }}>Depth Placement</span>
                               <span className="font-mono text-right max-w-[60%] truncate" style={{ color: 'hsl(280 50% 75%)' }}>
-                                {magicAnalysis.boseEngineering.soundstage.depthPlacement}
+                                {magicAnalysis.psychoacousticProfile.soundstage.depthPlacement}
                               </span>
                             </div>
                             <div className="pt-2 grid grid-cols-3 gap-1">
-                              <div className="text-center p-1 rounded" style={{ background: 'hsl(0 70% 35% / 0.3)' }}>
-                                <div className="text-[8px] uppercase" style={{ color: 'hsl(0 50% 60%)' }}>Sub-Bass</div>
-                                <div className="text-xs font-mono font-bold" style={{ color: 'hsl(0 70% 65%)' }}>
-                                  {(magicAnalysis.boseEngineering.soundstage.verticality.subBass * 100).toFixed(0)}%
+                              <div className="text-center p-1 rounded" style={{ background: 'hsl(280 70% 35% / 0.3)' }}>
+                                <div className="text-[8px] uppercase" style={{ color: 'hsl(280 50% 60%)' }}>Sub-Bass</div>
+                                <div className="text-xs font-mono font-bold" style={{ color: 'hsl(280 70% 65%)' }}>
+                                  {(magicAnalysis.psychoacousticProfile.soundstage.verticality.subBass * 100).toFixed(0)}%
                                 </div>
                               </div>
-                              <div className="text-center p-1 rounded" style={{ background: 'hsl(24 80% 40% / 0.3)' }}>
-                                <div className="text-[8px] uppercase" style={{ color: 'hsl(24 60% 65%)' }}>Mid</div>
-                                <div className="text-xs font-mono font-bold" style={{ color: 'hsl(24 80% 65%)' }}>
-                                  {(magicAnalysis.boseEngineering.soundstage.verticality.midRange * 100).toFixed(0)}%
+                              <div className="text-center p-1 rounded" style={{ background: 'hsl(300 80% 40% / 0.3)' }}>
+                                <div className="text-[8px] uppercase" style={{ color: 'hsl(300 60% 65%)' }}>Mid</div>
+                                <div className="text-xs font-mono font-bold" style={{ color: 'hsl(300 80% 65%)' }}>
+                                  {(magicAnalysis.psychoacousticProfile.soundstage.verticality.midRange * 100).toFixed(0)}%
                                 </div>
                               </div>
-                              <div className="text-center p-1 rounded" style={{ background: 'hsl(45 80% 45% / 0.3)' }}>
-                                <div className="text-[8px] uppercase" style={{ color: 'hsl(45 60% 65%)' }}>Air</div>
-                                <div className="text-xs font-mono font-bold" style={{ color: 'hsl(45 80% 70%)' }}>
-                                  {(magicAnalysis.boseEngineering.soundstage.verticality.airBand * 100).toFixed(0)}%
+                              <div className="text-center p-1 rounded" style={{ background: 'hsl(320 80% 45% / 0.3)' }}>
+                                <div className="text-[8px] uppercase" style={{ color: 'hsl(320 60% 65%)' }}>Air</div>
+                                <div className="text-xs font-mono font-bold" style={{ color: 'hsl(320 80% 70%)' }}>
+                                  {(magicAnalysis.psychoacousticProfile.soundstage.verticality.airBand * 100).toFixed(0)}%
                                 </div>
                               </div>
                             </div>
@@ -1542,19 +1552,19 @@ const ThermalMusicVisualizer = () => {
                             <div className="flex justify-between text-[10px]">
                               <span style={{ color: 'hsl(320 30% 50%)' }}>Character</span>
                               <span className="font-mono uppercase font-bold" style={{ color: 'hsl(320 60% 70%)' }}>
-                                {magicAnalysis.boseEngineering.timbre.character}
+                                {magicAnalysis.psychoacousticProfile.timbre.character}
                               </span>
                             </div>
                             <div className="text-[10px]">
                               <span style={{ color: 'hsl(320 30% 50%)' }}>Saturation:</span>
                               <p className="mt-1 leading-relaxed" style={{ color: 'hsl(320 40% 65%)' }}>
-                                {magicAnalysis.boseEngineering.timbre.saturation}
+                                {magicAnalysis.psychoacousticProfile.timbre.saturation}
                               </p>
                             </div>
                             <div className="text-[10px]">
                               <span style={{ color: 'hsl(320 30% 50%)' }}>Texture:</span>
                               <p className="mt-1 leading-relaxed" style={{ color: 'hsl(320 40% 65%)' }}>
-                                {magicAnalysis.boseEngineering.timbre.texture}
+                                {magicAnalysis.psychoacousticProfile.timbre.texture}
                               </p>
                             </div>
                           </div>
@@ -1563,28 +1573,28 @@ const ThermalMusicVisualizer = () => {
                         {/* Dynamics Section */}
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
-                            <div className="w-1 h-3 rounded-full" style={{ background: 'hsl(120 50% 45%)' }} />
-                            <span className="text-[9px] tracking-[0.15em] uppercase" style={{ color: 'hsl(120 40% 65%)' }}>
+                            <div className="w-1 h-3 rounded-full" style={{ background: 'hsl(260 50% 50%)' }} />
+                            <span className="text-[9px] tracking-[0.15em] uppercase" style={{ color: 'hsl(260 40% 70%)' }}>
                               Dynamic Response
                             </span>
                           </div>
-                          <div className="rounded-lg p-3 space-y-2" style={{ background: 'hsl(120 20% 12% / 0.5)' }}>
+                          <div className="rounded-lg p-3 space-y-2" style={{ background: 'hsl(260 20% 12% / 0.5)' }}>
                             <div className="text-[10px]">
-                              <span style={{ color: 'hsl(120 30% 50%)' }}>Attack:</span>
-                              <p className="mt-1 leading-relaxed" style={{ color: 'hsl(120 40% 65%)' }}>
-                                {magicAnalysis.boseEngineering.dynamics.attack}
+                              <span style={{ color: 'hsl(260 30% 50%)' }}>Attack:</span>
+                              <p className="mt-1 leading-relaxed" style={{ color: 'hsl(260 40% 65%)' }}>
+                                {magicAnalysis.psychoacousticProfile.dynamics.attack}
                               </p>
                             </div>
                             <div className="text-[10px]">
-                              <span style={{ color: 'hsl(120 30% 50%)' }}>Decay:</span>
-                              <p className="mt-1 leading-relaxed" style={{ color: 'hsl(120 40% 65%)' }}>
-                                {magicAnalysis.boseEngineering.dynamics.decay}
+                              <span style={{ color: 'hsl(260 30% 50%)' }}>Decay:</span>
+                              <p className="mt-1 leading-relaxed" style={{ color: 'hsl(260 40% 65%)' }}>
+                                {magicAnalysis.psychoacousticProfile.dynamics.decay}
                               </p>
                             </div>
                             <div className="text-[10px]">
-                              <span style={{ color: 'hsl(120 30% 50%)' }}>Noise Floor:</span>
-                              <p className="mt-1 leading-relaxed" style={{ color: 'hsl(120 40% 65%)' }}>
-                                {magicAnalysis.boseEngineering.dynamics.noiseFloor}
+                              <span style={{ color: 'hsl(260 30% 50%)' }}>Noise Floor:</span>
+                              <p className="mt-1 leading-relaxed" style={{ color: 'hsl(260 40% 65%)' }}>
+                                {magicAnalysis.psychoacousticProfile.dynamics.noiseFloor}
                               </p>
                             </div>
                           </div>
@@ -1593,31 +1603,31 @@ const ThermalMusicVisualizer = () => {
                         {/* Diffusion Section */}
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
-                            <div className="w-1 h-3 rounded-full" style={{ background: 'hsl(200 60% 50%)' }} />
-                            <span className="text-[9px] tracking-[0.15em] uppercase" style={{ color: 'hsl(200 50% 70%)' }}>
+                            <div className="w-1 h-3 rounded-full" style={{ background: 'hsl(240 60% 55%)' }} />
+                            <span className="text-[9px] tracking-[0.15em] uppercase" style={{ color: 'hsl(240 50% 70%)' }}>
                               Acoustic Diffusion
                             </span>
                           </div>
-                          <div className="rounded-lg p-3 space-y-2" style={{ background: 'hsl(200 30% 12% / 0.5)' }}>
+                          <div className="rounded-lg p-3 space-y-2" style={{ background: 'hsl(240 30% 12% / 0.5)' }}>
                             <div className="text-[10px]">
-                              <span style={{ color: 'hsl(200 30% 50%)' }}>Reverb:</span>
-                              <p className="mt-1 leading-relaxed" style={{ color: 'hsl(200 40% 65%)' }}>
-                                {magicAnalysis.boseEngineering.diffusion.reverb}
+                              <span style={{ color: 'hsl(240 30% 50%)' }}>Reverb:</span>
+                              <p className="mt-1 leading-relaxed" style={{ color: 'hsl(240 40% 65%)' }}>
+                                {magicAnalysis.psychoacousticProfile.diffusion.reverb}
                               </p>
                             </div>
                             <div className="text-[10px]">
-                              <span style={{ color: 'hsl(200 30% 50%)' }}>Space Character:</span>
-                              <p className="mt-1 leading-relaxed" style={{ color: 'hsl(200 40% 65%)' }}>
-                                {magicAnalysis.boseEngineering.diffusion.spaceCharacter}
+                              <span style={{ color: 'hsl(240 30% 50%)' }}>Space Character:</span>
+                              <p className="mt-1 leading-relaxed" style={{ color: 'hsl(240 40% 65%)' }}>
+                                {magicAnalysis.psychoacousticProfile.diffusion.spaceCharacter}
                               </p>
                             </div>
                           </div>
                         </div>
 
-                        {/* Bose Signature */}
-                        <div className="pt-2 border-t flex items-center justify-center gap-2" style={{ borderColor: 'hsl(300 30% 20%)' }}>
-                          <span className="text-[8px] tracking-[0.2em] uppercase" style={{ color: 'hsl(300 30% 45%)' }}>
-                            Bose Psychoacoustic Intelligence
+                        {/* Lavandar Signature */}
+                        <div className="pt-2 border-t flex items-center justify-center gap-2" style={{ borderColor: 'hsl(280 30% 20%)' }}>
+                          <span className="text-[8px] tracking-[0.2em] uppercase" style={{ color: 'hsl(280 30% 50%)' }}>
+                            Lavandar Psychoacoustic Intelligence
                           </span>
                         </div>
                       </CollapsibleContent>
