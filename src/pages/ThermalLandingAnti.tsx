@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import thermalDemoVideo from '@/assets/thermal-demo.mp4';
 import { SpatialAudioCAD, VINYL_COLLECTION, VinylRecord } from '@/components/SpatialAudioCAD';
 
@@ -136,25 +137,41 @@ const ThermalLandingAnti = () => {
       }}
     >
       {/* Kengo Kuma - Layered transparency panels */}
-      <div className="fixed inset-0 pointer-events-none z-[1]">
+      <motion.div 
+        className="fixed inset-0 pointer-events-none z-[1]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.5, ease: "easeOut" }}
+      >
         {/* Vertical slat rhythm - timber screen inspiration */}
-        <div 
+        <motion.div 
           className="absolute inset-0 opacity-[0.03]"
+          initial={{ x: -20 }}
+          animate={{ x: 0 }}
+          transition={{ duration: 1.8, ease: "easeOut", delay: 0.2 }}
           style={{
             background: 'repeating-linear-gradient(90deg, transparent, transparent 60px, hsl(var(--kuma-slat)) 60px, hsl(var(--kuma-slat)) 61px)',
           }}
         />
         {/* Horizontal strata - geological layering */}
-        <div 
+        <motion.div 
           className="absolute inset-0 opacity-[0.02]"
+          initial={{ y: -20 }}
+          animate={{ y: 0 }}
+          transition={{ duration: 1.8, ease: "easeOut", delay: 0.3 }}
           style={{
             background: 'repeating-linear-gradient(0deg, transparent, transparent 120px, hsl(var(--kuma-slat)) 120px, hsl(var(--kuma-slat)) 121px)',
           }}
         />
-      </div>
+      </motion.div>
 
       {/* AAL - Ruled surface lines (geometric precision) */}
-      <div className="fixed inset-0 pointer-events-none z-[2] opacity-[0.04]">
+      <motion.div 
+        className="fixed inset-0 pointer-events-none z-[2] opacity-[0.04]"
+        initial={{ opacity: 0, rotate: -1 }}
+        animate={{ opacity: 1, rotate: 0 }}
+        transition={{ duration: 2, ease: "easeOut", delay: 0.4 }}
+      >
         <div 
           className="absolute inset-0"
           style={{
@@ -162,10 +179,15 @@ const ThermalLandingAnti = () => {
             backgroundSize: '200px 200px',
           }}
         />
-      </div>
+      </motion.div>
 
       {/* Kuma - Floating glass panels (depth layering) */}
-      <div className="fixed top-[8%] right-[5%] w-48 h-64 pointer-events-none z-[3] opacity-60">
+      <motion.div 
+        className="fixed top-[8%] right-[5%] w-48 h-64 pointer-events-none z-[3] opacity-60"
+        initial={{ opacity: 0, x: 60, y: -30 }}
+        animate={{ opacity: 0.6, x: 0, y: 0 }}
+        transition={{ duration: 1.5, ease: "easeOut", delay: 0.6 }}
+      >
         <div 
           className="absolute inset-0 border border-white/[0.03] rounded-sm"
           style={{ 
@@ -173,15 +195,20 @@ const ThermalLandingAnti = () => {
             backdropFilter: 'blur(1px)',
           }}
         />
-      </div>
-      <div className="fixed bottom-[12%] left-[3%] w-32 h-80 pointer-events-none z-[3] opacity-40 -rotate-2">
+      </motion.div>
+      <motion.div 
+        className="fixed bottom-[12%] left-[3%] w-32 h-80 pointer-events-none z-[3] opacity-40 -rotate-2"
+        initial={{ opacity: 0, x: -40, y: 40 }}
+        animate={{ opacity: 0.4, x: 0, y: 0 }}
+        transition={{ duration: 1.5, ease: "easeOut", delay: 0.8 }}
+      >
         <div 
           className="absolute inset-0 border border-white/[0.02]"
           style={{ 
             background: 'linear-gradient(180deg, transparent 0%, hsl(var(--kuma-glass-2)) 100%)',
           }}
         />
-      </div>
+      </motion.div>
 
       {/* CAD Grid - Blueprint style */}
       <svg className="fixed inset-0 w-full h-full pointer-events-none z-0" style={{ opacity: 0.12 }}>
@@ -217,26 +244,57 @@ const ThermalLandingAnti = () => {
 
       {/* Technical HUD - Top with AAL geometric separator */}
       <header className="fixed top-0 left-0 right-0 z-40 p-6 flex justify-between items-start">
-        <div className="space-y-1">
+        <motion.div 
+          className="space-y-1"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
+        >
           {/* AAL geometric accent */}
-          <div className="flex items-center gap-3 mb-2">
+          <motion.div 
+            className="flex items-center gap-3 mb-2"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.5 }}
+          >
             <div className="w-6 h-px bg-cyan-500/40" />
-            <div className="w-1 h-1 rotate-45 border border-cyan-500/40" />
-          </div>
+            <motion.div 
+              className="w-1 h-1 rotate-45 border border-cyan-500/40"
+              initial={{ scale: 0, rotate: 0 }}
+              animate={{ scale: 1, rotate: 45 }}
+              transition={{ duration: 0.4, ease: "easeOut", delay: 0.7 }}
+            />
+          </motion.div>
           <div className="text-[9px] tracking-[0.4em] text-cyan-500/60">THERMAL RESONANCE SYSTEM</div>
           <div className="text-[8px] text-white/30">REV.2024.01 | SPATIAL AUDIO ENGINE</div>
-        </div>
-        <div className="text-right space-y-1">
+        </motion.div>
+        <motion.div 
+          className="text-right space-y-1"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
+        >
           {/* AAL geometric accent - mirrored */}
-          <div className="flex items-center justify-end gap-3 mb-2">
-            <div className="w-1 h-1 rotate-45 border border-white/20" />
+          <motion.div 
+            className="flex items-center justify-end gap-3 mb-2"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.5 }}
+            style={{ originX: 1 }}
+          >
+            <motion.div 
+              className="w-1 h-1 rotate-45 border border-white/20"
+              initial={{ scale: 0, rotate: 0 }}
+              animate={{ scale: 1, rotate: 45 }}
+              transition={{ duration: 0.4, ease: "easeOut", delay: 0.7 }}
+            />
             <div className="w-6 h-px bg-white/20" />
-          </div>
+          </motion.div>
           <div className="text-[9px] text-white/40">COORDINATES</div>
           <div className="text-[10px] font-mono text-cyan-400/80">
             X:{mousePos.x.toString().padStart(4, '0')} Y:{mousePos.y.toString().padStart(4, '0')}
           </div>
-        </div>
+        </motion.div>
       </header>
 
       {/* Main CAD Board */}
