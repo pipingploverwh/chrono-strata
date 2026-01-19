@@ -4,6 +4,7 @@ import { Play, Pause, Upload, Thermometer, Volume2, Activity, Disc, ArrowLeft, M
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import StrataEmbeddedDisplay from '@/components/strata/StrataEmbeddedDisplay';
+import WaveformVisualization from '@/components/strata/WaveformVisualization';
 
 // Proprietary Thermal Mapping Algorithm
 // Based on psychoacoustic energy density and spectral flux
@@ -51,6 +52,7 @@ const ThermalMusicVisualizer = () => {
   const [bpm, setBpm] = useState(0);
   const [peakEnergy, setPeakEnergy] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [waveformData, setWaveformData] = useState<number[]>(new Array(128).fill(128));
 
   // Fullscreen keyboard controls
   useEffect(() => {
@@ -191,6 +193,18 @@ const ThermalMusicVisualizer = () => {
     const frequencyData = new Uint8Array(analyserRef.current.frequencyBinCount);
     analyserRef.current.getByteFrequencyData(frequencyData);
 
+    // Capture time-domain waveform data
+    const timeDomainData = new Uint8Array(analyserRef.current.frequencyBinCount);
+    analyserRef.current.getByteTimeDomainData(timeDomainData);
+    
+    // Sample 128 points from the waveform for visualization
+    const sampledWaveform: number[] = [];
+    const sampleRate = Math.floor(timeDomainData.length / 128);
+    for (let i = 0; i < 128; i++) {
+      sampledWaveform.push(timeDomainData[i * sampleRate]);
+    }
+    setWaveformData(sampledWaveform);
+
     const spectral = calculateThermalResponse(frequencyData);
     setSpectralData(spectral);
 
@@ -310,10 +324,17 @@ const ThermalMusicVisualizer = () => {
           <div 
             className="flex-1 relative"
             style={{
-              background: `radial-gradient(ellipse at center, ${getThermalColor(globalTemp)} 0%, ${getThermalColor(globalTemp - 20)} 50%, hsl(0, 0%, 5%) 100%)`,
+              background: `radial-gradient(ellipse at center, ${getThermalColor(globalTemp)} 0%, ${getThermalColor(globalTemp - 20)} 50%, hsl(15, 30%, 6%) 100%)`,
               transition: 'background 0.15s ease-out',
             }}
           >
+            {/* Fullscreen Waveform Visualization */}
+            <WaveformVisualization
+              waveformData={waveformData}
+              temperature={globalTemp}
+              isPlaying={isPlaying}
+              getThermalColor={getThermalColor}
+            />
             {/* Ambient thermal particles - reduced on mobile */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
               {Array.from({ length: 20 }).map((_, i) => (
@@ -686,6 +707,14 @@ const ThermalMusicVisualizer = () => {
                     transition: 'background 0.1s ease-out',
                   }}
                 >
+                  {/* Waveform Visualization - Behind thermal zones */}
+                  <WaveformVisualization
+                    waveformData={waveformData}
+                    temperature={globalTemp}
+                    isPlaying={isPlaying}
+                    getThermalColor={getThermalColor}
+                  />
+                  
                   {/* Console body outline */}
                   <div className="absolute inset-4 rounded-2xl border-2 backdrop-blur-sm" style={{ borderColor: 'hsl(40 30% 85% / 0.2)', background: 'hsl(15 30% 6% / 0.3)' }}>
                     {/* Thermal zones */}
