@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, Volume2, VolumeX } from 'lucide-react';
 import thermalDemoVideo from '@/assets/thermal-demo.mp4';
+import SpatialAudioCAD from '@/components/SpatialAudioCAD';
 
 const DEMO_AUDIO_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
 
@@ -137,6 +138,43 @@ const ThermalLandingSlash = () => {
         </div>
       </section>
 
+      {/* 3D Spatial Audio CAD Section */}
+      <section className="h-screen relative bg-black">
+        <div className="absolute inset-0 border border-white/10">
+          <SpatialAudioCAD 
+            spectralData={spectralData} 
+            temperature={temperature} 
+            isPlaying={isPlaying} 
+          />
+        </div>
+        
+        {/* Section label */}
+        <div className="absolute bottom-8 left-8 z-10">
+          <p className="text-xs tracking-[0.3em] opacity-40 mb-2 font-mono">01</p>
+          <p className="text-xl font-extralight tracking-wide">SPATIAL AUDIO</p>
+          <p className="text-xs opacity-40 mt-1 font-mono">3D SOUND POSITIONING</p>
+        </div>
+        
+        {/* Audio control overlay */}
+        <div className="absolute bottom-8 right-8 z-10">
+          <button
+            onClick={toggleAudio}
+            className="group flex items-center gap-3"
+          >
+            <span className="text-xs tracking-[0.3em] opacity-40 group-hover:opacity-60 transition-opacity font-mono">
+              {isPlaying ? 'STOP' : 'PLAY'}
+            </span>
+            <span className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center group-hover:border-white/40 transition-colors bg-black/50 backdrop-blur">
+              {isPlaying ? (
+                <VolumeX className="w-4 h-4 opacity-60" />
+              ) : (
+                <Volume2 className="w-4 h-4 opacity-60" />
+              )}
+            </span>
+          </button>
+        </div>
+      </section>
+
       {/* Video section - full bleed */}
       <section className="relative h-screen">
         <video
@@ -152,11 +190,11 @@ const ThermalLandingSlash = () => {
         
         <div className="absolute bottom-12 left-8 right-8 flex justify-between items-end">
           <div>
-            <p className="text-xs tracking-[0.3em] opacity-40 mb-2">01</p>
-            <p className="text-2xl font-extralight">Visualize</p>
+            <p className="text-xs tracking-[0.3em] opacity-40 mb-2 font-mono">02</p>
+            <p className="text-2xl font-extralight">Thermal Vision</p>
           </div>
-          <p className="text-xs tracking-[0.2em] opacity-40 max-w-xs text-right">
-            Real-time thermal response
+          <p className="text-xs tracking-[0.2em] opacity-40 max-w-xs text-right font-mono">
+            REAL-TIME RESPONSE
           </p>
         </div>
       </section>
@@ -172,37 +210,30 @@ const ThermalLandingSlash = () => {
         />
 
         <div className="relative z-10 text-center">
-          <p className="text-xs tracking-[0.3em] opacity-40 mb-8">02</p>
+          <p className="text-xs tracking-[0.3em] opacity-40 mb-8 font-mono">03</p>
           
-          {/* Minimal frequency bars */}
-          <div className="flex items-end justify-center gap-1 h-32 mb-12">
-            {[spectralData.low, spectralData.mid, spectralData.high].map((val, i) => (
-              <div
-                key={i}
-                className="w-1 bg-white transition-all duration-75"
-                style={{ 
-                  height: `${8 + val * 120}px`,
-                  opacity: 0.3 + val * 0.7,
-                }}
-              />
-            ))}
+          {/* Spectral bars */}
+          <div className="flex items-end justify-center gap-2 h-40 mb-12">
+            {['LOW', 'MID', 'HIGH'].map((label, i) => {
+              const val = i === 0 ? spectralData.low : i === 1 ? spectralData.mid : spectralData.high;
+              return (
+                <div key={i} className="flex flex-col items-center gap-2">
+                  <div
+                    className="w-2 bg-white/80 transition-all duration-75 rounded-full"
+                    style={{ 
+                      height: `${10 + val * 130}px`,
+                      opacity: 0.4 + val * 0.6,
+                    }}
+                  />
+                  <span className="text-[8px] font-mono opacity-30">{label}</span>
+                </div>
+              );
+            })}
           </div>
 
-          <button
-            onClick={toggleAudio}
-            className="group flex items-center gap-4 mx-auto"
-          >
-            <span className="w-16 h-16 rounded-full border border-white/20 flex items-center justify-center group-hover:border-white/40 transition-colors">
-              {isPlaying ? (
-                <VolumeX className="w-5 h-5 opacity-60" />
-              ) : (
-                <Volume2 className="w-5 h-5 opacity-60" />
-              )}
-            </span>
-            <span className="text-xs tracking-[0.3em] opacity-40 group-hover:opacity-60 transition-opacity">
-              {isPlaying ? 'PAUSE' : 'LISTEN'}
-            </span>
-          </button>
+          <div className="font-mono text-xs opacity-30 mb-8">
+            FREQUENCY ANALYSIS
+          </div>
         </div>
       </section>
 
@@ -212,12 +243,12 @@ const ThermalLandingSlash = () => {
           to="/thermal-visualizer"
           className="group text-center"
         >
-          <p className="text-xs tracking-[0.3em] opacity-40 mb-6">03</p>
+          <p className="text-xs tracking-[0.3em] opacity-40 mb-6 font-mono">04</p>
           <h2 className="text-6xl sm:text-8xl font-extralight tracking-tight group-hover:tracking-normal transition-all duration-500">
-            Try it
+            Launch
           </h2>
           <div className="mt-8 flex items-center justify-center gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
-            <span className="text-xs tracking-[0.2em]">OPEN VISUALIZER</span>
+            <span className="text-xs tracking-[0.2em] font-mono">OPEN VISUALIZER</span>
             <ArrowUpRight className="w-4 h-4" />
           </div>
         </Link>
@@ -225,8 +256,8 @@ const ThermalLandingSlash = () => {
 
       {/* Footer */}
       <footer className="py-8 px-8 flex justify-between items-center border-t border-white/5">
-        <span className="text-xs opacity-30">© 2024</span>
-        <span className="text-xs opacity-30">THERMAL RESONANCE</span>
+        <span className="text-xs opacity-30 font-mono">© 2024</span>
+        <span className="text-xs opacity-30 font-mono">THERMAL RESONANCE SYSTEM</span>
       </footer>
     </div>
   );
