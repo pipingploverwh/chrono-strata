@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, Pause, Upload, Thermometer, Volume2, Activity, Disc, ArrowLeft, Monitor, Maximize2, Minimize2, X, Sparkles, Loader2 } from 'lucide-react';
+import { Play, Pause, Upload, Thermometer, Volume2, Activity, Disc, ArrowLeft, Monitor, Maximize2, Minimize2, X, Sparkles, Loader2, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import StrataEmbeddedDisplay from '@/components/strata/StrataEmbeddedDisplay';
@@ -58,6 +58,7 @@ const ThermalMusicVisualizer = () => {
   // Magic generation state
   const [isGeneratingMagic, setIsGeneratingMagic] = useState(false);
   const [magicAudio, setMagicAudio] = useState<HTMLAudioElement | null>(null);
+  const [magicAudioBase64, setMagicAudioBase64] = useState<string | null>(null);
   const [isMagicPlaying, setIsMagicPlaying] = useState(false);
   const [magicAnalysis, setMagicAnalysis] = useState<{
     mood: string;
@@ -291,6 +292,7 @@ const ThermalMusicVisualizer = () => {
       audio.loop = true;
       
       setMagicAudio(audio);
+      setMagicAudioBase64(data.audioContent);
       setMagicAnalysis(data.analysis);
       
       toast.success(`✨ Thermal magic generated! Mood: ${data.mood}`, { duration: 4000 });
@@ -312,6 +314,40 @@ const ThermalMusicVisualizer = () => {
       magicAudio.play();
     }
     setIsMagicPlaying(!isMagicPlaying);
+  };
+
+  // Download magic audio as MP3
+  const downloadMagicAudio = () => {
+    if (!magicAudioBase64) {
+      toast.error('No magic audio to download');
+      return;
+    }
+
+    // Convert base64 to blob
+    const byteCharacters = atob(magicAudioBase64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'audio/mpeg' });
+
+    // Create download link
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    
+    // Generate filename from original audio file and mood
+    const baseName = audioFile?.name.replace(/\.[^/.]+$/, '') || 'audio';
+    const mood = magicAnalysis?.mood || 'magic';
+    link.download = `${baseName}-thermal-magic-${mood}.mp3`;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    toast.success('Magic audio downloaded!');
   };
 
   // Toggle playback
@@ -791,7 +827,7 @@ const ThermalMusicVisualizer = () => {
                 {/* Magic Audio Controls */}
                 {magicAudio && (
                   <div 
-                    className="flex items-center gap-4 px-4 py-3 rounded-xl"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl"
                     style={{ 
                       background: 'linear-gradient(135deg, hsl(280 40% 15% / 0.8) 0%, hsl(320 40% 15% / 0.8) 100%)',
                       border: '1px solid hsl(300 50% 35% / 0.5)',
@@ -800,24 +836,38 @@ const ThermalMusicVisualizer = () => {
                     <Button
                       onClick={toggleMagicPlayback}
                       size="sm"
-                      className="w-10 h-10 rounded-full"
+                      className="w-10 h-10 rounded-full flex-shrink-0"
                       style={{ 
                         background: 'linear-gradient(135deg, hsl(280 70% 50%) 0%, hsl(320 80% 60%) 100%)',
                       }}
                     >
                       {isMagicPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
                     </Button>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 text-sm" style={{ color: 'hsl(300 50% 75%)' }}>
-                        <Sparkles className="w-3 h-3" />
-                        <span className="font-medium">Thermal Magic Layer</span>
+                        <Sparkles className="w-3 h-3 flex-shrink-0" />
+                        <span className="font-medium truncate">Thermal Magic Layer</span>
                       </div>
                       {magicAnalysis && (
-                        <div className="text-xs mt-1" style={{ color: 'hsl(300 30% 55%)' }}>
+                        <div className="text-xs mt-1 truncate" style={{ color: 'hsl(300 30% 55%)' }}>
                           {magicAnalysis.emotionalTone} • {magicAnalysis.frequencyProfile}
                         </div>
                       )}
                     </div>
+                    <Button
+                      onClick={downloadMagicAudio}
+                      size="sm"
+                      variant="outline"
+                      className="flex items-center gap-2 flex-shrink-0"
+                      style={{ 
+                        borderColor: 'hsl(300 50% 45% / 0.5)',
+                        color: 'hsl(300 50% 75%)',
+                        background: 'hsl(300 30% 20% / 0.5)',
+                      }}
+                    >
+                      <Download className="w-4 h-4" />
+                      <span className="hidden sm:inline">Save MP3</span>
+                    </Button>
                   </div>
                 )}
                 
