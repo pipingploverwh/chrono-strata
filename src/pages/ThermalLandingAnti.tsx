@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import thermalDemoVideo from '@/assets/thermal-demo.mp4';
 import { SpatialAudioCAD, VINYL_COLLECTION, VinylRecord } from '@/components/SpatialAudioCAD';
+import ThermalNavigation from '@/components/ThermalNavigation';
 
 const ThermalLandingAnti = () => {
   const [temperature, setTemperature] = useState(35);
@@ -242,60 +243,8 @@ const ThermalLandingAnti = () => {
         </svg>
       </div>
 
-      {/* Technical HUD - Top with AAL geometric separator */}
-      <header className="fixed top-0 left-0 right-0 z-40 p-6 flex justify-between items-start">
-        <motion.div 
-          className="space-y-1"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-        >
-          {/* AAL geometric accent */}
-          <motion.div 
-            className="flex items-center gap-3 mb-2"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.6, ease: "easeOut", delay: 0.5 }}
-          >
-            <div className="w-6 h-px bg-cyan-500/40" />
-            <motion.div 
-              className="w-1 h-1 rotate-45 border border-cyan-500/40"
-              initial={{ scale: 0, rotate: 0 }}
-              animate={{ scale: 1, rotate: 45 }}
-              transition={{ duration: 0.4, ease: "easeOut", delay: 0.7 }}
-            />
-          </motion.div>
-          <div className="text-[9px] tracking-[0.4em] text-cyan-500/60">THERMAL RESONANCE SYSTEM</div>
-          <div className="text-[8px] text-white/30">REV.2024.01 | SPATIAL AUDIO ENGINE</div>
-        </motion.div>
-        <motion.div 
-          className="text-right space-y-1"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-        >
-          {/* AAL geometric accent - mirrored */}
-          <motion.div 
-            className="flex items-center justify-end gap-3 mb-2"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.6, ease: "easeOut", delay: 0.5 }}
-            style={{ originX: 1 }}
-          >
-            <motion.div 
-              className="w-1 h-1 rotate-45 border border-white/20"
-              initial={{ scale: 0, rotate: 0 }}
-              animate={{ scale: 1, rotate: 45 }}
-              transition={{ duration: 0.4, ease: "easeOut", delay: 0.7 }}
-            />
-            <div className="w-6 h-px bg-white/20" />
-          </motion.div>
-          <div className="text-[9px] text-white/40">COORDINATES</div>
-          <div className="text-[10px] font-mono text-cyan-400/80">
-            X:{mousePos.x.toString().padStart(4, '0')} Y:{mousePos.y.toString().padStart(4, '0')}
-          </div>
-        </motion.div>
-      </header>
+      {/* Unified Thermal Navigation */}
+      <ThermalNavigation />
 
       {/* Main CAD Board */}
       <main className="relative z-10 min-h-screen pt-20 pb-20">
