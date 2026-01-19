@@ -75,6 +75,37 @@ html {
   /* Border & Glow Effects */
   --thermal-border: 30 30% 25%;
   --thermal-glow: 25 100% 50%;
+
+  /* ═══════════════════════════════════════════════════════════════
+     DJ KREMBO × KAZUMA 551 — Japanese Underground Design System
+     Tokyo nightlife meets Berlin industrial warehouse aesthetic
+     ═══════════════════════════════════════════════════════════════ */
+  
+  /* Core Rose/Crimson Palette */
+  --krembo-rose: 350 80% 55%;
+  --krembo-rose-bright: 350 90% 65%;
+  --krembo-rose-dim: 350 50% 25%;
+  --krembo-rose-subtle: 350 30% 12%;
+  
+  /* Neon Pink Accents */
+  --krembo-neon: 330 100% 60%;
+  --krembo-neon-bright: 330 100% 70%;
+  --krembo-neon-glow: 330 100% 50%;
+  
+  /* Tokyo Night Backgrounds */
+  --krembo-night: 340 30% 6%;
+  --krembo-night-elevated: 340 25% 10%;
+  --krembo-night-surface: 340 20% 14%;
+  
+  /* Berlin Industrial */
+  --krembo-industrial: 0 0% 8%;
+  --krembo-concrete: 0 0% 15%;
+  --krembo-steel: 220 10% 30%;
+  
+  /* Status */
+  --krembo-live: 350 80% 55%;
+  --krembo-standby: 45 70% 50%;
+  --krembo-offline: 0 0% 40%;
   
   /* ═══════════════════════════════════════════════════════════════
      KENGO KUMA LAYERING SYSTEM — Depth through transparency
