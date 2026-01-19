@@ -9,6 +9,7 @@ import ThermalFooter from '@/components/ThermalFooter';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const VALUE_PROPS = [
   {
@@ -665,11 +666,33 @@ const EmailCaptureSection = ({ getThermalColor, temperature }: { getThermalColor
     if (!email.trim()) return;
     
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsSubscribed(true);
-    setIsSubmitting(false);
-    toast.success('Welcome to early access! Check your inbox.');
+    
+    try {
+      const { error } = await supabase
+        .from('newsletter_subscribers')
+        .insert({ 
+          email: email.trim().toLowerCase(),
+          source: 'thermal_landing'
+        });
+      
+      if (error) {
+        if (error.code === '23505') {
+          // Unique constraint violation - already subscribed
+          toast.info('You\'re already on the list!');
+          setIsSubscribed(true);
+        } else {
+          throw error;
+        }
+      } else {
+        setIsSubscribed(true);
+        toast.success('Welcome to early access! Check your inbox.');
+      }
+    } catch (err) {
+      console.error('Newsletter signup error:', err);
+      toast.error('Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
