@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.plover-guide]
 verify_jwt = false
+
+[functions.create-allocation-checkout]
+verify_jwt = false

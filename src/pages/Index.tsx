@@ -114,13 +114,13 @@ const LandingPage = () => {
             </p>
             
             <div className="flex flex-wrap gap-4">
-              <Button 
-                onClick={() => navigate("/investor-hub")}
-                className="bg-lavender hover:bg-lavender-glow text-primary-foreground text-xs tracking-widest uppercase px-8 py-6 rounded-none group"
-              >
-                Request Allocation
-                <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" />
-              </Button>
+            <Button 
+              onClick={() => navigate("/allocation-checkout")}
+              className="bg-lavender hover:bg-lavender-glow text-primary-foreground text-xs tracking-widest uppercase px-8 py-6 rounded-none group"
+            >
+              Request Allocation
+              <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" />
+            </Button>
               <Button 
                 variant="outline"
                 onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
