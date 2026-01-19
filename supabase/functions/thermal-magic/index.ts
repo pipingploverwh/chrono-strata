@@ -16,7 +16,7 @@ interface MagicRequest {
   fileName: string;
 }
 
-// Bose Psychoacoustic Engineering: Spatial Soundstage Positioning
+// Psychoacoustic Engineering: Spatial Soundstage Positioning
 function calculateSpatialSoundstage(lowFreq: number, midFreq: number, highFreq: number, energy: number) {
   const totalEnergy = lowFreq + midFreq + highFreq + 0.001;
   
@@ -47,7 +47,7 @@ function calculateSpatialSoundstage(lowFreq: number, midFreq: number, highFreq: 
   };
 }
 
-// Bose Psychoacoustic Engineering: Temperature as Timbre
+// Psychoacoustic Engineering: Temperature as Timbre
 function calculateTemperatureTimbre(temperature: number) {
   // Normalize temperature to 0-1 scale (assuming -20°C to 80°C range)
   const normalizedTemp = Math.min(1, Math.max(0, (temperature + 20) / 100));
@@ -91,7 +91,7 @@ function calculateTemperatureTimbre(temperature: number) {
   }
 }
 
-// Bose Psychoacoustic Engineering: Dynamic Transient Response
+// Psychoacoustic Engineering: Dynamic Transient Response
 function calculateDynamicResponse(energy: number, bpm: number, lowFreq: number) {
   // Transient preservation based on energy peaks
   const transientAttack = energy > 0.8 ? 'explosive attack with preserved peak dynamics' :
@@ -105,7 +105,7 @@ function calculateDynamicResponse(energy: number, bpm: number, lowFreq: number) 
                         bpm > 60 ? 'extended decay with reverberant sustain' :
                         'infinite sustain with drone-like persistence';
   
-  // Noise floor management (Bose ANC philosophy)
+  // Noise floor management (adaptive noise control philosophy)
   const noiseFloor = energy < 0.1 ? 'velvet black silence with micro-texture detail' :
                      energy < 0.3 ? 'intimate close-mic presence, minimal room tone' :
                      'natural room ambience with controlled reflections';
@@ -123,7 +123,7 @@ function calculateDynamicResponse(energy: number, bpm: number, lowFreq: number) 
   };
 }
 
-// Bose Psychoacoustic Engineering: Reverb/Diffusion from "Humidity"
+// Psychoacoustic Engineering: Reverb/Diffusion from "Humidity"
 function calculateAcousticDiffusion(midFreq: number, energy: number) {
   // Treat mid-frequency energy as "humidity" - diffusion characteristic
   const humidity = midFreq;
@@ -165,7 +165,7 @@ serve(async (req) => {
       throw new Error('ElevenLabs API key not configured');
     }
 
-    // === BOSE PSYCHOACOUSTIC ANALYSIS ===
+    // === PSYCHOACOUSTIC ANALYSIS ===
     
     // 1. Spatial Soundstage Positioning
     const soundstage = calculateSpatialSoundstage(lowFreq, midFreq, highFreq, energy);
@@ -182,7 +182,7 @@ serve(async (req) => {
     // Calculate thermal intensity for mood classification
     const thermalIntensity = Math.min(1, Math.max(0, (temperature + 15) / 100));
     
-    // Determine mood with Bose-informed vocabulary
+    // Determine mood based on psychoacoustic analysis
     let mood: string;
     if (thermalIntensity < 0.25) {
       mood = 'crystalline-ambient';
@@ -194,7 +194,7 @@ serve(async (req) => {
       mood = 'thermal-intensity';
     }
 
-    // === CONSTRUCT BOSE-ENGINEERED PROMPT ===
+    // === CONSTRUCT PSYCHOACOUSTIC-ENGINEERED PROMPT ===
     const prompt = `PSYCHOACOUSTIC THERMAL COMPOSITION
 
 SOUNDSTAGE ARCHITECTURE:
@@ -267,8 +267,8 @@ Source: ${fileName.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ')}`;
           frequencyProfile,
           tempoFeel: dynamics.decayResponse,
           emotionalTone: timbre.psychoacoustic,
-          // Bose psychoacoustic metadata
-          boseEngineering: {
+          // Psychoacoustic metadata
+          psychoacousticProfile: {
             soundstage: {
               stereoWidth: soundstage.stereoWidth,
               depthPlacement: soundstage.depthPlacement,

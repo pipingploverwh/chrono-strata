@@ -17,14 +17,14 @@ interface PsychoacousticProps {
   getThermalColor: (temp: number) => string;
 }
 
-// Bose Psychoacoustic Engineering: Real-time visualization of audio intelligence
+// Psychoacoustic Engineering: Real-time visualization of audio intelligence
 const PsychoacousticVisualization = ({ 
   spectralData, 
   temperature, 
   isPlaying,
   getThermalColor 
 }: PsychoacousticProps) => {
-  // Calculate Bose soundstage metrics
+  // Calculate soundstage metrics
   const totalEnergy = spectralData.low + spectralData.mid + spectralData.high + 0.01;
   const subBassRatio = (spectralData.low / totalEnergy) * 100;
   const midRatio = (spectralData.mid / totalEnergy) * 100;
@@ -67,9 +67,9 @@ const PsychoacousticVisualization = ({
           />
           <span 
             className="text-xs font-medium tracking-[0.15em] uppercase"
-            style={{ color: 'hsl(24 100% 55%)' }}
+            style={{ color: 'hsl(290 70% 65%)' }}
           >
-            Bose Psychoacoustic Engine
+            Psychoacoustic Engine
           </span>
         </div>
         <span 
@@ -340,12 +340,12 @@ const PsychoacousticVisualization = ({
           </div>
         </div>
 
-        {/* Bose signature */}
-        <div className="pt-2 border-t flex items-center justify-between" style={{ borderColor: 'hsl(30 30% 12%)' }}>
-          <span className="text-[8px] tracking-[0.15em] uppercase" style={{ color: 'hsl(30 20% 35%)' }}>
+        {/* Lavandar signature */}
+        <div className="pt-2 border-t flex items-center justify-between" style={{ borderColor: 'hsl(280 30% 15%)' }}>
+          <span className="text-[8px] tracking-[0.15em] uppercase" style={{ color: 'hsl(280 25% 45%)' }}>
             Psychoacoustic Intelligence
           </span>
-          <span className="text-[8px] font-mono" style={{ color: 'hsl(30 20% 40%)' }}>
+          <span className="text-[8px] font-mono" style={{ color: 'hsl(280 30% 55%)' }}>
             {isPlaying ? 'ACTIVE' : 'STANDBY'}
           </span>
         </div>
