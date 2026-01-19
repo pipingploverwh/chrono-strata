@@ -53,3 +53,6 @@ verify_jwt = false
 
 [functions.send-executive-summary]
 verify_jwt = false
+
+[functions.beena-analysis]
+verify_jwt = false
