@@ -88,6 +88,14 @@ export default {
           2: "hsl(var(--surface-2))",
           3: "hsl(var(--surface-3))",
         },
+        // Piping Plover beach palette
+        plover: {
+          sand: "#D4C4A8",
+          ocean: "#4A7C94",
+          sunset: "#E8935A",
+          dune: "#FAF8F5",
+          driftwood: "#2D3436",
+        },
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],

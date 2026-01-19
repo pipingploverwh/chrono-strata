@@ -44,6 +44,7 @@ import LinkedInCEOPage from "./pages/LinkedInCEOPage";
 import ShibuyaStartup from "./pages/ShibuyaStartup";
 import OdooTransferPortal from "./pages/OdooTransferPortal";
 import ScreenshotTools from "./pages/ScreenshotTools";
+import WellfleetDispensary from "./pages/WellfleetDispensary";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +82,7 @@ const App = () => (
                 <Route path="/linkedin-company" element={<LinkedInCompanyPage />} />
                 <Route path="/linkedin-ceo" element={<LinkedInCEOPage />} />
                 <Route path="/shibuya" element={<ShibuyaStartup />} />
+                <Route path="/wellfleet" element={<WellfleetDispensary />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />
