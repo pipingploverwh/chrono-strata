@@ -11,7 +11,6 @@ import {
   Download, 
   Share2, 
   ArrowRight,
-  Flame,
   Waves,
   BarChart3,
   Monitor,
@@ -25,6 +24,7 @@ import { Slider } from '@/components/ui/slider';
 import thermalDemoVideo from '@/assets/thermal-demo.mp4';
 import ThermalNavigation from '@/components/ThermalNavigation';
 import ThermalFooter from '@/components/ThermalFooter';
+import LavandarBackground from '@/components/LavandarBackground';
 
 // Demo audio URL - using a free sample track
 const DEMO_AUDIO_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
@@ -227,11 +227,12 @@ const ThermalVisualizerLanding = () => {
     }
   };
 
-  const getThermalColor = (temp: number): string => {
+  // Lavandar-themed color function
+  const getLavandarColor = (temp: number): string => {
     const normalized = (temp - 20) / 50;
-    if (normalized < 0.3) return `hsl(15, 60%, ${20 + normalized * 60}%)`;
-    if (normalized < 0.6) return `hsl(${15 + (normalized - 0.3) * 40}, 80%, ${40 + (normalized - 0.3) * 30}%)`;
-    return `hsl(${35 + (normalized - 0.6) * 25}, 95%, ${55 + (normalized - 0.6) * 30}%)`;
+    if (normalized < 0.3) return `hsl(280, 40%, ${25 + normalized * 40}%)`;
+    if (normalized < 0.6) return `hsl(${280 - (normalized - 0.3) * 30}, 55%, ${45 + (normalized - 0.3) * 25}%)`;
+    return `hsl(${260 - (normalized - 0.6) * 20}, 70%, ${60 + (normalized - 0.6) * 25}%)`;
   };
 
   const features = [
@@ -268,108 +269,25 @@ const ThermalVisualizerLanding = () => {
   ];
 
   return (
-    <div className="min-h-screen text-white overflow-hidden" style={{ background: 'hsl(15 30% 4%)' }}>
-      {/* Unified Thermal Navigation */}
-      <ThermalNavigation />
+    <div className="min-h-screen text-white overflow-hidden" style={{ background: 'hsl(270 30% 6%)' }}>
+      {/* Lavandar Immersive Background */}
+      <LavandarBackground variant="dark" showWaves={true} showPolygons={true} intensity={1} />
+      
+      {/* Unified Navigation */}
+      <ThermalNavigation variant="dark" />
 
-      {/* Kengo Kuma - Layered transparency panels */}
-      <motion.div 
-        className="fixed inset-0 pointer-events-none z-[1]"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.5, ease: "easeOut" }}
-      >
-        {/* Vertical slat rhythm - timber screen inspiration */}
-        <motion.div 
-          className="absolute inset-0 opacity-[0.025]"
-          initial={{ x: -30 }}
-          animate={{ x: 0 }}
-          transition={{ duration: 2, ease: "easeOut", delay: 0.2 }}
-          style={{
-            background: 'repeating-linear-gradient(90deg, transparent, transparent 80px, hsl(var(--kuma-slat)) 80px, hsl(var(--kuma-slat)) 81px)',
-          }}
-        />
-        {/* Horizontal strata - geological layering */}
-        <motion.div 
-          className="absolute inset-0 opacity-[0.015]"
-          initial={{ y: -30 }}
-          animate={{ y: 0 }}
-          transition={{ duration: 2, ease: "easeOut", delay: 0.3 }}
-          style={{
-            background: 'repeating-linear-gradient(0deg, transparent, transparent 150px, hsl(var(--kuma-slat)) 150px, hsl(var(--kuma-slat)) 151px)',
-          }}
-        />
-      </motion.div>
-
-      {/* AAL - Ruled surface lines (geometric precision) */}
-      <motion.div 
-        className="fixed inset-0 pointer-events-none z-[2] opacity-[0.03]"
-        initial={{ opacity: 0, rotate: -1 }}
-        animate={{ opacity: 1, rotate: 0 }}
-        transition={{ duration: 2.5, ease: "easeOut", delay: 0.4 }}
-      >
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(135deg, transparent 49.5%, hsl(var(--aal-line)) 49.5%, hsl(var(--aal-line)) 50.5%, transparent 50.5%)',
-            backgroundSize: '250px 250px',
-          }}
-        />
-      </motion.div>
-
-      {/* Kuma - Floating glass panels (depth layering) */}
-      <motion.div 
-        className="fixed top-[10%] right-[4%] w-40 h-56 pointer-events-none z-[3] opacity-50"
-        initial={{ opacity: 0, x: 80, y: -40 }}
-        animate={{ opacity: 0.5, x: 0, y: 0 }}
-        transition={{ duration: 1.8, ease: "easeOut", delay: 0.6 }}
-      >
-        <div 
-          className="absolute inset-0 border border-white/[0.02] rounded-sm"
-          style={{ 
-            background: 'linear-gradient(145deg, hsl(var(--kuma-glass-1)) 0%, transparent 100%)',
-            backdropFilter: 'blur(1px)',
-          }}
-        />
-      </motion.div>
-      <motion.div 
-        className="fixed bottom-[15%] left-[2%] w-28 h-72 pointer-events-none z-[3] opacity-35 rotate-1"
-        initial={{ opacity: 0, x: -60, y: 50 }}
-        animate={{ opacity: 0.35, x: 0, y: 0 }}
-        transition={{ duration: 1.8, ease: "easeOut", delay: 0.8 }}
-      >
-        <div 
-          className="absolute inset-0 border border-white/[0.015]"
-          style={{ 
-            background: 'linear-gradient(180deg, transparent 0%, hsl(var(--kuma-glass-2)) 100%)',
-          }}
-        />
-      </motion.div>
-
-      {/* Dynamic thermal background */}
+      {/* Dynamic lavender glow following cursor */}
       <div 
         className="fixed inset-0 pointer-events-none transition-all duration-300 z-[4]"
         style={{
-          background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, ${getThermalColor(temperature)} 0%, transparent 50%)`,
-          opacity: 0.3,
-        }}
-      />
-
-      {/* Animated grid pattern */}
-      <div 
-        className="fixed inset-0 pointer-events-none opacity-[0.08] z-[5]"
-        style={{
-          backgroundImage: `
-            linear-gradient(hsl(24 100% 50% / 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, hsl(24 100% 50% / 0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: '60px 60px',
+          background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, ${getLavandarColor(temperature)} 0%, transparent 50%)`,
+          opacity: 0.25,
         }}
       />
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-6">
-        {/* Floating thermal orbs */}
+        {/* Floating lavender orbs */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {[...Array(8)].map((_, i) => (
             <div
@@ -380,7 +298,7 @@ const ThermalVisualizerLanding = () => {
                 top: `${20 + (i % 3) * 25}%`,
                 width: `${80 + i * 20}px`,
                 height: `${80 + i * 20}px`,
-                background: `radial-gradient(circle, ${getThermalColor(30 + i * 8)} 0%, transparent 70%)`,
+                background: `radial-gradient(circle, ${getLavandarColor(30 + i * 8)} 0%, transparent 70%)`,
                 animationDelay: `${i * 200}ms`,
                 animationDuration: `${3000 + i * 500}ms`,
               }}
@@ -411,28 +329,28 @@ const ThermalVisualizerLanding = () => {
           <div 
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8"
             style={{ 
-              background: 'hsl(20 40% 12% / 0.8)', 
-              border: '1px solid hsl(24 100% 50% / 0.3)',
+              background: 'hsl(270 30% 15% / 0.8)', 
+              border: '1px solid hsl(280 60% 50% / 0.3)',
               backdropFilter: 'blur(8px)',
             }}
           >
-            <Flame className="w-4 h-4" style={{ color: 'hsl(24 100% 50%)' }} />
-            <span className="text-sm tracking-wider" style={{ color: 'hsl(40 30% 75%)' }}>
-              THERMAL RESONANCE SYSTEM™
+            <Sparkles className="w-4 h-4" style={{ color: 'hsl(280 70% 65%)' }} />
+            <span className="text-sm tracking-wider" style={{ color: 'hsl(280 30% 80%)' }}>
+              LAVANDAR RESONANCE™
             </span>
-            <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'hsl(24 100% 50%)', color: 'hsl(15 30% 6%)' }}>
+            <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'hsl(280 60% 55%)', color: 'white' }}>
               NEW
             </span>
           </div>
 
           {/* Main headline */}
           <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extralight tracking-tight mb-6">
-            <span style={{ color: 'hsl(40 30% 85%)' }}>See Your Music</span>
+            <span style={{ color: 'hsl(280 20% 90%)' }}>See Your Music</span>
             <br />
             <span 
               className="font-light text-transparent bg-clip-text"
               style={{ 
-                backgroundImage: 'linear-gradient(135deg, hsl(0 70% 45%) 0%, hsl(24 100% 55%) 50%, hsl(45 100% 80%) 100%)',
+                backgroundImage: 'linear-gradient(135deg, hsl(280 60% 55%) 0%, hsl(300 70% 70%) 50%, hsl(320 60% 80%) 100%)',
               }}
             >
               Come Alive
@@ -440,9 +358,9 @@ const ThermalVisualizerLanding = () => {
           </h1>
 
           {/* Subheadline */}
-          <p className="text-lg sm:text-xl md:text-2xl max-w-2xl mx-auto mb-10 leading-relaxed" style={{ color: 'hsl(30 20% 60%)' }}>
-            Transform any audio into a <span style={{ color: 'hsl(24 100% 60%)' }}>living thermal landscape</span>. 
-            Watch temperatures rise with the beat, generate AI magic, and experience music like never before.
+          <p className="text-lg sm:text-xl md:text-2xl max-w-2xl mx-auto mb-10 leading-relaxed" style={{ color: 'hsl(270 20% 65%)' }}>
+            Transform any audio into a <span style={{ color: 'hsl(280 70% 70%)' }}>flowing luminous landscape</span>. 
+            Watch energy flow with the beat, generate AI magic, and experience music like never before.
           </p>
 
           {/* CTA buttons */}
@@ -452,8 +370,8 @@ const ThermalVisualizerLanding = () => {
                 size="lg"
                 className="text-lg px-8 py-6 rounded-full group"
                 style={{ 
-                  background: 'linear-gradient(135deg, hsl(0 70% 45%) 0%, hsl(24 100% 50%) 100%)',
-                  boxShadow: '0 0 40px hsl(24 100% 50% / 0.4)',
+                  background: 'linear-gradient(135deg, hsl(280 60% 45%) 0%, hsl(300 70% 55%) 100%)',
+                  boxShadow: '0 0 40px hsl(280 60% 50% / 0.4)',
                 }}
               >
                 <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
@@ -466,15 +384,15 @@ const ThermalVisualizerLanding = () => {
               variant="outline"
               className="text-lg px-8 py-6 rounded-full"
               style={{ 
-                borderColor: 'hsl(40 30% 30%)', 
-                color: 'hsl(40 30% 75%)',
+                borderColor: 'hsl(280 30% 40%)', 
+                color: 'hsl(280 30% 80%)',
                 background: 'transparent',
               }}
               onClick={() => {
                 if (navigator.share) {
                   navigator.share({
-                    title: 'Thermal Music Visualizer',
-                    text: 'Transform your music into living thermal landscapes',
+                    title: 'Lavandar Music Visualizer',
+                    text: 'Transform your music into flowing luminous landscapes',
                     url: window.location.href,
                   });
                 } else {
@@ -491,15 +409,15 @@ const ThermalVisualizerLanding = () => {
           <div 
             className="inline-flex items-center gap-4 px-6 py-3 rounded-2xl"
             style={{ 
-              background: 'hsl(20 25% 8% / 0.8)', 
-              border: '1px solid hsl(30 30% 20%)',
+              background: 'hsl(270 25% 12% / 0.8)', 
+              border: '1px solid hsl(280 40% 30%)',
             }}
           >
-            <Thermometer className="w-5 h-5" style={{ color: getThermalColor(temperature) }} />
-            <span className="text-sm" style={{ color: 'hsl(30 20% 55%)' }}>Move your cursor to feel the heat</span>
+            <Thermometer className="w-5 h-5" style={{ color: getLavandarColor(temperature) }} />
+            <span className="text-sm" style={{ color: 'hsl(270 20% 60%)' }}>Move your cursor to feel the energy</span>
             <span 
               className="font-mono text-2xl font-bold transition-colors duration-150"
-              style={{ color: getThermalColor(temperature) }}
+              style={{ color: getLavandarColor(temperature) }}
             >
               {temperature.toFixed(1)}°C
             </span>
@@ -599,13 +517,13 @@ const ThermalVisualizerLanding = () => {
       </section>
 
       {/* Live Audio Demo Section */}
-      <section className="relative py-24 px-6" style={{ background: 'linear-gradient(180deg, hsl(15 30% 4%) 0%, hsl(15 35% 6%) 50%, hsl(15 30% 4%) 100%)' }}>
+      <section className="relative py-24 px-6" style={{ background: 'linear-gradient(180deg, hsl(270 30% 6%) 0%, hsl(275 35% 10%) 50%, hsl(270 30% 6%) 100%)' }}>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extralight mb-4" style={{ color: 'hsl(40 30% 85%)' }}>
-              <span style={{ color: 'hsl(24 100% 55%)' }}>Hear</span> the Heat
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extralight mb-4" style={{ color: 'hsl(280 20% 90%)' }}>
+              <span style={{ color: 'hsl(280 70% 70%)' }}>Hear</span> the Energy
             </h2>
-            <p className="text-lg max-w-2xl mx-auto" style={{ color: 'hsl(30 20% 55%)' }}>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: 'hsl(270 20% 60%)' }}>
               Press play and watch the visualization respond to the music in real-time
             </p>
           </div>
@@ -614,21 +532,21 @@ const ThermalVisualizerLanding = () => {
           <div 
             className="relative rounded-3xl overflow-hidden p-8 transition-all duration-300"
             style={{ 
-              background: 'hsl(20 25% 6%)', 
-              border: `2px solid ${isPlaying ? getThermalColor(demoTemperature) : 'hsl(30 30% 18%)'}`,
-              boxShadow: isPlaying ? `0 0 60px ${getThermalColor(demoTemperature)}40` : 'none',
+              background: 'hsl(270 30% 8%)', 
+              border: `2px solid ${isPlaying ? getLavandarColor(demoTemperature) : 'hsl(280 30% 25%)'}`,
+              boxShadow: isPlaying ? `0 0 60px ${getLavandarColor(demoTemperature)}40` : 'none',
             }}
           >
-            {/* Thermal glow effect */}
+            {/* Glow effect */}
             <div 
               className="absolute inset-0 pointer-events-none transition-opacity duration-500"
               style={{
-                background: `radial-gradient(circle at 50% 50%, ${getThermalColor(demoTemperature)}30 0%, transparent 70%)`,
+                background: `radial-gradient(circle at 50% 50%, ${getLavandarColor(demoTemperature)}30 0%, transparent 70%)`,
                 opacity: isPlaying ? 1 : 0.3,
               }}
             />
 
-            {/* Spectral bars visualization */}
+            {/* Spectral bars visualization - Lavender palette */}
             <div className="relative z-10 flex items-end justify-center gap-4 h-48 mb-8">
               {/* Bass bar */}
               <div className="flex flex-col items-center gap-2">
@@ -636,11 +554,11 @@ const ThermalVisualizerLanding = () => {
                   className="w-16 sm:w-24 rounded-t-lg transition-all duration-75"
                   style={{ 
                     height: `${20 + spectralData.low * 150}px`,
-                    background: `linear-gradient(180deg, hsl(0 70% 50%) 0%, hsl(15 80% 35%) 100%)`,
-                    boxShadow: isPlaying ? `0 0 20px hsl(0 70% 50% / ${spectralData.low})` : 'none',
+                    background: `linear-gradient(180deg, hsl(280 60% 55%) 0%, hsl(270 50% 35%) 100%)`,
+                    boxShadow: isPlaying ? `0 0 20px hsl(280 60% 55% / ${spectralData.low})` : 'none',
                   }}
                 />
-                <span className="text-xs" style={{ color: 'hsl(30 20% 50%)' }}>BASS</span>
+                <span className="text-xs" style={{ color: 'hsl(270 20% 55%)' }}>BASS</span>
               </div>
               
               {/* Mid bar */}
@@ -649,11 +567,11 @@ const ThermalVisualizerLanding = () => {
                   className="w-16 sm:w-24 rounded-t-lg transition-all duration-75"
                   style={{ 
                     height: `${20 + spectralData.mid * 150}px`,
-                    background: `linear-gradient(180deg, hsl(24 100% 55%) 0%, hsl(20 90% 40%) 100%)`,
-                    boxShadow: isPlaying ? `0 0 20px hsl(24 100% 55% / ${spectralData.mid})` : 'none',
+                    background: `linear-gradient(180deg, hsl(300 70% 65%) 0%, hsl(290 55% 45%) 100%)`,
+                    boxShadow: isPlaying ? `0 0 20px hsl(300 70% 65% / ${spectralData.mid})` : 'none',
                   }}
                 />
-                <span className="text-xs" style={{ color: 'hsl(30 20% 50%)' }}>MID</span>
+                <span className="text-xs" style={{ color: 'hsl(270 20% 55%)' }}>MID</span>
               </div>
               
               {/* High bar */}
@@ -662,11 +580,11 @@ const ThermalVisualizerLanding = () => {
                   className="w-16 sm:w-24 rounded-t-lg transition-all duration-75"
                   style={{ 
                     height: `${20 + spectralData.high * 150}px`,
-                    background: `linear-gradient(180deg, hsl(45 100% 70%) 0%, hsl(35 95% 55%) 100%)`,
-                    boxShadow: isPlaying ? `0 0 20px hsl(45 100% 70% / ${spectralData.high})` : 'none',
+                    background: `linear-gradient(180deg, hsl(320 60% 75%) 0%, hsl(310 50% 55%) 100%)`,
+                    boxShadow: isPlaying ? `0 0 20px hsl(320 60% 75% / ${spectralData.high})` : 'none',
                   }}
                 />
-                <span className="text-xs" style={{ color: 'hsl(30 20% 50%)' }}>HIGH</span>
+                <span className="text-xs" style={{ color: 'hsl(270 20% 55%)' }}>HIGH</span>
               </div>
             </div>
 
@@ -675,14 +593,14 @@ const ThermalVisualizerLanding = () => {
               <div 
                 className="flex items-center gap-3 px-6 py-3 rounded-full"
                 style={{ 
-                  background: 'hsl(20 25% 10% / 0.8)', 
-                  border: `1px solid ${getThermalColor(demoTemperature)}50`,
+                  background: 'hsl(270 25% 12% / 0.8)', 
+                  border: `1px solid ${getLavandarColor(demoTemperature)}50`,
                 }}
               >
-                <Thermometer className="w-5 h-5" style={{ color: getThermalColor(demoTemperature) }} />
+                <Thermometer className="w-5 h-5" style={{ color: getLavandarColor(demoTemperature) }} />
                 <span 
                   className="font-mono text-3xl font-bold transition-colors duration-150"
-                  style={{ color: getThermalColor(demoTemperature) }}
+                  style={{ color: getLavandarColor(demoTemperature) }}
                 >
                   {demoTemperature.toFixed(1)}°C
                 </span>
@@ -699,11 +617,11 @@ const ThermalVisualizerLanding = () => {
                 className="text-lg px-10 py-7 rounded-full group transition-all duration-300"
                 style={{ 
                   background: isPlaying 
-                    ? `linear-gradient(135deg, ${getThermalColor(demoTemperature)} 0%, hsl(24 100% 40%) 100%)`
-                    : 'linear-gradient(135deg, hsl(0 70% 45%) 0%, hsl(24 100% 50%) 100%)',
+                    ? `linear-gradient(135deg, ${getLavandarColor(demoTemperature)} 0%, hsl(280 50% 45%) 100%)`
+                    : 'linear-gradient(135deg, hsl(280 60% 45%) 0%, hsl(300 70% 55%) 100%)',
                   boxShadow: isPlaying 
-                    ? `0 0 50px ${getThermalColor(demoTemperature)}60`
-                    : '0 0 30px hsl(24 100% 50% / 0.3)',
+                    ? `0 0 50px ${getLavandarColor(demoTemperature)}60`
+                    : '0 0 30px hsl(280 60% 50% / 0.3)',
                 }}
               >
                 {isPlaying ? (
@@ -724,7 +642,7 @@ const ThermalVisualizerLanding = () => {
                 <button 
                   onClick={() => setIsMuted(!isMuted)}
                   className="p-2 rounded-full transition-colors"
-                  style={{ color: 'hsl(30 20% 55%)' }}
+                  style={{ color: 'hsl(270 20% 60%)' }}
                 >
                   {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                 </button>
@@ -766,23 +684,21 @@ const ThermalVisualizerLanding = () => {
         </div>
       </section>
 
-      {/* Features Section - AAL geometric precision */}
+      {/* Features Section */}
       <section className="relative py-24 px-6">
-        {/* AAL ruled surface accent */}
         <div className="absolute top-12 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
         
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            {/* AAL geometric separator */}
             <div className="flex items-center justify-center gap-4 mb-6">
               <div className="w-12 h-px bg-white/10" />
-              <div className="w-1.5 h-1.5 rotate-45 border border-orange-500/40" />
+              <div className="w-1.5 h-1.5 rotate-45 border border-purple-500/40" />
               <div className="w-12 h-px bg-white/10" />
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extralight mb-4" style={{ color: 'hsl(40 30% 85%)' }}>
-              Powered by <span style={{ color: 'hsl(24 100% 55%)' }}>Innovation</span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extralight mb-4" style={{ color: 'hsl(280 20% 90%)' }}>
+              Powered by <span style={{ color: 'hsl(280 70% 70%)' }}>Innovation</span>
             </h2>
-            <p className="text-lg max-w-2xl mx-auto" style={{ color: 'hsl(30 20% 55%)' }}>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: 'hsl(270 20% 60%)' }}>
               Cutting-edge audio analysis meets stunning visualization technology
             </p>
           </div>
@@ -793,15 +709,14 @@ const ThermalVisualizerLanding = () => {
                 key={feature.title}
                 className="group relative p-6 rounded-2xl transition-all duration-300 hover:translate-y-[-4px]"
                 style={{ 
-                  background: 'hsl(20 25% 8% / 0.6)', 
-                  border: '1px solid hsl(30 30% 18%)',
+                  background: 'hsl(270 25% 10% / 0.6)', 
+                  border: '1px solid hsl(280 30% 25%)',
                 }}
               >
-                {/* Hover glow */}
                 <div 
                   className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   style={{ 
-                    background: `radial-gradient(circle at 50% 0%, hsl(24 100% 50% / 0.15) 0%, transparent 70%)`,
+                    background: `radial-gradient(circle at 50% 0%, hsl(280 60% 50% / 0.15) 0%, transparent 70%)`,
                   }}
                 />
                 
@@ -809,16 +724,16 @@ const ThermalVisualizerLanding = () => {
                   <div 
                     className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
                     style={{ 
-                      background: 'linear-gradient(135deg, hsl(0 70% 35% / 0.3) 0%, hsl(24 100% 50% / 0.3) 100%)',
-                      border: '1px solid hsl(24 100% 50% / 0.3)',
+                      background: 'linear-gradient(135deg, hsl(280 50% 35% / 0.3) 0%, hsl(300 60% 50% / 0.3) 100%)',
+                      border: '1px solid hsl(280 60% 50% / 0.3)',
                     }}
                   >
-                    <feature.icon className="w-6 h-6" style={{ color: 'hsl(24 100% 55%)' }} />
+                    <feature.icon className="w-6 h-6" style={{ color: 'hsl(280 70% 70%)' }} />
                   </div>
-                  <h3 className="text-xl font-medium mb-2" style={{ color: 'hsl(40 30% 85%)' }}>
+                  <h3 className="text-xl font-medium mb-2" style={{ color: 'hsl(280 20% 90%)' }}>
                     {feature.title}
                   </h3>
-                  <p className="text-sm leading-relaxed" style={{ color: 'hsl(30 20% 55%)' }}>
+                  <p className="text-sm leading-relaxed" style={{ color: 'hsl(270 20% 60%)' }}>
                     {feature.description}
                   </p>
                 </div>
@@ -829,7 +744,7 @@ const ThermalVisualizerLanding = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="relative py-24 px-6" style={{ background: 'hsl(15 35% 5%)' }}>
+      <section className="relative py-24 px-6" style={{ background: 'hsl(270 35% 8%)' }}>
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-extralight mb-4" style={{ color: 'hsl(40 30% 85%)' }}>
@@ -932,20 +847,20 @@ const ThermalVisualizerLanding = () => {
               size="lg"
               className="text-xl px-12 py-8 rounded-full group relative overflow-hidden"
               style={{ 
-                background: 'linear-gradient(135deg, hsl(0 70% 45%) 0%, hsl(24 100% 50%) 100%)',
-                boxShadow: '0 0 60px hsl(24 100% 50% / 0.5)',
+                background: 'linear-gradient(135deg, hsl(280 60% 45%) 0%, hsl(300 70% 55%) 100%)',
+                boxShadow: '0 0 60px hsl(280 60% 50% / 0.5)',
               }}
             >
-              <Flame className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
+              <Sparkles className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
               Start Visualizing
               <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-2 transition-transform" />
             </Button>
           </Link>
           
-          {/* AAL geometric accent below button */}
+          {/* Geometric accent below button */}
           <div className="flex items-center justify-center gap-3 mt-10">
             <div className="w-6 h-px bg-white/10" />
-            <div className="w-1 h-1 rotate-45 bg-orange-500/40" />
+            <div className="w-1 h-1 rotate-45 bg-purple-500/40" />
             <div className="w-6 h-px bg-white/10" />
           </div>
         </div>
