@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { X, Minimize2, Maximize2, Send, Bird } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useLanguageState } from "@/hooks/useLanguage";
 
 interface Message {
   role: "user" | "assistant";
@@ -9,13 +10,6 @@ interface Message {
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/plover-guide`;
-
-const quickActions = [
-  { label: "Browse Menu", message: "What products do you have available?" },
-  { label: "Beginner Tips", message: "I'm new to cannabis, what would you recommend?" },
-  { label: "Best Value", message: "What's the best deal for regular smokers?" },
-  { label: "Store Hours", message: "What are your hours and where are you located?" },
-];
 
 export default function PloverGuide() {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,6 +19,14 @@ export default function PloverGuide() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { t, language } = useLanguageState();
+
+  const quickActions = [
+    { label: t('plover.chat.browseMenu'), message: language === 'ja' ? "どんな商品がありますか？" : "What products do you have available?" },
+    { label: t('plover.chat.beginnerTips'), message: language === 'ja' ? "カンナビス初心者です。おすすめは？" : "I'm new to cannabis, what would you recommend?" },
+    { label: t('plover.chat.bestValue'), message: language === 'ja' ? "お得な商品は何ですか？" : "What's the best deal for regular smokers?" },
+    { label: t('plover.chat.storeHours'), message: language === 'ja' ? "営業時間と場所を教えてください" : "What are your hours and where are you located?" },
+  ];
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -49,7 +51,9 @@ export default function PloverGuide() {
         if (response.status === 429) {
           setMessages((prev) => [
             ...prev,
-            { role: "assistant", content: "I'm getting a lot of questions right now! Please try again in a moment. 🐦" },
+            { role: "assistant", content: language === 'ja' 
+              ? "今たくさんの質問を受けています！少し待ってからもう一度お試しください。🐦" 
+              : "I'm getting a lot of questions right now! Please try again in a moment. 🐦" },
           ]);
           setIsLoading(false);
           return;
@@ -62,7 +66,6 @@ export default function PloverGuide() {
       let textBuffer = "";
       let assistantContent = "";
 
-      // Add empty assistant message to update progressively
       setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
       while (true) {
@@ -104,7 +107,9 @@ export default function PloverGuide() {
       console.error("Chat error:", error);
       setMessages((prev) => [
         ...prev.filter((m) => m.content !== ""),
-        { role: "assistant", content: "Oops! Looks like the tide came in unexpectedly. Please try again! 🌊" },
+        { role: "assistant", content: language === 'ja' 
+          ? "おっと！予期せぬ潮が来たようです。もう一度お試しください！🌊" 
+          : "Oops! Looks like the tide came in unexpectedly. Please try again! 🌊" },
       ]);
     } finally {
       setIsLoading(false);
@@ -127,10 +132,11 @@ export default function PloverGuide() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-full bg-plover-ocean text-white shadow-lg hover:bg-plover-ocean/90 transition-all hover:scale-105"
+        data-chat-toggle
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all hover:scale-105"
       >
         <Bird className="w-5 h-5" />
-        <span className="font-medium">Chat with Piper</span>
+        <span className="font-medium">{t('plover.chatWithPiper')}</span>
       </button>
     );
   }
@@ -138,27 +144,27 @@ export default function PloverGuide() {
   return (
     <div
       className={cn(
-        "fixed z-50 flex flex-col bg-plover-dune border border-plover-ocean/20 shadow-2xl transition-all duration-300",
+        "fixed z-50 flex flex-col bg-card border border-border shadow-2xl transition-all duration-300",
         isExpanded
-          ? "inset-4 rounded-2xl"
+          ? "inset-4 rounded-lg"
           : isMinimized
           ? "bottom-6 right-6 w-72 h-14 rounded-full"
-          : "bottom-6 right-6 w-96 h-[32rem] rounded-2xl"
+          : "bottom-6 right-6 w-96 h-[32rem] rounded-lg"
       )}
     >
       {/* Header */}
       <div
         className={cn(
-          "flex items-center justify-between px-4 border-b border-plover-ocean/10",
+          "flex items-center justify-between px-4 border-b border-border",
           isMinimized ? "py-2" : "py-3"
         )}
       >
         <div className="flex items-center gap-2">
           <span className="text-2xl">🐦</span>
           <div>
-            <h3 className="font-medium text-plover-driftwood text-sm">Piper</h3>
+            <h3 className="font-medium text-foreground text-sm">Piper</h3>
             {!isMinimized && (
-              <p className="text-xs text-plover-driftwood/60">Your Piping Plover Guide</p>
+              <p className="text-xs text-muted-foreground">{t('plover.chat.yourGuide')}</p>
             )}
           </div>
         </div>
@@ -166,7 +172,7 @@ export default function PloverGuide() {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-plover-driftwood/70 hover:text-plover-driftwood hover:bg-plover-sand"
+            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted"
             onClick={() => setIsMinimized(!isMinimized)}
           >
             <Minimize2 className="h-4 w-4" />
@@ -175,7 +181,7 @@ export default function PloverGuide() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-plover-driftwood/70 hover:text-plover-driftwood hover:bg-plover-sand"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               <Maximize2 className="h-4 w-4" />
@@ -184,7 +190,7 @@ export default function PloverGuide() {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-plover-driftwood/70 hover:text-plover-driftwood hover:bg-plover-sand"
+            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted"
             onClick={() => setIsOpen(false)}
           >
             <X className="h-4 w-4" />
@@ -199,19 +205,18 @@ export default function PloverGuide() {
             {messages.length === 0 ? (
               <div className="text-center py-8">
                 <div className="text-5xl mb-4">🐦</div>
-                <h4 className="font-medium text-plover-driftwood mb-2">
-                  Welcome to the flock!
+                <h4 className="font-medium text-foreground mb-2">
+                  {t('plover.chat.welcomeFlock')}
                 </h4>
-                <p className="text-sm text-plover-driftwood/70 mb-6">
-                  I'm Piper, your friendly guide to The Piping Plover Dispensary.
-                  How can I help you today?
+                <p className="text-sm text-muted-foreground mb-6">
+                  {t('plover.chat.intro')}
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center">
                   {quickActions.map((action) => (
                     <button
                       key={action.label}
                       onClick={() => handleQuickAction(action.message)}
-                      className="px-3 py-1.5 text-xs rounded-full bg-plover-ocean/10 text-plover-ocean hover:bg-plover-ocean/20 transition-colors"
+                      className="px-3 py-1.5 text-xs rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                     >
                       {action.label}
                     </button>
@@ -229,10 +234,10 @@ export default function PloverGuide() {
                 >
                   <div
                     className={cn(
-                      "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm",
+                      "max-w-[85%] rounded-lg px-4 py-2.5 text-sm",
                       msg.role === "user"
-                        ? "bg-plover-ocean text-white rounded-br-md"
-                        : "bg-plover-sand text-plover-driftwood rounded-bl-md"
+                        ? "bg-primary text-primary-foreground rounded-br-sm"
+                        : "bg-muted text-foreground rounded-bl-sm"
                     )}
                   >
                     {msg.role === "assistant" && (
@@ -245,9 +250,9 @@ export default function PloverGuide() {
             )}
             {isLoading && messages[messages.length - 1]?.content === "" && (
               <div className="flex justify-start">
-                <div className="bg-plover-sand text-plover-driftwood rounded-2xl rounded-bl-md px-4 py-2.5 text-sm">
+                <div className="bg-muted text-foreground rounded-lg rounded-bl-sm px-4 py-2.5 text-sm">
                   <span className="mr-1">🐦</span>
-                  <span className="animate-pulse">Piper is thinking...</span>
+                  <span className="animate-pulse">{t('plover.chat.thinking')}</span>
                 </div>
               </div>
             )}
@@ -255,21 +260,21 @@ export default function PloverGuide() {
           </div>
 
           {/* Input */}
-          <form onSubmit={handleSubmit} className="p-4 border-t border-plover-ocean/10">
+          <form onSubmit={handleSubmit} className="p-4 border-t border-border">
             <div className="flex gap-2">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask Piper anything..."
-                className="flex-1 px-4 py-2.5 rounded-full bg-plover-sand text-plover-driftwood placeholder:text-plover-driftwood/50 focus:outline-none focus:ring-2 focus:ring-plover-ocean/30 text-sm"
+                placeholder={t('plover.chat.placeholder')}
+                className="flex-1 px-4 py-2.5 rounded-full bg-muted text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm"
                 disabled={isLoading}
               />
               <Button
                 type="submit"
                 size="icon"
                 disabled={isLoading || !input.trim()}
-                className="rounded-full bg-plover-ocean hover:bg-plover-ocean/90 text-white h-10 w-10"
+                className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground h-10 w-10"
               >
                 <Send className="h-4 w-4" />
               </Button>
