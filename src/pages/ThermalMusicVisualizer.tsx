@@ -260,30 +260,35 @@ const ThermalMusicVisualizer = () => {
       
       {/* Fullscreen Immersive Mode */}
       {isFullscreen ? (
-        <div className="relative w-full h-full flex flex-col">
-          {/* Minimal floating controls */}
-          <div className="absolute top-4 left-4 right-4 z-50 flex items-center justify-between">
-            <div className="flex items-center gap-3">
+        <div className="relative w-full h-full flex flex-col overflow-hidden">
+          {/* Minimal floating controls - responsive */}
+          <div className="absolute top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-4 z-50 flex items-center justify-between">
+            {/* Left controls */}
+            <div className="flex items-center gap-2 sm:gap-3">
               <Button
                 onClick={() => setIsFullscreen(false)}
                 variant="ghost"
                 size="icon"
-                className="w-10 h-10 rounded-full bg-zinc-900/80 backdrop-blur-xl border border-zinc-700 hover:bg-zinc-800"
+                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-zinc-900/80 backdrop-blur-xl border border-zinc-700 hover:bg-zinc-800"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4 sm:w-5 sm:h-5" />
               </Button>
-              <span className="text-sm font-light tracking-[0.3em] text-emerald-400 opacity-60">THERMAL RESONANCE</span>
+              <span className="hidden sm:block text-xs sm:text-sm font-light tracking-[0.2em] sm:tracking-[0.3em] text-emerald-400 opacity-60">
+                THERMAL RESONANCE
+              </span>
             </div>
-            <div className="flex items-center gap-3">
+            
+            {/* Right controls */}
+            <div className="flex items-center gap-2 sm:gap-3">
               <Button
                 onClick={togglePlayback}
                 disabled={!audioFile}
-                className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50"
               >
-                {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
+                {isPlaying ? <Pause className="w-4 h-4 sm:w-5 sm:h-5" /> : <Play className="w-4 h-4 sm:w-5 sm:h-5 ml-0.5" />}
               </Button>
               <div 
-                className="px-4 py-2 bg-zinc-900/80 backdrop-blur-xl rounded-lg border border-zinc-700 font-mono text-lg font-bold"
+                className="px-2 sm:px-4 py-1.5 sm:py-2 bg-zinc-900/80 backdrop-blur-xl rounded-lg border border-zinc-700 font-mono text-sm sm:text-lg font-bold"
                 style={{ color: getThermalColor(globalTemp) }}
               >
                 {globalTemp.toFixed(1)}°C
@@ -299,19 +304,19 @@ const ThermalMusicVisualizer = () => {
               transition: 'background 0.15s ease-out',
             }}
           >
-            {/* Ambient thermal particles */}
+            {/* Ambient thermal particles - reduced on mobile */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              {Array.from({ length: 30 }).map((_, i) => (
+              {Array.from({ length: 20 }).map((_, i) => (
                 <div
                   key={i}
                   className="absolute rounded-full animate-pulse"
                   style={{
-                    left: `${10 + (i * 3) % 80}%`,
-                    top: `${15 + (i * 7) % 70}%`,
-                    width: `${4 + spectralData.energy * 20}px`,
-                    height: `${4 + spectralData.energy * 20}px`,
+                    left: `${10 + (i * 4) % 80}%`,
+                    top: `${15 + (i * 8) % 70}%`,
+                    width: `${3 + spectralData.energy * 15}px`,
+                    height: `${3 + spectralData.energy * 15}px`,
                     background: getThermalColor(globalTemp + (i % 10) - 5),
-                    boxShadow: `0 0 ${20 + spectralData.energy * 30}px ${getThermalColor(globalTemp)}`,
+                    boxShadow: `0 0 ${15 + spectralData.energy * 20}px ${getThermalColor(globalTemp)}`,
                     opacity: 0.3 + spectralData.energy * 0.5,
                     animationDelay: `${i * 100}ms`,
                     animationDuration: `${1500 + i * 50}ms`,
@@ -320,55 +325,14 @@ const ThermalMusicVisualizer = () => {
               ))}
             </div>
 
-            {/* Central console visualization */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="relative w-full max-w-6xl aspect-[2.5/1] mx-8">
-                {/* Console glow backdrop */}
-                <div 
-                  className="absolute inset-0 rounded-3xl blur-3xl opacity-50"
-                  style={{ background: getThermalColor(globalTemp) }}
-                />
-                
-                {/* Console body */}
-                <div 
-                  className="relative h-full rounded-3xl border-2 overflow-hidden"
-                  style={{
-                    background: `linear-gradient(180deg, rgba(20,20,20,0.9) 0%, rgba(10,10,10,0.95) 100%)`,
-                    borderColor: `${getThermalColor(globalTemp)}60`,
-                    boxShadow: `
-                      0 0 60px ${getThermalColor(globalTemp)}40,
-                      inset 0 0 100px rgba(0,0,0,0.8)
-                    `,
-                  }}
-                >
-                  {/* Thermal zones */}
-                  {thermalZones.map(zone => (
-                    <div
-                      key={zone.id}
-                      className="absolute rounded-xl transition-all duration-150 flex items-center justify-center"
-                      style={{
-                        left: `${zone.x}%`,
-                        top: `${zone.y}%`,
-                        width: `${zone.width}%`,
-                        height: `${zone.height}%`,
-                        background: `linear-gradient(135deg, ${getThermalColor(zone.temperature)} 0%, ${getThermalColor(zone.temperature - 10)} 100%)`,
-                        boxShadow: `0 0 ${30 + zone.temperature / 2}px ${getThermalColor(zone.temperature)}`,
-                      }}
-                    >
-                      {zone.id.includes('deck') && (
-                        <Disc 
-                          className="w-16 h-16 text-white/80" 
-                          style={{ 
-                            animation: isPlaying ? 'spin 1.5s linear infinite' : 'none',
-                            filter: `drop-shadow(0 0 10px ${getThermalColor(zone.temperature)})`,
-                          }} 
-                        />
-                      )}
-                    </div>
-                  ))}
-
-                  {/* Embedded STRATA Displays - Larger in fullscreen */}
-                  <div className="absolute top-[3%] left-[3%] w-[28%]">
+            {/* Central console visualization - Portrait vs Landscape responsive */}
+            <div className="absolute inset-0 flex items-center justify-center p-2 sm:p-4 md:p-8">
+              {/* Portrait mode: vertical stack */}
+              <div className="portrait:flex portrait:flex-col portrait:gap-3 portrait:w-full portrait:max-w-md portrait:h-full portrait:max-h-[85vh] portrait:justify-center
+                            landscape:hidden">
+                {/* Portrait: Stacked STRATA displays */}
+                <div className="flex gap-2 justify-center">
+                  <div className="flex-1 max-w-[140px]">
                     <StrataEmbeddedDisplay
                       temperature={thermalZones.find(z => z.id === 'left-deck')?.temperature || globalTemp}
                       spectralEnergy={spectralData.energy}
@@ -377,7 +341,7 @@ const ThermalMusicVisualizer = () => {
                       displayId="left"
                     />
                   </div>
-                  <div className="absolute top-[3%] left-[36%] w-[28%]">
+                  <div className="flex-1 max-w-[140px]">
                     <StrataEmbeddedDisplay
                       temperature={thermalZones.find(z => z.id === 'mixer')?.temperature || globalTemp}
                       spectralEnergy={spectralData.energy}
@@ -386,7 +350,7 @@ const ThermalMusicVisualizer = () => {
                       displayId="center"
                     />
                   </div>
-                  <div className="absolute top-[3%] right-[3%] w-[28%]">
+                  <div className="flex-1 max-w-[140px]">
                     <StrataEmbeddedDisplay
                       temperature={thermalZones.find(z => z.id === 'right-deck')?.temperature || globalTemp}
                       spectralEnergy={spectralData.energy}
@@ -396,59 +360,212 @@ const ThermalMusicVisualizer = () => {
                     />
                   </div>
                 </div>
+
+                {/* Portrait: Vertical thermal zones */}
+                <div 
+                  className="relative flex-1 min-h-[200px] rounded-2xl border-2 overflow-hidden mx-auto w-full max-w-sm"
+                  style={{
+                    background: `linear-gradient(180deg, rgba(20,20,20,0.9) 0%, rgba(10,10,10,0.95) 100%)`,
+                    borderColor: `${getThermalColor(globalTemp)}60`,
+                    boxShadow: `0 0 40px ${getThermalColor(globalTemp)}40`,
+                  }}
+                >
+                  {/* Portrait thermal zones - vertical layout */}
+                  <div className="absolute inset-2 flex flex-col gap-2">
+                    <div 
+                      className="flex-1 rounded-xl flex items-center justify-center"
+                      style={{
+                        background: getThermalColor(thermalZones[0]?.temperature || globalTemp),
+                        boxShadow: `0 0 20px ${getThermalColor(globalTemp)}`,
+                      }}
+                    >
+                      <Disc 
+                        className="w-10 h-10 text-white/80" 
+                        style={{ animation: isPlaying ? 'spin 1.5s linear infinite' : 'none' }} 
+                      />
+                    </div>
+                    <div 
+                      className="flex-1 rounded-xl flex items-center justify-center"
+                      style={{
+                        background: getThermalColor(thermalZones[1]?.temperature || globalTemp),
+                        boxShadow: `0 0 20px ${getThermalColor(globalTemp)}`,
+                      }}
+                    >
+                      <span className="text-white/80 font-mono text-xs">MIXER</span>
+                    </div>
+                    <div 
+                      className="flex-1 rounded-xl flex items-center justify-center"
+                      style={{
+                        background: getThermalColor(thermalZones[2]?.temperature || globalTemp),
+                        boxShadow: `0 0 20px ${getThermalColor(globalTemp)}`,
+                      }}
+                    >
+                      <Disc 
+                        className="w-10 h-10 text-white/80" 
+                        style={{ animation: isPlaying ? 'spin 1.5s linear infinite' : 'none' }} 
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Portrait: Compact spectral bars */}
+                <div className="flex items-end justify-center gap-0.5 h-12">
+                  {Array.from({ length: 32 }).map((_, i) => {
+                    const segment = i < 10 ? 'low' : i < 22 ? 'mid' : 'high';
+                    const value = segment === 'low' ? spectralData.low : segment === 'mid' ? spectralData.mid : spectralData.high;
+                    const height = Math.max(8, value * 0.8);
+                    return (
+                      <div
+                        key={i}
+                        className="w-1 rounded-full transition-all duration-75"
+                        style={{
+                          height: `${height}%`,
+                          background: getThermalColor(globalTemp - 10 + (i / 32) * 30),
+                          boxShadow: `0 0 4px ${getThermalColor(globalTemp)}`,
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Landscape mode: horizontal console */}
+              <div className="hidden landscape:block relative w-full max-w-6xl mx-4 sm:mx-8">
+                <div className="aspect-[2.5/1] sm:aspect-[3/1] md:aspect-[2.5/1]">
+                  {/* Console glow backdrop */}
+                  <div 
+                    className="absolute inset-0 rounded-2xl sm:rounded-3xl blur-2xl sm:blur-3xl opacity-50"
+                    style={{ background: getThermalColor(globalTemp) }}
+                  />
+                  
+                  {/* Console body */}
+                  <div 
+                    className="relative h-full rounded-2xl sm:rounded-3xl border-2 overflow-hidden"
+                    style={{
+                      background: `linear-gradient(180deg, rgba(20,20,20,0.9) 0%, rgba(10,10,10,0.95) 100%)`,
+                      borderColor: `${getThermalColor(globalTemp)}60`,
+                      boxShadow: `0 0 40px sm:0 0 60px ${getThermalColor(globalTemp)}40, inset 0 0 60px sm:inset 0 0 100px rgba(0,0,0,0.8)`,
+                    }}
+                  >
+                    {/* Thermal zones - responsive sizes */}
+                    {thermalZones.slice(0, 3).map((zone, idx) => (
+                      <div
+                        key={zone.id}
+                        className="absolute rounded-lg sm:rounded-xl transition-all duration-150 flex items-center justify-center"
+                        style={{
+                          left: `${5 + idx * 32}%`,
+                          top: '35%',
+                          width: '28%',
+                          height: '50%',
+                          background: `linear-gradient(135deg, ${getThermalColor(zone.temperature)} 0%, ${getThermalColor(zone.temperature - 10)} 100%)`,
+                          boxShadow: `0 0 ${20 + zone.temperature / 3}px ${getThermalColor(zone.temperature)}`,
+                        }}
+                      >
+                        {zone.id.includes('deck') && (
+                          <Disc 
+                            className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 text-white/80" 
+                            style={{ 
+                              animation: isPlaying ? 'spin 1.5s linear infinite' : 'none',
+                              filter: `drop-shadow(0 0 8px ${getThermalColor(zone.temperature)})`,
+                            }} 
+                          />
+                        )}
+                        {zone.id === 'mixer' && (
+                          <span className="text-white/60 font-mono text-[10px] sm:text-xs">MIXER</span>
+                        )}
+                      </div>
+                    ))}
+
+                    {/* Embedded STRATA Displays - Landscape responsive */}
+                    <div className="absolute top-[2%] left-[2%] w-[30%] sm:w-[28%]">
+                      <StrataEmbeddedDisplay
+                        temperature={thermalZones.find(z => z.id === 'left-deck')?.temperature || globalTemp}
+                        spectralEnergy={spectralData.energy}
+                        bpm={bpm}
+                        isPlaying={isPlaying}
+                        displayId="left"
+                      />
+                    </div>
+                    <div className="absolute top-[2%] left-[35%] w-[30%] sm:w-[28%]">
+                      <StrataEmbeddedDisplay
+                        temperature={thermalZones.find(z => z.id === 'mixer')?.temperature || globalTemp}
+                        spectralEnergy={spectralData.energy}
+                        bpm={bpm}
+                        isPlaying={isPlaying}
+                        displayId="center"
+                      />
+                    </div>
+                    <div className="absolute top-[2%] right-[2%] w-[30%] sm:w-[28%]">
+                      <StrataEmbeddedDisplay
+                        temperature={thermalZones.find(z => z.id === 'right-deck')?.temperature || globalTemp}
+                        spectralEnergy={spectralData.energy}
+                        bpm={bpm}
+                        isPlaying={isPlaying}
+                        displayId="right"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Bottom metrics bar */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent pt-16 pb-6 px-8">
+            {/* Bottom metrics bar - responsive */}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent pt-8 sm:pt-16 pb-3 sm:pb-6 px-3 sm:px-8">
               <div className="max-w-6xl mx-auto">
-                {/* Spectral bars */}
-                <div className="flex items-end justify-center gap-1 h-24 mb-4">
-                  {Array.from({ length: 64 }).map((_, i) => {
-                    const segment = i < 20 ? 'low' : i < 45 ? 'mid' : 'high';
+                {/* Spectral bars - responsive count and size */}
+                <div className="hidden sm:flex items-end justify-center gap-0.5 sm:gap-1 h-16 sm:h-24 mb-2 sm:mb-4">
+                  {Array.from({ length: 48 }).map((_, i) => {
+                    const segment = i < 15 ? 'low' : i < 35 ? 'mid' : 'high';
                     const value = segment === 'low' ? spectralData.low : segment === 'mid' ? spectralData.mid : spectralData.high;
                     const height = Math.max(4, value * (0.8 + Math.sin(i * 0.3 + Date.now() * 0.005) * 0.2));
                     return (
                       <div
                         key={i}
-                        className="w-1.5 rounded-full transition-all duration-75"
+                        className="w-1 sm:w-1.5 rounded-full transition-all duration-75"
                         style={{
                           height: `${height}%`,
-                          background: getThermalColor(globalTemp - 10 + (i / 64) * 30),
-                          boxShadow: `0 0 8px ${getThermalColor(globalTemp)}`,
+                          background: getThermalColor(globalTemp - 10 + (i / 48) * 30),
+                          boxShadow: `0 0 6px ${getThermalColor(globalTemp)}`,
                         }}
                       />
                     );
                   })}
                 </div>
                 
-                {/* Metrics row */}
-                <div className="flex items-center justify-between text-sm font-mono">
-                  <div className="flex items-center gap-8">
+                {/* Metrics row - responsive layout */}
+                <div className="flex items-center justify-between text-xs sm:text-sm font-mono">
+                  {/* Left metrics */}
+                  <div className="flex items-center gap-3 sm:gap-8">
                     <div>
-                      <span className="text-zinc-500">BPM</span>
-                      <span className="ml-2 text-lg font-bold" style={{ color: getThermalColor(globalTemp) }}>{bpm || '---'}</span>
+                      <span className="text-zinc-500 text-[10px] sm:text-sm">BPM</span>
+                      <span className="ml-1 sm:ml-2 text-sm sm:text-lg font-bold" style={{ color: getThermalColor(globalTemp) }}>{bpm || '---'}</span>
                     </div>
-                    <div>
+                    <div className="hidden sm:block">
                       <span className="text-zinc-500">ENERGY</span>
                       <span className="ml-2 text-lg font-bold" style={{ color: getThermalColor(globalTemp) }}>{(spectralData.energy * 100).toFixed(0)}%</span>
                     </div>
                   </div>
-                  <div className="text-zinc-600 text-xs">
-                    Press <kbd className="px-2 py-0.5 bg-zinc-800 rounded mx-1">ESC</kbd> to exit • <kbd className="px-2 py-0.5 bg-zinc-800 rounded mx-1">SPACE</kbd> to play/pause
+                  
+                  {/* Center hint - desktop only */}
+                  <div className="hidden md:block text-zinc-600 text-xs">
+                    <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded mx-1">ESC</kbd> exit
+                    <span className="mx-2">•</span>
+                    <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded mx-1">SPACE</kbd> play
                   </div>
-                  <div className="flex items-center gap-8">
+                  
+                  {/* Right metrics */}
+                  <div className="flex items-center gap-2 sm:gap-8">
                     <div>
-                      <span className="text-zinc-500">LOW</span>
-                      <span className="ml-2 text-lg font-bold text-red-400">{spectralData.low.toFixed(0)}%</span>
+                      <span className="text-zinc-500 text-[10px] sm:text-sm">LOW</span>
+                      <span className="ml-1 sm:ml-2 text-sm sm:text-lg font-bold text-red-400">{spectralData.low.toFixed(0)}%</span>
+                    </div>
+                    <div className="hidden xs:block">
+                      <span className="text-zinc-500 text-[10px] sm:text-sm">MID</span>
+                      <span className="ml-1 sm:ml-2 text-sm sm:text-lg font-bold text-yellow-400">{spectralData.mid.toFixed(0)}%</span>
                     </div>
                     <div>
-                      <span className="text-zinc-500">MID</span>
-                      <span className="ml-2 text-lg font-bold text-yellow-400">{spectralData.mid.toFixed(0)}%</span>
-                    </div>
-                    <div>
-                      <span className="text-zinc-500">HIGH</span>
-                      <span className="ml-2 text-lg font-bold text-cyan-400">{spectralData.high.toFixed(0)}%</span>
+                      <span className="text-zinc-500 text-[10px] sm:text-sm">HIGH</span>
+                      <span className="ml-1 sm:ml-2 text-sm sm:text-lg font-bold text-cyan-400">{spectralData.high.toFixed(0)}%</span>
                     </div>
                   </div>
                 </div>
