@@ -14,6 +14,8 @@ import ImmersiveMode from '@/components/thermal/ImmersiveMode';
 import NeonKanjiOverlay from '@/components/thermal/NeonKanjiOverlay';
 import KatakanaRain from '@/components/thermal/KatakanaRain';
 import KatakanaMarquee from '@/components/thermal/KatakanaMarquee';
+import VerticalKatakanaColumns from '@/components/thermal/VerticalKatakanaColumns';
+import BassDropParticles from '@/components/thermal/BassDropParticles';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { VINYL_COLLECTION } from '@/components/SpatialAudioCAD';
@@ -112,6 +114,7 @@ interface SpectralBand {
 const ThermalMusicVisualizer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [systemStream, setSystemStream] = useState<MediaStream | null>(null);
   const [globalTemp, setGlobalTemp] = useState(PHYSICS.AMBIENT_TEMP);
   const [spectralData, setSpectralData] = useState<SpectralBand>({ 
     low: 0, mid: 0, high: 0, energy: 0,
@@ -773,8 +776,40 @@ const ThermalMusicVisualizer = () => {
     toast.success('Magic audio downloaded!');
   };
 
+  // Handle system audio stream from AudioIngestHub
+  const handleAudioStream = useCallback((stream: MediaStream) => {
+    setSystemStream(stream);
+    
+    // Set up audio context for stream analysis
+    if (!audioContextRef.current) {
+      audioContextRef.current = new AudioContext();
+    }
+    
+    analyserRef.current = audioContextRef.current.createAnalyser();
+    analyserRef.current.fftSize = 2048;
+    
+    const source = audioContextRef.current.createMediaStreamSource(stream);
+    source.connect(analyserRef.current);
+    
+    // Start animation loop
+    setIsPlaying(true);
+    animate();
+  }, [animate]);
+
   // Toggle playback
   const togglePlayback = async () => {
+    if (systemStream) {
+      // For system audio, toggle means start/stop visualization
+      if (isPlaying) {
+        cancelAnimationFrame(animationRef.current);
+        setIsPlaying(false);
+      } else {
+        animate();
+        setIsPlaying(true);
+      }
+      return;
+    }
+    
     if (!audioRef.current || !audioFile) return;
 
     if (!audioContextRef.current) {
@@ -810,13 +845,32 @@ const ThermalMusicVisualizer = () => {
       <LavandarBackground variant="dark" showWaves={true} showPolygons={true} intensity={0.7} />
       <audio ref={audioRef} />
       
+      {/* Vertical Katakana Columns - Matrix style */}
+      <VerticalKatakanaColumns
+        spectralData={{
+          bass: spectralData.low / 100,
+          mid: spectralData.mid / 100,
+          treble: spectralData.high / 100
+        }}
+        isPlaying={isPlaying}
+        getThermalColor={getThermalColor}
+        temperature={globalTemp}
+      />
+      
+      {/* Bass Drop Particle Effects */}
+      <BassDropParticles
+        bassEnergy={spectralData.low / 100}
+        isPlaying={isPlaying}
+        getThermalColor={getThermalColor}
+        temperature={globalTemp}
+      />
       {/* Fullscreen Immersive Mode - New Kuma/AAL Design */}
       {isFullscreen ? (
         <ImmersiveMode
           onExit={() => setIsFullscreen(false)}
           onTogglePlayback={togglePlayback}
           isPlaying={isPlaying}
-          hasAudio={!!audioFile}
+          hasAudio={!!audioFile || !!systemStream}
           globalTemp={globalTemp}
           thermalZones={thermalZones}
           spectralData={spectralData}
@@ -870,7 +924,7 @@ const ThermalMusicVisualizer = () => {
               {/* Audio Ingest Hub - Redesigned CTA */}
               <AudioIngestHub
                 audioFile={audioFile}
-                onFileUpload={handleFileUpload}
+                onAudioStream={handleAudioStream}
                 isPlaying={isPlaying}
                 onTogglePlayback={togglePlayback}
                 onEnterImmersive={() => setIsFullscreen(true)}
@@ -884,8 +938,6 @@ const ThermalMusicVisualizer = () => {
                   emotionalTone: magicAnalysis.emotionalTone,
                   frequencyProfile: magicAnalysis.frequencyProfile,
                 } : null}
-                demoTracks={demoTracks}
-                onDemoTrackSelect={handleDemoTrackSelect}
               />
 
               <div className="mb-12" />
