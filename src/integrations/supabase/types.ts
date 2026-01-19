@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      configuration_orders: {
+        Row: {
+          accessories: string[] | null
+          base_price: number
+          created_at: string
+          customer_email: string
+          customer_name: string | null
+          id: string
+          led_color: string
+          pdf_url: string | null
+          render_urls: string[] | null
+          status: string | null
+          stripe_session_id: string | null
+          surface_finish: string
+          total_price: number
+          updated_at: string
+        }
+        Insert: {
+          accessories?: string[] | null
+          base_price?: number
+          created_at?: string
+          customer_email: string
+          customer_name?: string | null
+          id?: string
+          led_color: string
+          pdf_url?: string | null
+          render_urls?: string[] | null
+          status?: string | null
+          stripe_session_id?: string | null
+          surface_finish: string
+          total_price: number
+          updated_at?: string
+        }
+        Update: {
+          accessories?: string[] | null
+          base_price?: number
+          created_at?: string
+          customer_email?: string
+          customer_name?: string | null
+          id?: string
+          led_color?: string
+          pdf_url?: string | null
+          render_urls?: string[] | null
+          status?: string | null
+          stripe_session_id?: string | null
+          surface_finish?: string
+          total_price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       investor_contacts: {
         Row: {
           created_at: string | null
