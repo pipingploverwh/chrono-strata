@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { 
   ArrowRight, ArrowLeft, Shield, Lock, CheckCircle, 
   CreditCard, Package, Clock, FileCheck
@@ -10,12 +10,29 @@ import { toast } from "sonner";
 
 const AllocationCheckout = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Determine if this is a DJ table deposit checkout
+  const isDeposit = searchParams.get('type') === 'deposit';
 
-  const allocationDetails = {
+  const allocationDetails = isDeposit ? {
+    tier: "APEX-1 DJ Table Deposit",
+    price: "$1,800.00",
+    priceId: "price_1Sr9lgPxsKYUGDkoR2zFdOhe",
+    allocationTier: "deposit",
+    features: [
+      "Reserved production slot",
+      "Priority build queue position",
+      "Serialized unit assignment",
+      "Full balance due before shipping",
+      "Integrated STRATA live displays",
+    ],
+  } : {
     tier: "Standard Allocation",
     price: "$250.00",
     priceId: "price_1Sr9DFPxsKYUGDko0Fzh40uO",
+    allocationTier: "standard",
     features: [
       "Verified buyer status",
       "Serialized unit tracking",
@@ -30,7 +47,7 @@ const AllocationCheckout = () => {
     
     try {
       const { data, error } = await supabase.functions.invoke('create-allocation-checkout', {
-        body: { allocationTier: 'standard' }
+        body: { allocationTier: allocationDetails.allocationTier }
       });
 
       if (error) {
@@ -58,7 +75,7 @@ const AllocationCheckout = () => {
       <header className="border-b border-border">
         <div className="max-w-7xl mx-auto px-6 md:px-12 py-5 flex items-center justify-between">
           <button 
-            onClick={() => navigate("/")}
+            onClick={() => navigate(isDeposit ? "/dj-table" : "/")}
             className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -78,9 +95,13 @@ const AllocationCheckout = () => {
             <Lock className="w-4 h-4 text-lavender" />
             <span className="text-xs tracking-widest uppercase text-lavender">Secure Checkout</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-medium mb-4">Complete Your Allocation</h1>
+          <h1 className="text-3xl md:text-4xl font-medium mb-4">
+            {isDeposit ? "Reserve Your APEX-1" : "Complete Your Allocation"}
+          </h1>
           <p className="text-muted-foreground max-w-lg mx-auto">
-            Finalize your verified allocation with secure payment processing
+            {isDeposit 
+              ? "Secure your production slot with a refundable deposit" 
+              : "Finalize your verified allocation with secure payment processing"}
           </p>
         </div>
 
@@ -98,16 +119,25 @@ const AllocationCheckout = () => {
                 <span className="font-medium">{allocationDetails.tier}</span>
               </div>
               <div className="flex justify-between items-center py-3 border-b border-border">
-                <span className="text-muted-foreground">Processing</span>
+                <span className="text-muted-foreground">
+                  {isDeposit ? "Lead Time" : "Processing"}
+                </span>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-muted-foreground" />
-                  <span>24-48 hours</span>
+                  <span>{isDeposit ? "12-16 weeks" : "24-48 hours"}</span>
                 </div>
               </div>
               <div className="flex justify-between items-center py-3">
-                <span className="text-lg font-medium">Total</span>
+                <span className="text-lg font-medium">
+                  {isDeposit ? "Deposit" : "Total"}
+                </span>
                 <span className="text-2xl font-medium text-lavender">{allocationDetails.price}</span>
               </div>
+              {isDeposit && (
+                <div className="text-xs text-muted-foreground text-right">
+                  Full unit price: $47,500.00 • Balance due at shipping
+                </div>
+              )}
             </div>
 
             <div className="space-y-3">
@@ -149,11 +179,11 @@ const AllocationCheckout = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-lavender font-medium">3.</span>
-                    Unit serialized and assigned to your account
+                    {isDeposit ? "Production slot reserved in queue" : "Unit serialized and assigned to your account"}
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-lavender font-medium">4.</span>
-                    Full audit trail generated
+                    {isDeposit ? "Build updates sent throughout production" : "Full audit trail generated"}
                   </li>
                 </ol>
               </div>
@@ -171,7 +201,7 @@ const AllocationCheckout = () => {
                 </span>
               ) : (
                 <>
-                  Proceed to Payment
+                  {isDeposit ? "Pay $1,800 Deposit" : "Proceed to Payment"}
                   <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
