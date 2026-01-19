@@ -49,7 +49,7 @@ import AllocationCheckout from "./pages/AllocationCheckout";
 import AllocationSuccess from "./pages/AllocationSuccess";
 import AllocationCanceled from "./pages/AllocationCanceled";
 import DJTableShowcase from "./pages/DJTableShowcase";
-
+import Apex1Landing from "./pages/Apex1Landing";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -91,6 +91,7 @@ const App = () => (
                 <Route path="/allocation-success" element={<AllocationSuccess />} />
                 <Route path="/allocation-canceled" element={<AllocationCanceled />} />
                 <Route path="/dj-table" element={<DJTableShowcase />} />
+                <Route path="/apex-1" element={<Apex1Landing />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />
