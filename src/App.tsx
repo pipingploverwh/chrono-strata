@@ -56,6 +56,7 @@ import ThermalVisualizerLanding from "./pages/ThermalVisualizerLanding";
 import ThermalLandingSlash from "./pages/ThermalLandingSlash";
 import ThermalLandingAnti from "./pages/ThermalLandingAnti";
 import BeenaRedTeam from "./pages/BeenaRedTeam";
+import AIShowcase from "./pages/AIShowcase";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -104,6 +105,7 @@ const App = () => (
                 <Route path="/thermal-slash" element={<ThermalLandingSlash />} />
                 <Route path="/thermal-anti" element={<ThermalLandingAnti />} />
                 <Route path="/beena" element={<BeenaRedTeam />} />
+                <Route path="/ai" element={<AIShowcase />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />
