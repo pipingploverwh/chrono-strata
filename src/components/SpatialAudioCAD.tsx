@@ -1,7 +1,76 @@
-import { useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Float, RoundedBox, MeshTransmissionMaterial } from '@react-three/drei';
+import { useRef, useMemo, useState, useEffect } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { OrbitControls, Float, RoundedBox } from '@react-three/drei';
 import * as THREE from 'three';
+
+// Camera preset configurations
+const CAMERA_PRESETS = {
+  default: { position: [4, 3, 4], target: [0, 0, 0], label: 'DEFAULT', icon: '◇' },
+  topDown: { position: [0, 8, 0.01], target: [0, 0, 0], label: 'TOP', icon: '⬡' },
+  side: { position: [8, 0.5, 0], target: [0, 0, 0], label: 'SIDE', icon: '▭' },
+  front: { position: [0, 1, 8], target: [0, 0, 0], label: 'FRONT', icon: '▯' },
+  isometric: { position: [5, 5, 5], target: [0, 0, 0], label: 'ISO', icon: '◈' },
+  closeup: { position: [2, 1.5, 2], target: [0, -0.3, 0], label: 'CLOSE', icon: '◉' },
+} as const;
+
+type CameraPreset = keyof typeof CAMERA_PRESETS;
+
+// Smooth camera controller component
+const CameraController = ({ 
+  activePreset, 
+  isPlaying 
+}: { 
+  activePreset: CameraPreset; 
+  isPlaying: boolean;
+}) => {
+  const { camera } = useThree();
+  const controlsRef = useRef<any>(null);
+  const targetPosition = useRef(new THREE.Vector3(4, 3, 4));
+  const targetLookAt = useRef(new THREE.Vector3(0, 0, 0));
+  const isTransitioning = useRef(false);
+  const transitionProgress = useRef(0);
+
+  useEffect(() => {
+    const preset = CAMERA_PRESETS[activePreset];
+    targetPosition.current.set(...(preset.position as [number, number, number]));
+    targetLookAt.current.set(...(preset.target as [number, number, number]));
+    isTransitioning.current = true;
+    transitionProgress.current = 0;
+  }, [activePreset]);
+
+  useFrame((_, delta) => {
+    if (isTransitioning.current && controlsRef.current) {
+      transitionProgress.current += delta * 1.5; // Speed of transition
+      const t = Math.min(transitionProgress.current, 1);
+      const eased = 1 - Math.pow(1 - t, 3); // Cubic ease-out
+
+      // Interpolate camera position
+      camera.position.lerp(targetPosition.current, eased * 0.08);
+      
+      // Interpolate orbit target
+      controlsRef.current.target.lerp(targetLookAt.current, eased * 0.08);
+      controlsRef.current.update();
+
+      if (t >= 1) {
+        isTransitioning.current = false;
+      }
+    }
+  });
+
+  return (
+    <OrbitControls 
+      ref={controlsRef}
+      enablePan={false} 
+      enableZoom={true} 
+      minDistance={2} 
+      maxDistance={12}
+      autoRotate={isPlaying && !isTransitioning.current}
+      autoRotateSpeed={0.5}
+      dampingFactor={0.05}
+      enableDamping
+    />
+  );
+};
 
 interface SpatialAudioCADProps {
   spectralData: { low: number; mid: number; high: number };
@@ -289,6 +358,8 @@ const CADGrid = () => {
 };
 
 export const SpatialAudioCAD = ({ spectralData, temperature, isPlaying }: SpatialAudioCADProps) => {
+  const [activePreset, setActivePreset] = useState<CameraPreset>('default');
+
   return (
     <div className="w-full h-full relative">
       {/* CAD technical overlay */}
@@ -298,9 +369,33 @@ export const SpatialAudioCAD = ({ spectralData, temperature, isPlaying }: Spatia
         <div>FREQ: L:{(spectralData.low * 100).toFixed(0)} M:{(spectralData.mid * 100).toFixed(0)} H:{(spectralData.high * 100).toFixed(0)}</div>
       </div>
       
+      {/* Camera Preset Controls */}
+      <div className="absolute top-4 right-4 z-10 flex flex-col gap-1">
+        <div className="font-mono text-[9px] text-white/30 tracking-widest mb-1">CAMERA_VIEW</div>
+        <div className="flex flex-wrap gap-1 max-w-[180px] justify-end">
+          {(Object.keys(CAMERA_PRESETS) as CameraPreset[]).map((preset) => (
+            <button
+              key={preset}
+              onClick={() => setActivePreset(preset)}
+              className={`
+                font-mono text-[9px] px-2 py-1.5 border transition-all duration-300
+                ${activePreset === preset 
+                  ? 'bg-orange-500/20 border-orange-500/60 text-orange-400' 
+                  : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10 hover:border-white/30 hover:text-white/70'
+                }
+              `}
+            >
+              <span className="mr-1">{CAMERA_PRESETS[preset].icon}</span>
+              {CAMERA_PRESETS[preset].label}
+            </button>
+          ))}
+        </div>
+      </div>
+      
       <div className="absolute bottom-4 right-4 z-10 font-mono text-[10px] text-white/40 tracking-wider text-right">
         <div>THERMAL: {temperature.toFixed(1)}°C</div>
         <div>STATUS: {isPlaying ? 'ACTIVE' : 'STANDBY'}</div>
+        <div className="text-white/20 mt-1">VIEW: {CAMERA_PRESETS[activePreset].label}</div>
       </div>
       
       {/* Corner markers */}
@@ -308,6 +403,13 @@ export const SpatialAudioCAD = ({ spectralData, temperature, isPlaying }: Spatia
       <div className="absolute top-2 right-2 w-4 h-4 border-r border-t border-white/20" />
       <div className="absolute bottom-2 left-2 w-4 h-4 border-l border-b border-white/20" />
       <div className="absolute bottom-2 right-2 w-4 h-4 border-r border-b border-white/20" />
+      
+      {/* Transition indicator */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+        <div className="w-16 h-16 border border-white/5 rounded-full flex items-center justify-center">
+          <div className="w-1 h-1 bg-orange-500/30 rounded-full" />
+        </div>
+      </div>
       
       <Canvas camera={{ position: [4, 3, 4], fov: 45 }} dpr={[1, 2]}>
         <color attach="background" args={['#050505']} />
@@ -324,14 +426,7 @@ export const SpatialAudioCAD = ({ spectralData, temperature, isPlaying }: Spatia
         <SpectrumBars3D spectralData={spectralData} />
         <CADGrid />
         
-        <OrbitControls 
-          enablePan={false} 
-          enableZoom={true} 
-          minDistance={3} 
-          maxDistance={10}
-          autoRotate={isPlaying}
-          autoRotateSpeed={0.5}
-        />
+        <CameraController activePreset={activePreset} isPlaying={isPlaying} />
       </Canvas>
     </div>
   );
