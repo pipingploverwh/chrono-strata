@@ -12,6 +12,7 @@ import AudioIngestHub from '@/components/AudioIngestHub';
 import LavandarBackground from '@/components/LavandarBackground';
 import ImmersiveMode from '@/components/thermal/ImmersiveMode';
 import NeonKanjiOverlay from '@/components/thermal/NeonKanjiOverlay';
+import KatakanaRain from '@/components/thermal/KatakanaRain';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { VINYL_COLLECTION } from '@/components/SpatialAudioCAD';
@@ -906,6 +907,19 @@ const ThermalMusicVisualizer = () => {
                     transition: 'background 0.1s ease-out',
                   }}
                 >
+                  {/* Katakana Rain Effect - Beat-synced falling characters */}
+                  <KatakanaRain
+                    spectralData={{
+                      bass: spectralData.low / 100,
+                      lowMid: spectralData.mid / 100,
+                      mid: spectralData.mid / 100,
+                      highMid: spectralData.high / 100,
+                      treble: spectralData.high / 100
+                    }}
+                    isPlaying={isPlaying}
+                    getThermalColor={getThermalColor}
+                  />
+                  
                   {/* Neon Kanji Overlay - Tokyo nightclub atmosphere */}
                   <NeonKanjiOverlay
                     spectralData={spectralData}

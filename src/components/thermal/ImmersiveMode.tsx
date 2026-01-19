@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import WaveformVisualization from '@/components/strata/WaveformVisualization';
 import StrataEmbeddedDisplay from '@/components/strata/StrataEmbeddedDisplay';
 import NeonKanjiOverlay from '@/components/thermal/NeonKanjiOverlay';
+import KatakanaRain from '@/components/thermal/KatakanaRain';
 
 interface ThermalZone {
   id: string;
@@ -175,6 +176,19 @@ const ImmersiveMode = ({
             getThermalColor={getThermalColor}
           />
         </div>
+        
+        {/* Katakana Rain Effect - Beat-synced falling characters */}
+        <KatakanaRain
+          spectralData={{
+            bass: spectralData.low / 100,
+            lowMid: spectralData.mid / 100,
+            mid: spectralData.mid / 100,
+            highMid: spectralData.high / 100,
+            treble: spectralData.high / 100
+          }}
+          isPlaying={isPlaying}
+          getThermalColor={getThermalColor}
+        />
         
         {/* Neon Kanji Overlay - Tokyo nightclub atmosphere */}
         <NeonKanjiOverlay
