@@ -921,10 +921,20 @@ const ThermalMusicVisualizer = () => {
                 </p>
               </div>
 
-              {/* Audio Ingest Hub - Redesigned CTA */}
+              {/* Audio Ingest Hub - Multi-source Input */}
               <AudioIngestHub
                 audioFile={audioFile}
                 onAudioStream={handleAudioStream}
+                onFileSelected={(file) => {
+                  setAudioFile(file);
+                  if (audioRef.current) {
+                    audioRef.current.src = URL.createObjectURL(file);
+                  }
+                  // Reset magic state
+                  setMagicAudio(null);
+                  setMagicAnalysis(null);
+                  setIsMagicPlaying(false);
+                }}
                 isPlaying={isPlaying}
                 onTogglePlayback={togglePlayback}
                 onEnterImmersive={() => setIsFullscreen(true)}
