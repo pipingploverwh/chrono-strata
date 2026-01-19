@@ -9,12 +9,18 @@ const ThermalLandingAnti = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [spectralData, setSpectralData] = useState({ low: 0, mid: 0, high: 0 });
+  const [time, setTime] = useState(0);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
   const animationRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => setTime(t => t + 1), 100);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -86,203 +92,422 @@ const ThermalLandingAnti = () => {
     }
   };
 
+  // Technical drawing helpers
+  const freqToHz = (normalized: number) => Math.round(20 + normalized * 19980);
+  const tempToKelvin = (c: number) => (c + 273.15).toFixed(1);
+
   return (
     <div 
-      className="min-h-screen overflow-hidden cursor-crosshair"
+      className="min-h-screen overflow-hidden cursor-crosshair select-none"
       style={{ 
-        background: '#0a0a0a',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
+        background: '#050508',
+        fontFamily: 'ui-monospace, "SF Mono", Monaco, monospace',
       }}
     >
-      {/* Chaotic floating elements */}
+      {/* CAD Grid - Blueprint style */}
+      <svg className="fixed inset-0 w-full h-full pointer-events-none z-0" style={{ opacity: 0.15 }}>
+        <defs>
+          <pattern id="smallGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1a3a5c" strokeWidth="0.5"/>
+          </pattern>
+          <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
+            <rect width="100" height="100" fill="url(#smallGrid)"/>
+            <path d="M 100 0 L 0 0 0 100" fill="none" stroke="#1a3a5c" strokeWidth="1"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#grid)" />
+      </svg>
+
+      {/* Cursor tracking crosshair */}
       <div 
-        className="fixed pointer-events-none z-0 transition-transform duration-100"
+        className="fixed pointer-events-none z-50 transition-transform duration-75"
         style={{ 
-          left: mousePos.x - 100,
-          top: mousePos.y - 100,
-          width: 200,
-          height: 200,
-          background: `radial-gradient(circle, hsl(${temperature}, 100%, 50%) 0%, transparent 70%)`,
-          opacity: 0.3,
-          filter: 'blur(40px)',
+          left: mousePos.x,
+          top: mousePos.y,
+          transform: 'translate(-50%, -50%)',
         }}
-      />
-
-      {/* Brutalist grid overlay */}
-      <div 
-        className="fixed inset-0 pointer-events-none z-10 opacity-[0.03]"
-        style={{
-          backgroundImage: `
-            repeating-linear-gradient(0deg, white 0px, white 1px, transparent 1px, transparent 100px),
-            repeating-linear-gradient(90deg, white 0px, white 1px, transparent 1px, transparent 100px)
-          `,
-        }}
-      />
-
-      {/* Scattered text elements */}
-      <div className="fixed top-4 left-4 z-20">
-        <span 
-          className="text-[10px] tracking-widest"
-          style={{ color: '#666', writingMode: 'vertical-rl' }}
-        >
-          THERMAL.EXE
-        </span>
+      >
+        <svg width="60" height="60" viewBox="0 0 60 60">
+          <circle cx="30" cy="30" r="28" fill="none" stroke="#ff6b35" strokeWidth="0.5" strokeDasharray="4 4" />
+          <line x1="0" y1="30" x2="20" y2="30" stroke="#ff6b35" strokeWidth="0.5" />
+          <line x1="40" y1="30" x2="60" y2="30" stroke="#ff6b35" strokeWidth="0.5" />
+          <line x1="30" y1="0" x2="30" y2="20" stroke="#ff6b35" strokeWidth="0.5" />
+          <line x1="30" y1="40" x2="30" y2="60" stroke="#ff6b35" strokeWidth="0.5" />
+        </svg>
       </div>
 
-      <div className="fixed top-4 right-4 z-20 text-right">
-        <span className="text-[10px] block" style={{ color: '#444' }}>
-          {new Date().toISOString().split('T')[0]}
-        </span>
-        <span 
-          className="text-xs font-mono"
-          style={{ color: `hsl(${temperature}, 80%, 50%)` }}
-        >
-          {temperature.toFixed(1)}°C
-        </span>
-      </div>
-
-      {/* Main content - asymmetric layout */}
-      <main className="relative z-20 min-h-screen">
-        {/* Hero - offset positioning */}
-        <section className="h-screen flex items-end pb-[20vh] pl-[10vw]">
-          <div>
-            <h1 
-              className="text-[20vw] leading-none font-black tracking-tighter"
-              style={{ 
-                color: 'transparent',
-                WebkitTextStroke: `1px hsl(${temperature}, 70%, 45%)`,
-                transform: `skewX(${(mousePos.x / window.innerWidth - 0.5) * -5}deg)`,
-              }}
-            >
-              HEAT
-            </h1>
-            <p 
-              className="text-xs mt-4 max-w-[200px]"
-              style={{ color: '#555' }}
-            >
-              audio → thermal
-            </p>
+      {/* Technical HUD - Top */}
+      <header className="fixed top-0 left-0 right-0 z-40 p-4 flex justify-between items-start">
+        <div className="space-y-1">
+          <div className="text-[9px] tracking-[0.4em] text-cyan-500/60">THERMAL RESONANCE SYSTEM</div>
+          <div className="text-[8px] text-white/30">REV.2024.01 | SPATIAL AUDIO ENGINE</div>
+        </div>
+        <div className="text-right space-y-1">
+          <div className="text-[9px] text-white/40">COORDINATES</div>
+          <div className="text-[10px] font-mono text-cyan-400/80">
+            X:{mousePos.x.toString().padStart(4, '0')} Y:{mousePos.y.toString().padStart(4, '0')}
           </div>
-        </section>
+        </div>
+      </header>
 
-        {/* Video - unconventional crop */}
-        <section className="relative py-20">
-          <div 
-            className="mx-auto"
-            style={{ 
-              width: '70vw',
-              marginLeft: '25vw',
-              transform: 'rotate(-1deg)',
-            }}
-          >
-            <video
-              src={thermalDemoVideo}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full aspect-[2.5/1] object-cover"
-              style={{ 
-                filter: 'grayscale(0.3) contrast(1.2)',
-                mixBlendMode: 'screen',
-              }}
-            />
-            <div 
-              className="absolute -bottom-4 -left-8 text-[100px] font-black leading-none pointer-events-none"
-              style={{ 
-                color: 'transparent',
-                WebkitTextStroke: '1px #333',
-              }}
-            >
-              01
+      {/* Main CAD Board */}
+      <main className="relative z-10 min-h-screen pt-20 pb-20">
+        
+        {/* Section A: Waveform Analysis */}
+        <section className="px-8 py-16">
+          <div className="max-w-6xl mx-auto">
+            {/* Section label */}
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-8 h-8 border border-cyan-500/30 flex items-center justify-center">
+                <span className="text-[10px] text-cyan-500">A</span>
+              </div>
+              <div>
+                <div className="text-[9px] tracking-[0.3em] text-white/40">SECTION A</div>
+                <div className="text-xs text-white/70">WAVEFORM DECOMPOSITION</div>
+              </div>
+              <div className="flex-1 h-px bg-gradient-to-r from-cyan-500/30 to-transparent" />
+            </div>
+
+            {/* Technical waveform display */}
+            <div className="relative border border-white/10 p-6" style={{ background: 'rgba(10, 20, 30, 0.5)' }}>
+              {/* Corner markers */}
+              <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-cyan-500/50" />
+              <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-cyan-500/50" />
+              <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-cyan-500/50" />
+              <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-cyan-500/50" />
+
+              <svg className="w-full h-48" viewBox="0 0 800 200" preserveAspectRatio="none">
+                {/* Axis lines */}
+                <line x1="50" y1="100" x2="750" y2="100" stroke="#1a3a5c" strokeWidth="1" />
+                <line x1="50" y1="20" x2="50" y2="180" stroke="#1a3a5c" strokeWidth="1" />
+                
+                {/* Axis labels */}
+                <text x="400" y="195" textAnchor="middle" fill="#4a5568" fontSize="8">t (ms)</text>
+                <text x="30" y="100" textAnchor="middle" fill="#4a5568" fontSize="8" transform="rotate(-90 30 100)">A</text>
+
+                {/* Dynamic waveform */}
+                <path
+                  d={`M 50 100 ${Array.from({ length: 70 }, (_, i) => {
+                    const x = 50 + i * 10;
+                    const bassWave = Math.sin((i + time) * 0.3) * 30 * spectralData.low;
+                    const midWave = Math.sin((i + time) * 0.8) * 20 * spectralData.mid;
+                    const highWave = Math.sin((i + time) * 2) * 10 * spectralData.high;
+                    const y = 100 - (bassWave + midWave + highWave);
+                    return `L ${x} ${y}`;
+                  }).join(' ')}`}
+                  fill="none"
+                  stroke="#ff6b35"
+                  strokeWidth="1.5"
+                />
+
+                {/* Frequency markers */}
+                {[0, 1, 2].map((i) => (
+                  <g key={i}>
+                    <line x1={200 + i * 200} y1="20" x2={200 + i * 200} y2="180" stroke="#ff6b35" strokeWidth="0.5" strokeDasharray="2 4" opacity="0.3" />
+                    <text x={200 + i * 200} y="15" textAnchor="middle" fill="#ff6b35" fontSize="7" opacity="0.6">
+                      {['20Hz', '1kHz', '20kHz'][i]}
+                    </text>
+                  </g>
+                ))}
+              </svg>
+
+              {/* Data readouts */}
+              <div className="flex justify-between mt-4 pt-4 border-t border-white/5">
+                <div className="text-[9px] text-white/40">
+                  SAMPLE RATE: <span className="text-cyan-400">44.1kHz</span>
+                </div>
+                <div className="text-[9px] text-white/40">
+                  BIT DEPTH: <span className="text-cyan-400">24-bit</span>
+                </div>
+                <div className="text-[9px] text-white/40">
+                  CHANNELS: <span className="text-cyan-400">STEREO</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Audio interaction - raw */}
-        <section className="py-32 px-8">
-          <div className="max-w-screen-lg mx-auto">
-            <div className="flex items-start justify-between gap-8 flex-wrap">
+        {/* Section B: Spectral Analysis */}
+        <section className="px-8 py-16">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-8 h-8 border border-orange-500/30 flex items-center justify-center">
+                <span className="text-[10px] text-orange-500">B</span>
+              </div>
               <div>
-                <span className="text-[8px] tracking-[0.5em] block mb-2" style={{ color: '#444' }}>
-                  INTERACT
-                </span>
-                
-                {/* Raw frequency display */}
-                <div className="flex gap-2 mt-8">
-                  {['LO', 'MD', 'HI'].map((label, i) => {
-                    const val = [spectralData.low, spectralData.mid, spectralData.high][i];
-                    return (
-                      <div key={label} className="text-center">
+                <div className="text-[9px] tracking-[0.3em] text-white/40">SECTION B</div>
+                <div className="text-xs text-white/70">SPECTRAL FREQUENCY ANALYSIS</div>
+              </div>
+              <div className="flex-1 h-px bg-gradient-to-r from-orange-500/30 to-transparent" />
+            </div>
+
+            <div className="grid grid-cols-3 gap-6">
+              {[
+                { label: 'LOW FREQ', range: '20-250Hz', value: spectralData.low, color: '#ff3333' },
+                { label: 'MID FREQ', range: '250-4kHz', value: spectralData.mid, color: '#ff6b35' },
+                { label: 'HIGH FREQ', range: '4-20kHz', value: spectralData.high, color: '#ffaa00' },
+              ].map((band, i) => (
+                <div 
+                  key={band.label}
+                  className="relative border border-white/10 p-4"
+                  style={{ background: 'rgba(10, 20, 30, 0.5)' }}
+                >
+                  {/* Technical corner */}
+                  <div className="absolute -top-2 -left-2 w-4 h-4">
+                    <svg viewBox="0 0 16 16">
+                      <path d="M 0 8 L 8 0 L 16 8 L 8 16 Z" fill="none" stroke={band.color} strokeWidth="1" opacity="0.5" />
+                    </svg>
+                  </div>
+
+                  <div className="text-[8px] tracking-[0.3em] text-white/40 mb-1">{band.label}</div>
+                  <div className="text-[10px] text-white/60 mb-4">{band.range}</div>
+                  
+                  {/* Vertical bar meter */}
+                  <div className="h-32 w-full flex items-end justify-center gap-1">
+                    {Array.from({ length: 8 }, (_, j) => {
+                      const threshold = (j + 1) / 8;
+                      const active = band.value >= threshold;
+                      return (
                         <div 
-                          className="w-8 mb-1"
+                          key={j}
+                          className="w-2 transition-all duration-75"
                           style={{ 
-                            height: `${20 + val * 80}px`,
-                            background: `hsl(${temperature + i * 10}, 70%, 45%)`,
-                            transition: 'height 50ms',
+                            height: `${(j + 1) * 12.5}%`,
+                            background: active ? band.color : '#1a1a2a',
+                            opacity: active ? 1 : 0.3,
                           }}
                         />
-                        <span className="text-[8px]" style={{ color: '#555' }}>{label}</span>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
+
+                  <div className="mt-4 pt-2 border-t border-white/5 text-center">
+                    <span className="text-lg font-mono" style={{ color: band.color }}>
+                      {(band.value * 100).toFixed(0)}%
+                    </span>
+                    <div className="text-[8px] text-white/30 mt-1">
+                      {freqToHz(band.value)} Hz
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Section C: Thermal Mapping */}
+        <section className="px-8 py-16">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-8 h-8 border border-red-500/30 flex items-center justify-center">
+                <span className="text-[10px] text-red-500">C</span>
+              </div>
+              <div>
+                <div className="text-[9px] tracking-[0.3em] text-white/40">SECTION C</div>
+                <div className="text-xs text-white/70">THERMAL ENERGY CONVERSION</div>
+              </div>
+              <div className="flex-1 h-px bg-gradient-to-r from-red-500/30 to-transparent" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-8">
+              {/* Thermal gauge */}
+              <div className="border border-white/10 p-6" style={{ background: 'rgba(10, 20, 30, 0.5)' }}>
+                <div className="relative">
+                  <svg className="w-full" viewBox="0 0 300 200">
+                    {/* Arc gauge background */}
+                    <path
+                      d="M 30 170 A 120 120 0 0 1 270 170"
+                      fill="none"
+                      stroke="#1a1a2a"
+                      strokeWidth="20"
+                      strokeLinecap="round"
+                    />
+                    {/* Arc gauge fill */}
+                    <path
+                      d="M 30 170 A 120 120 0 0 1 270 170"
+                      fill="none"
+                      stroke="url(#thermalGradient)"
+                      strokeWidth="20"
+                      strokeLinecap="round"
+                      strokeDasharray={`${((temperature - 20) / 50) * 377} 377`}
+                    />
+                    <defs>
+                      <linearGradient id="thermalGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#0066ff" />
+                        <stop offset="50%" stopColor="#ff6b35" />
+                        <stop offset="100%" stopColor="#ff0000" />
+                      </linearGradient>
+                    </defs>
+                    
+                    {/* Temperature labels */}
+                    <text x="30" y="190" fill="#4a5568" fontSize="10" textAnchor="middle">20°</text>
+                    <text x="150" y="40" fill="#4a5568" fontSize="10" textAnchor="middle">45°</text>
+                    <text x="270" y="190" fill="#4a5568" fontSize="10" textAnchor="middle">70°</text>
+                    
+                    {/* Center readout */}
+                    <text x="150" y="130" fill="#ff6b35" fontSize="36" textAnchor="middle" fontFamily="monospace">
+                      {temperature.toFixed(1)}°
+                    </text>
+                    <text x="150" y="155" fill="#4a5568" fontSize="10" textAnchor="middle">
+                      {tempToKelvin(temperature)}K
+                    </text>
+                  </svg>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/5">
+                  <div>
+                    <div className="text-[8px] text-white/40">CELSIUS</div>
+                    <div className="text-sm font-mono text-white/80">{temperature.toFixed(2)}°C</div>
+                  </div>
+                  <div>
+                    <div className="text-[8px] text-white/40">KELVIN</div>
+                    <div className="text-sm font-mono text-white/80">{tempToKelvin(temperature)}K</div>
+                  </div>
                 </div>
               </div>
 
-              <button
-                onClick={toggleAudio}
-                className="group"
-                style={{ marginTop: '60px' }}
-              >
-                <div 
-                  className="w-24 h-24 border flex items-center justify-center transition-all"
-                  style={{ 
-                    borderColor: isPlaying ? `hsl(${temperature}, 70%, 45%)` : '#333',
-                    transform: isPlaying ? 'rotate(45deg)' : 'rotate(0deg)',
-                  }}
-                >
-                  <span 
-                    className="text-[10px] tracking-widest"
-                    style={{ 
-                      color: isPlaying ? `hsl(${temperature}, 70%, 55%)` : '#666',
-                      transform: isPlaying ? 'rotate(-45deg)' : 'rotate(0deg)',
-                    }}
-                  >
-                    {isPlaying ? 'STOP' : 'PLAY'}
-                  </span>
+              {/* Video preview with technical overlay */}
+              <div className="border border-white/10 p-2 relative" style={{ background: 'rgba(10, 20, 30, 0.5)' }}>
+                <video
+                  src={thermalDemoVideo}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full aspect-video object-cover"
+                  style={{ filter: 'saturate(0.8) contrast(1.1)' }}
+                />
+                {/* Technical overlay */}
+                <div className="absolute inset-2 pointer-events-none border border-cyan-500/20">
+                  <div className="absolute top-2 left-2 text-[8px] text-cyan-500/60">REC ●</div>
+                  <div className="absolute top-2 right-2 text-[8px] text-white/40">1920×1080</div>
+                  <div className="absolute bottom-2 left-2 text-[8px] text-white/40">THERMAL.PREVIEW</div>
+                  <div className="absolute bottom-2 right-2 text-[8px] text-cyan-500/60">30fps</div>
+                  
+                  {/* Scan lines */}
+                  {[1, 2, 3].map((i) => (
+                    <div 
+                      key={i}
+                      className="absolute left-0 right-0 h-px bg-cyan-500/10"
+                      style={{ top: `${i * 25}%` }}
+                    />
+                  ))}
                 </div>
-              </button>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* CTA - aggressive */}
-        <section className="py-32 relative">
-          <Link 
-            to="/thermal-visualizer"
-            className="block text-center group"
-          >
-            <span 
-              className="text-[8vw] font-black tracking-tight transition-all duration-300 inline-block hover:text-orange-500"
-              style={{ 
-                color: '#111',
-                WebkitTextStroke: '1px #444',
-              }}
-            >
-              ENTER→
-            </span>
-          </Link>
+        {/* Section D: Audio Control */}
+        <section className="px-8 py-16">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-8 h-8 border border-green-500/30 flex items-center justify-center">
+                <span className="text-[10px] text-green-500">D</span>
+              </div>
+              <div>
+                <div className="text-[9px] tracking-[0.3em] text-white/40">SECTION D</div>
+                <div className="text-xs text-white/70">AUDIO INPUT CONTROL</div>
+              </div>
+              <div className="flex-1 h-px bg-gradient-to-r from-green-500/30 to-transparent" />
+            </div>
+
+            <div className="flex items-center justify-center gap-12">
+              {/* Play control */}
+              <button
+                onClick={toggleAudio}
+                className="group relative"
+              >
+                <svg width="120" height="120" viewBox="0 0 120 120">
+                  {/* Outer ring */}
+                  <circle cx="60" cy="60" r="55" fill="none" stroke="#1a3a5c" strokeWidth="1" />
+                  <circle 
+                    cx="60" cy="60" r="55" 
+                    fill="none" 
+                    stroke={isPlaying ? '#22c55e' : '#ff6b35'} 
+                    strokeWidth="2"
+                    strokeDasharray={isPlaying ? '345' : '0 345'}
+                    className="transition-all duration-300"
+                  />
+                  
+                  {/* Inner technical marks */}
+                  {Array.from({ length: 12 }, (_, i) => {
+                    const angle = (i * 30 * Math.PI) / 180;
+                    const x1 = 60 + Math.cos(angle) * 45;
+                    const y1 = 60 + Math.sin(angle) * 45;
+                    const x2 = 60 + Math.cos(angle) * 50;
+                    const y2 = 60 + Math.sin(angle) * 50;
+                    return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#3a3a4a" strokeWidth="1" />;
+                  })}
+                  
+                  {/* Play/Pause icon */}
+                  {isPlaying ? (
+                    <>
+                      <rect x="48" y="45" width="8" height="30" fill="#22c55e" />
+                      <rect x="64" y="45" width="8" height="30" fill="#22c55e" />
+                    </>
+                  ) : (
+                    <polygon points="50,40 50,80 80,60" fill="#ff6b35" />
+                  )}
+                </svg>
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] tracking-widest" style={{ color: isPlaying ? '#22c55e' : '#ff6b35' }}>
+                  {isPlaying ? 'ACTIVE' : 'ENGAGE'}
+                </div>
+              </button>
+
+              {/* Status panel */}
+              <div className="border border-white/10 p-4 min-w-[200px]" style={{ background: 'rgba(10, 20, 30, 0.5)' }}>
+                <div className="text-[8px] tracking-[0.3em] text-white/40 mb-3">SYSTEM STATUS</div>
+                {[
+                  { label: 'AUDIO ENGINE', status: isPlaying, value: isPlaying ? 'RUNNING' : 'STANDBY' },
+                  { label: 'FFT ANALYSIS', status: isPlaying, value: isPlaying ? '256 BINS' : 'IDLE' },
+                  { label: 'THERMAL MAP', status: true, value: 'LINKED' },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-center justify-between py-1 border-b border-white/5 last:border-0">
+                    <span className="text-[9px] text-white/50">{item.label}</span>
+                    <span className="flex items-center gap-2">
+                      <span className={`w-1.5 h-1.5 rounded-full ${item.status ? 'bg-green-500' : 'bg-white/20'}`} />
+                      <span className="text-[9px] text-white/70">{item.value}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </section>
 
-        {/* Footer - minimal */}
-        <footer 
-          className="py-6 px-8 flex justify-between text-[9px]"
-          style={{ color: '#333', borderTop: '1px solid #1a1a1a' }}
-        >
-          <span>THERMAL RESONANCE SYSTEM</span>
-          <span>V.2024</span>
-        </footer>
+        {/* CTA Section */}
+        <section className="px-8 py-24">
+          <div className="max-w-6xl mx-auto text-center">
+            <div className="inline-block border border-white/10 p-8" style={{ background: 'rgba(10, 20, 30, 0.5)' }}>
+              <div className="text-[9px] tracking-[0.5em] text-white/30 mb-4">INITIALIZE FULL INTERFACE</div>
+              <Link 
+                to="/thermal-visualizer"
+                className="inline-block"
+              >
+                <div className="text-4xl font-mono tracking-tight text-transparent hover:text-orange-500 transition-colors duration-300"
+                  style={{ WebkitTextStroke: '1px #ff6b35' }}
+                >
+                  LAUNCH →
+                </div>
+              </Link>
+              <div className="text-[8px] text-white/30 mt-4">THERMAL.VISUALIZER.EXE</div>
+            </div>
+          </div>
+        </section>
       </main>
+
+      {/* Technical Footer */}
+      <footer className="fixed bottom-0 left-0 right-0 z-40 p-4 flex justify-between items-end">
+        <div className="text-[8px] text-white/30">
+          <div>BUILD: 2024.01.19</div>
+          <div>ENGINE: WEB AUDIO API</div>
+        </div>
+        <div className="text-[8px] text-right text-white/30">
+          <div>SCALE: 1:1</div>
+          <div>UNITS: SI</div>
+        </div>
+      </footer>
     </div>
   );
 };
