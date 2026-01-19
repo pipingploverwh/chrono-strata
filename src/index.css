@@ -18,6 +18,33 @@ html {
   --plover-dune: 35 20% 75%;
   --plover-sage: 85 30% 42%;
   --plover-earth: 30 15% 22%;
+  
+  /* ═══════════════════════════════════════════════════════════════
+     APEX-1 DJ TABLE — Ultra-Premium Design System
+     Dark maximalism + emerald lume glow + material luxury
+     ═══════════════════════════════════════════════════════════════ */
+  
+  /* Core Emerald Lume Palette */
+  --apex-glow: 160 84% 39%;
+  --apex-glow-bright: 160 84% 45%;
+  --apex-glow-dim: 160 40% 25%;
+  --apex-glow-subtle: 160 30% 15%;
+  
+  /* Material Finishes */
+  --apex-carbon: 0 0% 8%;
+  --apex-titanium: 220 10% 45%;
+  --apex-marble: 40 15% 90%;
+  --apex-walnut: 25 35% 20%;
+  --apex-brass: 45 70% 50%;
+  
+  /* Status (STRATA-influenced) */
+  --apex-go: 142 70% 45%;
+  --apex-hold: 35 90% 55%;
+  --apex-stop: 0 70% 50%;
+  
+  /* Glass Effects */
+  --apex-glass: 0 0% 100% / 0.05;
+  --apex-glass-border: 0 0% 100% / 0.08;
 }
 
 @layer base {

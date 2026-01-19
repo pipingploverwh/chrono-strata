@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Volume2, Disc3, Gauge, Zap, Shield, Award, X, ChevronLeft, ChevronRight, Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import DJTableConfigurator, { ConfigState } from "@/components/DJTableConfigurator";
 
 // Import gallery images
 import heroImage from "@/assets/dj-table-hero.jpg";
@@ -137,10 +138,22 @@ const StrataLiveScreen = ({ type, size = 'normal' }: { type: 'dial' | 'metrics';
 };
 
 const DJTableShowcase = () => {
+  const navigate = useNavigate();
+  const configuratorRef = useRef<HTMLDivElement>(null);
   const [activeView, setActiveView] = useState<'front' | 'top' | 'side'>('front');
   const [isHovered, setIsHovered] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [currentConfig, setCurrentConfig] = useState<ConfigState | null>(null);
+
+  const scrollToConfigurator = () => {
+    configuratorRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleConfigCheckout = (config: ConfigState, totalPrice: number) => {
+    sessionStorage.setItem('apex1-config', JSON.stringify({ config, totalPrice }));
+    navigate('/allocation-checkout?type=deposit');
+  };
 
   const galleryImages = [
     { src: heroImage, title: "APEX-1 Overview", description: "3/4 angle with integrated STRATA live displays" },
@@ -356,12 +369,12 @@ const DJTableShowcase = () => {
               <div className="space-y-4">
                 <Button 
                   className="w-full py-6 text-sm tracking-widest uppercase bg-foreground text-background hover:bg-foreground/90"
-                  onClick={() => window.location.href = '/allocation-checkout?type=deposit'}
+                  onClick={scrollToConfigurator}
                 >
-                  Pay $1,800 Deposit
+                  Configure & Reserve
                 </Button>
                 <p className="text-xs text-center text-muted-foreground">
-                  12-16 week lead time • Refundable deposit • Balance due at shipping
+                  12-16 week lead time • $1,800 refundable deposit • Balance due at shipping
                 </p>
               </div>
 
@@ -481,6 +494,25 @@ const DJTableShowcase = () => {
           </div>
         </div>
       )}
+
+      {/* Configuration Tool */}
+      <section ref={configuratorRef} className="py-24 px-6 bg-gradient-to-b from-background via-apex-glow-subtle/5 to-background border-y border-apex-glow/20">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-apex-glow/10 border border-apex-glow/30 rounded-full mb-6">
+              <div className="w-2 h-2 rounded-full bg-apex-glow animate-pulse" style={{ boxShadow: '0 0 8px hsl(160 84% 39%)' }} />
+              <span className="text-xs tracking-widest text-apex-glow uppercase">Live Configuration</span>
+            </div>
+            <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase mb-4">Customization Studio</p>
+            <h2 className="text-3xl md:text-4xl font-extralight tracking-tight">Make It Yours</h2>
+          </div>
+          
+          <DJTableConfigurator 
+            onConfigChange={setCurrentConfig}
+            onCheckout={handleConfigCheckout}
+          />
+        </div>
+      </section>
 
       {/* Features Grid */}
       <section className="py-24 px-6 bg-muted/20 border-y border-border/30">
