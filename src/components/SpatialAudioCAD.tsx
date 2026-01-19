@@ -179,6 +179,7 @@ const DJConsole = ({
         spinning={spectralData.low > 0.2} 
         intensity={spectralData.low}
         labelColor={selectedVinyl?.labelColor || '#2a4a6a'}
+        spectralData={spectralData}
       />
       
       <Turntable 
@@ -186,6 +187,7 @@ const DJConsole = ({
         spinning={spectralData.high > 0.2} 
         intensity={spectralData.high}
         labelColor={selectedVinyl?.labelColor || '#2a4a6a'}
+        spectralData={spectralData}
       />
       
       <MixerSection position={[0, 0.35, 0]} spectralData={spectralData} />
@@ -206,18 +208,82 @@ const DJConsole = ({
   );
 };
 
+// Animated waveform grooves component
+const WaveformGrooves = ({ 
+  spectralData, 
+  intensity 
+}: { 
+  spectralData: { low: number; mid: number; high: number };
+  intensity: number;
+}) => {
+  const groovesRef = useRef<THREE.Group>(null);
+  const waveformData = useRef<number[]>(new Array(32).fill(0));
+  
+  useFrame((state) => {
+    if (groovesRef.current) {
+      // Update waveform data based on spectral input
+      const time = state.clock.elapsedTime;
+      
+      groovesRef.current.children.forEach((child, i) => {
+        const mesh = child as THREE.Mesh;
+        const angle = (i / 32) * Math.PI * 2;
+        
+        // Create wave pattern from audio data
+        const bassWave = Math.sin(angle * 3 + time * 4) * spectralData.low * 0.015;
+        const midWave = Math.sin(angle * 8 + time * 6) * spectralData.mid * 0.01;
+        const highWave = Math.sin(angle * 16 + time * 8) * spectralData.high * 0.005;
+        
+        const waveHeight = 0.002 + bassWave + midWave + highWave;
+        
+        // Animate groove displacement
+        mesh.scale.y = 1 + (waveHeight * intensity * 15);
+        
+        // Color pulse based on intensity
+        const mat = mesh.material as THREE.MeshStandardMaterial;
+        mat.emissiveIntensity = intensity * spectralData.low * 0.5;
+      });
+    }
+  });
+  
+  return (
+    <group ref={groovesRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.065, 0]}>
+      {Array.from({ length: 32 }, (_, i) => {
+        const angle = (i / 32) * Math.PI * 2;
+        const radius = 0.15 + (i % 8) * 0.025;
+        const x = Math.cos(angle) * radius;
+        const z = Math.sin(angle) * radius;
+        
+        return (
+          <mesh key={i} position={[x, 0, z]} rotation={[Math.PI / 2, 0, angle]}>
+            <boxGeometry args={[0.008, 0.002, 0.02 + (i % 4) * 0.005]} />
+            <meshStandardMaterial 
+              color="#ff6b35"
+              transparent
+              opacity={0.6}
+              emissive="#ff6b35"
+              emissiveIntensity={0}
+            />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+};
+
 const Turntable = ({ 
   position, 
   spinning, 
   intensity,
-  labelColor = '#2a4a6a'
+  labelColor = '#2a4a6a',
+  spectralData = { low: 0, mid: 0, high: 0 }
 }: { 
   position: [number, number, number]; 
   spinning: boolean; 
   intensity: number;
   labelColor?: string;
+  spectralData?: { low: number; mid: number; high: number };
 }) => {
-  const platterRef = useRef<THREE.Mesh>(null);
+  const platterRef = useRef<THREE.Group>(null);
   
   useFrame((_, delta) => {
     if (platterRef.current && spinning) {
@@ -227,25 +293,62 @@ const Turntable = ({
   
   return (
     <group position={position}>
+      {/* Turntable base */}
       <mesh rotation={[-Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.45, 0.45, 0.08, 32]} />
         <meshStandardMaterial color="#1a1a1a" metalness={0.3} roughness={0.8} />
       </mesh>
       
-      <mesh ref={platterRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]}>
-        <cylinderGeometry args={[0.4, 0.4, 0.02, 32]} />
-        <meshStandardMaterial color="#0a0a0a" metalness={0.1} roughness={0.9} />
-      </mesh>
+      {/* Spinning platter group */}
+      <group ref={platterRef}>
+        {/* Platter disc */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]}>
+          <cylinderGeometry args={[0.4, 0.4, 0.02, 32]} />
+          <meshStandardMaterial color="#0a0a0a" metalness={0.1} roughness={0.9} />
+        </mesh>
+        
+        {/* Vinyl grooves - static rings */}
+        {[0.12, 0.18, 0.24, 0.30, 0.36].map((r, i) => (
+          <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.062, 0]}>
+            <ringGeometry args={[r - 0.01, r, 64]} />
+            <meshStandardMaterial 
+              color="#1a1a1a" 
+              metalness={0.4} 
+              roughness={0.6}
+              transparent
+              opacity={0.8}
+            />
+          </mesh>
+        ))}
+        
+        {/* Animated waveform grooves */}
+        <WaveformGrooves spectralData={spectralData} intensity={intensity} />
+        
+        {/* Label center */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.08, 0]}>
+          <circleGeometry args={[0.1, 32]} />
+          <meshStandardMaterial color={labelColor} metalness={0.3} roughness={0.5} />
+        </mesh>
+        
+        {/* Spindle */}
+        <mesh position={[0, 0.1, 0]}>
+          <cylinderGeometry args={[0.015, 0.015, 0.04, 16]} />
+          <meshStandardMaterial color="#888" metalness={0.9} roughness={0.1} />
+        </mesh>
+      </group>
       
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.07, 0]}>
-        <ringGeometry args={[0.1, 0.38, 32, 8]} />
-        <meshStandardMaterial color="#1a1a1a" metalness={0.2} roughness={0.7} />
-      </mesh>
-      
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.08, 0]}>
-        <circleGeometry args={[0.1, 32]} />
-        <meshStandardMaterial color={labelColor} metalness={0.3} roughness={0.5} />
-      </mesh>
+      {/* Tonearm */}
+      <group position={[0.35, 0.12, -0.2]} rotation={[0, spinning ? -0.3 : -0.5, 0]}>
+        <mesh position={[0, 0, 0.15]} rotation={[0, 0, 0]}>
+          <boxGeometry args={[0.02, 0.015, 0.35]} />
+          <meshStandardMaterial color="#888" metalness={0.8} roughness={0.2} />
+        </mesh>
+        {/* Cartridge */}
+        <mesh position={[-0.01, -0.01, 0.32]}>
+          <boxGeometry args={[0.03, 0.02, 0.04]} />
+          <meshStandardMaterial color="#333" metalness={0.5} roughness={0.5} />
+        </mesh>
+      </group>
     </group>
   );
 };
