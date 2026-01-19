@@ -58,6 +58,7 @@ import ThermalLandingAnti from "./pages/ThermalLandingAnti";
 import BeenaRedTeam from "./pages/BeenaRedTeam";
 import AIShowcase from "./pages/AIShowcase";
 import TalentRecruitment from "./pages/TalentRecruitment";
+import ProjectSummary from "./pages/ProjectSummary";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -108,6 +109,7 @@ const App = () => (
                 <Route path="/beena" element={<BeenaRedTeam />} />
                 <Route path="/ai" element={<AIShowcase />} />
                 <Route path="/careers" element={<TalentRecruitment />} />
+                <Route path="/summary" element={<ProjectSummary />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />
