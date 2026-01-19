@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Bird, ShieldCheck } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -43,8 +44,8 @@ export default function AgeGate({ children }: AgeGateProps) {
   // Still loading
   if (isVerified === null) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-plover-sand">
+        <div className="animate-pulse text-plover-earth/50">Loading...</div>
       </div>
     );
   }
@@ -53,38 +54,41 @@ export default function AgeGate({ children }: AgeGateProps) {
     <>
       <Dialog open={showDialog} onOpenChange={() => {}}>
         <DialogContent 
-          className="sm:max-w-md border-border bg-card"
+          className="sm:max-w-md border-plover-dune/30 bg-plover-cream"
           onPointerDownOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
         >
           <DialogHeader className="text-center">
-            <div className="text-5xl mb-4">🐦</div>
-            <DialogTitle className="text-2xl font-medium text-foreground">
+            <div className="w-16 h-16 mx-auto rounded-full bg-plover-sage/20 flex items-center justify-center mb-4">
+              <Bird className="w-8 h-8 text-plover-sage" />
+            </div>
+            <DialogTitle className="text-2xl font-light text-plover-earth">
               {t('plover.ageGate.welcome')}
             </DialogTitle>
-            <DialogDescription className="text-muted-foreground mt-2">
+            <DialogDescription className="text-plover-earth/60 mt-2">
               {t('plover.ageGate.description')}
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-4 mt-6">
+          <div className="space-y-3 mt-6">
             <Button
               onClick={handleVerify}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-lg"
+              className="w-full bg-plover-sage hover:bg-plover-sage/90 text-plover-cream py-6 text-base rounded-full"
             >
+              <ShieldCheck className="w-5 h-5 mr-2" />
               {t('plover.ageGate.confirm')}
             </Button>
             
             <Button
               onClick={handleExit}
               variant="outline"
-              className="w-full border-border text-foreground hover:bg-muted py-6"
+              className="w-full border-plover-dune/30 text-plover-earth hover:bg-plover-dune/10 py-6 rounded-full"
             >
               {t('plover.ageGate.exit')}
             </Button>
           </div>
           
-          <p className="text-xs text-center text-muted-foreground mt-4">
+          <p className="text-xs text-center text-plover-earth/40 mt-4 leading-relaxed">
             {t('plover.ageGate.legal')}
           </p>
         </DialogContent>
