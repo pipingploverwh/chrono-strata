@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ArrowUpRight, Volume2, VolumeX } from 'lucide-react';
 import thermalDemoVideo from '@/assets/thermal-demo.mp4';
 import SpatialAudioCAD, { VINYL_COLLECTION, VinylRecord } from '@/components/SpatialAudioCAD';
@@ -99,8 +100,11 @@ const ThermalLandingSlash = () => {
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden">
       {/* Kengo Kuma - Layered slat pattern overlay */}
-      <div 
+      <motion.div 
         className="fixed inset-0 pointer-events-none z-10"
+        initial={{ opacity: 0, x: -30 }}
+        animate={{ opacity: 0.4, x: 0 }}
+        transition={{ duration: 1.5, ease: "easeOut" }}
         style={{
           backgroundImage: `repeating-linear-gradient(
             90deg,
@@ -109,13 +113,15 @@ const ThermalLandingSlash = () => {
             hsl(var(--kuma-slat-color)) 23px,
             hsl(var(--kuma-slat-color)) 24px
           )`,
-          opacity: 0.4,
         }}
       />
       
       {/* Arielle Assouline-Lichten - Geometric ruled surface lines */}
-      <div 
+      <motion.div 
         className="fixed inset-0 pointer-events-none z-10"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 2, ease: "easeOut", delay: 0.3 }}
         style={{
           backgroundImage: `
             linear-gradient(to right, hsl(0 0% 100% / 0.03) 1px, transparent 1px),
@@ -139,8 +145,11 @@ const ThermalLandingSlash = () => {
       {/* Hero - Full screen with Kuma depth layering */}
       <section className="h-screen flex items-center justify-center relative">
         {/* Layer 1: Deep background blur (far) */}
-        <div 
+        <motion.div 
           className="absolute inset-0 transition-all duration-700"
+          initial={{ opacity: 0, scale: 1.1 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.8, ease: "easeOut" }}
           style={{
             background: `radial-gradient(ellipse 80% 60% at 50% 50%, ${getThermalColor(temperature)}15 0%, transparent 70%)`,
             filter: 'blur(40px)',
@@ -148,8 +157,11 @@ const ThermalLandingSlash = () => {
         />
         
         {/* Layer 2: Mid-ground glass panels (Kuma layering) */}
-        <div 
+        <motion.div 
           className="absolute inset-20 border border-white/5 rounded-sm"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.5, ease: "easeOut", delay: 0.3 }}
           style={{ 
             background: 'hsl(var(--kuma-glass-1))',
             backdropFilter: 'blur(1px)',
@@ -157,8 +169,11 @@ const ThermalLandingSlash = () => {
         />
         
         {/* Layer 3: Inner frame with AAL geometric shadow */}
-        <div 
+        <motion.div 
           className="absolute inset-32 border border-white/8"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2, ease: "easeOut", delay: 0.5 }}
           style={{ 
             background: 'hsl(var(--kuma-glass-2))',
             boxShadow: 'inset 0 0 100px 20px hsl(0 0% 0% / 0.3)',
@@ -174,9 +189,20 @@ const ThermalLandingSlash = () => {
         />
 
         {/* Content - sharp foreground */}
-        <div className="relative z-20 text-center px-8">
+        <motion.div 
+          className="relative z-20 text-center px-8"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: "easeOut", delay: 0.7 }}
+        >
           {/* AAL - Ruled surface accent lines */}
-          <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-px h-16 bg-gradient-to-b from-transparent to-white/10" />
+          <motion.div 
+            className="absolute -top-8 left-1/2 -translate-x-1/2 w-px h-16 bg-gradient-to-b from-transparent to-white/10"
+            initial={{ scaleY: 0 }}
+            animate={{ scaleY: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 1.0 }}
+            style={{ originY: 0 }}
+          />
           
           <h1 
             className="text-[15vw] leading-[0.85] font-extralight tracking-tighter transition-colors duration-300"
@@ -189,19 +215,40 @@ const ThermalLandingSlash = () => {
           </h1>
           
           {/* AAL - Geometric separator */}
-          <div className="mt-6 flex items-center justify-center gap-3">
+          <motion.div 
+            className="mt-6 flex items-center justify-center gap-3"
+            initial={{ opacity: 0, scaleX: 0 }}
+            animate={{ opacity: 1, scaleX: 1 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 1.2 }}
+          >
             <div className="w-8 h-px bg-white/20" />
-            <div className="w-1.5 h-1.5 rotate-45 border border-white/30" />
+            <motion.div 
+              className="w-1.5 h-1.5 rotate-45 border border-white/30"
+              initial={{ scale: 0, rotate: 0 }}
+              animate={{ scale: 1, rotate: 45 }}
+              transition={{ duration: 0.4, ease: "easeOut", delay: 1.4 }}
+            />
             <div className="w-8 h-px bg-white/20" />
-          </div>
+          </motion.div>
           
-          <p className="mt-6 text-[10px] tracking-[0.5em] opacity-40 font-light">
+          <motion.p 
+            className="mt-6 text-[10px] tracking-[0.5em] opacity-40 font-light"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.4 }}
+            transition={{ duration: 0.8, delay: 1.5 }}
+          >
             MUSIC → HEAT
-          </p>
+          </motion.p>
           
           {/* AAL - Bottom ruled line */}
-          <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-px h-20 bg-gradient-to-b from-white/10 to-transparent" />
-        </div>
+          <motion.div 
+            className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-px h-20 bg-gradient-to-b from-white/10 to-transparent"
+            initial={{ scaleY: 0 }}
+            animate={{ scaleY: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 1.6 }}
+            style={{ originY: 0 }}
+          />
+        </motion.div>
 
         {/* Scroll line - AAL geometric precision */}
         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">

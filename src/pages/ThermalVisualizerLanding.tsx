@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { 
   Play, 
   Pause,
@@ -267,25 +268,41 @@ const ThermalVisualizerLanding = () => {
   return (
     <div className="min-h-screen text-white overflow-hidden" style={{ background: 'hsl(15 30% 4%)' }}>
       {/* Kengo Kuma - Layered transparency panels */}
-      <div className="fixed inset-0 pointer-events-none z-[1]">
+      <motion.div 
+        className="fixed inset-0 pointer-events-none z-[1]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.5, ease: "easeOut" }}
+      >
         {/* Vertical slat rhythm - timber screen inspiration */}
-        <div 
+        <motion.div 
           className="absolute inset-0 opacity-[0.025]"
+          initial={{ x: -30 }}
+          animate={{ x: 0 }}
+          transition={{ duration: 2, ease: "easeOut", delay: 0.2 }}
           style={{
             background: 'repeating-linear-gradient(90deg, transparent, transparent 80px, hsl(var(--kuma-slat)) 80px, hsl(var(--kuma-slat)) 81px)',
           }}
         />
         {/* Horizontal strata - geological layering */}
-        <div 
+        <motion.div 
           className="absolute inset-0 opacity-[0.015]"
+          initial={{ y: -30 }}
+          animate={{ y: 0 }}
+          transition={{ duration: 2, ease: "easeOut", delay: 0.3 }}
           style={{
             background: 'repeating-linear-gradient(0deg, transparent, transparent 150px, hsl(var(--kuma-slat)) 150px, hsl(var(--kuma-slat)) 151px)',
           }}
         />
-      </div>
+      </motion.div>
 
       {/* AAL - Ruled surface lines (geometric precision) */}
-      <div className="fixed inset-0 pointer-events-none z-[2] opacity-[0.03]">
+      <motion.div 
+        className="fixed inset-0 pointer-events-none z-[2] opacity-[0.03]"
+        initial={{ opacity: 0, rotate: -1 }}
+        animate={{ opacity: 1, rotate: 0 }}
+        transition={{ duration: 2.5, ease: "easeOut", delay: 0.4 }}
+      >
         <div 
           className="absolute inset-0"
           style={{
@@ -293,10 +310,15 @@ const ThermalVisualizerLanding = () => {
             backgroundSize: '250px 250px',
           }}
         />
-      </div>
+      </motion.div>
 
       {/* Kuma - Floating glass panels (depth layering) */}
-      <div className="fixed top-[10%] right-[4%] w-40 h-56 pointer-events-none z-[3] opacity-50">
+      <motion.div 
+        className="fixed top-[10%] right-[4%] w-40 h-56 pointer-events-none z-[3] opacity-50"
+        initial={{ opacity: 0, x: 80, y: -40 }}
+        animate={{ opacity: 0.5, x: 0, y: 0 }}
+        transition={{ duration: 1.8, ease: "easeOut", delay: 0.6 }}
+      >
         <div 
           className="absolute inset-0 border border-white/[0.02] rounded-sm"
           style={{ 
@@ -304,15 +326,20 @@ const ThermalVisualizerLanding = () => {
             backdropFilter: 'blur(1px)',
           }}
         />
-      </div>
-      <div className="fixed bottom-[15%] left-[2%] w-28 h-72 pointer-events-none z-[3] opacity-35 rotate-1">
+      </motion.div>
+      <motion.div 
+        className="fixed bottom-[15%] left-[2%] w-28 h-72 pointer-events-none z-[3] opacity-35 rotate-1"
+        initial={{ opacity: 0, x: -60, y: 50 }}
+        animate={{ opacity: 0.35, x: 0, y: 0 }}
+        transition={{ duration: 1.8, ease: "easeOut", delay: 0.8 }}
+      >
         <div 
           className="absolute inset-0 border border-white/[0.015]"
           style={{ 
             background: 'linear-gradient(180deg, transparent 0%, hsl(var(--kuma-glass-2)) 100%)',
           }}
         />
-      </div>
+      </motion.div>
 
       {/* Dynamic thermal background */}
       <div 
@@ -359,11 +386,21 @@ const ThermalVisualizerLanding = () => {
         {/* Main content */}
         <div className="relative z-10 max-w-5xl mx-auto text-center">
           {/* AAL geometric separator above badge */}
-          <div className="flex items-center justify-center gap-4 mb-6">
+          <motion.div 
+            className="flex items-center justify-center gap-4 mb-6"
+            initial={{ opacity: 0, scaleX: 0 }}
+            animate={{ opacity: 1, scaleX: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.5 }}
+          >
             <div className="w-16 h-px bg-gradient-to-r from-transparent to-white/10" />
-            <div className="w-1.5 h-1.5 rotate-45 border border-white/20" />
+            <motion.div 
+              className="w-1.5 h-1.5 rotate-45 border border-white/20"
+              initial={{ scale: 0, rotate: 0 }}
+              animate={{ scale: 1, rotate: 45 }}
+              transition={{ duration: 0.5, ease: "easeOut", delay: 0.8 }}
+            />
             <div className="w-16 h-px bg-gradient-to-l from-transparent to-white/10" />
-          </div>
+          </motion.div>
 
           {/* Badge */}
           <div 
