@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Volume2, Disc3, Gauge, Zap, Shield, Award, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Volume2, Disc3, Gauge, Zap, Shield, Award, X, ChevronLeft, ChevronRight, Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Import gallery images
@@ -11,6 +11,131 @@ import topImage from "@/assets/dj-table-top.jpg";
 import frameImage from "@/assets/dj-table-frame.jpg";
 import lifestyleImage from "@/assets/dj-table-lifestyle.jpg";
 
+// STRATA Live Screen Component
+const StrataLiveScreen = ({ type, size = 'normal' }: { type: 'dial' | 'metrics'; size?: 'normal' | 'large' }) => {
+  const [time, setTime] = useState(new Date());
+  
+  useEffect(() => {
+    const interval = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const hours = time.getHours() % 12;
+  const minutes = time.getMinutes();
+  const seconds = time.getSeconds();
+  
+  const hourAngle = (hours * 30) + (minutes * 0.5);
+  const minuteAngle = minutes * 6;
+  const secondAngle = seconds * 6;
+
+  const screenSize = size === 'large' ? 'w-20 h-20' : 'w-14 h-14';
+  const dialSize = size === 'large' ? 32 : 22;
+
+  if (type === 'dial') {
+    return (
+      <div className={`${screenSize} bg-zinc-950 rounded-sm border border-emerald-500/30 flex items-center justify-center relative overflow-hidden`}>
+        {/* Lume glow effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent animate-pulse" />
+        
+        {/* Mini watch dial */}
+        <svg width={dialSize} height={dialSize} viewBox="0 0 40 40" className="relative z-10">
+          {/* Dial face */}
+          <circle cx="20" cy="20" r="18" fill="none" stroke="rgb(16 185 129 / 0.3)" strokeWidth="1" />
+          
+          {/* Hour markers */}
+          {[...Array(12)].map((_, i) => {
+            const angle = i * 30 - 90;
+            const x1 = 20 + 15 * Math.cos(angle * Math.PI / 180);
+            const y1 = 20 + 15 * Math.sin(angle * Math.PI / 180);
+            const x2 = 20 + 17 * Math.cos(angle * Math.PI / 180);
+            const y2 = 20 + 17 * Math.sin(angle * Math.PI / 180);
+            return (
+              <line 
+                key={i} 
+                x1={x1} y1={y1} x2={x2} y2={y2} 
+                stroke="rgb(16 185 129)" 
+                strokeWidth={i % 3 === 0 ? 1.5 : 0.5}
+                style={{ filter: 'drop-shadow(0 0 2px rgb(16 185 129))' }}
+              />
+            );
+          })}
+          
+          {/* Hour hand */}
+          <line 
+            x1="20" y1="20" 
+            x2={20 + 8 * Math.cos((hourAngle - 90) * Math.PI / 180)} 
+            y2={20 + 8 * Math.sin((hourAngle - 90) * Math.PI / 180)}
+            stroke="rgb(16 185 129)" 
+            strokeWidth="2" 
+            strokeLinecap="round"
+            style={{ filter: 'drop-shadow(0 0 3px rgb(16 185 129))' }}
+          />
+          
+          {/* Minute hand */}
+          <line 
+            x1="20" y1="20" 
+            x2={20 + 12 * Math.cos((minuteAngle - 90) * Math.PI / 180)} 
+            y2={20 + 12 * Math.sin((minuteAngle - 90) * Math.PI / 180)}
+            stroke="rgb(16 185 129)" 
+            strokeWidth="1.5" 
+            strokeLinecap="round"
+            style={{ filter: 'drop-shadow(0 0 3px rgb(16 185 129))' }}
+          />
+          
+          {/* Second hand */}
+          <line 
+            x1="20" y1="20" 
+            x2={20 + 14 * Math.cos((secondAngle - 90) * Math.PI / 180)} 
+            y2={20 + 14 * Math.sin((secondAngle - 90) * Math.PI / 180)}
+            stroke="rgb(52 211 153)" 
+            strokeWidth="0.5" 
+            strokeLinecap="round"
+            style={{ filter: 'drop-shadow(0 0 4px rgb(52 211 153))' }}
+          />
+          
+          {/* Center dot */}
+          <circle cx="20" cy="20" r="2" fill="rgb(16 185 129)" style={{ filter: 'drop-shadow(0 0 4px rgb(16 185 129))' }} />
+        </svg>
+        
+        {/* STRATA label */}
+        <div className="absolute bottom-0.5 left-0 right-0 text-center">
+          <span className="text-[5px] tracking-[0.15em] text-emerald-500/80 uppercase font-medium" style={{ textShadow: '0 0 4px rgb(16 185 129)' }}>
+            STRATA
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // Metrics display
+  return (
+    <div className={`${screenSize} bg-zinc-950 rounded-sm border border-emerald-500/30 flex flex-col items-center justify-center relative overflow-hidden p-1`}>
+      {/* Lume glow effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent animate-pulse" />
+      
+      <div className="relative z-10 space-y-0.5 text-center">
+        {/* Wind metric */}
+        <div className="flex items-center gap-1">
+          <span className="text-[6px] text-emerald-500/60">W</span>
+          <span className="text-[8px] text-emerald-400 font-mono" style={{ textShadow: '0 0 4px rgb(16 185 129)' }}>12</span>
+        </div>
+        
+        {/* Pressure metric */}
+        <div className="flex items-center gap-1">
+          <span className="text-[6px] text-emerald-500/60">P</span>
+          <span className="text-[8px] text-emerald-400 font-mono" style={{ textShadow: '0 0 4px rgb(16 185 129)' }}>1013</span>
+        </div>
+        
+        {/* Live indicator */}
+        <div className="flex items-center justify-center gap-0.5 pt-0.5">
+          <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" style={{ boxShadow: '0 0 4px rgb(16 185 129)' }} />
+          <span className="text-[5px] text-emerald-500/80 uppercase tracking-wider">LIVE</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const DJTableShowcase = () => {
   const [activeView, setActiveView] = useState<'front' | 'top' | 'side'>('front');
   const [isHovered, setIsHovered] = useState(false);
@@ -18,12 +143,12 @@ const DJTableShowcase = () => {
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
   const galleryImages = [
-    { src: heroImage, title: "APEX-1 Overview", description: "3/4 angle showcasing the complete console" },
-    { src: topImage, title: "Top View", description: "Dual turntable layout with central mixer" },
+    { src: heroImage, title: "APEX-1 Overview", description: "3/4 angle with integrated STRATA live displays" },
+    { src: topImage, title: "Top View", description: "Dual turntable layout with central STRATA screens" },
     { src: turntableImage, title: "Turntable Mount", description: "Precision-machined vibration isolation system" },
-    { src: mixerImage, title: "Mixer Detail", description: "LED-illuminated control surface" },
+    { src: mixerImage, title: "Mixer Detail", description: "LED-illuminated controls with STRATA metrics integration" },
     { src: frameImage, title: "Frame Construction", description: "Aircraft-grade aluminum framework" },
-    { src: lifestyleImage, title: "In Performance", description: "Professional venue deployment" },
+    { src: lifestyleImage, title: "In Performance", description: "STRATA screens providing real-time weather intelligence" },
   ];
 
   const specs = [
@@ -33,6 +158,8 @@ const DJTableShowcase = () => {
     { label: "Frame", value: "Aircraft-Grade Aluminum" },
     { label: "Finish", value: "Matte Obsidian" },
     { label: "LED System", value: "Programmable RGB Matrix" },
+    { label: "STRATA Displays", value: "Dual 2.4\" OLED" },
+    { label: "Weather Integration", value: "Real-time NOAA Feed" },
   ];
 
   const features = [
@@ -40,6 +167,11 @@ const DJTableShowcase = () => {
       icon: Disc3,
       title: "Dual Turntable Integration",
       description: "Precision-engineered mounting system for industry-standard turntables with vibration isolation.",
+    },
+    {
+      icon: Monitor,
+      title: "STRATA Live Displays",
+      description: "Integrated weather intelligence screens with real-time atmospheric data and luminous dial readouts.",
     },
     {
       icon: Volume2,
@@ -60,11 +192,6 @@ const DJTableShowcase = () => {
       icon: Shield,
       title: "Road-Ready Construction",
       description: "Military-spec durability rated for touring. Modular assembly in under 15 minutes.",
-    },
-    {
-      icon: Award,
-      title: "Limited Production",
-      description: "Each unit is numbered and registered. Only 50 units manufactured annually.",
     },
   ];
 
@@ -130,9 +257,9 @@ const DJTableShowcase = () => {
                   >
                     {/* Table Top */}
                     <div className="w-80 h-48 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 rounded-sm shadow-2xl border border-zinc-700/50 relative">
-                      {/* LED Strips */}
-                      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-purple-500/60 via-cyan-400/60 to-purple-500/60 animate-pulse" />
-                      <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-cyan-400/60 via-purple-500/60 to-cyan-400/60 animate-pulse" />
+                      {/* LED Strips with STRATA glow */}
+                      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-500/60 via-cyan-400/60 to-emerald-500/60 animate-pulse" />
+                      <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-cyan-400/60 via-emerald-500/60 to-cyan-400/60 animate-pulse" />
                       
                       {/* Turntable Mounts */}
                       <div className="absolute top-6 left-6 w-20 h-20 rounded-full bg-zinc-950 border border-zinc-600 flex items-center justify-center">
@@ -146,13 +273,30 @@ const DJTableShowcase = () => {
                         </div>
                       </div>
                       
-                      {/* Mixer Section */}
-                      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-32 h-16 bg-zinc-950 rounded-sm border border-zinc-600 flex items-center justify-center gap-2 px-3">
-                        <div className="w-2 h-8 bg-gradient-to-t from-cyan-500 to-cyan-500/20 rounded-full" />
-                        <div className="w-2 h-10 bg-gradient-to-t from-purple-500 to-purple-500/20 rounded-full" />
-                        <div className="w-2 h-6 bg-gradient-to-t from-cyan-500 to-cyan-500/20 rounded-full" />
-                        <div className="w-2 h-12 bg-gradient-to-t from-purple-500 to-purple-500/20 rounded-full" />
-                        <div className="w-2 h-7 bg-gradient-to-t from-cyan-500 to-cyan-500/20 rounded-full" />
+                      {/* STRATA Screens + Mixer Section */}
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2">
+                        {/* Left STRATA Screen - Live Dial */}
+                        <StrataLiveScreen type="dial" />
+                        
+                        {/* Central Mixer */}
+                        <div className="w-24 h-16 bg-zinc-950 rounded-sm border border-zinc-600 flex items-center justify-center gap-1.5 px-2">
+                          <div className="w-1.5 h-8 bg-gradient-to-t from-emerald-500 to-emerald-500/20 rounded-full" />
+                          <div className="w-1.5 h-10 bg-gradient-to-t from-cyan-400 to-cyan-400/20 rounded-full" />
+                          <div className="w-1.5 h-6 bg-gradient-to-t from-emerald-500 to-emerald-500/20 rounded-full" />
+                          <div className="w-1.5 h-12 bg-gradient-to-t from-cyan-400 to-cyan-400/20 rounded-full" />
+                          <div className="w-1.5 h-7 bg-gradient-to-t from-emerald-500 to-emerald-500/20 rounded-full" />
+                        </div>
+                        
+                        {/* Right STRATA Screen - Metrics */}
+                        <StrataLiveScreen type="metrics" />
+                      </div>
+                      
+                      {/* STRATA LIVE Badge */}
+                      <div className="absolute top-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-2 py-0.5 bg-zinc-950/80 rounded-sm border border-emerald-500/30">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" style={{ boxShadow: '0 0 6px rgb(16 185 129)' }} />
+                        <span className="text-[8px] tracking-[0.2em] text-emerald-500 uppercase font-medium" style={{ textShadow: '0 0 4px rgb(16 185 129)' }}>
+                          STRATA LIVE
+                        </span>
                       </div>
                     </div>
                     
@@ -189,12 +333,18 @@ const DJTableShowcase = () => {
             {/* Product Info */}
             <div className="space-y-8">
               <div className="space-y-4">
-                <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">Performance Series</p>
+                <div className="flex items-center gap-3">
+                  <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">Performance Series</p>
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/30 rounded-sm">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] tracking-wider text-emerald-500 uppercase">STRATA Integrated</span>
+                  </div>
+                </div>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-extralight tracking-tight">
                   APEX<span className="text-muted-foreground">-1</span>
                 </h1>
                 <p className="text-lg text-muted-foreground font-light leading-relaxed max-w-md">
-                  The definitive professional DJ console. Engineered for precision. Built for permanence.
+                  The definitive professional DJ console. Engineered for precision. Built for permanence. With integrated STRATA weather intelligence.
                 </p>
               </div>
 
@@ -206,12 +356,12 @@ const DJTableShowcase = () => {
               <div className="space-y-4">
                 <Button 
                   className="w-full py-6 text-sm tracking-widest uppercase bg-foreground text-background hover:bg-foreground/90"
-                  onClick={() => window.location.href = '/allocation-checkout'}
+                  onClick={() => window.location.href = '/allocation-checkout?type=deposit'}
                 >
-                  Request Allocation
+                  Pay $1,800 Deposit
                 </Button>
                 <p className="text-xs text-center text-muted-foreground">
-                  12-16 week lead time • Invitation required
+                  12-16 week lead time • Refundable deposit • Balance due at shipping
                 </p>
               </div>
 
@@ -255,6 +405,14 @@ const DJTableShowcase = () => {
                     alt={image.title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
+                  {/* STRATA Screen Overlay - simulated on gallery images */}
+                  {(index === 0 || index === 1 || index === 3 || index === 5) && (
+                    <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="w-8 h-8 bg-zinc-950/80 rounded-sm border border-emerald-500/40 flex items-center justify-center">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" style={{ boxShadow: '0 0 4px rgb(16 185 129)' }} />
+                      </div>
+                    </div>
+                  )}
                   {/* Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
@@ -371,28 +529,25 @@ const DJTableShowcase = () => {
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase mb-6">Limited Availability</p>
           <h2 className="text-3xl md:text-4xl font-extralight tracking-tight mb-6">
-            Join the Waitlist
+            Reserve Your Unit
           </h2>
           <p className="text-muted-foreground mb-10 max-w-xl mx-auto">
-            Production is limited to 50 units per year. Request an allocation to secure your position.
+            Production is limited to 50 units per year. Secure your position with a refundable $1,800 deposit.
           </p>
           <Button 
             className="px-12 py-6 text-sm tracking-widest uppercase bg-foreground text-background hover:bg-foreground/90"
-            onClick={() => window.location.href = '/allocation-checkout'}
+            onClick={() => window.location.href = '/allocation-checkout?type=deposit'}
           >
-            Request Allocation
+            Pay $1,800 Deposit
           </Button>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="py-12 px-6 border-t border-border/30">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="max-w-7xl mx-auto text-center">
           <p className="text-xs tracking-[0.2em] text-muted-foreground uppercase">
-            LAVANDAR Tech • Performance Division
-          </p>
-          <p className="text-xs text-muted-foreground">
-            © 2026 All Rights Reserved
+            LAVANDAR Tech • Performance Division • STRATA Integrated
           </p>
         </div>
       </footer>

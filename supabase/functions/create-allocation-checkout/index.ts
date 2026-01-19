@@ -14,6 +14,11 @@ const ALLOCATION_PRODUCTS = {
     name: "Standard Allocation",
     amount: 25000, // $250.00
   },
+  deposit: {
+    priceId: "price_1Sr9lgPxsKYUGDkoR2zFdOhe",
+    name: "APEX-1 DJ Table Deposit",
+    amount: 180000, // $1,800.00
+  },
 };
 
 const logStep = (step: string, details?: Record<string, unknown>) => {
