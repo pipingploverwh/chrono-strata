@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, Pause, Upload, Thermometer, Volume2, Activity, Disc, ArrowLeft, Monitor, Maximize2, Minimize2, X } from 'lucide-react';
+import { Play, Pause, Upload, Thermometer, Volume2, Activity, Disc, ArrowLeft, Monitor, Maximize2, Minimize2, X, Sparkles, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import StrataEmbeddedDisplay from '@/components/strata/StrataEmbeddedDisplay';
 import WaveformVisualization from '@/components/strata/WaveformVisualization';
-
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 // Proprietary Thermal Mapping Algorithm
 // Based on psychoacoustic energy density and spectral flux
 const THERMAL_CONSTANTS = {
@@ -53,7 +54,18 @@ const ThermalMusicVisualizer = () => {
   const [peakEnergy, setPeakEnergy] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [waveformData, setWaveformData] = useState<number[]>(new Array(128).fill(128));
-
+  
+  // Magic generation state
+  const [isGeneratingMagic, setIsGeneratingMagic] = useState(false);
+  const [magicAudio, setMagicAudio] = useState<HTMLAudioElement | null>(null);
+  const [isMagicPlaying, setIsMagicPlaying] = useState(false);
+  const [magicAnalysis, setMagicAnalysis] = useState<{
+    mood: string;
+    thermalIntensity: string;
+    frequencyProfile: string;
+    tempoFeel: string;
+    emotionalTone: string;
+  } | null>(null);
   // Fullscreen keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -233,7 +245,73 @@ const ThermalMusicVisualizer = () => {
       if (audioRef.current) {
         audioRef.current.src = URL.createObjectURL(file);
       }
+      // Reset magic state when new file is uploaded
+      setMagicAudio(null);
+      setMagicAnalysis(null);
+      setIsMagicPlaying(false);
     }
+  };
+
+  // Generate magic based on thermal analysis
+  const generateMagic = async () => {
+    if (!audioFile) {
+      toast.error('Please upload an audio file first');
+      return;
+    }
+
+    setIsGeneratingMagic(true);
+    toast.info('Analyzing thermal signature...', { duration: 2000 });
+
+    try {
+      const response = await supabase.functions.invoke('thermal-magic', {
+        body: {
+          temperature: globalTemp,
+          energy: spectralData.energy,
+          lowFreq: spectralData.low,
+          midFreq: spectralData.mid,
+          highFreq: spectralData.high,
+          bpm: bpm,
+          fileName: audioFile.name,
+        },
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      const data = response.data;
+      
+      if (!data.success || !data.audioContent) {
+        throw new Error(data.error || 'Failed to generate magic');
+      }
+
+      // Create audio element from base64
+      const audioUrl = `data:audio/mpeg;base64,${data.audioContent}`;
+      const audio = new Audio(audioUrl);
+      audio.loop = true;
+      
+      setMagicAudio(audio);
+      setMagicAnalysis(data.analysis);
+      
+      toast.success(`✨ Thermal magic generated! Mood: ${data.mood}`, { duration: 4000 });
+    } catch (error) {
+      console.error('Error generating magic:', error);
+      toast.error('Failed to generate magic. Please try again.');
+    } finally {
+      setIsGeneratingMagic(false);
+    }
+  };
+
+  // Toggle magic audio playback
+  const toggleMagicPlayback = () => {
+    if (!magicAudio) return;
+    
+    if (isMagicPlaying) {
+      magicAudio.pause();
+    } else {
+      magicAudio.play();
+    }
+    setIsMagicPlaying(!isMagicPlaying);
   };
 
   // Toggle playback
@@ -685,7 +763,64 @@ const ThermalMusicVisualizer = () => {
                     <Maximize2 className="w-4 h-4" />
                     <span>Immersive Mode</span>
                   </Button>
+                  
+                  {/* Magic Generation Button */}
+                  <Button
+                    onClick={generateMagic}
+                    disabled={!audioFile || isGeneratingMagic}
+                    className="flex items-center gap-2 disabled:opacity-50"
+                    style={{ 
+                      background: 'linear-gradient(135deg, hsl(280 70% 45%) 0%, hsl(320 80% 55%) 100%)',
+                      boxShadow: '0 0 20px hsl(300 70% 50% / 0.4)',
+                    }}
+                  >
+                    {isGeneratingMagic ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Generating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        <span>Generate Magic</span>
+                      </>
+                    )}
+                  </Button>
                 </div>
+                
+                {/* Magic Audio Controls */}
+                {magicAudio && (
+                  <div 
+                    className="flex items-center gap-4 px-4 py-3 rounded-xl"
+                    style={{ 
+                      background: 'linear-gradient(135deg, hsl(280 40% 15% / 0.8) 0%, hsl(320 40% 15% / 0.8) 100%)',
+                      border: '1px solid hsl(300 50% 35% / 0.5)',
+                    }}
+                  >
+                    <Button
+                      onClick={toggleMagicPlayback}
+                      size="sm"
+                      className="w-10 h-10 rounded-full"
+                      style={{ 
+                        background: 'linear-gradient(135deg, hsl(280 70% 50%) 0%, hsl(320 80% 60%) 100%)',
+                      }}
+                    >
+                      {isMagicPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+                    </Button>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 text-sm" style={{ color: 'hsl(300 50% 75%)' }}>
+                        <Sparkles className="w-3 h-3" />
+                        <span className="font-medium">Thermal Magic Layer</span>
+                      </div>
+                      {magicAnalysis && (
+                        <div className="text-xs mt-1" style={{ color: 'hsl(300 30% 55%)' }}>
+                          {magicAnalysis.emotionalTone} • {magicAnalysis.frequencyProfile}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
                 <p className="text-xs" style={{ color: 'hsl(30 15% 40%)' }}>Press <kbd className="px-1.5 py-0.5 rounded" style={{ background: 'hsl(20 25% 15%)', color: 'hsl(40 30% 65%)' }}>F</kbd> for fullscreen</p>
               </div>
 
@@ -941,6 +1076,38 @@ const ThermalMusicVisualizer = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Magic Analysis Panel */}
+              {magicAnalysis && (
+                <div className="rounded-2xl p-6 backdrop-blur-xl" style={{ 
+                  background: 'linear-gradient(135deg, hsl(280 30% 10% / 0.6) 0%, hsl(320 30% 10% / 0.6) 100%)', 
+                  border: '1px solid hsl(300 40% 30% / 0.5)' 
+                }}>
+                  <h3 className="text-sm font-medium mb-4 flex items-center gap-2" style={{ color: 'hsl(300 50% 75%)' }}>
+                    <Sparkles className="w-4 h-4" style={{ color: 'hsl(320 80% 60%)' }} />
+                    THERMAL MAGIC ANALYSIS
+                  </h3>
+                  <div className="space-y-3 text-xs">
+                    <div className="flex justify-between">
+                      <span style={{ color: 'hsl(300 30% 55%)' }}>Thermal Intensity</span>
+                      <span className="font-mono" style={{ color: 'hsl(300 50% 75%)' }}>{(parseFloat(magicAnalysis.thermalIntensity) * 100).toFixed(0)}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span style={{ color: 'hsl(300 30% 55%)' }}>Frequency Profile</span>
+                      <span className="font-mono capitalize" style={{ color: 'hsl(300 50% 75%)' }}>{magicAnalysis.frequencyProfile}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span style={{ color: 'hsl(300 30% 55%)' }}>Tempo Feel</span>
+                      <span className="font-mono capitalize" style={{ color: 'hsl(300 50% 75%)' }}>{magicAnalysis.tempoFeel}</span>
+                    </div>
+                    <div className="pt-3 mt-3" style={{ borderTop: '1px solid hsl(300 30% 25%)' }}>
+                      <p className="text-xs italic" style={{ color: 'hsl(300 40% 50%)' }}>
+                        "{magicAnalysis.emotionalTone}"
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Algorithm Info */}
               <div className="rounded-2xl p-6 backdrop-blur-xl" style={{ background: 'hsl(20 25% 8% / 0.5)', border: '1px solid hsl(30 30% 20%)' }}>
