@@ -75,6 +75,43 @@ html {
   /* Border & Glow Effects */
   --thermal-border: 30 30% 25%;
   --thermal-glow: 25 100% 50%;
+  
+  /* ═══════════════════════════════════════════════════════════════
+     KENGO KUMA LAYERING SYSTEM — Depth through transparency
+     "Light filtering, material layering, organic rhythm"
+     ═══════════════════════════════════════════════════════════════ */
+  
+  /* Layered Glass Panels */
+  --kuma-glass-1: 0 0% 100% / 0.02;
+  --kuma-glass-2: 0 0% 100% / 0.04;
+  --kuma-glass-3: 0 0% 100% / 0.06;
+  
+  /* Depth Blur Levels */
+  --kuma-blur-near: 0px;
+  --kuma-blur-mid: 4px;
+  --kuma-blur-far: 12px;
+  
+  /* Linear Rhythm (slat patterns) */
+  --kuma-slat-width: 1px;
+  --kuma-slat-gap: 24px;
+  --kuma-slat-color: 0 0% 100% / 0.03;
+  
+  /* ═══════════════════════════════════════════════════════════════
+     ARIELLE ASSOULINE-LICHTEN PRECISION — Geometric discipline
+     "Mathematical ratios, ruled surfaces, sculptural shadow"
+     ═══════════════════════════════════════════════════════════════ */
+  
+  /* Golden Ratio Scaling */
+  --aal-ratio: 1.618;
+  --aal-unit: 8px;
+  
+  /* Ruled Surface Lines */
+  --aal-line-weight: 0.5px;
+  --aal-line-color: 0 0% 100% / 0.08;
+  
+  /* Shadow Cutouts */
+  --aal-shadow-soft: 0 20px 60px -20px hsl(0 0% 0% / 0.4);
+  --aal-shadow-hard: 8px 8px 0 0 hsl(0 0% 0% / 0.15);
 }
 
 @layer base {

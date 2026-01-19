@@ -9,6 +9,7 @@ const ThermalLandingAnti = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [spectralData, setSpectralData] = useState({ low: 0, mid: 0, high: 0 });
   const [time, setTime] = useState(0);
+  const [selectedVinyl, setSelectedVinyl] = useState<VinylRecord>(VINYL_COLLECTION[0]);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -33,7 +34,7 @@ const ThermalLandingAnti = () => {
   }, [isPlaying]);
 
   useEffect(() => {
-    audioRef.current = new Audio(DEMO_AUDIO_URL);
+    audioRef.current = new Audio(selectedVinyl.audioUrl);
     audioRef.current.crossOrigin = 'anonymous';
     audioRef.current.volume = 0.6;
     
@@ -42,7 +43,38 @@ const ThermalLandingAnti = () => {
       audioRef.current?.pause();
       audioContextRef.current?.close();
     };
-  }, []);
+  }, [selectedVinyl]);
+
+  // Handle vinyl change - switch audio source
+  const handleVinylSelect = useCallback((vinyl: VinylRecord) => {
+    const wasPlaying = isPlaying;
+    
+    // Stop current playback
+    if (audioRef.current && isPlaying) {
+      audioRef.current.pause();
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      setIsPlaying(false);
+    }
+    
+    // Update selected vinyl
+    setSelectedVinyl(vinyl);
+    
+    // Create new audio with new source
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
+      sourceRef.current = null;
+    }
+    
+    audioRef.current = new Audio(vinyl.audioUrl);
+    audioRef.current.crossOrigin = 'anonymous';
+    audioRef.current.volume = 0.6;
+    
+    // Resume playback if was playing
+    if (wasPlaying) {
+      setTimeout(() => toggleAudio(), 100);
+    }
+  }, [isPlaying]);
 
   const analyzeAudio = useCallback(() => {
     if (!analyserRef.current) return;

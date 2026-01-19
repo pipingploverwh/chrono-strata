@@ -2,14 +2,13 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, Volume2, VolumeX } from 'lucide-react';
 import thermalDemoVideo from '@/assets/thermal-demo.mp4';
-import SpatialAudioCAD from '@/components/SpatialAudioCAD';
-
-const DEMO_AUDIO_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+import SpatialAudioCAD, { VINYL_COLLECTION, VinylRecord } from '@/components/SpatialAudioCAD';
 
 const ThermalLandingSlash = () => {
   const [temperature, setTemperature] = useState(35);
   const [isPlaying, setIsPlaying] = useState(false);
   const [spectralData, setSpectralData] = useState({ low: 0, mid: 0, high: 0 });
+  const [selectedVinyl, setSelectedVinyl] = useState<VinylRecord>(VINYL_COLLECTION[0]);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -29,7 +28,7 @@ const ThermalLandingSlash = () => {
   }, [isPlaying]);
 
   useEffect(() => {
-    audioRef.current = new Audio(DEMO_AUDIO_URL);
+    audioRef.current = new Audio(selectedVinyl.audioUrl);
     audioRef.current.crossOrigin = 'anonymous';
     audioRef.current.volume = 0.6;
     
@@ -41,7 +40,7 @@ const ThermalLandingSlash = () => {
       }
       if (audioContextRef.current) audioContextRef.current.close();
     };
-  }, []);
+  }, [selectedVinyl]);
 
   const analyzeAudio = useCallback(() => {
     if (!analyserRef.current) return;
@@ -99,42 +98,115 @@ const ThermalLandingSlash = () => {
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden">
-      {/* Minimal nav */}
+      {/* Kengo Kuma - Layered slat pattern overlay */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-10"
+        style={{
+          backgroundImage: `repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 23px,
+            hsl(var(--kuma-slat-color)) 23px,
+            hsl(var(--kuma-slat-color)) 24px
+          )`,
+          opacity: 0.4,
+        }}
+      />
+      
+      {/* Arielle Assouline-Lichten - Geometric ruled surface lines */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-10"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, hsl(0 0% 100% / 0.03) 1px, transparent 1px),
+            linear-gradient(to bottom, hsl(0 0% 100% / 0.02) 1px, transparent 1px)
+          `,
+          backgroundSize: '100px 100px',
+        }}
+      />
+      
+      {/* Minimal nav - AAL geometric precision */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-8 py-6">
-        <span className="text-xs tracking-[0.3em] opacity-50">THERMAL</span>
+        <span className="text-xs tracking-[0.3em] opacity-50 font-light">THERMAL</span>
         <Link 
           to="/thermal-visualizer"
-          className="text-xs tracking-[0.2em] opacity-50 hover:opacity-100 transition-opacity flex items-center gap-1"
+          className="text-xs tracking-[0.2em] opacity-50 hover:opacity-100 transition-opacity flex items-center gap-1 font-light"
         >
           OPEN <ArrowUpRight className="w-3 h-3" />
         </Link>
       </nav>
 
-      {/* Hero - Full screen */}
+      {/* Hero - Full screen with Kuma depth layering */}
       <section className="h-screen flex items-center justify-center relative">
-        {/* Thermal glow background */}
+        {/* Layer 1: Deep background blur (far) */}
+        <div 
+          className="absolute inset-0 transition-all duration-700"
+          style={{
+            background: `radial-gradient(ellipse 80% 60% at 50% 50%, ${getThermalColor(temperature)}15 0%, transparent 70%)`,
+            filter: 'blur(40px)',
+          }}
+        />
+        
+        {/* Layer 2: Mid-ground glass panels (Kuma layering) */}
+        <div 
+          className="absolute inset-20 border border-white/5 rounded-sm"
+          style={{ 
+            background: 'hsl(var(--kuma-glass-1))',
+            backdropFilter: 'blur(1px)',
+          }}
+        />
+        
+        {/* Layer 3: Inner frame with AAL geometric shadow */}
+        <div 
+          className="absolute inset-32 border border-white/8"
+          style={{ 
+            background: 'hsl(var(--kuma-glass-2))',
+            boxShadow: 'inset 0 0 100px 20px hsl(0 0% 0% / 0.3)',
+          }}
+        />
+        
+        {/* Thermal glow - near layer */}
         <div 
           className="absolute inset-0 transition-all duration-500"
           style={{
-            background: `radial-gradient(circle at 50% 50%, ${getThermalColor(temperature)}20 0%, transparent 50%)`,
+            background: `radial-gradient(circle at 50% 50%, ${getThermalColor(temperature)}25 0%, transparent 40%)`,
           }}
         />
 
-        <div className="relative z-10 text-center px-8">
+        {/* Content - sharp foreground */}
+        <div className="relative z-20 text-center px-8">
+          {/* AAL - Ruled surface accent lines */}
+          <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-px h-16 bg-gradient-to-b from-transparent to-white/10" />
+          
           <h1 
             className="text-[15vw] leading-[0.85] font-extralight tracking-tighter transition-colors duration-300"
-            style={{ color: getThermalColor(temperature) }}
+            style={{ 
+              color: getThermalColor(temperature),
+              textShadow: `0 0 120px ${getThermalColor(temperature)}40`,
+            }}
           >
             {temperature.toFixed(0)}°
           </h1>
-          <p className="mt-8 text-xs tracking-[0.4em] opacity-40">
+          
+          {/* AAL - Geometric separator */}
+          <div className="mt-6 flex items-center justify-center gap-3">
+            <div className="w-8 h-px bg-white/20" />
+            <div className="w-1.5 h-1.5 rotate-45 border border-white/30" />
+            <div className="w-8 h-px bg-white/20" />
+          </div>
+          
+          <p className="mt-6 text-[10px] tracking-[0.5em] opacity-40 font-light">
             MUSIC → HEAT
           </p>
+          
+          {/* AAL - Bottom ruled line */}
+          <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-px h-20 bg-gradient-to-b from-white/10 to-transparent" />
         </div>
 
-        {/* Scroll line */}
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2">
+        {/* Scroll line - AAL geometric precision */}
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
           <div className="w-px h-16 bg-gradient-to-b from-transparent via-white/20 to-white/5" />
+          <div className="w-1 h-1 rounded-full bg-white/30" />
         </div>
       </section>
 
@@ -144,7 +216,9 @@ const ThermalLandingSlash = () => {
           <SpatialAudioCAD 
             spectralData={spectralData} 
             temperature={temperature} 
-            isPlaying={isPlaying} 
+            isPlaying={isPlaying}
+            selectedVinyl={selectedVinyl}
+            onVinylSelect={setSelectedVinyl}
           />
         </div>
         
