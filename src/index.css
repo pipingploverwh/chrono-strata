@@ -9,6 +9,15 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Piping Plover Beach Theme */
+.plover-theme {
+  --plover-sand: 39 30% 74%;
+  --plover-ocean: 198 35% 44%;
+  --plover-sunset: 24 77% 63%;
+  --plover-dune: 40 33% 97%;
+  --plover-driftwood: 195 15% 20%;
+}
+
 @layer base {
   :root {
     /* ═══════════════════════════════════════════════════════════════

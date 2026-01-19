@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.lavender-pipeline]
 verify_jwt = false
+
+[functions.plover-guide]
+verify_jwt = false
