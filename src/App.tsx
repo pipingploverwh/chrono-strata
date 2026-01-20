@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import GlobalWeatherProvider from "@/components/GlobalWeatherProvider";
+import { TemperatureProvider } from "@/hooks/useTemperatureUnit";
 import { SiteNavigation, SiteMapPage } from "@/components/SiteNavigation";
 import SkipLinks from "@/components/SkipLinks";
 import Footer from "@/components/Footer";
@@ -73,11 +74,12 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <GlobalWeatherProvider>
+    <TemperatureProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <GlobalWeatherProvider>
           {/* Smooth scroll to top on route changes */}
           <ScrollToTop />
           
@@ -160,9 +162,10 @@ const App = () => (
             <Footer />
           </div>
           <SiteNavigation />
-        </GlobalWeatherProvider>
-      </BrowserRouter>
-    </TooltipProvider>
+          </GlobalWeatherProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </TemperatureProvider>
   </QueryClientProvider>
 );
 

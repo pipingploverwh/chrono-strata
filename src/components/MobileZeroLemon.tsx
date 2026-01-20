@@ -17,6 +17,8 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { useWeatherData } from "@/hooks/useWeatherData";
+import { useTemperatureUnit } from "@/hooks/useTemperatureUnit";
+import TemperatureUnitToggle from "@/components/TemperatureUnitToggle";
 
 // Gillette Stadium coordinates
 const GILLETTE_LAT = 42.0909;
@@ -27,6 +29,7 @@ interface MobileZeroLemonProps {
 }
 
 const MobileZeroLemon = ({ className = "" }: MobileZeroLemonProps) => {
+  const { formatTemp } = useTemperatureUnit();
   const [lumeMode, setLumeMode] = useState(true);
   const [lumeIntensity, setLumeIntensity] = useState(70);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -202,11 +205,14 @@ const MobileZeroLemon = ({ className = "" }: MobileZeroLemonProps) => {
               boxShadow: `inset 0 0 ${glowSize(10)}px hsla(120, 100%, 62%, ${glowOpacity(0.1)})` 
             } : {}}
           >
-            <div className="flex items-center gap-2 mb-2">
-              <Thermometer className={`w-5 h-5 ${lumeMode ? 'text-strata-lume' : 'text-cyan-400'}`} />
-              <span className={`text-xs font-mono uppercase ${lumeMode ? 'text-strata-lume/50' : 'text-neutral-500'}`}>
-                Temp
-              </span>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Thermometer className={`w-5 h-5 ${lumeMode ? 'text-strata-lume' : 'text-cyan-400'}`} />
+                <span className={`text-xs font-mono uppercase ${lumeMode ? 'text-strata-lume/50' : 'text-neutral-500'}`}>
+                  Temp
+                </span>
+              </div>
+              <TemperatureUnitToggle variant="minimal" size="sm" className={lumeMode ? 'text-strata-lume/60' : ''} />
             </div>
             {loading ? (
               <Loader2 className={`w-6 h-6 animate-spin ${lumeMode ? 'text-strata-lume' : 'text-cyan-400'}`} />
@@ -217,7 +223,7 @@ const MobileZeroLemon = ({ className = "" }: MobileZeroLemonProps) => {
                   textShadow: `0 0 ${glowSize(12)}px hsla(120, 100%, 62%, ${glowOpacity(0.8)})` 
                 } : {}}
               >
-                {currentWeather.temp}°F
+                {formatTemp(currentWeather.temp)}
               </div>
             )}
           </div>
