@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Cloud, Sun, CloudRain, Snowflake, Wind, CloudFog, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useTemperatureUnit } from '@/hooks/useTemperatureUnit';
+import TemperatureUnitToggle from '@/components/TemperatureUnitToggle';
 
 interface Location {
   id: string;
@@ -57,6 +59,7 @@ interface AALWorldClockProps {
 }
 
 const AALWorldClock = ({ locations, variant = 'detailed' }: AALWorldClockProps) => {
+  const { formatTemp } = useTemperatureUnit();
   const [clockData, setClockData] = useState<ClockData[]>([]);
 
   useEffect(() => {
@@ -250,9 +253,9 @@ const AALWorldClock = ({ locations, variant = 'detailed' }: AALWorldClockProps) 
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <WeatherIcon className="w-5 h-5 text-rose-400" />
-                          <span className="text-xl font-light text-white">{data.weather.temp}°</span>
+                          <span className="text-xl font-light text-white">{formatTemp(data.weather.temp)}</span>
                         </div>
-                        <Wind className="w-4 h-4 text-slate-500" />
+                        <TemperatureUnitToggle variant="minimal" size="sm" />
                       </div>
                       <p className="text-xs text-slate-400 leading-relaxed">
                         {data.weather.description}

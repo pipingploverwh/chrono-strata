@@ -7,6 +7,8 @@ import {
   Cloud, CloudRain, Waves, Compass
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useTemperatureUnit } from '@/hooks/useTemperatureUnit';
+import TemperatureUnitToggle from '@/components/TemperatureUnitToggle';
 
 // The seven global strata - key environmental zones
 interface Stratum {
@@ -146,6 +148,7 @@ const getTemperatureColor = (temp: number): string => {
 
 const ChronoStrataEntrance = () => {
   const navigate = useNavigate();
+  const { formatTemp } = useTemperatureUnit();
   const [strataData, setStrataData] = useState<StratumLive[]>([]);
   const [selectedStratum, setSelectedStratum] = useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -469,7 +472,7 @@ const ChronoStrataEntrance = () => {
                       <div className="flex items-center gap-2">
                         <ConditionIcon className="w-3.5 h-3.5 text-slate-500" />
                         <span className={`text-sm font-mono ${getTemperatureColor(stratum.weather.temp)}`}>
-                          {stratum.weather.temp}°
+                          {formatTemp(stratum.weather.temp)}
                         </span>
                       </div>
                     )}
@@ -513,9 +516,12 @@ const ChronoStrataEntrance = () => {
                       {activeStratum.weather && (
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                           <div className="bg-zinc-800/50 rounded-xl p-4 border border-zinc-700/50">
-                            <Thermometer className="w-4 h-4 text-slate-500 mb-2" />
+                            <div className="flex items-center justify-between mb-2">
+                              <Thermometer className="w-4 h-4 text-slate-500" />
+                              <TemperatureUnitToggle variant="minimal" size="sm" />
+                            </div>
                             <p className={`text-2xl font-mono ${getTemperatureColor(activeStratum.weather.temp)}`}>
-                              {activeStratum.weather.temp}°
+                              {formatTemp(activeStratum.weather.temp)}
                             </p>
                             <p className="text-[10px] font-mono text-slate-600 uppercase">Temperature</p>
                           </div>

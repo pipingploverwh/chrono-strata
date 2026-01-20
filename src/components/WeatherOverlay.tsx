@@ -22,6 +22,8 @@ import { useGeolocation } from "@/hooks/useGeolocation";
 import { useWeatherData } from "@/hooks/useWeatherData";
 import { useWeatherLogger } from "@/hooks/useWeatherLogger";
 import { useMarineForecast } from "@/hooks/useMarineForecast";
+import { useTemperatureUnit } from "@/hooks/useTemperatureUnit";
+import TemperatureUnitToggle from "@/components/TemperatureUnitToggle";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface WeatherOverlayProps {
@@ -283,111 +285,116 @@ const WeatherContent = ({
   weather: any; 
   geolocation: ReturnType<typeof useGeolocation>; 
   isExpanded: boolean;
-}) => (
-  <>
-    {/* Compact view - always visible */}
-    <div className="px-4 py-3 flex items-center gap-4">
-      <div className="flex items-center gap-2">
-        <Thermometer className="w-4 h-4 text-strata-cyan" />
-        <span className="font-instrument text-xl text-strata-white">
-          {Math.round(weather.current.temp)}°F
-        </span>
+}) => {
+  const { formatTemp, unit } = useTemperatureUnit();
+  
+  return (
+    <>
+      {/* Compact view - always visible */}
+      <div className="px-4 py-3 flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <Thermometer className="w-4 h-4 text-strata-cyan" />
+          <span className="font-instrument text-xl text-strata-white">
+            {formatTemp(weather.current.temp)}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Wind className="w-4 h-4 text-strata-blue" />
+          <span className="font-mono text-sm text-strata-silver">
+            {Math.round(weather.current.wind)} mph
+          </span>
+        </div>
+        <div className="text-xs font-mono text-strata-silver/60">
+          {weather.current.condition}
+        </div>
+        <TemperatureUnitToggle variant="pill" size="sm" className="ml-auto" />
       </div>
-      <div className="flex items-center gap-2">
-        <Wind className="w-4 h-4 text-strata-blue" />
-        <span className="font-mono text-sm text-strata-silver">
-          {Math.round(weather.current.wind)} mph
-        </span>
-      </div>
-      <div className="text-xs font-mono text-strata-silver/60">
-        {weather.current.condition}
-      </div>
-    </div>
 
-    {/* Expanded view */}
-    <AnimatePresence>
-      {isExpanded && (
-        <motion.div 
-          className="border-t border-strata-steel/20"
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          {/* Location */}
-          <div className="relative px-4 py-3 bg-strata-steel/10">
-            <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-strata-orange/20 to-transparent" />
-            
-            <div className="flex items-center gap-2 mb-1">
-              <MapPin className="w-3.5 h-3.5 text-strata-orange" />
-              <span className="text-sm font-instrument text-strata-orange">
-                {geolocation.locationName || 'Current Location'}
-              </span>
-            </div>
-            <div className="text-[10px] font-mono text-strata-silver/50 flex items-center gap-2">
-              <Compass className="w-3 h-3" />
-              {geolocation.latitude?.toFixed(4)}°N, {Math.abs(geolocation.longitude ?? 0).toFixed(4)}°W
-            </div>
-          </div>
-
-          {/* Metrics grid */}
-          <div className="grid grid-cols-2 gap-px bg-strata-steel/20">
-            <MetricCell
-              icon={<Thermometer className="w-3.5 h-3.5 text-strata-cyan" />}
-              label="Feels Like"
-              value={Math.round(weather.current.feelsLike).toString()}
-              unit="°F"
-            />
-            <MetricCell
-              icon={<Wind className="w-3.5 h-3.5 text-strata-blue" />}
-              label="Wind Gusts"
-              value={Math.round(weather.current.windGusts).toString()}
-              unit="mph"
-            />
-            <MetricCell
-              icon={<Droplets className="w-3.5 h-3.5 text-strata-cyan" />}
-              label="Humidity"
-              value={weather.current.humidity.toString()}
-              unit="%"
-            />
-            <MetricCell
-              icon={<Waves className="w-3.5 h-3.5 text-strata-blue" />}
-              label="Precipitation"
-              value={weather.current.precipitation.toString()}
-              unit="in"
-            />
-          </div>
-
-          {/* Forecast strip */}
-          {weather.forecast && weather.forecast.length > 0 && (
-            <div className="px-4 py-3 bg-strata-black/30">
-              <div className="text-[9px] font-mono text-strata-silver/50 uppercase tracking-wider mb-2">
-                4-Hour Outlook
+      {/* Expanded view */}
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div 
+            className="border-t border-strata-steel/20"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {/* Location */}
+            <div className="relative px-4 py-3 bg-strata-steel/10">
+              <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-strata-orange/20 to-transparent" />
+              
+              <div className="flex items-center gap-2 mb-1">
+                <MapPin className="w-3.5 h-3.5 text-strata-orange" />
+                <span className="text-sm font-instrument text-strata-orange">
+                  {geolocation.locationName || 'Current Location'}
+                </span>
               </div>
-              <div className="flex gap-3">
-                {weather.forecast.slice(0, 4).map((hour: any, idx: number) => (
-                  <div key={idx} className="flex-1 text-center">
-                    <div className="text-[10px] font-mono text-strata-silver/60">
-                      {hour.time}
-                    </div>
-                    <div className="font-instrument text-sm text-strata-white">
-                      {Math.round(hour.temp)}°
-                    </div>
-                    {hour.precipProb > 0 && (
-                      <div className="text-[9px] font-mono text-strata-cyan">
-                        {hour.precipProb}%
+              <div className="text-[10px] font-mono text-strata-silver/50 flex items-center gap-2">
+                <Compass className="w-3 h-3" />
+                {geolocation.latitude?.toFixed(4)}°N, {Math.abs(geolocation.longitude ?? 0).toFixed(4)}°W
+              </div>
+            </div>
+
+            {/* Metrics grid */}
+            <div className="grid grid-cols-2 gap-px bg-strata-steel/20">
+              <MetricCell
+                icon={<Thermometer className="w-3.5 h-3.5 text-strata-cyan" />}
+                label="Feels Like"
+                value={formatTemp(weather.current.feelsLike)}
+                unit=""
+              />
+              <MetricCell
+                icon={<Wind className="w-3.5 h-3.5 text-strata-blue" />}
+                label="Wind Gusts"
+                value={Math.round(weather.current.windGusts).toString()}
+                unit="mph"
+              />
+              <MetricCell
+                icon={<Droplets className="w-3.5 h-3.5 text-strata-cyan" />}
+                label="Humidity"
+                value={weather.current.humidity.toString()}
+                unit="%"
+              />
+              <MetricCell
+                icon={<Waves className="w-3.5 h-3.5 text-strata-blue" />}
+                label="Precipitation"
+                value={weather.current.precipitation.toString()}
+                unit="in"
+              />
+            </div>
+
+            {/* Forecast strip */}
+            {weather.forecast && weather.forecast.length > 0 && (
+              <div className="px-4 py-3 bg-strata-black/30">
+                <div className="text-[9px] font-mono text-strata-silver/50 uppercase tracking-wider mb-2">
+                  4-Hour Outlook
+                </div>
+                <div className="flex gap-3">
+                  {weather.forecast.slice(0, 4).map((hour: any, idx: number) => (
+                    <div key={idx} className="flex-1 text-center">
+                      <div className="text-[10px] font-mono text-strata-silver/60">
+                        {hour.time}
                       </div>
-                    )}
-                  </div>
-                ))}
+                      <div className="font-instrument text-sm text-strata-white">
+                        {formatTemp(hour.temp)}
+                      </div>
+                      {hour.precipProb > 0 && (
+                        <div className="text-[9px] font-mono text-strata-cyan">
+                          {hour.precipProb}%
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </motion.div>
-      )}
-    </AnimatePresence>
-  </>
-);
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+};
 
 // Marine content component
 const MarineContent = ({ 
