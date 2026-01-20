@@ -91,6 +91,13 @@ export default {
           DEFAULT: "hsl(var(--lavender))",
           dim: "hsl(var(--lavender-dim))",
           glow: "hsl(var(--lavender-glow))",
+          50: "hsl(var(--lavender-50))",
+          100: "hsl(var(--lavender-100))",
+          200: "hsl(var(--lavender-200))",
+          300: "hsl(var(--lavender-300))",
+          400: "hsl(var(--lavender-400))",
+          500: "hsl(var(--lavender-500))",
+          600: "hsl(var(--lavender-600))",
         },
         // Surface layers
         surface: {
