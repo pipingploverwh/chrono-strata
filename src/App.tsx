@@ -61,6 +61,10 @@ import TalentRecruitment from "./pages/TalentRecruitment";
 import ProjectSummary from "./pages/ProjectSummary";
 import ExecutiveSummary from "./pages/ExecutiveSummary";
 import PilotInterestTracker from "./pages/PilotInterestTracker";
+import SecurityHoneypot from "./pages/SecurityHoneypot";
+import StrataWorldThree from "./pages/StrataWorldThree";
+import StrataWorldFive from "./pages/StrataWorldFive";
+import StrataWorldSeven from "./pages/StrataWorldSeven";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -114,6 +118,10 @@ const App = () => (
                 <Route path="/summary" element={<ProjectSummary />} />
                 <Route path="/exec" element={<ExecutiveSummary />} />
                 <Route path="/pilot" element={<PilotInterestTracker />} />
+                <Route path="/security-honeypot" element={<SecurityHoneypot />} />
+                <Route path="/world-3" element={<StrataWorldThree />} />
+                <Route path="/world-5" element={<StrataWorldFive />} />
+                <Route path="/world-7" element={<StrataWorldSeven />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />

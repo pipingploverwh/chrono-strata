@@ -65,6 +65,48 @@ export type Database = {
         }
         Relationships: []
       }
+      honeypot_logs: {
+        Row: {
+          attempted_password: string | null
+          attempted_username: string | null
+          created_at: string
+          id: string
+          interaction_type: string
+          ip_hint: string | null
+          metadata: Json | null
+          page_path: string | null
+          referrer: string | null
+          session_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          attempted_password?: string | null
+          attempted_username?: string | null
+          created_at?: string
+          id?: string
+          interaction_type: string
+          ip_hint?: string | null
+          metadata?: Json | null
+          page_path?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          attempted_password?: string | null
+          attempted_username?: string | null
+          created_at?: string
+          id?: string
+          interaction_type?: string
+          ip_hint?: string | null
+          metadata?: Json | null
+          page_path?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       investor_contacts: {
         Row: {
           created_at: string | null
