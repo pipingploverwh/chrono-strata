@@ -1,93 +1,118 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Check, Droplets, Wind, Thermometer, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { ShoppingBag, Check, Droplets, Wind, Shield, Loader2, Zap, Map, Clock, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/hooks/useLanguage";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-// Time Strata design variants
-const DESIGN_VARIANTS = [
-  {
-    id: 'temporal-flux',
-    name: 'Temporal Flux',
-    description: 'Dynamic weather gradients with precision time markers',
-    gradient: 'from-strata-charcoal via-strata-steel to-strata-orange/30',
-    accentColor: 'strata-orange',
-  },
-  {
-    id: 'midnight-strata',
-    name: 'Midnight Strata',
-    description: 'Deep atmospheric layers with cyan chronograph accents',
-    gradient: 'from-strata-black via-strata-charcoal to-strata-cyan/20',
-    accentColor: 'strata-cyan',
-  },
-  {
-    id: 'storm-protocol',
-    name: 'Storm Protocol',
-    description: 'High-contrast weather system visualization',
-    gradient: 'from-zinc-900 via-slate-800 to-emerald-900/30',
-    accentColor: 'strata-lume',
-  },
-];
+// Import the AI-generated HUD jacket
+import strataShellHUD from "@/assets/strata-shell-hud-jacket.jpg";
 
-const PRODUCT = {
-  name: 'STRATA Rain Shell',
-  brand: 'Charles River Apparel × LAVANDAR',
-  price: 3600,
-  currency: 'USD',
-  description: 'Premium waterproof shell featuring AI-rendered Time Strata design. Engineered for operations professionals who demand precision performance in any weather condition.',
-  features: [
-    'Waterproof 3-layer construction',
-    'Seam-sealed for complete weather protection',
-    'AI-generated Time Strata pattern',
-    'Reflective precision accents',
-    'Articulated fit for mobility',
-    'Hidden hood in collar',
-  ],
-  specs: {
-    material: '100% Polyester with TPU membrane',
-    weight: '380g',
-    waterproof: '10,000mm',
-    breathability: '8,000g/m²/24h',
+// Strata Ownership - $176/year (post-first-year billing)
+const STRATA_OWNERSHIP = {
+  name: 'STRATA OWNERSHIP',
+  subtitle: 'Cyber-Physical Weather Shell',
+  price: 176,
+  interval: 'year',
+  description: 'Vulcanized hydrophobic shell with embedded chronometer display and topographic terrain HUD. Not fashion—equipment.',
+  tagline: 'Fabric as Display. Weather as Data.',
+};
+
+// Technical specifications - equipment, not fashion
+const EQUIPMENT_SPECS = {
+  membrane: {
+    label: 'MEMBRANE',
+    value: 'PU/TPU Hybrid',
+    description: 'Vulcanized barrier film',
+  },
+  hydrostatic: {
+    label: 'HYDROSTATIC',
+    value: '15,000mm',
+    description: 'Heat-sealed seams',
+  },
+  hud: {
+    label: 'HUD DISPLAY',
+    value: 'Active',
+    description: 'Chronometer + Terrain',
+  },
+  weight: {
+    label: 'UNIT WEIGHT',
+    value: '420g',
+    description: 'Mission-ready',
   },
 };
 
-const PrecisionCornerAccent = ({ position, color = "strata-orange" }: { position: 'tl' | 'tr' | 'bl' | 'br'; color?: string }) => {
-  const positionClasses = {
-    tl: 'top-0 left-0',
-    tr: 'top-0 right-0',
-    bl: 'bottom-0 left-0',
-    br: 'bottom-0 right-0'
-  };
+// Live clock component for the HUD
+const LiveClock = () => {
+  const [time, setTime] = useState(new Date());
   
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-    <div className={`absolute ${positionClasses[position]} w-4 h-4 pointer-events-none`}>
-      <div className={`absolute ${position.includes('t') ? 'top-0' : 'bottom-0'} ${position.includes('l') ? 'left-0' : 'right-0'} w-full h-px bg-gradient-to-r from-${color}/60 to-transparent`} />
-      <div className={`absolute ${position.includes('t') ? 'top-0' : 'bottom-0'} ${position.includes('l') ? 'left-0' : 'right-0'} w-px h-full bg-gradient-to-b from-${color}/60 to-transparent`} />
+    <div className="font-mono text-strata-cyan text-xs tracking-[0.3em]">
+      {time.toLocaleTimeString('en-US', { hour12: false })}
     </div>
   );
 };
 
+// Crosshair targeting element
+const Crosshair = ({ color = "strata-cyan" }: { color?: string }) => (
+  <div className="relative w-8 h-8">
+    <div className={`absolute top-1/2 left-0 w-full h-px bg-${color}/60`} />
+    <div className={`absolute top-0 left-1/2 w-px h-full bg-${color}/60`} />
+    <div className={`absolute top-1/2 left-1/2 w-2 h-2 -translate-x-1/2 -translate-y-1/2 border border-${color}/80 rotate-45`} />
+  </div>
+);
+
+// Technical readout component
+const TechReadout = ({ label, value, unit, pulse = false }: { label: string; value: string | number; unit?: string; pulse?: boolean }) => (
+  <div className="flex items-center gap-2">
+    <div className={`w-1.5 h-1.5 rounded-full ${pulse ? 'bg-strata-lume animate-pulse' : 'bg-strata-orange'}`} />
+    <span className="text-strata-silver/60 font-mono text-[10px] uppercase tracking-wider">{label}:</span>
+    <span className="text-strata-white font-mono text-xs">{value}</span>
+    {unit && <span className="text-strata-silver/40 font-mono text-[9px]">{unit}</span>}
+  </div>
+);
+
 const Shop = () => {
   const { t } = useLanguage();
-  const [selectedDesign, setSelectedDesign] = useState(DESIGN_VARIANTS[0]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [systemStatus, setSystemStatus] = useState('NOMINAL');
 
-  const handlePreOrder = async () => {
+  // Check URL params for checkout status
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('success') === 'true') {
+      toast.success('Strata Ownership activated. Welcome to the protocol.');
+      window.history.replaceState({}, '', '/shop');
+    }
+    if (params.get('canceled') === 'true') {
+      toast.info('Checkout canceled.');
+      window.history.replaceState({}, '', '/shop');
+    }
+  }, []);
+
+  const handleSubscribe = async () => {
     setIsProcessing(true);
+    setSystemStatus('INITIATING');
+    
     try {
       const { data, error } = await supabase.functions.invoke('create-shop-checkout', {
         body: { 
-          designVariant: selectedDesign.id,
-          productName: PRODUCT.name,
+          mode: 'subscription',
+          priceType: 'strata_ownership',
         }
       });
 
       if (error) throw error;
       
       if (data?.url) {
+        setSystemStatus('REDIRECTING');
         window.open(data.url, '_blank');
         toast.success("Checkout opened in new tab");
       } else {
@@ -95,252 +120,201 @@ const Shop = () => {
       }
     } catch (error) {
       console.error('Checkout error:', error);
+      setSystemStatus('ERROR');
       toast.error('Failed to start checkout. Please try again.');
     } finally {
       setIsProcessing(false);
+      setTimeout(() => setSystemStatus('NOMINAL'), 2000);
     }
   };
 
-  const currentDesignIndex = DESIGN_VARIANTS.findIndex(d => d.id === selectedDesign.id);
-  
-  const nextDesign = () => {
-    const nextIndex = (currentDesignIndex + 1) % DESIGN_VARIANTS.length;
-    setSelectedDesign(DESIGN_VARIANTS[nextIndex]);
-  };
-  
-  const prevDesign = () => {
-    const prevIndex = (currentDesignIndex - 1 + DESIGN_VARIANTS.length) % DESIGN_VARIANTS.length;
-    setSelectedDesign(DESIGN_VARIANTS[prevIndex]);
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-strata-black via-strata-charcoal to-strata-black">
-      {/* Kuma slat overlay */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.02]">
-        {[...Array(30)].map((_, i) => (
-          <div 
-            key={i} 
-            className="absolute top-0 bottom-0 w-px bg-white" 
-            style={{ left: `${(i + 1) * 3.33}%` }} 
-          />
-        ))}
+    <div className="min-h-screen bg-strata-black overflow-hidden">
+      {/* CAD Grid overlay */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, hsl(var(--strata-steel)) 1px, transparent 1px),
+              linear-gradient(to bottom, hsl(var(--strata-steel)) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px',
+          }}
+        />
+        {/* Crosshair overlay lines */}
+        <div className="absolute top-0 left-1/2 w-px h-full bg-strata-cyan/5" />
+        <div className="absolute top-1/2 left-0 w-full h-px bg-strata-cyan/5" />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-6 py-16">
-        {/* Header */}
+      <div className="relative max-w-7xl mx-auto px-6 py-12">
+        {/* System Header */}
         <motion.header 
-          className="text-center mb-16"
+          className="mb-12"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <Badge className="mb-4 bg-strata-orange/20 text-strata-orange border-strata-orange/30">
-            {t('shop.limitedEdition')}
-          </Badge>
-          <h1 className="text-4xl md:text-6xl font-instrument text-strata-white mb-4 tracking-tight">
-            {t('shop.title')}
-          </h1>
-          <p className="text-strata-silver font-mono text-sm uppercase tracking-[0.3em]">
-            {t('shop.subtitle')}
-          </p>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-4">
+              <div className="w-2 h-2 rounded-full bg-strata-lume animate-pulse" />
+              <span className="font-mono text-[10px] text-strata-silver/60 uppercase tracking-[0.3em]">
+                Equipment Lab / Store Protocol
+              </span>
+            </div>
+            <div className="flex items-center gap-4">
+              <TechReadout label="SYS" value={systemStatus} pulse={systemStatus !== 'NOMINAL'} />
+              <LiveClock />
+            </div>
+          </div>
+          
+          <div className="border border-strata-steel/20 rounded-lg p-6 bg-strata-charcoal/30 backdrop-blur">
+            <Badge className="mb-4 bg-strata-cyan/10 text-strata-cyan border-strata-cyan/30 font-mono text-[10px] uppercase tracking-wider">
+              Single Product Protocol
+            </Badge>
+            <h1 className="text-3xl md:text-5xl font-instrument text-strata-white mb-2">
+              {STRATA_OWNERSHIP.name}
+            </h1>
+            <p className="text-strata-orange font-mono text-sm uppercase tracking-[0.2em]">
+              {STRATA_OWNERSHIP.subtitle}
+            </p>
+          </div>
         </motion.header>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
-          {/* Product Visualization */}
+        <div className="grid lg:grid-cols-5 gap-8">
+          {/* Equipment Render - 3 columns */}
           <motion.div 
-            className="relative"
+            className="lg:col-span-3 relative"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            {/* AI-rendered jacket preview */}
-            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-strata-steel/30">
-              <PrecisionCornerAccent position="tl" color={selectedDesign.accentColor} />
-              <PrecisionCornerAccent position="br" color={selectedDesign.accentColor} />
+            <div className="relative border border-strata-steel/30 rounded-lg overflow-hidden bg-strata-charcoal/20">
+              {/* Corner brackets */}
+              <div className="absolute top-2 left-2 w-6 h-6 border-l border-t border-strata-cyan/40" />
+              <div className="absolute top-2 right-2 w-6 h-6 border-r border-t border-strata-cyan/40" />
+              <div className="absolute bottom-2 left-2 w-6 h-6 border-l border-b border-strata-cyan/40" />
+              <div className="absolute bottom-2 right-2 w-6 h-6 border-r border-b border-strata-cyan/40" />
               
-              {/* Dynamic gradient background representing the design */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${selectedDesign.gradient}`} />
-              
-              {/* Jacket silhouette overlay */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative w-3/4 h-3/4">
-                  {/* Stylized jacket representation */}
-                  <svg viewBox="0 0 200 250" className="w-full h-full">
-                    {/* Jacket body */}
-                    <path 
-                      d="M40 80 L60 40 L100 30 L140 40 L160 80 L170 200 L30 200 Z" 
-                      fill="hsl(var(--strata-charcoal))"
-                      stroke={`hsl(var(--${selectedDesign.accentColor}))`}
-                      strokeWidth="1"
-                      opacity="0.9"
-                    />
-                    {/* Hood */}
-                    <path 
-                      d="M60 40 L100 20 L140 40 L100 30 Z" 
-                      fill="hsl(var(--strata-steel))"
-                      stroke={`hsl(var(--${selectedDesign.accentColor}))`}
-                      strokeWidth="0.5"
-                      opacity="0.7"
-                    />
-                    {/* Left sleeve */}
-                    <path 
-                      d="M40 80 L10 100 L20 180 L45 180 L50 100 Z" 
-                      fill="hsl(var(--strata-charcoal))"
-                      stroke={`hsl(var(--${selectedDesign.accentColor}))`}
-                      strokeWidth="0.5"
-                      opacity="0.85"
-                    />
-                    {/* Right sleeve */}
-                    <path 
-                      d="M160 80 L190 100 L180 180 L155 180 L150 100 Z" 
-                      fill="hsl(var(--strata-charcoal))"
-                      stroke={`hsl(var(--${selectedDesign.accentColor}))`}
-                      strokeWidth="0.5"
-                      opacity="0.85"
-                    />
-                    {/* Strata pattern lines */}
-                    {[...Array(5)].map((_, i) => (
-                      <motion.line
-                        key={i}
-                        x1="50"
-                        y1={100 + i * 20}
-                        x2="150"
-                        y2={100 + i * 20}
-                        stroke={`hsl(var(--${selectedDesign.accentColor}))`}
-                        strokeWidth="0.5"
-                        opacity={0.3 + i * 0.1}
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: 1 }}
-                        transition={{ duration: 1, delay: i * 0.1 }}
-                      />
-                    ))}
-                    {/* Time markers */}
-                    {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => {
-                      const rad = (angle * Math.PI) / 180;
-                      const x = 100 + Math.cos(rad) * 40;
-                      const y = 120 + Math.sin(rad) * 40;
-                      return (
-                        <motion.circle
-                          key={i}
-                          cx={x}
-                          cy={y}
-                          r="1.5"
-                          fill={`hsl(var(--${selectedDesign.accentColor}))`}
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{ delay: 0.5 + i * 0.05 }}
-                        />
-                      );
-                    })}
-                  </svg>
-                  
-                  {/* Floating design name */}
-                  <motion.div 
-                    className="absolute bottom-4 left-0 right-0 text-center"
-                    key={selectedDesign.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    <span className={`text-${selectedDesign.accentColor} font-mono text-xs uppercase tracking-widest`}>
-                      {selectedDesign.name}
-                    </span>
-                  </motion.div>
+              {/* HUD overlay elements */}
+              <div className="absolute top-4 left-4 z-10">
+                <div className="flex items-center gap-2 mb-2">
+                  <Activity className="w-3 h-3 text-strata-lume" />
+                  <span className="font-mono text-[9px] text-strata-lume uppercase tracking-wider">Live Render</span>
+                </div>
+                <div className="text-strata-cyan font-mono text-[10px] opacity-60">
+                  CHRONO-TOPO-HUD-01
                 </div>
               </div>
-
-              {/* Weather icon overlays */}
-              <div className="absolute top-4 right-4 flex flex-col gap-2">
-                <div className={`w-8 h-8 rounded-full bg-${selectedDesign.accentColor}/20 flex items-center justify-center`}>
-                  <Droplets className={`w-4 h-4 text-${selectedDesign.accentColor}`} />
-                </div>
-                <div className={`w-8 h-8 rounded-full bg-${selectedDesign.accentColor}/20 flex items-center justify-center`}>
-                  <Wind className={`w-4 h-4 text-${selectedDesign.accentColor}`} />
-                </div>
-                <div className={`w-8 h-8 rounded-full bg-${selectedDesign.accentColor}/20 flex items-center justify-center`}>
-                  <Thermometer className={`w-4 h-4 text-${selectedDesign.accentColor}`} />
+              
+              <div className="absolute top-4 right-4 z-10">
+                <Crosshair color="strata-orange" />
+              </div>
+              
+              {/* Main jacket image */}
+              <img 
+                src={strataShellHUD} 
+                alt="STRATA Ownership Shell with embedded HUD"
+                className="w-full h-auto"
+              />
+              
+              {/* Bottom HUD strip */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-strata-black/90 to-transparent p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-6">
+                    <TechReadout label="CHRON" value="ACTIVE" pulse />
+                    <TechReadout label="TOPO" value="LINKED" />
+                    <TechReadout label="SEAL" value="100%" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Map className="w-4 h-4 text-strata-orange/60" />
+                    <Clock className="w-4 h-4 text-strata-cyan/60" />
+                    <Shield className="w-4 h-4 text-strata-lume/60" />
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Design variant selector */}
-            <div className="mt-6">
-              <p className="text-strata-silver font-mono text-xs uppercase tracking-wider mb-4 text-center">
-                {t('shop.selectDesign')}
+            {/* Tagline */}
+            <motion.div 
+              className="mt-6 text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              <p className="font-mono text-strata-silver/40 text-xs uppercase tracking-[0.4em]">
+                {STRATA_OWNERSHIP.tagline}
               </p>
-              <div className="flex items-center justify-center gap-4">
-                <button
-                  onClick={prevDesign}
-                  className="p-2 rounded-full bg-strata-steel/20 hover:bg-strata-steel/40 transition-colors"
-                >
-                  <ChevronLeft className="w-5 h-5 text-strata-silver" />
-                </button>
-                
-                <div className="flex gap-3">
-                  {DESIGN_VARIANTS.map((variant) => (
-                    <button
-                      key={variant.id}
-                      onClick={() => setSelectedDesign(variant)}
-                      className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
-                        selectedDesign.id === variant.id 
-                          ? `border-${variant.accentColor} shadow-lg shadow-${variant.accentColor}/20` 
-                          : 'border-strata-steel/30 hover:border-strata-steel/60'
-                      }`}
-                    >
-                      <div className={`absolute inset-0 bg-gradient-to-br ${variant.gradient}`} />
-                      {selectedDesign.id === variant.id && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                          <Check className="w-4 h-4 text-white" />
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-                
-                <button
-                  onClick={nextDesign}
-                  className="p-2 rounded-full bg-strata-steel/20 hover:bg-strata-steel/40 transition-colors"
-                >
-                  <ChevronRight className="w-5 h-5 text-strata-silver" />
-                </button>
-              </div>
-              <p className="text-center mt-3 text-strata-silver/60 text-sm">
-                {selectedDesign.description}
-              </p>
-            </div>
+            </motion.div>
           </motion.div>
 
-          {/* Product Details */}
+          {/* Specifications & Purchase - 2 columns */}
           <motion.div
+            className="lg:col-span-2"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
           >
             <div className="space-y-6">
-              {/* Brand */}
-              <p className="text-strata-silver font-mono text-xs uppercase tracking-[0.2em]">
-                {PRODUCT.brand}
-              </p>
-
-              {/* Product Name */}
-              <h2 className="text-3xl md:text-4xl font-instrument text-strata-white">
-                {PRODUCT.name}
-              </h2>
-
-              {/* Price */}
-              <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-mono text-strata-orange">
-                  ${PRODUCT.price.toLocaleString()}
-                </span>
-                <span className="text-strata-silver font-mono text-sm">USD</span>
+              {/* Price Card */}
+              <div className="border border-strata-orange/30 rounded-lg p-6 bg-strata-orange/5">
+                <div className="flex items-center gap-2 mb-4">
+                  <Zap className="w-4 h-4 text-strata-orange" />
+                  <span className="font-mono text-[10px] text-strata-orange uppercase tracking-wider">
+                    Strata Ownership
+                  </span>
+                </div>
+                <div className="flex items-baseline gap-2 mb-2">
+                  <span className="text-5xl font-mono text-strata-white">
+                    ${STRATA_OWNERSHIP.price}
+                  </span>
+                  <span className="text-strata-silver font-mono text-sm">/{STRATA_OWNERSHIP.interval}</span>
+                </div>
+                <p className="text-strata-silver/60 font-mono text-[10px] uppercase tracking-wider">
+                  Post-first-year billing
+                </p>
               </div>
 
               {/* Description */}
-              <p className="text-strata-silver/80 leading-relaxed">
-                {PRODUCT.description}
+              <p className="text-strata-silver/80 text-sm leading-relaxed border-l-2 border-strata-cyan/30 pl-4">
+                {STRATA_OWNERSHIP.description}
               </p>
 
+              {/* Equipment Specs */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-1 h-1 bg-strata-cyan" />
+                  <span className="font-mono text-[10px] text-strata-cyan uppercase tracking-[0.2em]">
+                    Technical Specifications
+                  </span>
+                </div>
+                
+                {Object.entries(EQUIPMENT_SPECS).map(([key, spec]) => (
+                  <div 
+                    key={key}
+                    className="flex items-center justify-between p-3 bg-strata-charcoal/30 border border-strata-steel/20 rounded"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-1.5 h-1.5 bg-strata-orange/60" />
+                      <span className="font-mono text-[10px] text-strata-silver/60 uppercase tracking-wider">
+                        {spec.label}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-mono text-sm text-strata-white">{spec.value}</span>
+                      <p className="font-mono text-[9px] text-strata-silver/40">{spec.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
               {/* Features */}
-              <div className="space-y-3 py-6 border-y border-strata-steel/20">
-                {PRODUCT.features.map((feature, index) => (
+              <div className="space-y-2 py-4 border-y border-strata-steel/20">
+                {[
+                  { icon: Droplets, text: 'Vulcanized hydrophobic membrane' },
+                  { icon: Shield, text: 'Heat-sealed seam construction' },
+                  { icon: Clock, text: 'Embedded chronometer HUD display' },
+                  { icon: Map, text: 'Topographic terrain visualization' },
+                  { icon: Wind, text: 'All-weather operations rated' },
+                ].map((feature, index) => (
                   <motion.div 
                     key={index}
                     className="flex items-center gap-3"
@@ -348,65 +322,50 @@ const Shop = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 + index * 0.05 }}
                   >
-                    <div className={`w-5 h-5 rounded-full bg-${selectedDesign.accentColor}/20 flex items-center justify-center flex-shrink-0`}>
-                      <Check className={`w-3 h-3 text-${selectedDesign.accentColor}`} />
+                    <div className="w-6 h-6 rounded bg-strata-cyan/10 flex items-center justify-center flex-shrink-0">
+                      <feature.icon className="w-3 h-3 text-strata-cyan" />
                     </div>
-                    <span className="text-strata-silver text-sm">{feature}</span>
+                    <span className="text-strata-silver text-xs font-mono">{feature.text}</span>
                   </motion.div>
                 ))}
               </div>
 
-              {/* Specs */}
-              <div className="grid grid-cols-2 gap-4">
-                {Object.entries(PRODUCT.specs).map(([key, value]) => (
-                  <div key={key} className="bg-strata-steel/10 rounded-lg p-3 border border-strata-steel/20">
-                    <p className="text-strata-silver/60 font-mono text-[10px] uppercase tracking-wider mb-1">
-                      {key}
-                    </p>
-                    <p className="text-strata-white font-mono text-sm">
-                      {value}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Selected Design Display */}
-              <div className={`p-4 rounded-lg bg-${selectedDesign.accentColor}/10 border border-${selectedDesign.accentColor}/30`}>
-                <p className="text-strata-silver/60 font-mono text-[10px] uppercase tracking-wider mb-1">
-                  Selected Design
-                </p>
-                <p className={`text-${selectedDesign.accentColor} font-semibold`}>
-                  {selectedDesign.name}
-                </p>
-              </div>
-
-              {/* Pre-Order Button */}
+              {/* Subscribe Button */}
               <Button
-                onClick={handlePreOrder}
+                onClick={handleSubscribe}
                 disabled={isProcessing}
                 size="lg"
-                className={`w-full py-6 text-lg font-mono uppercase tracking-wider bg-gradient-to-r from-${selectedDesign.accentColor} to-${selectedDesign.accentColor}/80 hover:opacity-90 transition-opacity`}
+                className="w-full py-6 text-sm font-mono uppercase tracking-[0.2em] bg-strata-orange hover:bg-strata-orange/90 text-strata-black transition-all"
               >
                 {isProcessing ? (
                   <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Processing...
+                    <Loader2 className="w-4 h-4 mr-3 animate-spin" />
+                    Initiating Protocol...
                   </>
                 ) : (
                   <>
-                    <ShoppingBag className="w-5 h-5 mr-2" />
-                    {t('shop.preOrder')} — ${PRODUCT.price.toLocaleString()}
+                    <ShoppingBag className="w-4 h-4 mr-3" />
+                    Activate Ownership — ${STRATA_OWNERSHIP.price}/yr
                   </>
                 )}
               </Button>
 
               {/* Trust signals */}
-              <div className="flex items-center justify-center gap-6 text-strata-silver/50 text-xs font-mono">
-                <span>Secure Checkout</span>
+              <div className="flex items-center justify-center gap-4 text-strata-silver/40 text-[9px] font-mono uppercase tracking-wider">
+                <span className="flex items-center gap-1">
+                  <Check className="w-3 h-3" />
+                  Secure
+                </span>
                 <span>•</span>
-                <span>Limited Production</span>
+                <span className="flex items-center gap-1">
+                  <Check className="w-3 h-3" />
+                  Limited Run
+                </span>
                 <span>•</span>
-                <span>Free Shipping</span>
+                <span className="flex items-center gap-1">
+                  <Check className="w-3 h-3" />
+                  Annual Access
+                </span>
               </div>
             </div>
           </motion.div>
@@ -414,15 +373,17 @@ const Shop = () => {
 
         {/* Footer */}
         <motion.footer 
-          className="mt-24 text-center"
+          className="mt-16 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
         >
-          <div className="flex items-center justify-center gap-4 text-[9px] font-mono text-strata-silver/40 uppercase tracking-[0.3em]">
-            <div className="w-1.5 h-1.5 rotate-45 border border-strata-orange/40" />
-            <span>STRATA COLLECTION</span>
-            <div className="w-1.5 h-1.5 rotate-45 border border-strata-orange/40" />
+          <div className="flex items-center justify-center gap-4 text-[9px] font-mono text-strata-silver/30 uppercase tracking-[0.3em]">
+            <div className="w-1.5 h-1.5 rotate-45 border border-strata-cyan/30" />
+            <span>Equipment Lab</span>
+            <span>•</span>
+            <span>Protocol v2.0</span>
+            <div className="w-1.5 h-1.5 rotate-45 border border-strata-cyan/30" />
           </div>
         </motion.footer>
       </div>

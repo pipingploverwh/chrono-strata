@@ -7,8 +7,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// STRATA Rain Shell - $3,600
-const STRATA_JACKET_PRICE_ID = "price_strata_rain_shell_3600";
+// STRATA OWNERSHIP - $176/year (post-first-year billing)
+const STRATA_OWNERSHIP_PRICE = 17600; // cents
 
 const logStep = (step: string, details?: Record<string, unknown>) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -29,8 +29,8 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const { designVariant, productName } = await req.json();
-    logStep("Request received", { designVariant, productName });
+    const { mode, priceType } = await req.json();
+    logStep("Request received", { mode, priceType });
 
     // Initialize Stripe
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
@@ -61,65 +61,46 @@ serve(async (req) => {
       }
     }
 
-    // Build checkout session metadata
-    const metadata: Record<string, string> = {
-      product: "strata_rain_shell",
-      design_variant: designVariant || "temporal-flux",
-      product_name: productName || "STRATA Rain Shell",
-    };
-
     const origin = req.headers.get("origin") || "https://chrono-strata.lovable.app";
 
-    // Create checkout session with price_data since we may not have pre-created the price
+    // Build checkout session for STRATA OWNERSHIP subscription
+    const metadata: Record<string, string> = {
+      product: "strata_ownership",
+      type: "annual_subscription",
+    };
+
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       line_items: [
         {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: 'STRATA Rain Shell',
-              description: `Time Strata Design: ${designVariant || 'Temporal Flux'} - Charles River Apparel × LAVANDAR`,
+              name: 'STRATA OWNERSHIP',
+              description: 'Cyber-Physical Weather Shell — Annual Access Protocol',
               metadata: {
-                design_variant: designVariant || 'temporal-flux',
+                product_type: 'strata_ownership',
               },
             },
-            unit_amount: 360000, // $3,600.00 in cents
+            unit_amount: STRATA_OWNERSHIP_PRICE,
+            recurring: {
+              interval: 'year',
+            },
           },
           quantity: 1,
         },
       ],
-      mode: "payment",
+      mode: "subscription",
       success_url: `${origin}/shop?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/shop?canceled=true`,
       metadata,
-      payment_intent_data: {
+      subscription_data: {
         metadata,
+        // First year is at full price, subsequent years auto-renew
+        description: 'STRATA OWNERSHIP - Annual Weather Shell Access',
       },
       shipping_address_collection: {
         allowed_countries: ['US', 'CA', 'GB', 'JP', 'DE', 'FR', 'IT', 'AU'],
       },
-      shipping_options: [
-        {
-          shipping_rate_data: {
-            type: 'fixed_amount',
-            fixed_amount: {
-              amount: 0,
-              currency: 'usd',
-            },
-            display_name: 'Complimentary Shipping',
-            delivery_estimate: {
-              minimum: {
-                unit: 'business_day',
-                value: 10,
-              },
-              maximum: {
-                unit: 'business_day',
-                value: 21,
-              },
-            },
-          },
-        },
-      ],
     };
 
     // Add customer info if available
@@ -130,7 +111,7 @@ serve(async (req) => {
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
-    logStep("Checkout session created", { sessionId: session.id, url: session.url });
+    logStep("Checkout session created", { sessionId: session.id, url: session.url, mode: "subscription" });
 
     return new Response(
       JSON.stringify({ 
