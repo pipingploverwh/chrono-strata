@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Heart, Shield, Droplets, Cloud, Star, Sparkles, MapPin, CheckCircle2, ArrowRight } from "lucide-react";
+import { Heart, Shield, Droplets, Cloud, Star, Sparkles, MapPin, CheckCircle2, ArrowRight, ShoppingCart, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -110,6 +110,7 @@ const KidsStrataShell = () => {
   const { t } = useLanguage();
   const [selectedSize, setSelectedSize] = useState(KIDS_SHELL.sizes[1]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isAddedToCart, setIsAddedToCart] = useState(false);
   const { formatTemp } = useTemperatureUnit();
   const { latitude, longitude, hasLocation, requestLocation } = useGeolocation();
   const { weather, loading: weatherLoading } = useWeatherData(
@@ -123,7 +124,23 @@ const KidsStrataShell = () => {
     }
   }, [hasLocation, requestLocation]);
 
-  const handleSubscribe = async () => {
+  // Handle URL params for canceled checkout
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('canceled') === 'true') {
+      toast.info('Checkout canceled. Your cart is still saved.');
+      window.history.replaceState({}, '', '/kids');
+    }
+  }, []);
+
+  const handleAddToCart = () => {
+    setIsAddedToCart(true);
+    toast.success('Added to cart!', {
+      description: `STRATA Shell - Polar Junior (${selectedSize})`,
+    });
+  };
+
+  const handleBuyNow = async () => {
     setIsProcessing(true);
     
     try {
@@ -140,17 +157,20 @@ const KidsStrataShell = () => {
       if (error) throw error;
       
       if (data?.url) {
-        window.open(data.url, '_blank');
-        toast.success("Checkout opened in new tab");
+        window.location.href = data.url;
       } else {
         throw new Error('No checkout URL returned');
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      toast.error('Checkout coming soon! Product in development.');
+      toast.error('Unable to start checkout. Please try again.');
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleCheckout = async () => {
+    await handleBuyNow();
   };
 
   return (
@@ -345,23 +365,59 @@ const KidsStrataShell = () => {
                 Annual protection program • Cancel anytime
               </p>
               
-              <Button
-                onClick={handleSubscribe}
-                disabled={isProcessing}
-                className="w-full bg-white text-lavender-600 hover:bg-lavender-50 font-semibold py-6 text-lg rounded-xl shadow-lg"
-              >
-                {isProcessing ? (
-                  <>Processing...</>
+              {/* Cart + Buy Now buttons */}
+              <div className="space-y-3">
+                {!isAddedToCart ? (
+                  <Button
+                    onClick={handleAddToCart}
+                    variant="outline"
+                    className="w-full bg-transparent border-2 border-white text-white hover:bg-white/10 font-semibold py-5 text-base rounded-xl"
+                  >
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Add to Cart
+                  </Button>
                 ) : (
-                  <>
-                    Begin Adventure
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </>
+                  <Button
+                    onClick={handleCheckout}
+                    disabled={isProcessing}
+                    variant="outline"
+                    className="w-full bg-white/20 border-2 border-white text-white hover:bg-white/30 font-semibold py-5 text-base rounded-xl"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart className="w-5 h-5 mr-2" />
+                        Checkout (1 item)
+                      </>
+                    )}
+                  </Button>
                 )}
-              </Button>
+                
+                <Button
+                  onClick={handleBuyNow}
+                  disabled={isProcessing}
+                  className="w-full bg-white text-lavender-600 hover:bg-lavender-50 font-semibold py-6 text-lg rounded-xl shadow-lg"
+                >
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      Buy Now
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </>
+                  )}
+                </Button>
+              </div>
               
               <p className="text-center text-lavender-200 text-xs mt-4">
-                Secure checkout • 30-day satisfaction guarantee
+                Secure Stripe checkout • 30-day satisfaction guarantee
               </p>
             </div>
 

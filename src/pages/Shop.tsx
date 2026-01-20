@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Check, Droplets, Wind, Shield, Loader2, Zap, Map, Clock, Activity, Anchor, Snowflake, Sun, Building2, ChevronLeft, ChevronRight, Infinity, Users, Gift, Thermometer, AlertTriangle, ArrowRight, Lock, X, Fingerprint, Package } from "lucide-react";
+import { ShoppingBag, Check, Droplets, Wind, Shield, Loader2, Zap, Map, Clock, Activity, Anchor, Snowflake, Sun, Building2, ChevronLeft, ChevronRight, Infinity, Users, Gift, Thermometer, AlertTriangle, ArrowRight, Lock, X, Fingerprint, Package, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -1089,9 +1090,42 @@ const Shop = () => {
           </motion.div>
         </div>
 
+        {/* Junior Collection Banner */}
+        <motion.div 
+          className="mt-16 mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <Link 
+            to="/kids"
+            className="block bg-gradient-to-r from-lavender-500/10 via-lavender-400/5 to-lavender-500/10 border border-lavender-400/30 rounded-xl p-6 hover:border-lavender-400/60 transition-all group"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-lavender-500/20 rounded-lg">
+                  <Sparkles className="w-6 h-6 text-lavender-400" />
+                </div>
+                <div>
+                  <p className="font-mono text-[10px] text-lavender-400 uppercase tracking-widest mb-1">
+                    Junior Collection
+                  </p>
+                  <h3 className="text-xl font-instrument text-strata-white">
+                    STRATA Shell — Polar Junior
+                  </h3>
+                  <p className="text-strata-silver/60 text-sm mt-1">
+                    Ages 4-12 • White rubberized shell with lavender emblem • $148/year
+                  </p>
+                </div>
+              </div>
+              <ArrowRight className="w-5 h-5 text-lavender-400 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
+        </motion.div>
+
         {/* Footer */}
         <motion.footer 
-          className="mt-16 text-center"
+          className="mt-8 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
