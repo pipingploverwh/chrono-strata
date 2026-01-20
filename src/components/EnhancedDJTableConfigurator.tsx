@@ -54,7 +54,7 @@ const accessories: ConfigOption[] = [
 
 const BASE_PRICE = 47500;
 
-// AAL Corner Accent Component
+// Precision Corner Accent Component
 const CornerAccent = ({ position, color = "rgba(16, 185, 129, 0.4)" }: { position: 'tl' | 'tr' | 'bl' | 'br'; color?: string }) => {
   const positionClasses = {
     tl: "top-0 left-0",
@@ -305,7 +305,7 @@ const EnhancedDJTableConfigurator = ({ onConfigChange, onCheckout }: EnhancedDJT
 
   return (
     <div className="w-full">
-      {/* Kuma/AAL Header */}
+      {/* Kuma/Precision Header */}
       <GlassPanel className="p-6 mb-8">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div>

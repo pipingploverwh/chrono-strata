@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Globe, MapPin, Plus, X, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import AALWorldClock from '@/components/strata/AALWorldClock';
+import StrataWorldClock from '@/components/strata/StrataWorldClock';
 
 interface Location {
   id: string;
@@ -54,7 +54,7 @@ const StrataWorldFive = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-rose-950/10 to-slate-950">
-      {/* AAL-style geometric pattern */}
+      {/* Precision-style geometric pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(244,63,94,0.05),transparent_50%)]" />
         {[...Array(30)].map((_, i) => (
@@ -89,7 +89,7 @@ const StrataWorldFive = () => {
 
         {/* Clock display */}
         <div className="max-w-6xl mx-auto mb-12">
-          <AALWorldClock locations={locations} variant="detailed" />
+          <StrataWorldClock locations={locations} variant="detailed" />
         </div>
 
         {/* Edit controls */}

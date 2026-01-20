@@ -864,7 +864,7 @@ const ThermalMusicVisualizer = () => {
         getThermalColor={getThermalColor}
         temperature={globalTemp}
       />
-      {/* Fullscreen Immersive Mode - New Kuma/AAL Design */}
+      {/* Fullscreen Immersive Mode - New Kuma/Precision Design */}
       {isFullscreen ? (
         <ImmersiveMode
           onExit={() => setIsFullscreen(false)}

@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Arielle-Inspired Typography: One family, two weights */
+/* Precision Typography: One family, two weights */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
 
 html {
@@ -128,27 +128,28 @@ html {
   --kuma-slat-color: 0 0% 100% / 0.03;
   
   /* ═══════════════════════════════════════════════════════════════
-     ARIELLE ASSOULINE-LICHTEN PRECISION — Geometric discipline
+     PRECISION GEOMETRY SYSTEM — Geometric discipline
      "Mathematical ratios, ruled surfaces, sculptural shadow"
      ═══════════════════════════════════════════════════════════════ */
   
   /* Golden Ratio Scaling */
-  --aal-ratio: 1.618;
-  --aal-unit: 8px;
+  --precision-ratio: 1.618;
+  --precision-unit: 8px;
   
   /* Ruled Surface Lines */
-  --aal-line-weight: 0.5px;
-  --aal-line-color: 0 0% 100% / 0.08;
+  --precision-line: 0 0% 100% / 0.08;
+  --precision-line-weight: 0.5px;
+  --precision-line-color: 0 0% 100% / 0.08;
   
   /* Shadow Cutouts */
-  --aal-shadow-soft: 0 20px 60px -20px hsl(0 0% 0% / 0.4);
-  --aal-shadow-hard: 8px 8px 0 0 hsl(0 0% 0% / 0.15);
+  --precision-shadow-soft: 0 20px 60px -20px hsl(0 0% 0% / 0.4);
+  --precision-shadow-hard: 8px 8px 0 0 hsl(0 0% 0% / 0.15);
 }
 
 @layer base {
   :root {
     /* ═══════════════════════════════════════════════════════════════
-       LAVENDER DESIGN SYSTEM — Arielle Assouline-Lichten Philosophy
+       LAVENDER DESIGN SYSTEM — Precision Design Philosophy
        "Discipline, restraint, and conceptual clarity"
        ═══════════════════════════════════════════════════════════════ */
     

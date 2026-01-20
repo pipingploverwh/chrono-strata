@@ -9,8 +9,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 type GateStep = 'location' | 'select' | 'payment';
 
-// AAL Geometric Corner Accent
-const AALSecurityCorner = ({ position, active = false }: { position: 'tl' | 'tr' | 'bl' | 'br'; active?: boolean }) => {
+// Precision Geometric Corner Accent
+const PrecisionSecurityCorner = ({ position, active = false }: { position: 'tl' | 'tr' | 'bl' | 'br'; active?: boolean }) => {
   const positionClasses = {
     tl: 'top-0 left-0',
     tr: 'top-0 right-0',
@@ -169,7 +169,7 @@ const StrataGate = () => {
 
   return (
     <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Ruled surface grid - AAL signature */}
+      {/* Ruled surface grid - Precision signature */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Horizontal precision lines */}
         {[...Array(40)].map((_, i) => (
@@ -277,10 +277,10 @@ const StrataGate = () => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <AALSecurityCorner position="tl" active={step === 'location'} />
-          <AALSecurityCorner position="tr" active={step === 'select'} />
-          <AALSecurityCorner position="bl" active={step === 'payment'} />
-          <AALSecurityCorner position="br" active={locationShared} />
+          <PrecisionSecurityCorner position="tl" active={step === 'location'} />
+          <PrecisionSecurityCorner position="tr" active={step === 'select'} />
+          <PrecisionSecurityCorner position="bl" active={step === 'payment'} />
+          <PrecisionSecurityCorner position="br" active={locationShared} />
 
           <div className="p-8">
             <AnimatePresence mode="wait">
@@ -375,7 +375,7 @@ const StrataGate = () => {
                             : 'bg-zinc-800/50 border border-zinc-800 hover:border-zinc-700'
                         }`}
                       >
-                        {/* AAL corner accents on selected */}
+                        {/* Precision corner accents on selected */}
                         {selectedCount === tier.count && (
                           <>
                             <div className="absolute top-0 left-0 w-3 h-3 border-t border-l border-emerald-400" />
@@ -525,7 +525,7 @@ const StrataGate = () => {
           transition={{ delay: 0.5 }}
         >
           <p className="text-[9px] font-mono text-zinc-700 tracking-[0.3em]">
-            LAVANDAR × AAL
+            LAVANDAR × STRATA
           </p>
         </motion.div>
       </div>

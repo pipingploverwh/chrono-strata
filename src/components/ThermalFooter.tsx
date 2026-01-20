@@ -51,11 +51,11 @@ const ThermalFooter = ({ variant = 'dark' }: ThermalFooterProps) => {
         }}
       />
 
-      {/* AAL ruled surface pattern overlay */}
+      {/* Precision ruled surface pattern overlay */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-[0.02]"
         style={{
-          background: 'linear-gradient(135deg, transparent 49.5%, hsl(var(--aal-line)) 49.5%, hsl(var(--aal-line)) 50.5%, transparent 50.5%)',
+          background: 'linear-gradient(135deg, transparent 49.5%, hsl(var(--precision-line)) 49.5%, hsl(var(--precision-line)) 50.5%, transparent 50.5%)',
           backgroundSize: '100px 100px',
         }}
       />
@@ -63,7 +63,7 @@ const ThermalFooter = ({ variant = 'dark' }: ThermalFooterProps) => {
       <div className="relative max-w-6xl mx-auto">
         {/* Top section: Logo + Links */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
-          {/* Logo with AAL geometric accent */}
+          {/* Logo with geometric accent */}
           <motion.div 
             className="flex items-center gap-4"
             initial={{ opacity: 0, x: -20 }}
@@ -71,7 +71,7 @@ const ThermalFooter = ({ variant = 'dark' }: ThermalFooterProps) => {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            {/* AAL geometric prefix */}
+            {/* Precision geometric prefix */}
             <div className="hidden sm:flex items-center gap-2">
               <div className="w-6 h-px bg-gradient-to-r from-transparent to-orange-500/30" />
               <motion.div 
@@ -99,7 +99,7 @@ const ThermalFooter = ({ variant = 'dark' }: ThermalFooterProps) => {
             </Link>
           </motion.div>
 
-          {/* Navigation links with AAL separators */}
+          {/* Navigation links with Precision separators */}
           <motion.nav 
             className="flex items-center gap-2"
             initial={{ opacity: 0, y: 10 }}
@@ -127,7 +127,7 @@ const ThermalFooter = ({ variant = 'dark' }: ThermalFooterProps) => {
           </motion.nav>
         </div>
 
-        {/* AAL geometric separator line */}
+        {/* Precision geometric separator line */}
         <motion.div 
           className="flex items-center justify-center gap-4 mb-10"
           initial={{ opacity: 0, scaleX: 0 }}
@@ -203,7 +203,7 @@ const ThermalFooter = ({ variant = 'dark' }: ThermalFooterProps) => {
 
         {/* Bottom section: Copyright + Technical specs */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-white/[0.03]">
-          {/* Copyright with AAL prefix */}
+          {/* Copyright with geometric prefix */}
           <motion.div 
             className="flex items-center gap-3"
             initial={{ opacity: 0 }}
