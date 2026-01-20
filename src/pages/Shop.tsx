@@ -14,6 +14,7 @@ import { useWeatherData } from "@/hooks/useWeatherData";
 import { HUDGlitchOverlay } from "@/components/shop/HUDGlitchOverlay";
 import { BondVaultReveal } from "@/components/shop/BondVaultReveal";
 import { AcquisitionRitual } from "@/components/shop/AcquisitionRitual";
+import { AddToCartPrompt } from "@/components/shop/AddToCartPrompt";
 
 // Import terrain-specific jacket renders
 import strataShellHUD from "@/assets/strata-shell-hud-jacket.jpg";
@@ -191,6 +192,7 @@ const Shop = () => {
   const [isTerrainTransitioning, setIsTerrainTransitioning] = useState(false);
   const [isBondHovered, setIsBondHovered] = useState(false);
   const [isRitualOpen, setIsRitualOpen] = useState(false);
+  const [isPromptOpen, setIsPromptOpen] = useState(false);
   const [dimmedBackground, setDimmedBackground] = useState(false);
   
   // Get the selected terrain with translations
@@ -320,8 +322,43 @@ const Shop = () => {
 
   const TerrainIcon = selectedTerrain.icon;
 
+  // Get product name for prompt
+  const getProductName = () => {
+    switch (selectedPaymentMode) {
+      case 'tactical': return TACTICAL_PROVISION.name;
+      case 'bond': return STRATA_BOND.name;
+      default: return STRATA_OWNERSHIP.name;
+    }
+  };
+
+  // Handle soft add-to-cart flow
+  const handleInitiateAcquisition = () => {
+    setIsPromptOpen(true);
+  };
+
+  const handlePromptConfirm = () => {
+    setIsPromptOpen(false);
+    setIsRitualOpen(true);
+  };
+
+  const handlePromptCancel = () => {
+    setIsPromptOpen(false);
+  };
+
   return (
     <div className={`min-h-screen bg-strata-black overflow-hidden transition-all duration-500 ${dimmedBackground ? 'brightness-75' : ''}`}>
+      {/* Soft Add-to-Cart Prompt */}
+      <AddToCartPrompt
+        isOpen={isPromptOpen}
+        productName={getProductName()}
+        terrainName={selectedTerrain.name}
+        paymentMode={selectedPaymentMode}
+        price={getCurrentPrice()}
+        depositPrice={selectedPaymentMode === 'tactical' ? TACTICAL_PROVISION.depositPrice : undefined}
+        onConfirm={handlePromptConfirm}
+        onCancel={handlePromptCancel}
+      />
+
       {/* Acquisition Ritual Modal */}
       <AcquisitionRitual
         isOpen={isRitualOpen}
@@ -808,7 +845,7 @@ const Shop = () => {
               {/* CHECKOUT BUTTON */}
               <div className="space-y-4">
                 <motion.button
-                  onClick={() => setIsRitualOpen(true)}
+                  onClick={handleInitiateAcquisition}
                   className="w-full relative overflow-hidden group"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
