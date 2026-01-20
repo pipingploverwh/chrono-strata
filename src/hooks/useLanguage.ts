@@ -351,6 +351,215 @@ const translations: Record<string, Record<Language, string>> = {
     ar: 'غلاف مقاوم للماء مع شاشة كرونومتر مدمجة وواجهة HUD خرائطية. هذا ليس إصداراً محدوداً — إنه بداية 100 عام من الملكية.'
   },
 
+  // Strata Zone Names
+  'zone.default': {
+    en: 'Default',
+    ja: 'デフォルト',
+    it: 'Predefinito',
+    fr: 'Par Défaut',
+    ar: 'افتراضي'
+  },
+  'zone.pacificMarine': {
+    en: 'Pacific Marine',
+    ja: '太平洋海洋',
+    it: 'Pacifico Marittimo',
+    fr: 'Pacifique Maritime',
+    ar: 'المحيط الهادئ البحري'
+  },
+  'zone.tromsoArctic': {
+    en: 'Tromsø Arctic',
+    ja: 'トロムソ北極圏',
+    it: 'Tromsø Artico',
+    fr: 'Tromsø Arctique',
+    ar: 'ترومسو القطبية'
+  },
+  'zone.saharaInterior': {
+    en: 'Sahara Interior',
+    ja: 'サハラ内陸部',
+    it: 'Sahara Interno',
+    fr: 'Sahara Intérieur',
+    ar: 'الصحراء الداخلية'
+  },
+  'zone.tokyoMetropolis': {
+    en: 'Tokyo Metropolis',
+    ja: '東京都心',
+    it: 'Tokyo Metropoli',
+    fr: 'Tokyo Métropole',
+    ar: 'مدينة طوكيو'
+  },
+
+  // Technical Specifications
+  'spec.membrane': {
+    en: 'MEMBRANE',
+    ja: 'メンブレン',
+    it: 'MEMBRANA',
+    fr: 'MEMBRANE',
+    ar: 'غشاء'
+  },
+  'spec.membrane.value': {
+    en: 'PU/TPU Hybrid',
+    ja: 'PU/TPU ハイブリッド',
+    it: 'Ibrido PU/TPU',
+    fr: 'Hybride PU/TPU',
+    ar: 'هجين PU/TPU'
+  },
+  'spec.membrane.desc': {
+    en: 'Vulcanized barrier film',
+    ja: '加硫バリアフィルム',
+    it: 'Film barriera vulcanizzato',
+    fr: 'Film barrière vulcanisé',
+    ar: 'فيلم حاجز مبركن'
+  },
+  'spec.hydrostatic': {
+    en: 'HYDROSTATIC',
+    ja: '耐水圧',
+    it: 'IDROSTATICO',
+    fr: 'HYDROSTATIQUE',
+    ar: 'هيدروستاتيكي'
+  },
+  'spec.hydrostatic.value': {
+    en: '15,000mm',
+    ja: '15,000mm',
+    it: '15.000mm',
+    fr: '15 000mm',
+    ar: '15,000 مم'
+  },
+  'spec.hydrostatic.desc': {
+    en: 'Heat-sealed seams',
+    ja: '熱圧着シーム',
+    it: 'Cuciture termosaldate',
+    fr: 'Coutures thermosoudées',
+    ar: 'طبقات ملحومة حرارياً'
+  },
+  'spec.hud': {
+    en: 'HUD DISPLAY',
+    ja: 'HUDディスプレイ',
+    it: 'DISPLAY HUD',
+    fr: 'AFFICHAGE HUD',
+    ar: 'شاشة HUD'
+  },
+  'spec.hud.value': {
+    en: 'Active',
+    ja: 'アクティブ',
+    it: 'Attivo',
+    fr: 'Actif',
+    ar: 'نشط'
+  },
+  'spec.hud.desc': {
+    en: 'Chronometer + Terrain',
+    ja: 'クロノメーター + テレイン',
+    it: 'Cronometro + Terreno',
+    fr: 'Chronomètre + Terrain',
+    ar: 'كرونومتر + تضاريس'
+  },
+  'spec.weight': {
+    en: 'UNIT WEIGHT',
+    ja: '重量',
+    it: 'PESO UNITÀ',
+    fr: 'POIDS UNITÉ',
+    ar: 'وزن الوحدة'
+  },
+  'spec.weight.value': {
+    en: '420g',
+    ja: '420g',
+    it: '420g',
+    fr: '420g',
+    ar: '420 جرام'
+  },
+  'spec.weight.desc': {
+    en: 'Mission-ready',
+    ja: 'ミッション対応',
+    it: 'Pronto per la missione',
+    fr: 'Prêt pour la mission',
+    ar: 'جاهز للمهمة'
+  },
+
+  // Acquisition Flow
+  'acquisition.initiate': {
+    en: 'INITIATE ACQUISITION',
+    ja: '取得開始',
+    it: 'AVVIA ACQUISIZIONE',
+    fr: 'LANCER ACQUISITION',
+    ar: 'بدء الاستحواذ'
+  },
+  'acquisition.step1': {
+    en: 'CONFIRM TERRAIN SETUP',
+    ja: 'テレイン設定確認',
+    it: 'CONFERMA CONFIGURAZIONE TERRENO',
+    fr: 'CONFIRMER CONFIGURATION TERRAIN',
+    ar: 'تأكيد إعداد التضاريس'
+  },
+  'acquisition.step2': {
+    en: 'VERIFY STRATA ID',
+    ja: 'STRATA ID確認',
+    it: 'VERIFICA ID STRATA',
+    fr: 'VÉRIFIER ID STRATA',
+    ar: 'التحقق من هوية STRATA'
+  },
+  'acquisition.step3': {
+    en: 'EXECUTE PAYMENT',
+    ja: '決済実行',
+    it: 'ESEGUI PAGAMENTO',
+    fr: 'EXÉCUTER PAIEMENT',
+    ar: 'تنفيذ الدفع'
+  },
+  'acquisition.terrainLocked': {
+    en: 'TERRAIN LOCKED',
+    ja: 'テレイン確定',
+    it: 'TERRENO BLOCCATO',
+    fr: 'TERRAIN VERROUILLÉ',
+    ar: 'التضاريس مؤمنة'
+  },
+  'acquisition.idVerified': {
+    en: 'ID VERIFIED',
+    ja: 'ID確認済',
+    it: 'ID VERIFICATO',
+    fr: 'ID VÉRIFIÉ',
+    ar: 'الهوية موثقة'
+  },
+  'acquisition.launchSequence': {
+    en: 'LAUNCH SEQUENCE',
+    ja: 'ローンチシーケンス',
+    it: 'SEQUENZA DI LANCIO',
+    fr: 'SÉQUENCE DE LANCEMENT',
+    ar: 'تسلسل الإطلاق'
+  },
+  'acquisition.systemArmed': {
+    en: 'SYSTEM ARMED',
+    ja: 'システム準備完了',
+    it: 'SISTEMA ARMATO',
+    fr: 'SYSTÈME ARMÉ',
+    ar: 'النظام جاهز'
+  },
+  'acquisition.confirm': {
+    en: 'CONFIRM',
+    ja: '確認',
+    it: 'CONFERMA',
+    fr: 'CONFIRMER',
+    ar: 'تأكيد'
+  },
+  'acquisition.proceed': {
+    en: 'PROCEED',
+    ja: '続行',
+    it: 'PROCEDI',
+    fr: 'CONTINUER',
+    ar: 'متابعة'
+  },
+  'acquisition.execute': {
+    en: 'EXECUTE',
+    ja: '実行',
+    it: 'ESEGUI',
+    fr: 'EXÉCUTER',
+    ar: 'تنفيذ'
+  },
+  'acquisition.abort': {
+    en: 'ABORT',
+    ja: '中止',
+    it: 'ANNULLA',
+    fr: 'ANNULER',
+    ar: 'إلغاء'
+  },
+
   // Piping Plover Dispensary
   'plover.storeName': { 
     en: 'The Piping Plover', 
