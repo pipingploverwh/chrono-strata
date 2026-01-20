@@ -1322,6 +1322,148 @@ const translations: Record<string, Record<Language, string>> = {
     fr: 'Accéder à STRATA',
     ar: 'الوصول إلى STRATA'
   },
+
+  // Acquisition Ritual
+  'ritual.acquisitionSequence': {
+    en: 'ACQUISITION SEQUENCE',
+    ja: '取得シーケンス',
+    it: 'SEQUENZA DI ACQUISIZIONE',
+    fr: 'SÉQUENCE D\'ACQUISITION',
+    ar: 'تسلسل الاستحواذ'
+  },
+  'ritual.biometric.title': {
+    en: 'Biometric Authentication',
+    ja: '生体認証',
+    it: 'Autenticazione Biometrica',
+    fr: 'Authentification Biométrique',
+    ar: 'المصادقة البيومترية'
+  },
+  'ritual.biometric.description': {
+    en: 'Verifying ownership eligibility. Hold steady.',
+    ja: '所有資格を確認中。そのままお待ちください。',
+    it: 'Verifica dell\'idoneità alla proprietà. Rimani fermo.',
+    fr: 'Vérification de l\'éligibilité. Restez stable.',
+    ar: 'جاري التحقق من أهلية الملكية. ابقَ ثابتاً.'
+  },
+  'ritual.biometric.proceed': {
+    en: 'Proceed to Protocol',
+    ja: 'プロトコルへ進む',
+    it: 'Procedi al Protocollo',
+    fr: 'Passer au Protocole',
+    ar: 'المتابعة إلى البروتوكول'
+  },
+  'ritual.protocol.title': {
+    en: 'Century Protocol Acceptance',
+    ja: 'センチュリープロトコル承認',
+    it: 'Accettazione Protocollo Century',
+    fr: 'Acceptation du Protocole Century',
+    ar: 'قبول بروتوكول Century'
+  },
+  'ritual.protocol.bondDescription': {
+    en: 'You are entering a 100-year generational ownership covenant. This bond transfers to heirs.',
+    ja: '100年の世代間所有権契約に参加します。このボンドは相続人に譲渡されます。',
+    it: 'Stai entrando in un patto di proprietà generazionale di 100 anni. Questo bond si trasferisce agli eredi.',
+    fr: 'Vous entrez dans un pacte de propriété générationnelle de 100 ans. Ce bond est transférable aux héritiers.',
+    ar: 'أنت تدخل في عهد ملكية الأجيال لمدة 100 عام. ينتقل هذا السند إلى الورثة.'
+  },
+  'ritual.protocol.annualDescription': {
+    en: 'You are entering the Century Protocol annual ownership program.',
+    ja: 'センチュリープロトコル年間所有権プログラムに参加します。',
+    it: 'Stai entrando nel programma di proprietà annuale del Protocollo Century.',
+    fr: 'Vous entrez dans le programme de propriété annuelle du Protocole Century.',
+    ar: 'أنت تدخل برنامج الملكية السنوي لبروتوكول Century.'
+  },
+  'ritual.protocol.agreement': {
+    en: 'OWNERSHIP AGREEMENT',
+    ja: '所有権契約',
+    it: 'ACCORDO DI PROPRIETÀ',
+    fr: 'ACCORD DE PROPRIÉTÉ',
+    ar: 'اتفاقية الملكية'
+  },
+  'ritual.protocol.term1': {
+    en: 'Access to all STRATA terrain variants and HUD updates',
+    ja: 'すべてのSTRATAテレインバリアントとHUDアップデートへのアクセス',
+    it: 'Accesso a tutte le varianti di terreno STRATA e aggiornamenti HUD',
+    fr: 'Accès à toutes les variantes de terrain STRATA et mises à jour HUD',
+    ar: 'الوصول إلى جميع متغيرات التضاريس STRATA وتحديثات HUD'
+  },
+  'ritual.protocol.term2': {
+    en: 'Chronometer calibration and weather intelligence sync',
+    ja: 'クロノメーターキャリブレーションと気象インテリジェンス同期',
+    it: 'Calibrazione cronometro e sincronizzazione intelligence meteo',
+    fr: 'Calibration du chronomètre et synchronisation de l\'intelligence météo',
+    ar: 'معايرة الكرونومتر ومزامنة استخبارات الطقس'
+  },
+  'ritual.protocol.term3': {
+    en: 'Priority access to future STRATA equipment releases',
+    ja: '将来のSTRATA機器リリースへの優先アクセス',
+    it: 'Accesso prioritario ai futuri rilasci di equipaggiamento STRATA',
+    fr: 'Accès prioritaire aux futures versions d\'équipement STRATA',
+    ar: 'الوصول ذو الأولوية إلى إصدارات معدات STRATA المستقبلية'
+  },
+  'ritual.protocol.amount': {
+    en: 'TOTAL COMMITMENT',
+    ja: '合計コミットメント',
+    it: 'IMPEGNO TOTALE',
+    fr: 'ENGAGEMENT TOTAL',
+    ar: 'إجمالي الالتزام'
+  },
+  'ritual.protocol.signNow': {
+    en: 'Sign Protocol Agreement',
+    ja: 'プロトコル契約に署名',
+    it: 'Firma Accordo Protocollo',
+    fr: 'Signer l\'Accord du Protocole',
+    ar: 'توقيع اتفاقية البروتوكول'
+  },
+  'ritual.protocol.signed': {
+    en: 'Protocol Signed',
+    ja: 'プロトコル署名済み',
+    it: 'Protocollo Firmato',
+    fr: 'Protocole Signé',
+    ar: 'تم توقيع البروتوكول'
+  },
+  'ritual.fabrication.title': {
+    en: 'Unit Fabrication',
+    ja: 'ユニット製造',
+    it: 'Fabbricazione Unità',
+    fr: 'Fabrication de l\'Unité',
+    ar: 'تصنيع الوحدة'
+  },
+  'ritual.fabrication.description': {
+    en: 'Allocating your serialized STRATA unit with terrain configuration',
+    ja: 'テレイン設定を含むシリアル化されたSTRATAユニットを割り当て中',
+    it: 'Allocazione della tua unità STRATA serializzata con configurazione terreno',
+    fr: 'Allocation de votre unité STRATA sérialisée avec configuration terrain',
+    ar: 'تخصيص وحدة STRATA المتسلسلة الخاصة بك مع تكوين التضاريس'
+  },
+  'ritual.fabrication.execute': {
+    en: 'Execute Acquisition',
+    ja: '取得を実行',
+    it: 'Esegui Acquisizione',
+    fr: 'Exécuter l\'Acquisition',
+    ar: 'تنفيذ الاستحواذ'
+  },
+  'ritual.executing.title': {
+    en: 'Executing Transaction',
+    ja: 'トランザクション実行中',
+    it: 'Esecuzione Transazione',
+    fr: 'Exécution de la Transaction',
+    ar: 'جاري تنفيذ المعاملة'
+  },
+  'ritual.executing.description': {
+    en: 'Redirecting to secure payment gateway...',
+    ja: 'セキュア決済ゲートウェイにリダイレクト中...',
+    it: 'Reindirizzamento al gateway di pagamento sicuro...',
+    fr: 'Redirection vers la passerelle de paiement sécurisée...',
+    ar: 'جاري إعادة التوجيه إلى بوابة الدفع الآمنة...'
+  },
+  'ritual.warning': {
+    en: 'SECURE TRANSACTION — ALL DATA ENCRYPTED',
+    ja: 'セキュアトランザクション — 全データ暗号化',
+    it: 'TRANSAZIONE SICURA — TUTTI I DATI CRITTOGRAFATI',
+    fr: 'TRANSACTION SÉCURISÉE — TOUTES LES DONNÉES CHIFFRÉES',
+    ar: 'معاملة آمنة — جميع البيانات مشفرة'
+  },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
