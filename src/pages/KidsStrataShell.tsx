@@ -11,6 +11,9 @@ import { useTemperatureUnit } from "@/hooks/useTemperatureUnit";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useWeatherData } from "@/hooks/useWeatherData";
 
+// Import product image
+import kidsShellImage from "@/assets/kids-strata-shell-white.jpg";
+
 // Kids product configuration
 const KIDS_SHELL = {
   name: 'STRATA SHELL — POLAR JUNIOR',
@@ -231,79 +234,19 @@ const KidsStrataShell = () => {
               <div className="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2 border-lavender-300/50 rounded-bl-lg" />
               <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-lavender-300/50 rounded-br-lg" />
               
-              {/* Product render placeholder */}
-              <div className="aspect-[4/5] bg-gradient-to-br from-muted/30 via-white to-lavender-50 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden">
-                {/* White shell silhouette */}
-                <motion.div 
-                  className="relative"
-                  initial={{ scale: 0.9, opacity: 0 }}
+              {/* Product image */}
+              <div className="aspect-[4/5] rounded-2xl overflow-hidden relative">
+                <motion.img 
+                  src={kidsShellImage}
+                  alt="STRATA Shell Polar Junior - White with Lavender Emblem"
+                  className="w-full h-full object-cover object-center"
+                  initial={{ scale: 1.05, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                >
-                  {/* Shell body representation */}
-                  <div className="w-64 h-80 bg-gradient-to-b from-white via-muted/20 to-muted/40 rounded-t-[80px] rounded-b-3xl shadow-2xl shadow-muted/30 relative">
-                    {/* Surface texture lines */}
-                    <div className="absolute inset-0 rounded-t-[80px] rounded-b-3xl opacity-20">
-                      {[...Array(8)].map((_, i) => (
-                        <div 
-                          key={i} 
-                          className="absolute w-full h-px bg-muted-foreground/30"
-                          style={{ top: `${15 + i * 10}%` }}
-                        />
-                      ))}
-                    </div>
-                    
-                    {/* Collar */}
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-12 bg-gradient-to-b from-muted/30 to-white rounded-b-[40px] border-b border-border" />
-                    
-                    {/* Lavender emblem placement */}
-                    <div className="absolute top-16 left-1/2 -translate-x-1/2">
-                      <LavenderEmblem />
-                    </div>
-                    
-                    {/* Zipper line */}
-                    <div className="absolute top-12 left-1/2 -translate-x-1/2 w-1 h-48 bg-gradient-to-b from-lavender-300 to-lavender-400 rounded-full opacity-60" />
-                    
-                    {/* Pocket detail */}
-                    <div className="absolute bottom-20 left-6 w-16 h-10 border border-border rounded-lg bg-white/50" />
-                    <div className="absolute bottom-20 right-6 w-16 h-10 border border-border rounded-lg bg-white/50" />
-                    
-                    {/* Reflective safety strip */}
-                    <motion.div 
-                      className="absolute bottom-8 left-4 right-4 h-2 bg-gradient-to-r from-lavender-200 via-white to-lavender-200 rounded-full"
-                      animate={{ opacity: [0.5, 1, 0.5] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                  </div>
-                  
-                  {/* Sleeve hints */}
-                  <div className="absolute top-24 -left-8 w-12 h-32 bg-gradient-to-r from-muted/30 to-white rounded-l-full transform -rotate-12" />
-                  <div className="absolute top-24 -right-8 w-12 h-32 bg-gradient-to-l from-muted/30 to-white rounded-r-full transform rotate-12" />
-                </motion.div>
+                  transition={{ delay: 0.3, duration: 0.6 }}
+                />
                 
-                {/* Floating sparkles */}
-                {[...Array(6)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute"
-                    style={{
-                      top: `${20 + Math.random() * 60}%`,
-                      left: `${10 + Math.random() * 80}%`,
-                    }}
-                    animate={{
-                      y: [0, -10, 0],
-                      opacity: [0.3, 0.8, 0.3],
-                      scale: [0.8, 1.2, 0.8],
-                    }}
-                    transition={{
-                      duration: 3 + i * 0.5,
-                      repeat: Infinity,
-                      delay: i * 0.3,
-                    }}
-                  >
-                    <Sparkles className="w-4 h-4 text-lavender-400" />
-                  </motion.div>
-                ))}
+                {/* Subtle overlay gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-lavender-50/20 via-transparent to-transparent pointer-events-none" />
               </div>
               
               {/* Product label */}
