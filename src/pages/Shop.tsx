@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Check, Droplets, Wind, Shield, Loader2, Zap, Map, Clock, Activity, Anchor, Snowflake, Sun, Building2, ChevronLeft, ChevronRight, Infinity, Users, Gift, Thermometer, AlertTriangle, ArrowRight, Lock, X } from "lucide-react";
+import { ShoppingBag, Check, Droplets, Wind, Shield, Loader2, Zap, Map, Clock, Activity, Anchor, Snowflake, Sun, Building2, ChevronLeft, ChevronRight, Infinity, Users, Gift, Thermometer, AlertTriangle, ArrowRight, Lock, X, Fingerprint } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -10,6 +10,9 @@ import { LanguageToggle } from "@/components/LanguageToggle";
 import { useTemperatureUnit } from "@/hooks/useTemperatureUnit";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useWeatherData } from "@/hooks/useWeatherData";
+import { HUDGlitchOverlay } from "@/components/shop/HUDGlitchOverlay";
+import { BondVaultReveal } from "@/components/shop/BondVaultReveal";
+import { AcquisitionRitual } from "@/components/shop/AcquisitionRitual";
 
 // Import terrain-specific jacket renders
 import strataShellHUD from "@/assets/strata-shell-hud-jacket.jpg";
@@ -171,9 +174,29 @@ const Shop = () => {
   const [systemStatus, setSystemStatus] = useState('NOMINAL');
   const [selectedPaymentMode, setSelectedPaymentMode] = useState<'annual' | 'bond'>('annual');
   const [acquisitionStep, setAcquisitionStep] = useState<AcquisitionStep>('idle');
+  const [isTerrainTransitioning, setIsTerrainTransitioning] = useState(false);
+  const [isBondHovered, setIsBondHovered] = useState(false);
+  const [isRitualOpen, setIsRitualOpen] = useState(false);
+  const [dimmedBackground, setDimmedBackground] = useState(false);
   
   // Get the selected terrain with translations
   const selectedTerrain = TERRAIN_VARIANTS.find(v => v.id === selectedTerrainId) || TERRAIN_VARIANTS[0];
+  
+  // Handle terrain change with glitch effect
+  const handleTerrainChange = (newTerrainId: string) => {
+    if (newTerrainId !== selectedTerrainId) {
+      setIsTerrainTransitioning(true);
+      setTimeout(() => {
+        setSelectedTerrainId(newTerrainId);
+        setTimeout(() => setIsTerrainTransitioning(false), 400);
+      }, 100);
+    }
+  };
+  
+  // Dim lights when Bond is hovered/selected
+  useEffect(() => {
+    setDimmedBackground(isBondHovered || selectedPaymentMode === 'bond');
+  }, [isBondHovered, selectedPaymentMode]);
   
   // Weather and temperature
   const { unit, toggleUnit, formatTemp } = useTemperatureUnit();
@@ -194,12 +217,12 @@ const Shop = () => {
   
   const nextTerrain = () => {
     const nextIdx = (currentIndex + 1) % TERRAIN_VARIANTS.length;
-    setSelectedTerrainId(TERRAIN_VARIANTS[nextIdx].id);
+    handleTerrainChange(TERRAIN_VARIANTS[nextIdx].id);
   };
   
   const prevTerrain = () => {
     const prevIdx = (currentIndex - 1 + TERRAIN_VARIANTS.length) % TERRAIN_VARIANTS.length;
-    setSelectedTerrainId(TERRAIN_VARIANTS[prevIdx].id);
+    handleTerrainChange(TERRAIN_VARIANTS[prevIdx].id);
   };
 
   useEffect(() => {
@@ -260,7 +283,22 @@ const Shop = () => {
   const TerrainIcon = selectedTerrain.icon;
 
   return (
-    <div className="min-h-screen bg-strata-black overflow-hidden">
+    <div className={`min-h-screen bg-strata-black overflow-hidden transition-all duration-500 ${dimmedBackground ? 'brightness-75' : ''}`}>
+      {/* Acquisition Ritual Modal */}
+      <AcquisitionRitual
+        isOpen={isRitualOpen}
+        onClose={() => setIsRitualOpen(false)}
+        onExecute={handleSubscribe}
+        isProcessing={isProcessing}
+        selectedTerrain={{
+          name: selectedTerrain.name,
+          strataZone: selectedTerrain.strataZone,
+          color: selectedTerrain.color,
+        }}
+        paymentMode={selectedPaymentMode}
+        price={selectedPaymentMode === 'bond' ? STRATA_BOND.price : STRATA_OWNERSHIP.price}
+      />
+      
       {/* CAD Grid overlay */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute inset-0 opacity-[0.03]"
@@ -390,19 +428,21 @@ const Shop = () => {
               </div>
               
               {/* Terrain image with transition */}
-              <AnimatePresence mode="wait">
-                <motion.img 
-                  key={selectedTerrain.id}
-                  src={selectedTerrain.image} 
-                  alt={`STRATA Shell - ${selectedTerrain.name} terrain`}
-                  className="w-full h-auto"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                />
-              </AnimatePresence>
-              
+              <div className="relative">
+                <HUDGlitchOverlay isActive={isTerrainTransitioning} terrainColor={selectedTerrain.color} />
+                <AnimatePresence mode="wait">
+                  <motion.img 
+                    key={selectedTerrain.id}
+                    src={selectedTerrain.image} 
+                    alt={`STRATA Shell - ${selectedTerrain.name} terrain`}
+                    className="w-full h-auto"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </AnimatePresence>
+              </div>
               {/* Bottom HUD strip */}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-strata-black/90 to-transparent p-4">
                 <div className="flex items-center justify-between">
@@ -446,7 +486,7 @@ const Shop = () => {
                     return (
                       <button
                         key={variant.id}
-                        onClick={() => setSelectedTerrainId(variant.id)}
+                        onClick={() => handleTerrainChange(variant.id)}
                         className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
                           isSelected 
                             ? `border-${variant.color} shadow-lg` 
@@ -680,7 +720,7 @@ const Shop = () => {
                   {acquisitionStep === 'idle' && (
                     <motion.button
                       key="initiate"
-                      onClick={() => setAcquisitionStep('terrain')}
+                      onClick={() => setIsRitualOpen(true)}
                       className="w-full relative overflow-hidden group"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
