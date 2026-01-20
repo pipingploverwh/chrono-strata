@@ -272,7 +272,7 @@ const Shop = () => {
             <div className="flex items-center gap-4">
               <div className="w-2 h-2 rounded-full bg-strata-lume animate-pulse" />
               <span className="font-mono text-[10px] text-strata-silver/60 uppercase tracking-[0.3em]">
-                Equipment Lab / Store Protocol
+                {t('shop.labHeader')}
               </span>
             </div>
             
@@ -322,13 +322,13 @@ const Shop = () => {
           
           <div className="border border-strata-steel/20 rounded-lg p-6 bg-strata-charcoal/30 backdrop-blur">
             <Badge className="mb-4 bg-strata-cyan/10 text-strata-cyan border-strata-cyan/30 font-mono text-[10px] uppercase tracking-wider">
-              Terrain-Mapped Protocol
+              {t('shop.terrainMapped')}
             </Badge>
             <h1 className="text-3xl md:text-5xl font-instrument text-strata-white mb-2">
-              {STRATA_OWNERSHIP.name}
+              {t('shop.ownership')}
             </h1>
             <p className="text-strata-orange font-mono text-sm uppercase tracking-[0.2em]">
-              {STRATA_OWNERSHIP.subtitle}
+              {t('shop.centuryProtocol')}
             </p>
           </div>
         </motion.header>
@@ -408,7 +408,7 @@ const Shop = () => {
             <div className="mt-6">
               <div className="flex items-center justify-between mb-4">
                 <span className="font-mono text-[10px] text-strata-silver/60 uppercase tracking-[0.2em]">
-                  Select Strata Terrain
+                  {t('shop.selectTerrain')}
                 </span>
                 <span className="font-mono text-[9px] text-strata-silver/40">
                   {currentIndex + 1} / {TERRAIN_VARIANTS.length}
@@ -481,7 +481,7 @@ const Shop = () => {
               transition={{ delay: 0.5 }}
             >
               <p className="font-mono text-strata-silver/40 text-xs uppercase tracking-[0.4em]">
-                {STRATA_OWNERSHIP.tagline}
+                {t('shop.tagline')}
               </p>
             </motion.div>
           </motion.div>
@@ -499,18 +499,18 @@ const Shop = () => {
                 <div className="flex items-center gap-3 mb-2">
                   <Infinity className="w-5 h-5 text-strata-cyan" />
                   <span className="font-mono text-xs text-strata-cyan uppercase tracking-wider">
-                    Century Protocol
+                    {t('shop.centuryHeader')}
                   </span>
                 </div>
                 <p className="text-strata-silver/80 text-xs font-mono">
-                  This is not a limited run. This is the start of <span className="text-strata-white">100 years</span> of ownership.
+                  {t('shop.notLimitedRun')} <span className="text-strata-white">{t('shop.yearsOwnership')}</span> {t('shop.ofOwnership')}
                 </p>
               </div>
 
               {/* Payment Mode Toggle */}
               <div className="space-y-3">
                 <span className="font-mono text-[10px] text-strata-silver/60 uppercase tracking-[0.2em]">
-                  Select Ownership Mode
+                  {t('shop.selectOwnershipMode')}
                 </span>
                 
                 {/* Annual Option */}
@@ -526,7 +526,7 @@ const Shop = () => {
                     <div className="flex items-center gap-2">
                       <Clock className={`w-4 h-4 ${selectedPaymentMode === 'annual' ? 'text-strata-orange' : 'text-strata-silver/60'}`} />
                       <span className={`font-mono text-sm uppercase tracking-wider ${selectedPaymentMode === 'annual' ? 'text-strata-orange' : 'text-strata-silver'}`}>
-                        Annual
+                        {t('shop.annual')}
                       </span>
                     </div>
                     <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
@@ -539,9 +539,9 @@ const Shop = () => {
                     <span className={`text-3xl font-mono ${selectedPaymentMode === 'annual' ? 'text-strata-white' : 'text-strata-silver'}`}>
                       ${STRATA_OWNERSHIP.price}
                     </span>
-                    <span className="text-strata-silver/60 font-mono text-xs">/year</span>
+                    <span className="text-strata-silver/60 font-mono text-xs">{t('shop.perYear')}</span>
                   </div>
-                  <p className="text-strata-silver/50 font-mono text-[9px] mt-1">Post-first-year billing</p>
+                  <p className="text-strata-silver/50 font-mono text-[9px] mt-1">{t('shop.postFirstYear')}</p>
                 </button>
                 
                 {/* Bond Option */}
@@ -557,10 +557,10 @@ const Shop = () => {
                     <div className="flex items-center gap-2">
                       <Gift className={`w-4 h-4 ${selectedPaymentMode === 'bond' ? 'text-strata-lume' : 'text-strata-silver/60'}`} />
                       <span className={`font-mono text-sm uppercase tracking-wider ${selectedPaymentMode === 'bond' ? 'text-strata-lume' : 'text-strata-silver'}`}>
-                        STRATA Bond
+                        {t('shop.strataBond')}
                       </span>
                       <Badge className="bg-strata-lume/20 text-strata-lume border-strata-lume/30 font-mono text-[8px] px-1.5 py-0">
-                        LEGACY
+                        {t('shop.legacy')}
                       </Badge>
                     </div>
                     <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
@@ -573,13 +573,13 @@ const Shop = () => {
                     <span className={`text-3xl font-mono ${selectedPaymentMode === 'bond' ? 'text-strata-white' : 'text-strata-silver'}`}>
                       ${STRATA_BOND.price.toLocaleString()}
                     </span>
-                    <span className="text-strata-silver/60 font-mono text-xs">one-time</span>
+                    <span className="text-strata-silver/60 font-mono text-xs">{t('shop.oneTime')}</span>
                   </div>
-                  <p className="text-strata-silver/50 font-mono text-[9px] mt-1">{STRATA_BOND.savings} • 100 years prepaid</p>
+                  <p className="text-strata-silver/50 font-mono text-[9px] mt-1">{t('shop.savingsVsAnnual')}</p>
                   <div className="flex items-center gap-2 mt-2 pt-2 border-t border-strata-steel/20">
                     <Users className={`w-3 h-3 ${selectedPaymentMode === 'bond' ? 'text-strata-lume/80' : 'text-strata-silver/40'}`} />
                     <span className={`font-mono text-[9px] ${selectedPaymentMode === 'bond' ? 'text-strata-lume/80' : 'text-strata-silver/40'}`}>
-                      Transferable to children & heirs
+                      {t('shop.transferable')}
                     </span>
                   </div>
                 </button>
@@ -591,7 +591,7 @@ const Shop = () => {
                   <TerrainIcon className={`w-5 h-5 text-${selectedTerrain.color}`} />
                   <div>
                     <p className="text-strata-silver/60 font-mono text-[10px] uppercase tracking-wider">
-                      Selected Terrain Map
+                      {t('shop.selectedTerrainMap')}
                     </p>
                     <p className={`text-${selectedTerrain.color} font-semibold`}>
                       {selectedTerrain.name} — {selectedTerrain.strataZone}
@@ -602,7 +602,7 @@ const Shop = () => {
 
               {/* Description */}
               <p className="text-strata-silver/80 text-sm leading-relaxed border-l-2 border-strata-cyan/30 pl-4">
-                {STRATA_OWNERSHIP.description}
+                {t('shop.description')}
               </p>
 
               {/* Equipment Specs */}
@@ -610,7 +610,7 @@ const Shop = () => {
                 <div className="flex items-center gap-2 mb-4">
                   <div className="w-1 h-1 bg-strata-cyan" />
                   <span className="font-mono text-[10px] text-strata-cyan uppercase tracking-[0.2em]">
-                    Technical Specifications
+                    {t('shop.techSpecs')}
                   </span>
                 </div>
                 
@@ -671,17 +671,17 @@ const Shop = () => {
                 {isProcessing ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-3 animate-spin" />
-                    Initiating Protocol...
+                    {t('shop.initiating')}
                   </>
                 ) : selectedPaymentMode === 'bond' ? (
                   <>
                     <Gift className="w-4 h-4 mr-3" />
-                    Secure STRATA Bond — ${STRATA_BOND.price.toLocaleString()}
+                    {t('shop.secureBond')} — ${STRATA_BOND.price.toLocaleString()}
                   </>
                 ) : (
                   <>
                     <ShoppingBag className="w-4 h-4 mr-3" />
-                    Activate {selectedTerrain.name} — ${STRATA_OWNERSHIP.price}/yr
+                    {t('shop.activateTerrain')} {selectedTerrain.name} — ${STRATA_OWNERSHIP.price}{t('shop.perYear')}
                   </>
                 )}
               </Button>
@@ -690,17 +690,17 @@ const Shop = () => {
               <div className="flex items-center justify-center gap-4 text-strata-silver/40 text-[9px] font-mono uppercase tracking-wider">
                 <span className="flex items-center gap-1">
                   <Check className="w-3 h-3" />
-                  Secure
+                  {t('shop.secure')}
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1">
                   <Infinity className="w-3 h-3" />
-                  100-Year Legacy
+                  {t('shop.100YearLegacy')}
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1">
                   <Users className="w-3 h-3" />
-                  Generational
+                  {t('shop.generational')}
                 </span>
               </div>
             </div>
@@ -716,9 +716,9 @@ const Shop = () => {
         >
           <div className="flex items-center justify-center gap-4 text-[9px] font-mono text-strata-silver/30 uppercase tracking-[0.3em]">
             <div className="w-1.5 h-1.5 rotate-45 border border-strata-cyan/30" />
-            <span>Equipment Lab</span>
+            <span>{t('shop.equipmentLab')}</span>
             <span>•</span>
-            <span>Protocol v2.1</span>
+            <span>{t('shop.protocolVersion')}</span>
             <div className="w-1.5 h-1.5 rotate-45 border border-strata-cyan/30" />
           </div>
         </motion.footer>
