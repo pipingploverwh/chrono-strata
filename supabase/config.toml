@@ -56,3 +56,9 @@ verify_jwt = false
 
 [functions.beena-analysis]
 verify_jwt = false
+
+[functions.create-strata-checkout]
+verify_jwt = false
+
+[functions.notify-pilot-application]
+verify_jwt = false
