@@ -213,6 +213,15 @@ html {
     --lavender-dim: 270 30% 25%;
     --lavender-glow: 270 60% 65%;
     
+    /* Kids Collection — Light lavender palette */
+    --lavender-50: 270 60% 98%;
+    --lavender-100: 270 55% 94%;
+    --lavender-200: 270 50% 86%;
+    --lavender-300: 270 50% 75%;
+    --lavender-400: 270 50% 60%;
+    --lavender-500: 270 50% 55%;
+    --lavender-600: 270 50% 45%;
+    
     /* Structural Layers */
     --surface-0: 0 0% 3%;
     --surface-1: 0 0% 5%;
