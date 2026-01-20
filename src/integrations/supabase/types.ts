@@ -356,6 +356,45 @@ export type Database = {
         }
         Relationships: []
       }
+      strata_access: {
+        Row: {
+          amount_paid: number | null
+          created_at: string
+          email: string
+          granted_at: string | null
+          id: string
+          location_count: number
+          payment_status: string
+          stripe_payment_intent: string | null
+          stripe_session_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_paid?: number | null
+          created_at?: string
+          email: string
+          granted_at?: string | null
+          id?: string
+          location_count?: number
+          payment_status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_paid?: number | null
+          created_at?: string
+          email?: string
+          granted_at?: string | null
+          id?: string
+          location_count?: number
+          payment_status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
