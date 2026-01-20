@@ -993,6 +993,335 @@ const translations: Record<string, Record<Language, string>> = {
     fr: 'STRATA Shell rangée — conditions chaudes',
     ar: 'STRATA Shell مخزن — ظروف دافئة'
   },
+
+  // Success Page - Post-Acquisition
+  'success.paymentConfirmed': {
+    en: 'PAYMENT CONFIRMED',
+    ja: '支払い確認済み',
+    it: 'PAGAMENTO CONFERMATO',
+    fr: 'PAIEMENT CONFIRMÉ',
+    ar: 'تم تأكيد الدفع'
+  },
+  'success.acquisitionComplete': {
+    en: 'Acquisition Complete',
+    ja: '取得完了',
+    it: 'Acquisizione Completata',
+    fr: 'Acquisition Terminée',
+    ar: 'اكتمال الاستحواذ'
+  },
+  'success.bondSecured': {
+    en: 'Your STRATA Bond has been secured. 100-year generational ownership activated.',
+    ja: 'STRATAボンドが確保されました。100年の世代間所有権が有効化されました。',
+    it: 'Il tuo STRATA Bond è stato assicurato. Proprietà generazionale di 100 anni attivata.',
+    fr: 'Votre STRATA Bond a été sécurisé. Propriété générationnelle de 100 ans activée.',
+    ar: 'تم تأمين سند STRATA الخاص بك. تم تفعيل ملكية الأجيال لمدة 100 عام.'
+  },
+  'success.ownershipSecured': {
+    en: 'Your STRATA Ownership has been secured. Annual Century Protocol access granted.',
+    ja: 'STRATA所有権が確保されました。年間センチュリープロトコルアクセスが付与されました。',
+    it: 'La tua proprietà STRATA è stata assicurata. Accesso annuale al Protocollo Century concesso.',
+    fr: 'Votre propriété STRATA a été sécurisée. Accès annuel au Protocole Century accordé.',
+    ar: 'تم تأمين ملكية STRATA الخاصة بك. تم منح الوصول السنوي لبروتوكول Century.'
+  },
+
+  // Success Steps
+  'success.step.certificate': {
+    en: 'Certificate',
+    ja: '証明書',
+    it: 'Certificato',
+    fr: 'Certificat',
+    ar: 'الشهادة'
+  },
+  'success.step.activation': {
+    en: 'Activation',
+    ja: 'アクティベーション',
+    it: 'Attivazione',
+    fr: 'Activation',
+    ar: 'التفعيل'
+  },
+  'success.step.calibration': {
+    en: 'Calibration',
+    ja: 'キャリブレーション',
+    it: 'Calibrazione',
+    fr: 'Calibration',
+    ar: 'المعايرة'
+  },
+  'success.step.complete': {
+    en: 'Complete',
+    ja: '完了',
+    it: 'Completato',
+    fr: 'Terminé',
+    ar: 'مكتمل'
+  },
+
+  // Certificate
+  'success.certificate.title': {
+    en: 'OWNERSHIP CERTIFICATE',
+    ja: '所有証明書',
+    it: 'CERTIFICATO DI PROPRIETÀ',
+    fr: 'CERTIFICAT DE PROPRIÉTÉ',
+    ar: 'شهادة الملكية'
+  },
+  'success.certificate.bondType': {
+    en: 'STRATA BOND — 100 Year Legacy',
+    ja: 'STRATAボンド — 100年レガシー',
+    it: 'STRATA BOND — Eredità 100 Anni',
+    fr: 'STRATA BOND — Héritage 100 Ans',
+    ar: 'سند STRATA — إرث 100 عام'
+  },
+  'success.certificate.ownershipType': {
+    en: 'STRATA OWNERSHIP — Century Protocol',
+    ja: 'STRATA所有権 — センチュリープロトコル',
+    it: 'PROPRIETÀ STRATA — Protocollo Century',
+    fr: 'PROPRIÉTÉ STRATA — Protocole Century',
+    ar: 'ملكية STRATA — بروتوكول Century'
+  },
+  'success.certificate.serial': {
+    en: 'SERIAL',
+    ja: 'シリアル',
+    it: 'SERIALE',
+    fr: 'SÉRIE',
+    ar: 'الرقم التسلسلي'
+  },
+  'success.certificate.terrainConfig': {
+    en: 'TERRAIN CONFIGURATION',
+    ja: 'テレイン設定',
+    it: 'CONFIGURAZIONE TERRENO',
+    fr: 'CONFIGURATION TERRAIN',
+    ar: 'تكوين التضاريس'
+  },
+  'success.certificate.ownership': {
+    en: 'OWNERSHIP TERM',
+    ja: '所有期間',
+    it: 'TERMINE DI PROPRIETÀ',
+    fr: 'DURÉE DE PROPRIÉTÉ',
+    ar: 'مدة الملكية'
+  },
+  'success.certificate.years': {
+    en: 'YEARS',
+    ja: '年',
+    it: 'ANNI',
+    fr: 'ANS',
+    ar: 'سنوات'
+  },
+  'success.certificate.bondLegacy': {
+    en: 'Generational legacy — transferable to heirs',
+    ja: '世代間レガシー — 相続人に譲渡可能',
+    it: 'Eredità generazionale — trasferibile agli eredi',
+    fr: 'Héritage générationnel — transférable aux héritiers',
+    ar: 'إرث الأجيال — قابل للتحويل للورثة'
+  },
+  'success.certificate.annualRenewal': {
+    en: 'Annual renewal — continuous access',
+    ja: '年間更新 — 継続的なアクセス',
+    it: 'Rinnovo annuale — accesso continuo',
+    fr: 'Renouvellement annuel — accès continu',
+    ar: 'تجديد سنوي — وصول مستمر'
+  },
+  'success.certificate.access': {
+    en: 'ACCESS',
+    ja: 'アクセス',
+    it: 'ACCESSO',
+    fr: 'ACCÈS',
+    ar: 'الوصول'
+  },
+  'success.certificate.global': {
+    en: 'Global',
+    ja: 'グローバル',
+    it: 'Globale',
+    fr: 'Mondial',
+    ar: 'عالمي'
+  },
+  'success.certificate.issued': {
+    en: 'ISSUED',
+    ja: '発行日',
+    it: 'EMESSO',
+    fr: 'ÉMIS',
+    ar: 'صدر في'
+  },
+  'success.certificate.downloadPdf': {
+    en: 'Download Certificate PDF',
+    ja: '証明書PDFをダウンロード',
+    it: 'Scarica PDF Certificato',
+    fr: 'Télécharger le PDF du Certificat',
+    ar: 'تحميل شهادة PDF'
+  },
+  'success.certificate.verified': {
+    en: 'BLOCKCHAIN VERIFIED',
+    ja: 'ブロックチェーン検証済み',
+    it: 'VERIFICATO BLOCKCHAIN',
+    fr: 'VÉRIFIÉ BLOCKCHAIN',
+    ar: 'تم التحقق عبر البلوكتشين'
+  },
+  'success.certificate.valid': {
+    en: 'VALID',
+    ja: '有効',
+    it: 'VALIDO',
+    fr: 'VALIDE',
+    ar: 'صالح'
+  },
+
+  // Activation
+  'success.activation.title': {
+    en: 'Ownership Activation',
+    ja: '所有権アクティベーション',
+    it: 'Attivazione Proprietà',
+    fr: 'Activation de la Propriété',
+    ar: 'تفعيل الملكية'
+  },
+  'success.activation.description': {
+    en: 'Your unique activation code has been generated. This code links your ownership to the STRATA network.',
+    ja: '固有のアクティベーションコードが生成されました。このコードはあなたの所有権をSTRATAネットワークにリンクします。',
+    it: 'Il tuo codice di attivazione unico è stato generato. Questo codice collega la tua proprietà alla rete STRATA.',
+    fr: 'Votre code d\'activation unique a été généré. Ce code lie votre propriété au réseau STRATA.',
+    ar: 'تم إنشاء رمز التفعيل الفريد الخاص بك. هذا الرمز يربط ملكيتك بشبكة STRATA.'
+  },
+  'success.activation.code': {
+    en: 'ACTIVATION CODE',
+    ja: 'アクティベーションコード',
+    it: 'CODICE DI ATTIVAZIONE',
+    fr: 'CODE D\'ACTIVATION',
+    ar: 'رمز التفعيل'
+  },
+  'success.activation.saveCode': {
+    en: 'Save this code securely. It will be needed for physical shell registration.',
+    ja: 'このコードを安全に保存してください。物理シェルの登録に必要です。',
+    it: 'Salva questo codice in modo sicuro. Sarà necessario per la registrazione fisica della shell.',
+    fr: 'Enregistrez ce code en lieu sûr. Il sera nécessaire pour l\'enregistrement physique de la coque.',
+    ar: 'احفظ هذا الرمز بشكل آمن. سيكون مطلوباً لتسجيل الغلاف المادي.'
+  },
+
+  // Calibration
+  'success.calibration.title': {
+    en: 'System Calibration',
+    ja: 'システムキャリブレーション',
+    it: 'Calibrazione Sistema',
+    fr: 'Calibration du Système',
+    ar: 'معايرة النظام'
+  },
+  'success.calibration.subtitle': {
+    en: 'Syncing ownership parameters',
+    ja: '所有権パラメータを同期中',
+    it: 'Sincronizzazione parametri di proprietà',
+    fr: 'Synchronisation des paramètres de propriété',
+    ar: 'مزامنة معلمات الملكية'
+  },
+  'success.calibration.terrainMapped': {
+    en: 'Terrain variant mapped',
+    ja: 'テレインバリアントがマッピングされました',
+    it: 'Variante terreno mappata',
+    fr: 'Variante de terrain mappée',
+    ar: 'تم تعيين متغير التضاريس'
+  },
+  'success.calibration.hudSynced': {
+    en: 'HUD display synced',
+    ja: 'HUDディスプレイが同期されました',
+    it: 'Display HUD sincronizzato',
+    fr: 'Affichage HUD synchronisé',
+    ar: 'تمت مزامنة شاشة HUD'
+  },
+  'success.calibration.chronoCalibrated': {
+    en: 'Chronometer calibrated',
+    ja: 'クロノメーターがキャリブレートされました',
+    it: 'Cronometro calibrato',
+    fr: 'Chronomètre calibré',
+    ar: 'تمت معايرة الكرونومتر'
+  },
+
+  // Navigation buttons
+  'success.proceedToActivation': {
+    en: 'Proceed to Activation',
+    ja: 'アクティベーションへ進む',
+    it: 'Procedi all\'Attivazione',
+    fr: 'Passer à l\'Activation',
+    ar: 'المتابعة إلى التفعيل'
+  },
+  'success.back': {
+    en: 'Back',
+    ja: '戻る',
+    it: 'Indietro',
+    fr: 'Retour',
+    ar: 'رجوع'
+  },
+  'success.continueCalibration': {
+    en: 'Continue to Calibration',
+    ja: 'キャリブレーションへ続く',
+    it: 'Continua alla Calibrazione',
+    fr: 'Continuer vers la Calibration',
+    ar: 'المتابعة إلى المعايرة'
+  },
+  'success.finalizeSetup': {
+    en: 'Finalize Setup',
+    ja: 'セットアップを完了',
+    it: 'Finalizza Configurazione',
+    fr: 'Finaliser la Configuration',
+    ar: 'إنهاء الإعداد'
+  },
+
+  // Complete step
+  'success.complete.title': {
+    en: 'Setup Complete',
+    ja: 'セットアップ完了',
+    it: 'Configurazione Completata',
+    fr: 'Configuration Terminée',
+    ar: 'اكتمل الإعداد'
+  },
+  'success.complete.description': {
+    en: 'Your STRATA ownership is now fully activated. Welcome to the Century Protocol.',
+    ja: 'あなたのSTRATA所有権が完全にアクティベートされました。センチュリープロトコルへようこそ。',
+    it: 'La tua proprietà STRATA è ora completamente attivata. Benvenuto nel Protocollo Century.',
+    fr: 'Votre propriété STRATA est maintenant entièrement activée. Bienvenue dans le Protocole Century.',
+    ar: 'تم تفعيل ملكية STRATA الخاصة بك بالكامل. مرحباً بك في بروتوكول Century.'
+  },
+  'success.complete.status': {
+    en: 'STATUS',
+    ja: 'ステータス',
+    it: 'STATO',
+    fr: 'STATUT',
+    ar: 'الحالة'
+  },
+  'success.complete.active': {
+    en: 'ACTIVE',
+    ja: 'アクティブ',
+    it: 'ATTIVO',
+    fr: 'ACTIF',
+    ar: 'نشط'
+  },
+  'success.complete.coverage': {
+    en: 'COVERAGE',
+    ja: 'カバレッジ',
+    it: 'COPERTURA',
+    fr: 'COUVERTURE',
+    ar: 'التغطية'
+  },
+  'success.complete.worldwide': {
+    en: 'Worldwide',
+    ja: 'ワールドワイド',
+    it: 'Mondiale',
+    fr: 'Mondial',
+    ar: 'عالمي'
+  },
+  'success.complete.protocol': {
+    en: 'PROTOCOL',
+    ja: 'プロトコル',
+    it: 'PROTOCOLLO',
+    fr: 'PROTOCOLE',
+    ar: 'البروتوكول'
+  },
+  'success.complete.returnToShop': {
+    en: 'Return to Shop',
+    ja: 'ショップに戻る',
+    it: 'Torna al Negozio',
+    fr: 'Retour à la Boutique',
+    ar: 'العودة إلى المتجر'
+  },
+  'success.complete.accessStrata': {
+    en: 'Access STRATA',
+    ja: 'STRATAにアクセス',
+    it: 'Accedi a STRATA',
+    fr: 'Accéder à STRATA',
+    ar: 'الوصول إلى STRATA'
+  },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);

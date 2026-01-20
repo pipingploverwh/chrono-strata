@@ -103,7 +103,7 @@ serve(async (req) => {
           },
         ],
         mode: "payment",
-        success_url: `${origin}/shop?success=true&bond=true&session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${origin}/shop-success?bond=true&terrain=${terrainVariant || 'standard'}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/shop?canceled=true`,
         metadata,
         payment_intent_data: {
@@ -138,7 +138,7 @@ serve(async (req) => {
           },
         ],
         mode: "subscription",
-        success_url: `${origin}/shop?success=true&session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${origin}/shop-success?terrain=${terrainVariant || 'standard'}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/shop?canceled=true`,
         metadata,
         subscription_data: {
