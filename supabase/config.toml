@@ -68,3 +68,21 @@ verify_jwt = false
 
 [functions.verify-strata-access]
 verify_jwt = false
+
+[functions.create-shop-checkout]
+verify_jwt = false
+
+[functions.generate-config-render]
+verify_jwt = false
+
+[functions.send-config-receipt]
+verify_jwt = false
+
+[functions.generate-config-pdf]
+verify_jwt = false
+
+[functions.odoo-sync]
+verify_jwt = false
+
+[functions.odoo-scheduled-sync]
+verify_jwt = false
