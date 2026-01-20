@@ -43,6 +43,7 @@ const ShopSuccess = () => {
   
   const sessionId = searchParams.get('session_id');
   const isBond = searchParams.get('bond') === 'true';
+  const isTactical = searchParams.get('tactical') === 'true';
   const terrainId = searchParams.get('terrain') || 'standard';
   
   const [currentStep, setCurrentStep] = useState<OnboardingStep>('certificate');
@@ -125,7 +126,11 @@ const ShopSuccess = () => {
             {t('success.acquisitionComplete')}
           </h1>
           <p className="text-strata-silver/70 max-w-lg mx-auto">
-            {isBond ? t('success.bondSecured') : t('success.ownershipSecured')}
+            {isTactical 
+              ? t('success.tacticalSecured')
+              : isBond 
+              ? t('success.bondSecured') 
+              : t('success.ownershipSecured')}
           </p>
         </motion.div>
 
@@ -182,7 +187,11 @@ const ShopSuccess = () => {
                         {t('success.certificate.title')}
                       </div>
                       <div className="text-sm font-medium">
-                        {isBond ? t('success.certificate.bondType') : t('success.certificate.ownershipType')}
+                        {isTactical 
+                          ? t('success.certificate.tacticalType') 
+                          : isBond 
+                          ? t('success.certificate.bondType') 
+                          : t('success.certificate.ownershipType')}
                       </div>
                     </div>
                   </div>
@@ -216,15 +225,28 @@ const ShopSuccess = () => {
                       <div className="flex items-center gap-2 mb-3">
                         <Infinity className="w-4 h-4 text-strata-orange" />
                         <span className="font-mono text-xs text-strata-silver/60 uppercase tracking-wider">
-                          {t('success.certificate.ownership')}
+                          {isTactical ? t('success.certificate.allocation') : t('success.certificate.ownership')}
                         </span>
                       </div>
-                      <div className="text-2xl font-light">
-                        {isBond ? '100' : '1'} <span className="text-sm text-strata-silver/60">{t('success.certificate.years')}</span>
-                      </div>
-                      <div className="text-xs text-strata-silver/50 mt-1">
-                        {isBond ? t('success.certificate.bondLegacy') : t('success.certificate.annualRenewal')}
-                      </div>
+                      {isTactical ? (
+                        <>
+                          <div className="text-lg font-light text-strata-orange">
+                            {t('success.certificate.manufacturingPending')}
+                          </div>
+                          <div className="text-xs text-strata-silver/50 mt-1">
+                            {t('success.certificate.leadTime')}: 8-12 {t('success.certificate.weeks')}
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="text-2xl font-light">
+                            {isBond ? '100' : '1'} <span className="text-sm text-strata-silver/60">{t('success.certificate.years')}</span>
+                          </div>
+                          <div className="text-xs text-strata-silver/50 mt-1">
+                            {isBond ? t('success.certificate.bondLegacy') : t('success.certificate.annualRenewal')}
+                          </div>
+                        </>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
