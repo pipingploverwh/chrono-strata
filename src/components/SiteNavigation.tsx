@@ -113,8 +113,8 @@ const navItems: NavItem[] = [
   isPublic: true
 }];
 
-// AAL Corner Accent component
-const AALCornerAccent = ({
+// Precision Corner Accent component
+const PrecisionCornerAccent = ({
   position,
   color = "strata-orange"
 }: {
@@ -171,8 +171,8 @@ const KumaGlassPanel = ({
 }) => <div className={`relative backdrop-blur-md border border-white/[0.08] ${className}`} style={{
   background: 'linear-gradient(135deg, hsl(var(--strata-charcoal) / 0.6) 0%, hsl(var(--strata-black) / 0.8) 100%)'
 }}>
-    <AALCornerAccent position="tl" />
-    <AALCornerAccent position="br" />
+    <PrecisionCornerAccent position="tl" />
+    <PrecisionCornerAccent position="br" />
     {children}
   </div>;
 export const SiteNavigation = () => {
@@ -227,10 +227,10 @@ export const SiteNavigation = () => {
         }} />)}
         </div>
 
-        {/* Header with AAL geometric accents */}
+        {/* Header with geometric accents */}
         <SheetHeader className="relative p-6 border-b border-strata-steel/20">
-          <AALCornerAccent position="tl" />
-          <AALCornerAccent position="tr" />
+          <PrecisionCornerAccent position="tl" />
+          <PrecisionCornerAccent position="tr" />
           
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -254,7 +254,7 @@ export const SiteNavigation = () => {
             LAVANDAR AI • Operations Platform
           </p>
 
-          {/* AAL horizontal separator line */}
+          {/* Precision horizontal separator line */}
           <div className="absolute bottom-0 left-0 right-0 h-px">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-strata-orange/30 to-transparent" />
             <div className="absolute left-1/2 -translate-x-1/2 -bottom-0.5 w-1.5 h-1.5 rotate-45 border border-strata-orange/40 bg-strata-charcoal" />
@@ -311,7 +311,7 @@ export const SiteNavigation = () => {
                 delay: index * 0.05
               }}>
                     <Link to={item.path} className={`group relative block p-4 rounded-lg transition-all duration-300 ${isActive ? "bg-strata-cyan/10 border border-strata-cyan/30" : "bg-strata-steel/5 border border-transparent hover:bg-strata-steel/15 hover:border-strata-steel/20"}`} aria-current={isActive ? "page" : undefined}>
-                      {/* AAL corner on hover/active */}
+                      {/* Precision corner on hover/active */}
                       <div className={`absolute top-0 left-0 w-3 h-3 transition-opacity ${isActive || 'group-hover:opacity-100 opacity-0'}`}>
                         <div className={`absolute top-0 left-0 w-full h-px ${isActive ? 'bg-strata-cyan/50' : 'bg-strata-steel/30'}`} />
                         <div className={`absolute top-0 left-0 w-px h-full ${isActive ? 'bg-strata-cyan/50' : 'bg-strata-steel/30'}`} />
@@ -336,7 +336,7 @@ export const SiteNavigation = () => {
           <NavSection title="System" items={systemItems} location={location} accentColor="strata-lume" compact />
         </nav>
 
-        {/* Footer with AAL geometric pattern */}
+        {/* Footer with geometric pattern */}
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-strata-steel/20 bg-strata-black/80 backdrop-blur-sm">
           <div className="flex items-center justify-between text-[9px] font-mono text-strata-silver/40">
             <span className="tracking-widest">v2.0 • STRATA</span>
@@ -351,7 +351,7 @@ export const SiteNavigation = () => {
     </Sheet>;
 };
 
-// Nav Section component with AAL styling
+// Nav Section component with Precision styling
 const NavSection = ({
   title,
   items,
@@ -421,13 +421,13 @@ export const SiteMapPage = () => {
       </div>
 
       <div className="relative max-w-6xl mx-auto">
-        {/* Header with AAL accents */}
+        {/* Header with Precision accents */}
         <header className="relative mb-12 p-8 rounded-2xl" style={{
         background: 'linear-gradient(135deg, hsl(var(--strata-charcoal) / 0.8) 0%, hsl(var(--strata-black) / 0.9) 100%)',
         border: '1px solid hsl(var(--strata-steel) / 0.2)'
       }}>
-          <AALCornerAccent position="tl" />
-          <AALCornerAccent position="br" />
+          <PrecisionCornerAccent position="tl" />
+          <PrecisionCornerAccent position="br" />
           
           <motion.div initial={{
           opacity: 0,
@@ -493,7 +493,7 @@ const SiteMapSection = ({
   background: 'linear-gradient(180deg, hsl(var(--strata-charcoal) / 0.5) 0%, hsl(var(--strata-black) / 0.7) 100%)',
   border: '1px solid hsl(var(--strata-steel) / 0.15)'
 }}>
-    <AALCornerAccent position="tl" color={color} />
+    <PrecisionCornerAccent position="tl" color={color} />
     
     <h2 className={`text-lg font-instrument text-${color} mb-6 flex items-center gap-3`}>
       <div className={`w-1 h-6 rounded-full bg-${color}`} />

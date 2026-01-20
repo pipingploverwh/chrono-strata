@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Globe, MapPin, Plus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import AALWorldClock from '@/components/strata/AALWorldClock';
+import StrataWorldClock from '@/components/strata/StrataWorldClock';
 
 interface Location {
   id: string;
@@ -50,7 +50,7 @@ const StrataWorldThree = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* AAL-style ruled surface background */}
+      {/* Precision-style ruled surface background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(20)].map((_, i) => (
           <div
@@ -84,7 +84,7 @@ const StrataWorldThree = () => {
 
         {/* Clock display */}
         <div className="max-w-4xl mx-auto mb-12">
-          <AALWorldClock locations={locations} variant="detailed" />
+          <StrataWorldClock locations={locations} variant="detailed" />
         </div>
 
         {/* Edit controls */}

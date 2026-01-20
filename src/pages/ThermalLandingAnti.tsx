@@ -167,7 +167,7 @@ const ThermalLandingAnti = () => {
         />
       </motion.div>
 
-      {/* AAL - Ruled surface lines (geometric precision) */}
+      {/* Precision - Ruled surface lines (geometric precision) */}
       <motion.div 
         className="fixed inset-0 pointer-events-none z-[2] opacity-[0.04]"
         initial={{ opacity: 0, rotate: -1 }}
@@ -177,7 +177,7 @@ const ThermalLandingAnti = () => {
         <div 
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(135deg, transparent 49.5%, hsl(var(--aal-line)) 49.5%, hsl(var(--aal-line)) 50.5%, transparent 50.5%)',
+            background: 'linear-gradient(135deg, transparent 49.5%, hsl(var(--precision-line)) 49.5%, hsl(var(--precision-line)) 50.5%, transparent 50.5%)',
             backgroundSize: '200px 200px',
           }}
         />
@@ -573,9 +573,9 @@ const ThermalLandingAnti = () => {
           </div>
         </section>
 
-        {/* CTA Section - Kuma/AAL refined */}
+        {/* CTA Section - Kuma/Precision refined */}
         <section className="px-8 py-24 relative">
-          {/* AAL geometric frame lines */}
+          {/* Precision geometric frame lines */}
           <div className="absolute inset-x-8 top-16 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
           <div className="absolute inset-x-8 bottom-16 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
           
@@ -593,13 +593,13 @@ const ThermalLandingAnti = () => {
                   backdropFilter: 'blur(8px)',
                 }}
               >
-                {/* AAL corner accents */}
+                {/* Precision corner accents */}
                 <div className="absolute -top-px -left-px w-8 h-px bg-gradient-to-r from-cyan-500/60 to-transparent" />
                 <div className="absolute -top-px -left-px h-8 w-px bg-gradient-to-b from-cyan-500/60 to-transparent" />
                 <div className="absolute -bottom-px -right-px w-8 h-px bg-gradient-to-l from-orange-500/40 to-transparent" />
                 <div className="absolute -bottom-px -right-px h-8 w-px bg-gradient-to-t from-orange-500/40 to-transparent" />
                 
-                {/* AAL geometric separator */}
+                {/* Precision geometric separator */}
                 <div className="flex items-center justify-center gap-3 mb-6">
                   <div className="w-12 h-px bg-white/10" />
                   <div className="w-1.5 h-1.5 rotate-45 border border-white/20" />
@@ -616,7 +616,7 @@ const ThermalLandingAnti = () => {
                   >
                     LAUNCH →
                   </div>
-                  {/* Hover underline - AAL precision */}
+                  {/* Hover underline - Precision */}
                   <div className="h-px w-0 group-hover:w-full bg-gradient-to-r from-orange-500/60 to-cyan-500/40 transition-all duration-500 mt-2" />
                 </Link>
                 <div className="text-[8px] text-white/30 mt-6">THERMAL.VISUALIZER.EXE</div>

@@ -40,14 +40,14 @@ const ThermalNavigation = ({ variant = 'dark' }: ThermalNavigationProps) => {
       />
 
       <nav className="relative flex items-center justify-between px-6 sm:px-8 py-4">
-        {/* Left: Logo with AAL geometric accent */}
+        {/* Left: Logo with geometric accent */}
         <motion.div 
           className="flex items-center gap-4"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          {/* AAL geometric prefix */}
+          {/* Precision geometric prefix */}
           <motion.div 
             className="hidden sm:flex items-center gap-2"
             initial={{ scaleX: 0 }}
@@ -77,7 +77,7 @@ const ThermalNavigation = ({ variant = 'dark' }: ThermalNavigationProps) => {
           </Link>
         </motion.div>
 
-        {/* Center: Navigation links with AAL geometric separators */}
+        {/* Center: Navigation links with geometric separators */}
         <motion.div 
           className="hidden md:flex items-center gap-1"
           initial={{ opacity: 0, y: -10 }}
@@ -145,7 +145,7 @@ const ThermalNavigation = ({ variant = 'dark' }: ThermalNavigationProps) => {
           ))}
         </motion.div>
 
-        {/* Right: CTA with AAL geometric suffix */}
+        {/* Right: CTA with geometric suffix */}
         <motion.div 
           className="flex items-center gap-4"
           initial={{ opacity: 0, x: 20 }}
@@ -160,7 +160,7 @@ const ThermalNavigation = ({ variant = 'dark' }: ThermalNavigationProps) => {
             <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </Link>
 
-          {/* AAL geometric suffix */}
+          {/* Precision geometric suffix */}
           <motion.div 
             className="hidden sm:flex items-center gap-2"
             initial={{ scaleX: 0 }}

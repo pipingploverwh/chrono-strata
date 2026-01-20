@@ -53,12 +53,12 @@ const getWeatherDescription = (code: number): string => {
   return 'Variable conditions';
 };
 
-interface AALWorldClockProps {
+interface StrataWorldClockProps {
   locations: Location[];
   variant?: 'minimal' | 'detailed';
 }
 
-const AALWorldClock = ({ locations, variant = 'detailed' }: AALWorldClockProps) => {
+const StrataWorldClock = ({ locations, variant = 'detailed' }: StrataWorldClockProps) => {
   const { formatTemp } = useTemperatureUnit();
   const [clockData, setClockData] = useState<ClockData[]>([]);
 
@@ -160,9 +160,9 @@ const AALWorldClock = ({ locations, variant = 'detailed' }: AALWorldClockProps) 
             className="group relative"
             style={{ animationDelay: `${index * 100}ms` }}
           >
-            {/* AAL-style geometric card */}
+            {/* Precision-style geometric card */}
             <div className="relative bg-gradient-to-br from-slate-900/90 via-slate-800/80 to-slate-900/90 backdrop-blur-xl border border-slate-700/30 rounded-2xl p-6 overflow-hidden transition-all duration-500 hover:border-rose-500/30 hover:shadow-[0_0_40px_rgba(244,63,94,0.1)]">
-              {/* Ruled surface lines - AAL signature */}
+              {/* Ruled surface lines - precision signature */}
               <div className="absolute inset-0 opacity-10">
                 {[...Array(8)].map((_, i) => (
                   <div
@@ -178,7 +178,7 @@ const AALWorldClock = ({ locations, variant = 'detailed' }: AALWorldClockProps) 
                 ))}
               </div>
 
-              {/* Precision corner accents - AAL detail */}
+              {/* Precision corner accents - Strata detail */}
               <div className="absolute top-0 left-0 w-8 h-8 border-t border-l border-rose-500/40 rounded-tl-2xl" />
               <div className="absolute bottom-0 right-0 w-8 h-8 border-b border-r border-rose-500/40 rounded-br-2xl" />
 
@@ -274,4 +274,4 @@ const AALWorldClock = ({ locations, variant = 'detailed' }: AALWorldClockProps) 
   );
 };
 
-export default AALWorldClock;
+export default StrataWorldClock;

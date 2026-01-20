@@ -32,8 +32,8 @@ const KumaSlats = ({ count = 12, height = 200, className = "" }: { count?: numbe
   </div>
 );
 
-// AAL-inspired geometric accent with ruled surface lines
-const AALCornerAccent = ({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) => {
+// Precision-inspired geometric accent with ruled surface lines
+const PrecisionCornerAccent = ({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) => {
   const positionClasses = {
     tl: 'top-0 left-0',
     tr: 'top-0 right-0 rotate-90',
@@ -299,9 +299,9 @@ const DJTableShowcase = () => {
         </div>
       </header>
 
-      {/* Hero Section - Kuma/AAL Design */}
+      {/* Hero Section - Kuma/Precision Design */}
       <section className="pt-32 pb-20 px-6 relative">
-        <AALCornerAccent position="tl" />
+        <PrecisionCornerAccent position="tl" />
         
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -314,10 +314,10 @@ const DJTableShowcase = () => {
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
-              {/* Glass panel frame with AAL corner accents */}
+              {/* Glass panel frame with precision corner accents */}
               <div className="relative aspect-[4/3] bg-gradient-to-br from-muted/30 to-muted/10 rounded-sm overflow-hidden border border-border/20">
-                <AALCornerAccent position="tl" />
-                <AALCornerAccent position="br" />
+                <PrecisionCornerAccent position="tl" />
+                <PrecisionCornerAccent position="br" />
                 
                 {/* Layered transparency effect */}
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
@@ -391,7 +391,7 @@ const DJTableShowcase = () => {
                   </div>
                 </div>
                 
-                {/* View Controls with AAL precision styling */}
+                {/* View Controls with precision styling */}
                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1">
                   {(['front', 'top', 'side'] as const).map((view) => (
                     <button
@@ -410,7 +410,7 @@ const DJTableShowcase = () => {
               </div>
             </motion.div>
 
-            {/* Product Info with AAL geometric accents */}
+            {/* Product Info with geometric accents */}
             <motion.div 
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
@@ -517,10 +517,10 @@ const DJTableShowcase = () => {
                       <p className="text-sm text-foreground/80">{image.description}</p>
                     </div>
                   </div>
-                  {/* AAL corner accents on hover */}
+                  {/* Precision corner accents on hover */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                    <AALCornerAccent position="tl" />
-                    <AALCornerAccent position="br" />
+                    <PrecisionCornerAccent position="tl" />
+                    <PrecisionCornerAccent position="br" />
                   </div>
                   <div className="absolute inset-0 border border-border/20 group-hover:border-apex-glow/30 transition-colors" />
                 </div>
@@ -634,7 +634,7 @@ const DJTableShowcase = () => {
                 transition={{ delay: index * 0.05 }}
                 className="p-8 bg-muted/10 backdrop-blur-sm border border-border/20 hover:border-apex-glow/30 transition-all group relative"
               >
-                <AALCornerAccent position="tl" />
+                <PrecisionCornerAccent position="tl" />
                 <feature.icon className="w-8 h-8 text-muted-foreground group-hover:text-apex-glow transition-colors mb-6" />
                 <h3 className="text-lg font-light mb-3">{feature.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
