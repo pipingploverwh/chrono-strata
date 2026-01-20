@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Check, Droplets, Wind, Shield, Loader2, Zap, Map, Clock, Activity, Anchor, Snowflake, Sun, Building2, ChevronLeft, ChevronRight, Infinity, Users, Gift, Thermometer } from "lucide-react";
+import { ShoppingBag, Check, Droplets, Wind, Shield, Loader2, Zap, Map, Clock, Activity, Anchor, Snowflake, Sun, Building2, ChevronLeft, ChevronRight, Infinity, Users, Gift, Thermometer, AlertTriangle, ArrowRight, Lock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -24,7 +24,7 @@ const TERRAIN_VARIANTS_BASE = [
     id: 'standard',
     nameKey: 'terrain.chronoTopo.name',
     descriptionKey: 'terrain.chronoTopo.description',
-    strataZone: 'Default',
+    strataZoneKey: 'zone.default',
     coordinates: { lat: 0, lon: 0 },
     image: strataShellHUD,
     color: 'strata-orange',
@@ -35,7 +35,7 @@ const TERRAIN_VARIANTS_BASE = [
     id: 'marine',
     nameKey: 'terrain.bathymetric.name',
     descriptionKey: 'terrain.bathymetric.description',
-    strataZone: 'Pacific Marine',
+    strataZoneKey: 'zone.pacificMarine',
     coordinates: { lat: -36.8485, lon: 174.7633 },
     image: strataShellMarine,
     color: 'cyan-400',
@@ -46,7 +46,7 @@ const TERRAIN_VARIANTS_BASE = [
     id: 'polar',
     nameKey: 'terrain.glacial.name',
     descriptionKey: 'terrain.glacial.description',
-    strataZone: 'Tromsø Arctic',
+    strataZoneKey: 'zone.tromsoArctic',
     coordinates: { lat: 69.6496, lon: 18.9560 },
     image: strataShellPolar,
     color: 'blue-300',
@@ -57,7 +57,7 @@ const TERRAIN_VARIANTS_BASE = [
     id: 'desert',
     nameKey: 'terrain.geological.name',
     descriptionKey: 'terrain.geological.description',
-    strataZone: 'Sahara Interior',
+    strataZoneKey: 'zone.saharaInterior',
     coordinates: { lat: 33.8869, lon: 9.5375 },
     image: strataShellDesert,
     color: 'orange-500',
@@ -68,7 +68,7 @@ const TERRAIN_VARIANTS_BASE = [
     id: 'urban',
     nameKey: 'terrain.metropolitan.name',
     descriptionKey: 'terrain.metropolitan.description',
-    strataZone: 'Tokyo Metropolis',
+    strataZoneKey: 'zone.tokyoMetropolis',
     coordinates: { lat: 35.6762, lon: 139.6503 },
     image: strataShellUrban,
     color: 'violet-400',
@@ -98,13 +98,16 @@ const STRATA_BOND = {
   yearsIncluded: 100,
 };
 
-// Technical specifications
-const EQUIPMENT_SPECS = {
-  membrane: { label: 'MEMBRANE', value: 'PU/TPU Hybrid', description: 'Vulcanized barrier film' },
-  hydrostatic: { label: 'HYDROSTATIC', value: '15,000mm', description: 'Heat-sealed seams' },
-  hud: { label: 'HUD DISPLAY', value: 'Active', description: 'Chronometer + Terrain' },
-  weight: { label: 'UNIT WEIGHT', value: '420g', description: 'Mission-ready' },
-};
+// Technical specifications keys for translation
+const EQUIPMENT_SPECS_KEYS = [
+  { key: 'membrane', labelKey: 'spec.membrane', valueKey: 'spec.membrane.value', descKey: 'spec.membrane.desc' },
+  { key: 'hydrostatic', labelKey: 'spec.hydrostatic', valueKey: 'spec.hydrostatic.value', descKey: 'spec.hydrostatic.desc' },
+  { key: 'hud', labelKey: 'spec.hud', valueKey: 'spec.hud.value', descKey: 'spec.hud.desc' },
+  { key: 'weight', labelKey: 'spec.weight', valueKey: 'spec.weight.value', descKey: 'spec.weight.desc' },
+];
+
+// Acquisition flow steps
+type AcquisitionStep = 'idle' | 'terrain' | 'verify' | 'execute';
 
 // Live clock component
 const LiveClock = () => {
@@ -160,12 +163,14 @@ const Shop = () => {
     ...variant,
     name: t(variant.nameKey),
     description: t(variant.descriptionKey),
+    strataZone: t(variant.strataZoneKey),
   }));
   
   const [selectedTerrainId, setSelectedTerrainId] = useState(TERRAIN_VARIANTS_BASE[0].id);
   const [isProcessing, setIsProcessing] = useState(false);
   const [systemStatus, setSystemStatus] = useState('NOMINAL');
   const [selectedPaymentMode, setSelectedPaymentMode] = useState<'annual' | 'bond'>('annual');
+  const [acquisitionStep, setAcquisitionStep] = useState<AcquisitionStep>('idle');
   
   // Get the selected terrain with translations
   const selectedTerrain = TERRAIN_VARIANTS.find(v => v.id === selectedTerrainId) || TERRAIN_VARIANTS[0];
@@ -625,20 +630,20 @@ const Shop = () => {
                   </span>
                 </div>
                 
-                {Object.entries(EQUIPMENT_SPECS).map(([key, spec]) => (
+                {EQUIPMENT_SPECS_KEYS.map((spec) => (
                   <div 
-                    key={key}
+                    key={spec.key}
                     className="flex items-center justify-between p-3 bg-strata-charcoal/30 border border-strata-steel/20 rounded"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-1.5 h-1.5 bg-strata-orange/60" />
                       <span className="font-mono text-[10px] text-strata-silver/60 uppercase tracking-wider">
-                        {spec.label}
+                        {t(spec.labelKey)}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="font-mono text-sm text-strata-white">{spec.value}</span>
-                      <p className="font-mono text-[9px] text-strata-silver/40">{spec.description}</p>
+                      <span className="font-mono text-sm text-strata-white">{t(spec.valueKey)}</span>
+                      <p className="font-mono text-[9px] text-strata-silver/40">{t(spec.descKey)}</p>
                     </div>
                   </div>
                 ))}
@@ -668,34 +673,267 @@ const Shop = () => {
                 ))}
               </div>
 
-              {/* Subscribe Button */}
-              <Button
-                onClick={handleSubscribe}
-                disabled={isProcessing}
-                size="lg"
-                className={`w-full py-6 text-sm font-mono uppercase tracking-[0.2em] transition-all ${
-                  selectedPaymentMode === 'bond' 
-                    ? 'bg-strata-lume hover:bg-strata-lume/90 text-strata-black' 
-                    : 'bg-strata-orange hover:bg-strata-orange/90 text-strata-black'
-                }`}
-              >
-                {isProcessing ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-3 animate-spin" />
-                    {t('shop.initiating')}
-                  </>
-                ) : selectedPaymentMode === 'bond' ? (
-                  <>
-                    <Gift className="w-4 h-4 mr-3" />
-                    {t('shop.secureBond')} — ${STRATA_BOND.price.toLocaleString()}
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBag className="w-4 h-4 mr-3" />
-                    {t('shop.activateTerrain')} {selectedTerrain.name} — ${STRATA_OWNERSHIP.price}{t('shop.perYear')}
-                  </>
-                )}
-              </Button>
+              {/* TACTICAL ACQUISITION FLOW */}
+              <div className="space-y-4">
+                {/* Main CTA - INITIATE ACQUISITION */}
+                <AnimatePresence mode="wait">
+                  {acquisitionStep === 'idle' && (
+                    <motion.button
+                      key="initiate"
+                      onClick={() => setAcquisitionStep('terrain')}
+                      className="w-full relative overflow-hidden group"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      {/* Safety Orange background with warning stripes */}
+                      <div className="absolute inset-0 bg-orange-500" />
+                      <div className="absolute inset-0 opacity-20" style={{
+                        backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.3) 10px, rgba(0,0,0,0.3) 20px)'
+                      }} />
+                      
+                      {/* Content */}
+                      <div className="relative py-5 px-6 flex items-center justify-center gap-4">
+                        <AlertTriangle className="w-5 h-5 text-black animate-pulse" />
+                        <span className="text-lg font-mono font-black uppercase tracking-[0.3em] text-black">
+                          {t('acquisition.initiate')}
+                        </span>
+                        <AlertTriangle className="w-5 h-5 text-black animate-pulse" />
+                      </div>
+                      
+                      {/* Hover effect - glow */}
+                      <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
+                      
+                      {/* Border effect */}
+                      <div className="absolute inset-0 border-4 border-black/40" />
+                    </motion.button>
+                  )}
+
+                  {/* Step 1: Confirm Terrain */}
+                  {acquisitionStep === 'terrain' && (
+                    <motion.div
+                      key="terrain-step"
+                      className="border-2 border-orange-500 bg-strata-black p-4 space-y-4"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                    >
+                      {/* Header */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+                          <span className="font-mono text-[10px] text-orange-500 uppercase tracking-[0.3em]">
+                            {t('acquisition.launchSequence')} — 1/3
+                          </span>
+                        </div>
+                        <button 
+                          onClick={() => setAcquisitionStep('idle')}
+                          className="p-1 hover:bg-strata-steel/20 rounded transition-colors"
+                        >
+                          <X className="w-4 h-4 text-strata-silver/60" />
+                        </button>
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="py-3 border-y border-strata-steel/30">
+                        <p className="font-mono text-xs text-strata-silver uppercase tracking-wider mb-3">
+                          {t('acquisition.step1')}
+                        </p>
+                        <div className={`flex items-center gap-3 p-3 bg-${selectedTerrain.color}/10 border border-${selectedTerrain.color}/40 rounded`}>
+                          <TerrainIcon className={`w-5 h-5 text-${selectedTerrain.color}`} />
+                          <div>
+                            <p className={`text-${selectedTerrain.color} font-mono font-semibold`}>{selectedTerrain.name}</p>
+                            <p className="text-strata-silver/60 font-mono text-[10px]">{selectedTerrain.strataZone}</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Actions */}
+                      <div className="flex items-center gap-3">
+                        <button 
+                          onClick={() => setAcquisitionStep('idle')}
+                          className="flex-1 py-3 border border-strata-steel/40 text-strata-silver font-mono text-xs uppercase tracking-wider hover:bg-strata-steel/10 transition-colors"
+                        >
+                          {t('acquisition.abort')}
+                        </button>
+                        <button 
+                          onClick={() => setAcquisitionStep('verify')}
+                          className="flex-1 py-3 bg-orange-500 text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-orange-400 transition-colors flex items-center justify-center gap-2"
+                        >
+                          <Lock className="w-3 h-3" />
+                          {t('acquisition.confirm')}
+                          <ArrowRight className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Step 2: Verify Strata ID */}
+                  {acquisitionStep === 'verify' && (
+                    <motion.div
+                      key="verify-step"
+                      className="border-2 border-strata-cyan bg-strata-black p-4 space-y-4"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                    >
+                      {/* Header */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-2 h-2 rounded-full bg-strata-cyan animate-pulse" />
+                          <span className="font-mono text-[10px] text-strata-cyan uppercase tracking-[0.3em]">
+                            {t('acquisition.launchSequence')} — 2/3
+                          </span>
+                        </div>
+                        <button 
+                          onClick={() => setAcquisitionStep('idle')}
+                          className="p-1 hover:bg-strata-steel/20 rounded transition-colors"
+                        >
+                          <X className="w-4 h-4 text-strata-silver/60" />
+                        </button>
+                      </div>
+                      
+                      {/* Terrain Locked Indicator */}
+                      <div className="flex items-center gap-2 px-3 py-2 bg-strata-lume/10 border border-strata-lume/30 rounded">
+                        <Check className="w-4 h-4 text-strata-lume" />
+                        <span className="font-mono text-[10px] text-strata-lume uppercase tracking-wider">
+                          {t('acquisition.terrainLocked')}: {selectedTerrain.name}
+                        </span>
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="py-3 border-y border-strata-steel/30">
+                        <p className="font-mono text-xs text-strata-silver uppercase tracking-wider mb-3">
+                          {t('acquisition.step2')}
+                        </p>
+                        <div className="flex items-center gap-3 p-3 bg-strata-cyan/10 border border-strata-cyan/40 rounded">
+                          <Shield className="w-5 h-5 text-strata-cyan" />
+                          <div>
+                            <p className="text-strata-cyan font-mono font-semibold">
+                              {selectedPaymentMode === 'bond' ? t('shop.strataBond') : t('shop.annual')}
+                            </p>
+                            <p className="text-strata-silver/60 font-mono text-[10px]">
+                              {selectedPaymentMode === 'bond' 
+                                ? `$${STRATA_BOND.price.toLocaleString()} — 100 ${t('shop.yearsOwnership')}`
+                                : `$${STRATA_OWNERSHIP.price}${t('shop.perYear')}`
+                              }
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Actions */}
+                      <div className="flex items-center gap-3">
+                        <button 
+                          onClick={() => setAcquisitionStep('terrain')}
+                          className="flex-1 py-3 border border-strata-steel/40 text-strata-silver font-mono text-xs uppercase tracking-wider hover:bg-strata-steel/10 transition-colors"
+                        >
+                          {t('acquisition.abort')}
+                        </button>
+                        <button 
+                          onClick={() => setAcquisitionStep('execute')}
+                          className="flex-1 py-3 bg-strata-cyan text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-strata-cyan/90 transition-colors flex items-center justify-center gap-2"
+                        >
+                          <Check className="w-3 h-3" />
+                          {t('acquisition.proceed')}
+                          <ArrowRight className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Step 3: Execute Payment */}
+                  {acquisitionStep === 'execute' && (
+                    <motion.div
+                      key="execute-step"
+                      className="border-2 border-strata-lume bg-strata-black p-4 space-y-4"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                    >
+                      {/* Header */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-2 h-2 rounded-full bg-strata-lume animate-pulse" />
+                          <span className="font-mono text-[10px] text-strata-lume uppercase tracking-[0.3em]">
+                            {t('acquisition.launchSequence')} — 3/3
+                          </span>
+                        </div>
+                        <button 
+                          onClick={() => setAcquisitionStep('idle')}
+                          className="p-1 hover:bg-strata-steel/20 rounded transition-colors"
+                        >
+                          <X className="w-4 h-4 text-strata-silver/60" />
+                        </button>
+                      </div>
+                      
+                      {/* Status Indicators */}
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 px-3 py-2 bg-strata-lume/10 border border-strata-lume/30 rounded">
+                          <Check className="w-4 h-4 text-strata-lume" />
+                          <span className="font-mono text-[10px] text-strata-lume uppercase tracking-wider">
+                            {t('acquisition.terrainLocked')}: {selectedTerrain.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 px-3 py-2 bg-strata-lume/10 border border-strata-lume/30 rounded">
+                          <Check className="w-4 h-4 text-strata-lume" />
+                          <span className="font-mono text-[10px] text-strata-lume uppercase tracking-wider">
+                            {t('acquisition.idVerified')}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="py-3 border-y border-strata-steel/30">
+                        <p className="font-mono text-xs text-strata-silver uppercase tracking-wider mb-3">
+                          {t('acquisition.step3')}
+                        </p>
+                        <div className="text-center py-2">
+                          <p className="text-strata-lume font-mono text-2xl font-bold">
+                            {selectedPaymentMode === 'bond' 
+                              ? `$${STRATA_BOND.price.toLocaleString()}`
+                              : `$${STRATA_OWNERSHIP.price}${t('shop.perYear')}`
+                            }
+                          </p>
+                          <p className="text-strata-silver/60 font-mono text-[10px] mt-1">
+                            {t('acquisition.systemArmed')}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Actions */}
+                      <div className="flex items-center gap-3">
+                        <button 
+                          onClick={() => setAcquisitionStep('idle')}
+                          className="flex-1 py-3 border border-strata-steel/40 text-strata-silver font-mono text-xs uppercase tracking-wider hover:bg-strata-steel/10 transition-colors"
+                        >
+                          {t('acquisition.abort')}
+                        </button>
+                        <button 
+                          onClick={() => {
+                            handleSubscribe();
+                            setAcquisitionStep('idle');
+                          }}
+                          disabled={isProcessing}
+                          className="flex-1 py-3 bg-strata-lume text-black font-mono text-xs font-black uppercase tracking-wider hover:bg-strata-lume/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                          {isProcessing ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              {t('shop.initiating')}
+                            </>
+                          ) : (
+                            <>
+                              <Zap className="w-4 h-4" />
+                              {t('acquisition.execute')}
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
 
               {/* Trust signals */}
               <div className="flex items-center justify-center gap-4 text-strata-silver/40 text-[9px] font-mono uppercase tracking-wider">
