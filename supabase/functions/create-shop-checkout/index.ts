@@ -18,6 +18,10 @@ const STRATA_BOND_YEARS = 100;
 const TACTICAL_PROVISION_FULL_PRICE = 1800000; // cents ($18,000)
 const TACTICAL_PROVISION_DEPOSIT = 180000; // cents ($1,800 = 10% deposit)
 
+// KIDS SHELL - $148/year - Polar Junior
+const KIDS_SHELL_PRICE_ID = "price_1SriqHPxsKYUGDko5fyfF7re";
+const KIDS_SHELL_PRICE = 14800; // cents ($148)
+
 const logStep = (step: string, details?: Record<string, unknown>) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[SHOP-CHECKOUT] ${step}${detailsStr}`);
@@ -37,11 +41,12 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const { mode, priceType, terrainVariant, strataZone, coordinates, legacyYears } = await req.json();
-    logStep("Request received", { mode, priceType, terrainVariant, strataZone, coordinates, legacyYears });
+    const { mode, priceType, terrainVariant, strataZone, coordinates, legacyYears, size } = await req.json();
+    logStep("Request received", { mode, priceType, terrainVariant, strataZone, coordinates, legacyYears, size });
 
     const isBond = priceType === 'strata_bond';
     const isTactical = priceType === 'tactical_provision';
+    const isKidsShell = priceType === 'kids_shell';
 
     // Initialize Stripe
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
@@ -76,13 +81,17 @@ serve(async (req) => {
 
     // Build checkout session metadata
     const metadata: Record<string, string> = {
-      product: isTactical ? "tactical_provision" : isBond ? "strata_bond" : "strata_ownership",
-      type: isTactical ? "physical_deposit" : isBond ? "century_bond" : "annual_subscription",
+      product: isKidsShell ? "kids_shell" : isTactical ? "tactical_provision" : isBond ? "strata_bond" : "strata_ownership",
+      type: isKidsShell ? "kids_annual_subscription" : isTactical ? "physical_deposit" : isBond ? "century_bond" : "annual_subscription",
       terrain_variant: terrainVariant || "standard",
       strata_zone: strataZone || "Default",
       coordinates_lat: coordinates?.lat?.toString() || "0",
       coordinates_lon: coordinates?.lon?.toString() || "0",
       legacy_years: (legacyYears || STRATA_BOND_YEARS).toString(),
+      ...(isKidsShell && {
+        size: size || "S (6-7)",
+        collection: "junior",
+      }),
       ...(isTactical && {
         full_price: (TACTICAL_PROVISION_FULL_PRICE / 100).toString(),
         deposit_amount: (TACTICAL_PROVISION_DEPOSIT / 100).toString(),
@@ -92,7 +101,29 @@ serve(async (req) => {
 
     let sessionParams: Stripe.Checkout.SessionCreateParams;
 
-    if (isTactical) {
+    if (isKidsShell) {
+      // KIDS SHELL - $148/year subscription
+      sessionParams = {
+        line_items: [
+          {
+            price: KIDS_SHELL_PRICE_ID,
+            quantity: 1,
+          },
+        ],
+        mode: "subscription",
+        success_url: `${origin}/shop-success?kids=true&size=${encodeURIComponent(size || 'S')}&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/kids?canceled=true`,
+        metadata,
+        subscription_data: {
+          metadata,
+          description: `STRATA Shell - Polar Junior (${size || 'S (6-7)'})`,
+        },
+        shipping_address_collection: {
+          allowed_countries: ['US', 'CA', 'GB', 'JP', 'DE', 'FR', 'IT', 'AU'],
+        },
+      };
+      logStep("Creating KIDS SHELL checkout", { price: KIDS_SHELL_PRICE, size, mode: "subscription" });
+    } else if (isTactical) {
       // TACTICAL PROVISION - $1,800 deposit for $18,000 physical jacket
       sessionParams = {
         line_items: [
