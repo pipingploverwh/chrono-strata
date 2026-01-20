@@ -60,6 +60,7 @@ import AIShowcase from "./pages/AIShowcase";
 import TalentRecruitment from "./pages/TalentRecruitment";
 import ProjectSummary from "./pages/ProjectSummary";
 import ExecutiveSummary from "./pages/ExecutiveSummary";
+import PilotInterestTracker from "./pages/PilotInterestTracker";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -112,6 +113,7 @@ const App = () => (
                 <Route path="/careers" element={<TalentRecruitment />} />
                 <Route path="/summary" element={<ProjectSummary />} />
                 <Route path="/exec" element={<ExecutiveSummary />} />
+                <Route path="/pilot" element={<PilotInterestTracker />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />

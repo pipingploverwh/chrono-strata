@@ -128,6 +128,66 @@ export type Database = {
         }
         Relationships: []
       }
+      pilot_applications: {
+        Row: {
+          budget_range: string | null
+          company_name: string
+          company_size: string
+          contact_email: string
+          contact_name: string
+          contact_title: string | null
+          created_at: string
+          current_solution: string | null
+          desired_timeline: string
+          id: string
+          industry: string
+          notes: string | null
+          priority: string | null
+          status: string | null
+          updated_at: string
+          use_case: string
+          use_case_details: string | null
+        }
+        Insert: {
+          budget_range?: string | null
+          company_name: string
+          company_size: string
+          contact_email: string
+          contact_name: string
+          contact_title?: string | null
+          created_at?: string
+          current_solution?: string | null
+          desired_timeline: string
+          id?: string
+          industry: string
+          notes?: string | null
+          priority?: string | null
+          status?: string | null
+          updated_at?: string
+          use_case: string
+          use_case_details?: string | null
+        }
+        Update: {
+          budget_range?: string | null
+          company_name?: string
+          company_size?: string
+          contact_email?: string
+          contact_name?: string
+          contact_title?: string | null
+          created_at?: string
+          current_solution?: string | null
+          desired_timeline?: string
+          id?: string
+          industry?: string
+          notes?: string | null
+          priority?: string | null
+          status?: string | null
+          updated_at?: string
+          use_case?: string
+          use_case_details?: string | null
+        }
+        Relationships: []
+      }
       scheduled_emails: {
         Row: {
           created_at: string
