@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Check, Droplets, Wind, Shield, Loader2, Zap, Map, Clock, Activity, Anchor, Snowflake, Sun, Building2, ChevronLeft, ChevronRight, Infinity, Users, Gift, Thermometer, AlertTriangle, ArrowRight, Lock, X, Fingerprint } from "lucide-react";
+import { ShoppingBag, Check, Droplets, Wind, Shield, Loader2, Zap, Map, Clock, Activity, Anchor, Snowflake, Sun, Building2, ChevronLeft, ChevronRight, Infinity, Users, Gift, Thermometer, AlertTriangle, ArrowRight, Lock, X, Fingerprint, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -80,7 +80,7 @@ const TERRAIN_VARIANTS_BASE = [
   },
 ];
 
-// Strata Ownership - 100 Year Legacy Program
+// Strata Ownership - 100 Year Legacy Program (Level 1: $176/yr)
 const STRATA_OWNERSHIP = {
   name: 'STRATA OWNERSHIP',
   subtitle: 'Century Protocol — 100 Years of Ownership',
@@ -91,7 +91,7 @@ const STRATA_OWNERSHIP = {
   legacyYears: 100,
 };
 
-// STRATA Bond - Upfront generational payment
+// STRATA Bond - Upfront generational payment (Level 2: $12,500)
 const STRATA_BOND = {
   name: 'STRATA BOND',
   subtitle: 'Generational Prepaid Access',
@@ -99,6 +99,18 @@ const STRATA_BOND = {
   description: 'Secure 100 years of STRATA ownership upfront. Transfer to children, heirs, or designees. One payment. One century.',
   savings: 'Save $5,100 vs annual',
   yearsIncluded: 100,
+};
+
+// TACTICAL PROVISION - Physical Pre-Order (Level 3: $18,000 with $1,800 deposit)
+const TACTICAL_PROVISION = {
+  name: 'TACTICAL PROVISION',
+  subtitle: 'Physical Rain Shell — Manufacturing Allocation',
+  fullPrice: 18000,
+  depositPrice: 1800,
+  depositPercent: 10,
+  description: 'Secure your physical STRATA shell. $1,800 deposit (10%) locks your manufacturing slot. Balance due upon fabrication completion.',
+  status: 'Allocated / Manufacturing Pending',
+  leadTime: '8-12 weeks',
 };
 
 // Technical specifications keys for translation
@@ -111,6 +123,9 @@ const EQUIPMENT_SPECS_KEYS = [
 
 // Acquisition flow steps
 type AcquisitionStep = 'idle' | 'terrain' | 'verify' | 'execute';
+
+// Payment mode types - sorted by commitment level
+type PaymentMode = 'annual' | 'bond' | 'tactical';
 
 // Live clock component
 const LiveClock = () => {
@@ -172,7 +187,7 @@ const Shop = () => {
   const [selectedTerrainId, setSelectedTerrainId] = useState(TERRAIN_VARIANTS_BASE[0].id);
   const [isProcessing, setIsProcessing] = useState(false);
   const [systemStatus, setSystemStatus] = useState('NOMINAL');
-  const [selectedPaymentMode, setSelectedPaymentMode] = useState<'annual' | 'bond'>('annual');
+  const [selectedPaymentMode, setSelectedPaymentMode] = useState<'annual' | 'bond' | 'tactical'>('annual');
   const [acquisitionStep, setAcquisitionStep] = useState<AcquisitionStep>('idle');
   const [isTerrainTransitioning, setIsTerrainTransitioning] = useState(false);
   const [isBondHovered, setIsBondHovered] = useState(false);
@@ -250,10 +265,25 @@ const Shop = () => {
     setSystemStatus('INITIATING');
     
     try {
+      const getPriceType = () => {
+        switch (selectedPaymentMode) {
+          case 'tactical': return 'tactical_provision';
+          case 'bond': return 'strata_bond';
+          default: return 'strata_ownership';
+        }
+      };
+      
+      const getMode = () => {
+        // Tactical uses payment mode for deposit
+        // Bond uses payment mode for one-time
+        // Annual uses subscription mode
+        return selectedPaymentMode === 'annual' ? 'subscription' : 'payment';
+      };
+      
       const { data, error } = await supabase.functions.invoke('create-shop-checkout', {
         body: { 
-          mode: selectedPaymentMode === 'bond' ? 'payment' : 'subscription',
-          priceType: selectedPaymentMode === 'bond' ? 'strata_bond' : 'strata_ownership',
+          mode: getMode(),
+          priceType: getPriceType(),
           terrainVariant: selectedTerrain.id,
           strataZone: selectedTerrain.strataZone,
           coordinates: selectedTerrain.coordinates,
@@ -280,6 +310,15 @@ const Shop = () => {
     }
   };
 
+  // Calculate price for AcquisitionRitual
+  const getCurrentPrice = () => {
+    switch (selectedPaymentMode) {
+      case 'tactical': return TACTICAL_PROVISION.fullPrice;
+      case 'bond': return STRATA_BOND.price;
+      default: return STRATA_OWNERSHIP.price;
+    }
+  };
+
   const TerrainIcon = selectedTerrain.icon;
 
   return (
@@ -296,7 +335,9 @@ const Shop = () => {
           color: selectedTerrain.color,
         }}
         paymentMode={selectedPaymentMode}
-        price={selectedPaymentMode === 'bond' ? STRATA_BOND.price : STRATA_OWNERSHIP.price}
+        price={getCurrentPrice()}
+        depositPrice={selectedPaymentMode === 'tactical' ? TACTICAL_PROVISION.depositPrice : undefined}
+        isDeposit={selectedPaymentMode === 'tactical'}
       />
       
       {/* CAD Grid overlay */}
@@ -636,6 +677,58 @@ const Shop = () => {
                     <Users className={`w-3 h-3 ${selectedPaymentMode === 'bond' ? 'text-strata-lume/80' : 'text-strata-silver/40'}`} />
                     <span className={`font-mono text-[9px] ${selectedPaymentMode === 'bond' ? 'text-strata-lume/80' : 'text-strata-silver/40'}`}>
                       {t('shop.transferable')}
+                    </span>
+                  </div>
+                </button>
+                
+                {/* TACTICAL PROVISION Option - Physical Pre-Order */}
+                <button
+                  onClick={() => setSelectedPaymentMode('tactical')}
+                  className={`w-full text-left border rounded-lg p-4 transition-all ${
+                    selectedPaymentMode === 'tactical'
+                      ? 'border-strata-orange bg-strata-orange/10 ring-2 ring-strata-orange/30'
+                      : 'border-strata-steel/30 bg-strata-charcoal/20 hover:border-strata-steel/50'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Package className={`w-4 h-4 ${selectedPaymentMode === 'tactical' ? 'text-strata-orange' : 'text-strata-silver/60'}`} />
+                      <span className={`font-mono text-sm uppercase tracking-wider ${selectedPaymentMode === 'tactical' ? 'text-strata-orange' : 'text-strata-silver'}`}>
+                        {t('shop.tacticalProvision')}
+                      </span>
+                      <Badge className="bg-strata-orange/20 text-strata-orange border-strata-orange/30 font-mono text-[8px] px-1.5 py-0">
+                        {t('shop.physical')}
+                      </Badge>
+                    </div>
+                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                      selectedPaymentMode === 'tactical' ? 'border-strata-orange' : 'border-strata-steel/50'
+                    }`}>
+                      {selectedPaymentMode === 'tactical' && <div className="w-2 h-2 rounded-full bg-strata-orange" />}
+                    </div>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className={`text-3xl font-mono ${selectedPaymentMode === 'tactical' ? 'text-strata-white' : 'text-strata-silver'}`}>
+                      ${TACTICAL_PROVISION.fullPrice.toLocaleString()}
+                    </span>
+                    <span className="text-strata-silver/60 font-mono text-xs">{t('shop.physicalShell')}</span>
+                  </div>
+                  <div className="mt-2 p-2 bg-strata-steel/10 border border-strata-steel/20 rounded">
+                    <div className="flex items-center justify-between">
+                      <span className={`font-mono text-[10px] uppercase tracking-wider ${selectedPaymentMode === 'tactical' ? 'text-strata-orange' : 'text-strata-silver/60'}`}>
+                        {t('shop.depositToday')}
+                      </span>
+                      <span className={`font-mono text-lg font-bold ${selectedPaymentMode === 'tactical' ? 'text-strata-white' : 'text-strata-silver'}`}>
+                        ${TACTICAL_PROVISION.depositPrice.toLocaleString()}
+                      </span>
+                    </div>
+                    <p className="text-strata-silver/40 font-mono text-[9px] mt-1">
+                      {TACTICAL_PROVISION.depositPercent}% {t('shop.depositNote')} — {t('shop.balanceDue')}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 mt-2 pt-2 border-t border-strata-steel/20">
+                    <Clock className={`w-3 h-3 ${selectedPaymentMode === 'tactical' ? 'text-strata-orange/80' : 'text-strata-silver/40'}`} />
+                    <span className={`font-mono text-[9px] ${selectedPaymentMode === 'tactical' ? 'text-strata-orange/80' : 'text-strata-silver/40'}`}>
+                      {t('shop.leadTimeLabel')}: {TACTICAL_PROVISION.leadTime}
                     </span>
                   </div>
                 </button>
