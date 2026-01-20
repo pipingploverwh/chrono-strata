@@ -44,7 +44,7 @@ import LinkedInCEOPage from "./pages/LinkedInCEOPage";
 import ShibuyaStartup from "./pages/ShibuyaStartup";
 import OdooTransferPortal from "./pages/OdooTransferPortal";
 import ScreenshotTools from "./pages/ScreenshotTools";
-import WellfleetDispensary from "./pages/WellfleetDispensary";
+
 import AllocationCheckout from "./pages/AllocationCheckout";
 import AllocationSuccess from "./pages/AllocationSuccess";
 import AllocationCanceled from "./pages/AllocationCanceled";
@@ -106,7 +106,7 @@ const App = () => (
                 <Route path="/linkedin-company" element={<LinkedInCompanyPage />} />
                 <Route path="/linkedin-ceo" element={<LinkedInCEOPage />} />
                 <Route path="/shibuya" element={<ShibuyaStartup />} />
-                <Route path="/wellfleet" element={<WellfleetDispensary />} />
+                
                 <Route path="/allocation-checkout" element={<AllocationCheckout />} />
                 <Route path="/allocation-success" element={<AllocationSuccess />} />
                 <Route path="/allocation-canceled" element={<AllocationCanceled />} />

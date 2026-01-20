@@ -129,16 +129,6 @@ const AI_FEATURES: AIFeature[] = [
     link: '/kraft-harmony'
   },
   {
-    id: 'plover',
-    name: 'Plover Guide',
-    description: 'AI-powered dispensary assistant with local Cape Cod charm.',
-    icon: Brain,
-    model: 'gemini-3-flash',
-    edgeFunction: 'plover-guide',
-    demoType: 'chat',
-    link: '/wellfleet'
-  },
-  {
     id: 'predictions',
     name: 'Game Predictions',
     description: 'Real-time sports predictions based on game state and weather.',
