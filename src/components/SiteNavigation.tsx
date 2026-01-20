@@ -24,13 +24,6 @@ const navItems: NavItem[] = [
   category: "main",
   isPublic: true
 }, {
-  path: "/vc",
-  label: "Investor Summary",
-  description: "VC Investment Overview",
-  icon: Activity,
-  category: "main",
-  isPublic: true
-}, {
   path: "/strata",
   label: "STRATA Instrument",
   description: "Core Weather Intelligence Dashboard",
@@ -117,13 +110,6 @@ const navItems: NavItem[] = [
   description: "Complete Navigation Index",
   icon: Map,
   category: "system",
-  isPublic: true
-}, {
-  path: "/shibuya",
-  label: "渋谷 Shibuya",
-  description: "Startup Visa Landing Page",
-  icon: Building2,
-  category: "main",
   isPublic: true
 }];
 
