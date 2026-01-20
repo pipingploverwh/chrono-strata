@@ -13,7 +13,12 @@ import {
   Globe,
   Radio,
   ChevronRight,
-  Infinity
+  Infinity as InfinityIcon,
+  Star,
+  Heart,
+  Sparkles,
+  CloudRain,
+  Sun
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -24,6 +29,7 @@ import strataShellMarine from "@/assets/strata-shell-marine.jpg";
 import strataShellPolar from "@/assets/strata-shell-polar.jpg";
 import strataShellDesert from "@/assets/strata-shell-desert.jpg";
 import strataShellUrban from "@/assets/strata-shell-urban.jpg";
+import kidsStrataShellWhite from "@/assets/kids-strata-shell-white.jpg";
 
 const TERRAIN_IMAGES: Record<string, string> = {
   standard: strataShellHUD,
@@ -31,6 +37,7 @@ const TERRAIN_IMAGES: Record<string, string> = {
   polar: strataShellPolar,
   desert: strataShellDesert,
   urban: strataShellUrban,
+  polar_junior: kidsStrataShellWhite,
 };
 
 // Onboarding steps
@@ -44,7 +51,9 @@ const ShopSuccess = () => {
   const sessionId = searchParams.get('session_id');
   const isBond = searchParams.get('bond') === 'true';
   const isTactical = searchParams.get('tactical') === 'true';
-  const terrainId = searchParams.get('terrain') || 'standard';
+  const isKidsShell = searchParams.get('kids') === 'true';
+  const selectedSize = searchParams.get('size') || 'M';
+  const terrainId = searchParams.get('terrain') || (isKidsShell ? 'polar_junior' : 'standard');
   
   const [currentStep, setCurrentStep] = useState<OnboardingStep>('certificate');
   const [progress, setProgress] = useState(0);
@@ -86,6 +95,228 @@ const ShopSuccess = () => {
   };
 
   const terrainImage = TERRAIN_IMAGES[terrainId] || TERRAIN_IMAGES.standard;
+
+  // Kids Shell specific flow
+  if (isKidsShell) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-lavender-50 to-white relative overflow-hidden">
+        {/* Floating sparkles background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(12)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute"
+              initial={{ 
+                x: Math.random() * 100 + '%', 
+                y: '100%',
+                opacity: 0.3,
+                scale: 0.5
+              }}
+              animate={{ 
+                y: '-10%',
+                opacity: [0.3, 0.7, 0.3],
+                scale: [0.5, 1, 0.5],
+                rotate: 360
+              }}
+              transition={{ 
+                duration: 8 + Math.random() * 4,
+                repeat: Infinity,
+                delay: Math.random() * 5,
+                ease: "linear"
+              }}
+            >
+              <Sparkles className="w-4 h-4 text-lavender-300" />
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Cloud decorations */}
+        <motion.div 
+          className="absolute top-20 left-10 text-lavender-200"
+          animate={{ x: [0, 20, 0], y: [0, -5, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <CloudRain className="w-16 h-16 opacity-30" />
+        </motion.div>
+        <motion.div 
+          className="absolute top-40 right-16 text-lavender-200"
+          animate={{ x: [0, -15, 0], y: [0, 5, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        >
+          <Sun className="w-12 h-12 opacity-40" />
+        </motion.div>
+
+        <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
+          {/* Success Header */}
+          <motion.div 
+            initial={{ opacity: 0, y: -20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            className="text-center mb-8"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", bounce: 0.6, delay: 0.2 }}
+              className="w-24 h-24 rounded-full bg-gradient-to-br from-lavender-400 to-lavender-500 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-lavender-300/50"
+            >
+              <Star className="w-12 h-12 text-white fill-white" />
+            </motion.div>
+            
+            <motion.h1 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-3xl md:text-4xl font-bold text-lavender-600 mb-3"
+            >
+              🎉 Adventure Awaits! 🎉
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="text-lavender-500 text-lg"
+            >
+              Your Polar Junior shell is on its way!
+            </motion.p>
+          </motion.div>
+
+          {/* Product Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="bg-white rounded-2xl shadow-xl shadow-lavender-200/50 border-2 border-lavender-200 overflow-hidden mb-8"
+          >
+            <div className="p-6 md:p-8">
+              <div className="flex flex-col md:flex-row gap-6 items-center">
+                {/* Product Image */}
+                <div className="w-40 h-40 rounded-xl bg-gradient-to-br from-lavender-50 to-lavender-100 p-3 flex-shrink-0">
+                  <img 
+                    src={kidsStrataShellWhite} 
+                    alt="Polar Junior Shell" 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+
+                {/* Product Details */}
+                <div className="flex-1 text-center md:text-left">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-lavender-100 rounded-full text-lavender-600 text-sm font-medium mb-3">
+                    <Heart className="w-3.5 h-3.5 fill-lavender-400 text-lavender-400" />
+                    Junior Explorer
+                  </div>
+                  <h2 className="text-2xl font-bold text-lavender-700 mb-2">
+                    STRATA Shell — Polar Junior
+                  </h2>
+                  <p className="text-lavender-500 text-sm mb-4">
+                    Ready for rain, shine, and everything in between!
+                  </p>
+                  
+                  <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                    <div className="px-3 py-2 bg-lavender-50 rounded-lg border border-lavender-100">
+                      <div className="text-xs text-lavender-400 uppercase tracking-wide">Size</div>
+                      <div className="text-sm font-semibold text-lavender-600">{selectedSize}</div>
+                    </div>
+                    <div className="px-3 py-2 bg-lavender-50 rounded-lg border border-lavender-100">
+                      <div className="text-xs text-lavender-400 uppercase tracking-wide">Plan</div>
+                      <div className="text-sm font-semibold text-lavender-600">Annual</div>
+                    </div>
+                    <div className="px-3 py-2 bg-lavender-50 rounded-lg border border-lavender-100">
+                      <div className="text-xs text-lavender-400 uppercase tracking-wide">Status</div>
+                      <div className="text-sm font-semibold text-emerald-500">Confirmed ✓</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Fun Facts Strip */}
+            <div className="bg-gradient-to-r from-lavender-100 to-lavender-50 px-6 py-4 border-t border-lavender-200">
+              <div className="flex items-center justify-center gap-6 text-sm">
+                <div className="flex items-center gap-2 text-lavender-600">
+                  <CloudRain className="w-4 h-4" />
+                  <span>Waterproof</span>
+                </div>
+                <div className="w-1 h-1 rounded-full bg-lavender-300" />
+                <div className="flex items-center gap-2 text-lavender-600">
+                  <Sun className="w-4 h-4" />
+                  <span>UV Protected</span>
+                </div>
+                <div className="w-1 h-1 rounded-full bg-lavender-300" />
+                <div className="flex items-center gap-2 text-lavender-600">
+                  <Sparkles className="w-4 h-4" />
+                  <span>Adventure Ready</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Next Steps */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="bg-white rounded-2xl shadow-lg shadow-lavender-100/50 border border-lavender-100 p-6 mb-8"
+          >
+            <h3 className="text-lg font-semibold text-lavender-700 mb-4 flex items-center gap-2">
+              <Clock className="w-5 h-5 text-lavender-500" />
+              What Happens Next?
+            </h3>
+            <div className="space-y-3">
+              {[
+                { icon: "📧", text: "Confirmation email is on its way!" },
+                { icon: "📦", text: "Your shell ships within 5-7 business days" },
+                { icon: "🌈", text: "Track adventures in the STRATA app" },
+              ].map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.9 + index * 0.1 }}
+                  className="flex items-center gap-3 p-3 bg-lavender-50 rounded-xl"
+                >
+                  <span className="text-2xl">{item.icon}</span>
+                  <span className="text-lavender-600">{item.text}</span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Action Buttons */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
+            <Button 
+              onClick={() => navigate('/kids')}
+              variant="outline"
+              className="border-lavender-300 text-lavender-600 hover:bg-lavender-50 rounded-xl px-6 py-3"
+            >
+              Back to Kids Collection
+            </Button>
+            <Button 
+              onClick={() => navigate('/shop')}
+              className="bg-gradient-to-r from-lavender-500 to-lavender-600 hover:from-lavender-600 hover:to-lavender-700 text-white rounded-xl px-6 py-3 shadow-lg shadow-lavender-300/50"
+            >
+              Explore More Shells
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </motion.div>
+
+          {/* Footer */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.4 }}
+            className="text-center mt-12 text-lavender-400 text-sm"
+          >
+            Order ID: <span className="font-mono">{serialNumber}</span>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-strata-void text-strata-white relative overflow-hidden">
@@ -223,7 +454,7 @@ const ShopSuccess = () => {
                   <div className="space-y-4">
                     <div className="p-4 bg-strata-void/50 border border-strata-silver/10 rounded-sm">
                       <div className="flex items-center gap-2 mb-3">
-                        <Infinity className="w-4 h-4 text-strata-orange" />
+                        <InfinityIcon className="w-4 h-4 text-strata-orange" />
                         <span className="font-mono text-xs text-strata-silver/60 uppercase tracking-wider">
                           {isTactical ? t('success.certificate.allocation') : t('success.certificate.ownership')}
                         </span>
@@ -447,7 +678,7 @@ const ShopSuccess = () => {
                   <div className="text-sm font-medium">{t('success.complete.worldwide')}</div>
                 </div>
                 <div className="p-4 bg-strata-graphite/50 border border-strata-silver/20 rounded-sm">
-                  <Infinity className="w-6 h-6 text-strata-lume mx-auto mb-2" />
+                  <InfinityIcon className="w-6 h-6 text-strata-lume mx-auto mb-2" />
                   <div className="font-mono text-[10px] text-strata-silver/60 uppercase">{t('success.complete.protocol')}</div>
                   <div className="text-sm font-medium">{isBond ? 'STRATA BOND' : 'CENTURY'}</div>
                 </div>
