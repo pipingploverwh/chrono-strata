@@ -67,6 +67,8 @@ import StrataWorldFive from "./pages/StrataWorldFive";
 import StrataWorldSeven from "./pages/StrataWorldSeven";
 import StrataGate from "./pages/StrataGate";
 import StrataWelcome from "./pages/StrataWelcome";
+import ChronoStrataGate from "./pages/ChronoStrataGate";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -90,7 +92,8 @@ const App = () => (
                 <Route path="/vc" element={<VCSummary />} />
                 <Route path="/vc-summary" element={<VCSummary />} />
                 <Route path="/launch" element={<Index />} />
-                <Route path="/strata" element={<Strata />} />
+                <Route path="/strata" element={<ChronoStrataGate />} />
+                <Route path="/strata-instrument" element={<Strata />} />
                 <Route path="/aviation" element={<StrataAviation />} />
                 <Route path="/marine" element={<StrataMarine />} />
                 <Route path="/construction" element={<StrataConstruction />} />
