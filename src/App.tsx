@@ -70,6 +70,7 @@ import StrataGate from "./pages/StrataGate";
 import StrataWelcome from "./pages/StrataWelcome";
 import ChronoStrataGate from "./pages/ChronoStrataGate";
 import Shop from "./pages/Shop";
+import ShopSuccess from "./pages/ShopSuccess";
 
 const queryClient = new QueryClient();
 
@@ -133,6 +134,7 @@ const App = () => (
                 <Route path="/world-5" element={<StrataWorldFive />} />
                 <Route path="/world-7" element={<StrataWorldSeven />} />
                 <Route path="/shop" element={<Shop />} />
+                <Route path="/shop-success" element={<ShopSuccess />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />
