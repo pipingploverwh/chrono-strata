@@ -180,7 +180,7 @@ const StrataWelcome = () => {
         
         <p className="text-slate-400 mb-8">
           Your {accessDetails?.locationCount || locationCount}-zone world clock is ready. 
-          Enjoy lifetime access to elegant timekeeping designed by AAL.
+          Enjoy lifetime access to elegant timekeeping.
         </p>
 
         <Button
