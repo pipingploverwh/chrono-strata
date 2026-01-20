@@ -633,6 +633,157 @@ const translations: Record<string, Record<Language, string>> = {
     fr: 'Sativa',
     ar: 'ساتيفا'
   },
+
+  // Terrain Variants
+  'terrain.chronoTopo.name': {
+    en: 'CHRONO-TOPO',
+    ja: 'クロノ・トポ',
+    it: 'CRONO-TOPO',
+    fr: 'CHRONO-TOPO',
+    ar: 'كرونو-توبو'
+  },
+  'terrain.chronoTopo.description': {
+    en: 'Standard chronometer + topographic HUD',
+    ja: '標準クロノメーター + 地形HUD',
+    it: 'Cronometro standard + HUD topografico',
+    fr: 'Chronomètre standard + HUD topographique',
+    ar: 'كرونومتر قياسي + شاشة طبوغرافية'
+  },
+  'terrain.bathymetric.name': {
+    en: 'BATHYMETRIC',
+    ja: 'バシメトリック',
+    it: 'BATIMETRICO',
+    fr: 'BATHYMÉTRIQUE',
+    ar: 'باثيمتري'
+  },
+  'terrain.bathymetric.description': {
+    en: 'Oceanic depth contours — Auckland Basin',
+    ja: '海洋深度等高線 — オークランド海盆',
+    it: 'Contorni di profondità oceanica — Bacino di Auckland',
+    fr: 'Contours de profondeur océanique — Bassin d\'Auckland',
+    ar: 'خطوط العمق المحيطي — حوض أوكلاند'
+  },
+  'terrain.glacial.name': {
+    en: 'GLACIAL',
+    ja: 'グレイシャル',
+    it: 'GLACIALE',
+    fr: 'GLACIAIRE',
+    ar: 'جليدي'
+  },
+  'terrain.glacial.description': {
+    en: 'Ice sheet elevation — Arctic Circle',
+    ja: '氷床標高 — 北極圏',
+    it: 'Elevazione della calotta glaciale — Circolo Artico',
+    fr: 'Élévation de la calotte glaciaire — Cercle Arctique',
+    ar: 'ارتفاع الصفيحة الجليدية — الدائرة القطبية'
+  },
+  'terrain.geological.name': {
+    en: 'GEOLOGICAL',
+    ja: 'ジオロジカル',
+    it: 'GEOLOGICO',
+    fr: 'GÉOLOGIQUE',
+    ar: 'جيولوجي'
+  },
+  'terrain.geological.description': {
+    en: 'Dune elevation patterns — Saharan terrain',
+    ja: '砂丘標高パターン — サハラ地形',
+    it: 'Modelli di elevazione delle dune — Terreno sahariano',
+    fr: 'Motifs d\'élévation des dunes — Terrain saharien',
+    ar: 'أنماط ارتفاع الكثبان — تضاريس صحراوية'
+  },
+  'terrain.metropolitan.name': {
+    en: 'METROPOLITAN',
+    ja: 'メトロポリタン',
+    it: 'METROPOLITANO',
+    fr: 'MÉTROPOLITAIN',
+    ar: 'حضري'
+  },
+  'terrain.metropolitan.description': {
+    en: 'Urban density grid — Tokyo infrastructure',
+    ja: '都市密度グリッド — 東京インフラ',
+    it: 'Griglia di densità urbana — Infrastruttura di Tokyo',
+    fr: 'Grille de densité urbaine — Infrastructure de Tokyo',
+    ar: 'شبكة الكثافة الحضرية — البنية التحتية لطوكيو'
+  },
+
+  // Weather Clothing Advice
+  'weather.advice.snowLayers': {
+    en: 'Layer up with the STRATA Shell — snow conditions ahead',
+    ja: 'STRATAシェルでレイヤリング — 降雪予報',
+    it: 'Stratifica con la STRATA Shell — neve in arrivo',
+    fr: 'Superposez avec la STRATA Shell — neige prévue',
+    ar: 'ارتدِ طبقات مع STRATA Shell — ثلوج متوقعة'
+  },
+  'weather.advice.coldFull': {
+    en: 'Full thermal layers recommended under STRATA Shell',
+    ja: 'STRATAシェルの下に完全サーマルレイヤー推奨',
+    it: 'Strati termici completi consigliati sotto STRATA Shell',
+    fr: 'Couches thermiques complètes recommandées sous STRATA Shell',
+    ar: 'طبقات حرارية كاملة موصى بها تحت STRATA Shell'
+  },
+  'weather.advice.coldRain': {
+    en: 'STRATA Shell essential — cold rain expected',
+    ja: 'STRATAシェル必須 — 冷たい雨予報',
+    it: 'STRATA Shell essenziale — pioggia fredda prevista',
+    fr: 'STRATA Shell essentielle — pluie froide prévue',
+    ar: 'STRATA Shell ضروري — مطر بارد متوقع'
+  },
+  'weather.advice.coldMidLayers': {
+    en: 'STRATA Shell over mid-weight layers',
+    ja: 'ミッドウェイトレイヤーの上にSTRATAシェル',
+    it: 'STRATA Shell sopra strati di peso medio',
+    fr: 'STRATA Shell sur couches intermédiaires',
+    ar: 'STRATA Shell فوق طبقات متوسطة الوزن'
+  },
+  'weather.advice.perfectWeather': {
+    en: 'Perfect STRATA Shell weather — stay dry',
+    ja: '完璧なSTRATAシェル日和 — ドライに',
+    it: 'Tempo perfetto per STRATA Shell — resta asciutto',
+    fr: 'Temps parfait pour STRATA Shell — restez au sec',
+    ar: 'طقس مثالي لـ STRATA Shell — ابقَ جافاً'
+  },
+  'weather.advice.lightWind': {
+    en: 'Light STRATA Shell for wind protection',
+    ja: '風よけにライトSTRATAシェル',
+    it: 'STRATA Shell leggera per protezione dal vento',
+    fr: 'STRATA Shell légère pour protection contre le vent',
+    ar: 'STRATA Shell خفيف للحماية من الرياح'
+  },
+  'weather.advice.optional': {
+    en: 'STRATA Shell optional — mild conditions',
+    ja: 'STRATAシェルはオプション — 穏やかな天候',
+    it: 'STRATA Shell opzionale — condizioni miti',
+    fr: 'STRATA Shell optionnelle — conditions douces',
+    ar: 'STRATA Shell اختياري — ظروف معتدلة'
+  },
+  'weather.advice.lightRain': {
+    en: 'STRATA Shell for light rain coverage',
+    ja: '小雨対策にSTRATAシェル',
+    it: 'STRATA Shell per pioggia leggera',
+    fr: 'STRATA Shell pour pluie légère',
+    ar: 'STRATA Shell للمطر الخفيف'
+  },
+  'weather.advice.carryShell': {
+    en: 'Carry STRATA Shell — conditions may shift',
+    ja: 'STRATAシェルを携帯 — 天候変化の可能性',
+    it: 'Porta STRATA Shell — le condizioni potrebbero cambiare',
+    fr: 'Emportez STRATA Shell — les conditions peuvent changer',
+    ar: 'احمل STRATA Shell — قد تتغير الظروف'
+  },
+  'weather.advice.suddenShowers': {
+    en: 'STRATA Shell for sudden showers',
+    ja: '突然の雨にSTRATAシェル',
+    it: 'STRATA Shell per acquazzoni improvvisi',
+    fr: 'STRATA Shell pour averses soudaines',
+    ar: 'STRATA Shell للأمطار المفاجئة'
+  },
+  'weather.advice.stowed': {
+    en: 'STRATA Shell stowed — warm conditions',
+    ja: 'STRATAシェル収納 — 暖かい天候',
+    it: 'STRATA Shell riposta — condizioni calde',
+    fr: 'STRATA Shell rangée — conditions chaudes',
+    ar: 'STRATA Shell مخزن — ظروف دافئة'
+  },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);

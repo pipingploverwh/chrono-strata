@@ -18,14 +18,14 @@ import strataShellPolar from "@/assets/strata-shell-polar.jpg";
 import strataShellDesert from "@/assets/strata-shell-desert.jpg";
 import strataShellUrban from "@/assets/strata-shell-urban.jpg";
 
-// Strata-coordinate mapped terrain variants
-const TERRAIN_VARIANTS = [
+// Strata-coordinate mapped terrain variants (base data - translations applied in component)
+const TERRAIN_VARIANTS_BASE = [
   {
     id: 'standard',
-    name: 'CHRONO-TOPO',
+    nameKey: 'terrain.chronoTopo.name',
+    descriptionKey: 'terrain.chronoTopo.description',
     strataZone: 'Default',
     coordinates: { lat: 0, lon: 0 },
-    description: 'Standard chronometer + topographic HUD',
     image: strataShellHUD,
     color: 'strata-orange',
     icon: Map,
@@ -33,10 +33,10 @@ const TERRAIN_VARIANTS = [
   },
   {
     id: 'marine',
-    name: 'BATHYMETRIC',
+    nameKey: 'terrain.bathymetric.name',
+    descriptionKey: 'terrain.bathymetric.description',
     strataZone: 'Pacific Marine',
     coordinates: { lat: -36.8485, lon: 174.7633 },
-    description: 'Oceanic depth contours — Auckland Basin',
     image: strataShellMarine,
     color: 'cyan-400',
     icon: Anchor,
@@ -44,10 +44,10 @@ const TERRAIN_VARIANTS = [
   },
   {
     id: 'polar',
-    name: 'GLACIAL',
+    nameKey: 'terrain.glacial.name',
+    descriptionKey: 'terrain.glacial.description',
     strataZone: 'Tromsø Arctic',
     coordinates: { lat: 69.6496, lon: 18.9560 },
-    description: 'Ice sheet elevation — Arctic Circle',
     image: strataShellPolar,
     color: 'blue-300',
     icon: Snowflake,
@@ -55,10 +55,10 @@ const TERRAIN_VARIANTS = [
   },
   {
     id: 'desert',
-    name: 'GEOLOGICAL',
+    nameKey: 'terrain.geological.name',
+    descriptionKey: 'terrain.geological.description',
     strataZone: 'Sahara Interior',
     coordinates: { lat: 33.8869, lon: 9.5375 },
-    description: 'Dune elevation patterns — Saharan terrain',
     image: strataShellDesert,
     color: 'orange-500',
     icon: Sun,
@@ -66,10 +66,10 @@ const TERRAIN_VARIANTS = [
   },
   {
     id: 'urban',
-    name: 'METROPOLITAN',
+    nameKey: 'terrain.metropolitan.name',
+    descriptionKey: 'terrain.metropolitan.description',
     strataZone: 'Tokyo Metropolis',
     coordinates: { lat: 35.6762, lon: 139.6503 },
-    description: 'Urban density grid — Tokyo infrastructure',
     image: strataShellUrban,
     color: 'violet-400',
     icon: Building2,
@@ -139,25 +139,36 @@ const TechReadout = ({ label, value, unit, pulse = false }: { label: string; val
   </div>
 );
 
-// Get clothing recommendation based on weather
-const getClothingAdvice = (tempF: number, condition: string): string => {
+// Get clothing recommendation based on weather - returns translation key
+const getClothingAdviceKey = (tempF: number, condition: string): string => {
   const isRainy = condition.toLowerCase().includes('rain') || condition.toLowerCase().includes('drizzle');
   const isWindy = condition.toLowerCase().includes('wind');
   const isSnowy = condition.toLowerCase().includes('snow');
   
-  if (tempF < 32) return isSnowy ? "Layer up with the STRATA Shell — snow conditions ahead" : "Full thermal layers recommended under STRATA Shell";
-  if (tempF < 50) return isRainy ? "STRATA Shell essential — cold rain expected" : "STRATA Shell over mid-weight layers";
-  if (tempF < 65) return isRainy ? "Perfect STRATA Shell weather — stay dry" : isWindy ? "Light STRATA Shell for wind protection" : "STRATA Shell optional — mild conditions";
-  if (tempF < 75) return isRainy ? "STRATA Shell for light rain coverage" : "Carry STRATA Shell — conditions may shift";
-  return isRainy ? "STRATA Shell for sudden showers" : "STRATA Shell stowed — warm conditions";
+  if (tempF < 32) return isSnowy ? 'weather.advice.snowLayers' : 'weather.advice.coldFull';
+  if (tempF < 50) return isRainy ? 'weather.advice.coldRain' : 'weather.advice.coldMidLayers';
+  if (tempF < 65) return isRainy ? 'weather.advice.perfectWeather' : isWindy ? 'weather.advice.lightWind' : 'weather.advice.optional';
+  if (tempF < 75) return isRainy ? 'weather.advice.lightRain' : 'weather.advice.carryShell';
+  return isRainy ? 'weather.advice.suddenShowers' : 'weather.advice.stowed';
 };
 
 const Shop = () => {
   const { t } = useLanguage();
-  const [selectedTerrain, setSelectedTerrain] = useState(TERRAIN_VARIANTS[0]);
+  
+  // Build translated terrain variants
+  const TERRAIN_VARIANTS = TERRAIN_VARIANTS_BASE.map(variant => ({
+    ...variant,
+    name: t(variant.nameKey),
+    description: t(variant.descriptionKey),
+  }));
+  
+  const [selectedTerrainId, setSelectedTerrainId] = useState(TERRAIN_VARIANTS_BASE[0].id);
   const [isProcessing, setIsProcessing] = useState(false);
   const [systemStatus, setSystemStatus] = useState('NOMINAL');
   const [selectedPaymentMode, setSelectedPaymentMode] = useState<'annual' | 'bond'>('annual');
+  
+  // Get the selected terrain with translations
+  const selectedTerrain = TERRAIN_VARIANTS.find(v => v.id === selectedTerrainId) || TERRAIN_VARIANTS[0];
   
   // Weather and temperature
   const { unit, toggleUnit, formatTemp } = useTemperatureUnit();
@@ -174,16 +185,16 @@ const Shop = () => {
     }
   }, [hasLocation, requestLocation]);
 
-  const currentIndex = TERRAIN_VARIANTS.findIndex(t => t.id === selectedTerrain.id);
+  const currentIndex = TERRAIN_VARIANTS.findIndex(v => v.id === selectedTerrainId);
   
   const nextTerrain = () => {
     const nextIdx = (currentIndex + 1) % TERRAIN_VARIANTS.length;
-    setSelectedTerrain(TERRAIN_VARIANTS[nextIdx]);
+    setSelectedTerrainId(TERRAIN_VARIANTS[nextIdx].id);
   };
   
   const prevTerrain = () => {
     const prevIdx = (currentIndex - 1 + TERRAIN_VARIANTS.length) % TERRAIN_VARIANTS.length;
-    setSelectedTerrain(TERRAIN_VARIANTS[prevIdx]);
+    setSelectedTerrainId(TERRAIN_VARIANTS[prevIdx].id);
   };
 
   useEffect(() => {
@@ -312,7 +323,7 @@ const Shop = () => {
             >
               <Shield className="w-4 h-4 text-strata-cyan flex-shrink-0" />
               <span className="font-mono text-xs text-strata-silver">
-                {getClothingAdvice(weather.current.temp, weather.current.condition)}
+                {t(getClothingAdviceKey(weather.current.temp, weather.current.condition))}
               </span>
               <span className="font-mono text-[9px] text-strata-silver/40 hidden sm:inline">
                 — {weather.current.condition}
@@ -430,7 +441,7 @@ const Shop = () => {
                     return (
                       <button
                         key={variant.id}
-                        onClick={() => setSelectedTerrain(variant)}
+                        onClick={() => setSelectedTerrainId(variant.id)}
                         className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
                           isSelected 
                             ? `border-${variant.color} shadow-lg` 
