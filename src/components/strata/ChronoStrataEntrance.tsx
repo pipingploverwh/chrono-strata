@@ -450,9 +450,8 @@ const ChronoStrataEntrance = () => {
                       />
                     )}
 
-                    {/* Icon & Name */}
-                    <div className="flex items-center gap-2 mb-3">
-                      <Icon className={`w-4 h-4 ${stratum.color}`} />
+                    {/* Name */}
+                    <div className="mb-3">
                       <span className="text-xs font-mono text-slate-400 truncate">{stratum.name.split(' ')[0]}</span>
                     </div>
 
