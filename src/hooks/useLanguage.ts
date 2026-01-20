@@ -1023,6 +1023,13 @@ const translations: Record<string, Record<Language, string>> = {
     fr: 'Votre propriété STRATA a été sécurisée. Accès annuel au Protocole Century accordé.',
     ar: 'تم تأمين ملكية STRATA الخاصة بك. تم منح الوصول السنوي لبروتوكول Century.'
   },
+  'success.tacticalSecured': {
+    en: 'Your TACTICAL PROVISION deposit has been secured. Manufacturing slot allocated.',
+    ja: 'タクティカルプロビジョンのデポジットが確保されました。製造スロットが割り当てられました。',
+    it: 'Il deposito TACTICAL PROVISION è stato assicurato. Slot di produzione allocato.',
+    fr: 'Votre acompte TACTICAL PROVISION a été sécurisé. Créneau de fabrication alloué.',
+    ar: 'تم تأمين وديعة التزويد التكتيكي. تم تخصيص فتحة التصنيع.'
+  },
 
   // Success Steps
   'success.step.certificate': {
@@ -1069,6 +1076,13 @@ const translations: Record<string, Record<Language, string>> = {
     fr: 'STRATA BOND — Héritage 100 Ans',
     ar: 'سند STRATA — إرث 100 عام'
   },
+  'success.certificate.tacticalType': {
+    en: 'TACTICAL PROVISION — Physical Allocation',
+    ja: 'タクティカルプロビジョン — 物理的割り当て',
+    it: 'TACTICAL PROVISION — Allocazione Fisica',
+    fr: 'TACTICAL PROVISION — Allocation Physique',
+    ar: 'التزويد التكتيكي — تخصيص مادي'
+  },
   'success.certificate.ownershipType': {
     en: 'STRATA OWNERSHIP — Century Protocol',
     ja: 'STRATA所有権 — センチュリープロトコル',
@@ -1096,6 +1110,34 @@ const translations: Record<string, Record<Language, string>> = {
     it: 'TERMINE DI PROPRIETÀ',
     fr: 'DURÉE DE PROPRIÉTÉ',
     ar: 'مدة الملكية'
+  },
+  'success.certificate.allocation': {
+    en: 'ALLOCATION STATUS',
+    ja: '割り当て状況',
+    it: 'STATO ALLOCAZIONE',
+    fr: 'STATUT D\'ALLOCATION',
+    ar: 'حالة التخصيص'
+  },
+  'success.certificate.manufacturingPending': {
+    en: 'Manufacturing Pending',
+    ja: '製造保留中',
+    it: 'Produzione in Attesa',
+    fr: 'Fabrication en Attente',
+    ar: 'التصنيع معلق'
+  },
+  'success.certificate.leadTime': {
+    en: 'Lead Time',
+    ja: 'リードタイム',
+    it: 'Tempo di Consegna',
+    fr: 'Délai de Livraison',
+    ar: 'وقت التسليم'
+  },
+  'success.certificate.weeks': {
+    en: 'weeks',
+    ja: '週間',
+    it: 'settimane',
+    fr: 'semaines',
+    ar: 'أسابيع'
   },
   'success.certificate.years': {
     en: 'YEARS',
