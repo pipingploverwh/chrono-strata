@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Check, Droplets, Wind, Shield, Loader2, Zap, Map, Clock, Activity, Anchor, Snowflake, Sun, Building2, ChevronLeft, ChevronRight, Infinity, Users, Gift } from "lucide-react";
+import { ShoppingBag, Check, Droplets, Wind, Shield, Loader2, Zap, Map, Clock, Activity, Anchor, Snowflake, Sun, Building2, ChevronLeft, ChevronRight, Infinity, Users, Gift, Thermometer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/hooks/useLanguage";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { LanguageToggle } from "@/components/LanguageToggle";
+import { useTemperatureUnit } from "@/hooks/useTemperatureUnit";
+import { useGeolocation } from "@/hooks/useGeolocation";
+import { useWeatherData } from "@/hooks/useWeatherData";
 
 // Import terrain-specific jacket renders
 import strataShellHUD from "@/assets/strata-shell-hud-jacket.jpg";
@@ -135,12 +139,40 @@ const TechReadout = ({ label, value, unit, pulse = false }: { label: string; val
   </div>
 );
 
+// Get clothing recommendation based on weather
+const getClothingAdvice = (tempF: number, condition: string): string => {
+  const isRainy = condition.toLowerCase().includes('rain') || condition.toLowerCase().includes('drizzle');
+  const isWindy = condition.toLowerCase().includes('wind');
+  const isSnowy = condition.toLowerCase().includes('snow');
+  
+  if (tempF < 32) return isSnowy ? "Layer up with the STRATA Shell — snow conditions ahead" : "Full thermal layers recommended under STRATA Shell";
+  if (tempF < 50) return isRainy ? "STRATA Shell essential — cold rain expected" : "STRATA Shell over mid-weight layers";
+  if (tempF < 65) return isRainy ? "Perfect STRATA Shell weather — stay dry" : isWindy ? "Light STRATA Shell for wind protection" : "STRATA Shell optional — mild conditions";
+  if (tempF < 75) return isRainy ? "STRATA Shell for light rain coverage" : "Carry STRATA Shell — conditions may shift";
+  return isRainy ? "STRATA Shell for sudden showers" : "STRATA Shell stowed — warm conditions";
+};
+
 const Shop = () => {
   const { t } = useLanguage();
   const [selectedTerrain, setSelectedTerrain] = useState(TERRAIN_VARIANTS[0]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [systemStatus, setSystemStatus] = useState('NOMINAL');
   const [selectedPaymentMode, setSelectedPaymentMode] = useState<'annual' | 'bond'>('annual');
+  
+  // Weather and temperature
+  const { unit, toggleUnit, formatTemp } = useTemperatureUnit();
+  const { latitude, longitude, requestLocation, hasLocation } = useGeolocation();
+  const { weather, loading: weatherLoading } = useWeatherData(
+    latitude ?? undefined,
+    longitude ?? undefined
+  );
+  
+  // Auto-request location on mount
+  useEffect(() => {
+    if (!hasLocation) {
+      requestLocation();
+    }
+  }, [hasLocation, requestLocation]);
 
   const currentIndex = TERRAIN_VARIANTS.findIndex(t => t.id === selectedTerrain.id);
   
@@ -235,18 +267,58 @@ const Shop = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="flex items-center justify-between mb-6">
+          {/* Top bar with language, weather, and system status */}
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-4">
               <div className="w-2 h-2 rounded-full bg-strata-lume animate-pulse" />
               <span className="font-mono text-[10px] text-strata-silver/60 uppercase tracking-[0.3em]">
                 Equipment Lab / Store Protocol
               </span>
             </div>
-            <div className="flex items-center gap-4">
+            
+            <div className="flex flex-wrap items-center gap-4">
+              {/* Language Toggle */}
+              <LanguageToggle variant="compact" />
+              
+              {/* Temperature with C/F toggle */}
+              {weather && !weatherLoading && (
+                <button 
+                  onClick={toggleUnit}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-strata-steel/20 hover:bg-strata-steel/30 border border-strata-steel/30 rounded transition-colors"
+                  aria-label={`Toggle temperature unit. Currently ${unit}`}
+                >
+                  <Thermometer className="w-3 h-3 text-strata-cyan" />
+                  <span className="font-mono text-xs text-strata-white">
+                    {formatTemp(weather.current.temp)}
+                  </span>
+                  <span className="font-mono text-[9px] text-strata-silver/50">
+                    {unit === 'F' ? '→ C' : '→ F'}
+                  </span>
+                </button>
+              )}
+              
               <TechReadout label="SYS" value={systemStatus} pulse={systemStatus !== 'NOMINAL'} />
               <LiveClock />
             </div>
           </div>
+          
+          {/* Weather clothing recommendation */}
+          {weather && !weatherLoading && (
+            <motion.div 
+              className="mb-6 px-4 py-2 bg-strata-cyan/5 border border-strata-cyan/20 rounded flex items-center gap-3"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Shield className="w-4 h-4 text-strata-cyan flex-shrink-0" />
+              <span className="font-mono text-xs text-strata-silver">
+                {getClothingAdvice(weather.current.temp, weather.current.condition)}
+              </span>
+              <span className="font-mono text-[9px] text-strata-silver/40 hidden sm:inline">
+                — {weather.current.condition}
+              </span>
+            </motion.div>
+          )}
           
           <div className="border border-strata-steel/20 rounded-lg p-6 bg-strata-charcoal/30 backdrop-blur">
             <Badge className="mb-4 bg-strata-cyan/10 text-strata-cyan border-strata-cyan/30 font-mono text-[10px] uppercase tracking-wider">
