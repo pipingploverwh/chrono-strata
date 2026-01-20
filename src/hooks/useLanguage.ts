@@ -139,41 +139,216 @@ const translations: Record<string, Record<Language, string>> = {
     ar: 'ابدأ الآن'
   },
 
-  // Shop
-  'shop.title': {
-    en: 'STRATA Collection',
-    ja: 'STRATAコレクション',
-    it: 'Collezione STRATA',
-    fr: 'Collection STRATA',
-    ar: 'مجموعة STRATA'
+  // Shop - Equipment Lab
+  'shop.labHeader': {
+    en: 'Equipment Lab / Store Protocol',
+    ja: '装備ラボ / ストアプロトコル',
+    it: 'Laboratorio Equipaggiamento / Protocollo Negozio',
+    fr: 'Laboratoire Équipement / Protocole Boutique',
+    ar: 'مختبر المعدات / بروتوكول المتجر'
   },
-  'shop.subtitle': {
-    en: 'Premium Weather Gear',
-    ja: 'プレミアムウェザーギア',
-    it: 'Attrezzatura Meteo Premium',
-    fr: 'Équipement Météo Premium',
-    ar: 'معدات الطقس الفاخرة'
+  'shop.terrainMapped': {
+    en: 'Terrain-Mapped Protocol',
+    ja: '地形マッピングプロトコル',
+    it: 'Protocollo Mappatura Terreno',
+    fr: 'Protocole Cartographie Terrain',
+    ar: 'بروتوكول الخرائط الطبوغرافية'
   },
-  'shop.preOrder': {
-    en: 'Pre-Order',
-    ja: '予約注文',
-    it: 'Pre-Ordine',
-    fr: 'Pré-commander',
-    ar: 'الطلب المسبق'
+  'shop.ownership': {
+    en: 'STRATA OWNERSHIP',
+    ja: 'STRATA オーナーシップ',
+    it: 'PROPRIETÀ STRATA',
+    fr: 'PROPRIÉTÉ STRATA',
+    ar: 'ملكية STRATA'
   },
-  'shop.limitedEdition': {
-    en: 'Limited Edition',
-    ja: '限定版',
-    it: 'Edizione Limitata',
-    fr: 'Édition Limitée',
-    ar: 'إصدار محدود'
+  'shop.centuryProtocol': {
+    en: 'Century Protocol — 100 Years of Ownership',
+    ja: 'センチュリープロトコル — 100年の所有権',
+    it: 'Protocollo Centenario — 100 Anni di Proprietà',
+    fr: 'Protocole Centenaire — 100 Ans de Propriété',
+    ar: 'بروتوكول القرن — 100 عام من الملكية'
   },
-  'shop.selectDesign': {
-    en: 'Select Design',
-    ja: 'デザインを選択',
-    it: 'Seleziona Design',
-    fr: 'Sélectionner le Design',
-    ar: 'اختر التصميم'
+  'shop.centuryHeader': {
+    en: 'Century Protocol',
+    ja: 'センチュリープロトコル',
+    it: 'Protocollo Centenario',
+    fr: 'Protocole Centenaire',
+    ar: 'بروتوكول القرن'
+  },
+  'shop.notLimitedRun': {
+    en: 'This is not a limited run. This is the start of',
+    ja: 'これは限定版ではありません。これは',
+    it: 'Questa non è un\'edizione limitata. È l\'inizio di',
+    fr: 'Ce n\'est pas une édition limitée. C\'est le début de',
+    ar: 'هذا ليس إصداراً محدوداً. هذه بداية'
+  },
+  'shop.yearsOwnership': {
+    en: '100 years',
+    ja: '100年間',
+    it: '100 anni',
+    fr: '100 ans',
+    ar: '100 عام'
+  },
+  'shop.ofOwnership': {
+    en: 'of ownership.',
+    ja: 'の所有権の始まりです。',
+    it: 'di proprietà.',
+    fr: 'de propriété.',
+    ar: 'من الملكية.'
+  },
+  'shop.selectOwnershipMode': {
+    en: 'Select Ownership Mode',
+    ja: '所有モードを選択',
+    it: 'Seleziona Modalità Proprietà',
+    fr: 'Sélectionner Mode de Propriété',
+    ar: 'اختر وضع الملكية'
+  },
+  'shop.annual': {
+    en: 'Annual',
+    ja: '年間',
+    it: 'Annuale',
+    fr: 'Annuel',
+    ar: 'سنوي'
+  },
+  'shop.perYear': {
+    en: '/year',
+    ja: '/年',
+    it: '/anno',
+    fr: '/an',
+    ar: '/سنة'
+  },
+  'shop.postFirstYear': {
+    en: 'Post-first-year billing',
+    ja: '初年度以降の請求',
+    it: 'Fatturazione post-primo anno',
+    fr: 'Facturation après première année',
+    ar: 'الفوترة بعد السنة الأولى'
+  },
+  'shop.strataBond': {
+    en: 'STRATA Bond',
+    ja: 'STRATAボンド',
+    it: 'Obbligazione STRATA',
+    fr: 'Obligation STRATA',
+    ar: 'سند STRATA'
+  },
+  'shop.legacy': {
+    en: 'LEGACY',
+    ja: 'レガシー',
+    it: 'EREDITÀ',
+    fr: 'HÉRITAGE',
+    ar: 'إرث'
+  },
+  'shop.oneTime': {
+    en: 'one-time',
+    ja: '一括払い',
+    it: 'una tantum',
+    fr: 'unique',
+    ar: 'دفعة واحدة'
+  },
+  'shop.savingsVsAnnual': {
+    en: 'Save $5,100 vs annual • 100 years prepaid',
+    ja: '年間比$5,100節約 • 100年分前払い',
+    it: 'Risparmia $5.100 vs annuale • 100 anni prepagati',
+    fr: 'Économisez $5 100 vs annuel • 100 ans prépayés',
+    ar: 'وفر 5,100$ مقارنة بالسنوي • 100 عام مدفوعة مسبقاً'
+  },
+  'shop.transferable': {
+    en: 'Transferable to children & heirs',
+    ja: '子供や相続人に譲渡可能',
+    it: 'Trasferibile a figli ed eredi',
+    fr: 'Transférable aux enfants et héritiers',
+    ar: 'قابل للتحويل للأطفال والورثة'
+  },
+  'shop.selectTerrain': {
+    en: 'Select Strata Terrain',
+    ja: 'Strataテレインを選択',
+    it: 'Seleziona Terreno Strata',
+    fr: 'Sélectionner Terrain Strata',
+    ar: 'اختر تضاريس Strata'
+  },
+  'shop.selectedTerrainMap': {
+    en: 'Selected Terrain Map',
+    ja: '選択されたテレインマップ',
+    it: 'Mappa Terreno Selezionata',
+    fr: 'Carte Terrain Sélectionnée',
+    ar: 'خريطة التضاريس المختارة'
+  },
+  'shop.techSpecs': {
+    en: 'Technical Specifications',
+    ja: '技術仕様',
+    it: 'Specifiche Tecniche',
+    fr: 'Spécifications Techniques',
+    ar: 'المواصفات التقنية'
+  },
+  'shop.activateTerrain': {
+    en: 'Activate',
+    ja: 'アクティベート',
+    it: 'Attiva',
+    fr: 'Activer',
+    ar: 'تفعيل'
+  },
+  'shop.secureBond': {
+    en: 'Secure STRATA Bond',
+    ja: 'STRATAボンドを確保',
+    it: 'Assicura Obbligazione STRATA',
+    fr: 'Sécuriser Obligation STRATA',
+    ar: 'تأمين سند STRATA'
+  },
+  'shop.initiating': {
+    en: 'Initiating Protocol...',
+    ja: 'プロトコル開始中...',
+    it: 'Inizializzazione Protocollo...',
+    fr: 'Initialisation Protocole...',
+    ar: 'بدء البروتوكول...'
+  },
+  'shop.secure': {
+    en: 'Secure',
+    ja: 'セキュア',
+    it: 'Sicuro',
+    fr: 'Sécurisé',
+    ar: 'آمن'
+  },
+  'shop.100YearLegacy': {
+    en: '100-Year Legacy',
+    ja: '100年のレガシー',
+    it: 'Eredità 100 Anni',
+    fr: 'Héritage 100 Ans',
+    ar: 'إرث 100 عام'
+  },
+  'shop.generational': {
+    en: 'Generational',
+    ja: '世代間',
+    it: 'Generazionale',
+    fr: 'Générationnel',
+    ar: 'جيلي'
+  },
+  'shop.equipmentLab': {
+    en: 'Equipment Lab',
+    ja: '装備ラボ',
+    it: 'Laboratorio Equipaggiamento',
+    fr: 'Laboratoire Équipement',
+    ar: 'مختبر المعدات'
+  },
+  'shop.protocolVersion': {
+    en: 'Protocol v2.1',
+    ja: 'プロトコル v2.1',
+    it: 'Protocollo v2.1',
+    fr: 'Protocole v2.1',
+    ar: 'البروتوكول v2.1'
+  },
+  'shop.tagline': {
+    en: 'A Century of Ownership. Generational Access.',
+    ja: '100年の所有権。世代を超えたアクセス。',
+    it: 'Un Secolo di Proprietà. Accesso Generazionale.',
+    fr: 'Un Siècle de Propriété. Accès Générationnel.',
+    ar: 'قرن من الملكية. وصول جيلي.'
+  },
+  'shop.description': {
+    en: 'Vulcanized hydrophobic shell with embedded chronometer display and terrain-mapped HUD. This is not a limited run — it is the beginning of a 100-year ownership lineage.',
+    ja: '埋め込みクロノメーターディスプレイと地形マッピングHUDを備えた加硫疎水性シェル。これは限定版ではありません — 100年間の所有権系譜の始まりです。',
+    it: 'Guscio idrofobico vulcanizzato con display cronometro integrato e HUD mappato sul terreno. Non è un\'edizione limitata — è l\'inizio di 100 anni di proprietà.',
+    fr: 'Coque hydrophobe vulcanisée avec affichage chronomètre intégré et HUD cartographié. Ce n\'est pas une édition limitée — c\'est le début de 100 ans de propriété.',
+    ar: 'غلاف مقاوم للماء مع شاشة كرونومتر مدمجة وواجهة HUD خرائطية. هذا ليس إصداراً محدوداً — إنه بداية 100 عام من الملكية.'
   },
 
   // Piping Plover Dispensary
