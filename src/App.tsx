@@ -18,6 +18,7 @@ import Logs from "./pages/Logs";
 import WeatherCoordinateLogs from "./pages/WeatherCoordinateLogs";
 import WeatherShowcase from "./pages/WeatherShowcase";
 import WeatherIntelligence from "./pages/WeatherIntelligence";
+import WeatherHistory from "./pages/WeatherHistory";
 import StrataAviation from "./pages/StrataAviation";
 import StrataMarine from "./pages/StrataMarine";
 import StrataConstruction from "./pages/StrataConstruction";
@@ -103,6 +104,7 @@ const App = () => (
                 <Route path="/construction" element={<StrataConstruction />} />
                 <Route path="/events" element={<StrataEvents />} />
                 <Route path="/weather-showcase" element={<WeatherShowcase />} />
+                <Route path="/weather-history" element={<WeatherHistory />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/sitemap" element={<SiteMapPage />} />
                 <Route path="/links" element={<ShareableLinks />} />
