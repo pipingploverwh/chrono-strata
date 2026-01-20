@@ -38,6 +38,22 @@ const WeatherOverlay = ({ isOpen, onClose, compact = false }: WeatherOverlayProp
   const [isExpanded, setIsExpanded] = useState(!compact);
   const [activeTab, setActiveTab] = useState<'weather' | 'marine'>('weather');
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
+  // Keyboard shortcut: H to open Storm History
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isOpen || isHistoryOpen) return;
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      
+      if (e.key.toLowerCase() === 'h') {
+        e.preventDefault();
+        setIsHistoryOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, isHistoryOpen]);
   const geolocation = useGeolocation();
   const { weather, loading: weatherLoading, error: weatherError, refetch } = useWeatherData(
     geolocation.latitude ?? undefined,
