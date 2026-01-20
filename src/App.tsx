@@ -65,6 +65,8 @@ import SecurityHoneypot from "./pages/SecurityHoneypot";
 import StrataWorldThree from "./pages/StrataWorldThree";
 import StrataWorldFive from "./pages/StrataWorldFive";
 import StrataWorldSeven from "./pages/StrataWorldSeven";
+import StrataGate from "./pages/StrataGate";
+import StrataWelcome from "./pages/StrataWelcome";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -119,6 +121,8 @@ const App = () => (
                 <Route path="/exec" element={<ExecutiveSummary />} />
                 <Route path="/pilot" element={<PilotInterestTracker />} />
                 <Route path="/security-honeypot" element={<SecurityHoneypot />} />
+                <Route path="/strata-gate" element={<StrataGate />} />
+                <Route path="/strata-welcome" element={<StrataWelcome />} />
                 <Route path="/world-3" element={<StrataWorldThree />} />
                 <Route path="/world-5" element={<StrataWorldFive />} />
                 <Route path="/world-7" element={<StrataWorldSeven />} />
