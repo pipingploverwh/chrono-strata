@@ -29,8 +29,8 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const { mode, priceType } = await req.json();
-    logStep("Request received", { mode, priceType });
+    const { mode, priceType, terrainVariant, strataZone, coordinates } = await req.json();
+    logStep("Request received", { mode, priceType, terrainVariant, strataZone, coordinates });
 
     // Initialize Stripe
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
@@ -67,6 +67,10 @@ serve(async (req) => {
     const metadata: Record<string, string> = {
       product: "strata_ownership",
       type: "annual_subscription",
+      terrain_variant: terrainVariant || "standard",
+      strata_zone: strataZone || "Default",
+      coordinates_lat: coordinates?.lat?.toString() || "0",
+      coordinates_lon: coordinates?.lon?.toString() || "0",
     };
 
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
