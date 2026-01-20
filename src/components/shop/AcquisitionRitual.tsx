@@ -26,8 +26,10 @@ interface AcquisitionRitualProps {
     strataZone: string;
     color: string;
   };
-  paymentMode: 'annual' | 'bond';
+  paymentMode: 'annual' | 'bond' | 'tactical';
   price: number;
+  depositPrice?: number;
+  isDeposit?: boolean;
 }
 
 /**
@@ -44,7 +46,9 @@ export const AcquisitionRitual = ({
   isProcessing,
   selectedTerrain,
   paymentMode,
-  price
+  price,
+  depositPrice,
+  isDeposit = false
 }: AcquisitionRitualProps) => {
   const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState<RitualStep>('idle');
@@ -294,7 +298,9 @@ export const AcquisitionRitual = ({
                         {t('ritual.protocol.title')}
                       </h3>
                       <p className="text-strata-silver/60 text-xs">
-                        {paymentMode === 'bond' 
+                        {paymentMode === 'tactical' 
+                          ? t('ritual.protocol.tacticalDescription')
+                          : paymentMode === 'bond' 
                           ? t('ritual.protocol.bondDescription')
                           : t('ritual.protocol.annualDescription')
                         }
@@ -317,10 +323,19 @@ export const AcquisitionRitual = ({
                         <p>• {t('ritual.protocol.term3')}</p>
                       </div>
                       <div className="pt-3 border-t border-strata-orange/20 flex items-center justify-between">
-                        <span className="font-mono text-[10px] text-strata-silver/60">{t('ritual.protocol.amount')}</span>
-                        <span className="font-mono text-lg text-strata-orange">
-                          ${price.toLocaleString()}
+                        <span className="font-mono text-[10px] text-strata-silver/60">
+                          {isDeposit ? t('ritual.protocol.depositAmount') : t('ritual.protocol.amount')}
                         </span>
+                        <div className="text-right">
+                          <span className="font-mono text-lg text-strata-orange">
+                            ${(isDeposit && depositPrice ? depositPrice : price).toLocaleString()}
+                          </span>
+                          {isDeposit && (
+                            <p className="font-mono text-[9px] text-strata-silver/50">
+                              {t('ritual.protocol.fullPrice')}: ${price.toLocaleString()}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
 

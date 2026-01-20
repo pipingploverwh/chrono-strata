@@ -7,12 +7,16 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// STRATA OWNERSHIP - $176/year (post-first-year billing)
+// STRATA OWNERSHIP - $176/year (post-first-year billing) — Level 1
 const STRATA_OWNERSHIP_PRICE = 17600; // cents
 
-// STRATA BOND - $12,500 one-time (100 years prepaid)
+// STRATA BOND - $12,500 one-time (100 years prepaid) — Level 2
 const STRATA_BOND_PRICE = 1250000; // cents
 const STRATA_BOND_YEARS = 100;
+
+// TACTICAL PROVISION - $18,000 physical pre-order (10% deposit = $1,800) — Level 3
+const TACTICAL_PROVISION_FULL_PRICE = 1800000; // cents ($18,000)
+const TACTICAL_PROVISION_DEPOSIT = 180000; // cents ($1,800 = 10% deposit)
 
 const logStep = (step: string, details?: Record<string, unknown>) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -37,6 +41,7 @@ serve(async (req) => {
     logStep("Request received", { mode, priceType, terrainVariant, strataZone, coordinates, legacyYears });
 
     const isBond = priceType === 'strata_bond';
+    const isTactical = priceType === 'tactical_provision';
 
     // Initialize Stripe
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
@@ -71,18 +76,57 @@ serve(async (req) => {
 
     // Build checkout session metadata
     const metadata: Record<string, string> = {
-      product: isBond ? "strata_bond" : "strata_ownership",
-      type: isBond ? "century_bond" : "annual_subscription",
+      product: isTactical ? "tactical_provision" : isBond ? "strata_bond" : "strata_ownership",
+      type: isTactical ? "physical_deposit" : isBond ? "century_bond" : "annual_subscription",
       terrain_variant: terrainVariant || "standard",
       strata_zone: strataZone || "Default",
       coordinates_lat: coordinates?.lat?.toString() || "0",
       coordinates_lon: coordinates?.lon?.toString() || "0",
       legacy_years: (legacyYears || STRATA_BOND_YEARS).toString(),
+      ...(isTactical && {
+        full_price: (TACTICAL_PROVISION_FULL_PRICE / 100).toString(),
+        deposit_amount: (TACTICAL_PROVISION_DEPOSIT / 100).toString(),
+        status: "allocated_manufacturing_pending",
+      }),
     };
 
     let sessionParams: Stripe.Checkout.SessionCreateParams;
 
-    if (isBond) {
+    if (isTactical) {
+      // TACTICAL PROVISION - $1,800 deposit for $18,000 physical jacket
+      sessionParams = {
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: 'TACTICAL PROVISION — Deposit',
+                description: `Physical STRATA Shell Pre-Order. 10% deposit ($1,800) to secure manufacturing slot. Full price: $18,000. Balance due upon fabrication completion.`,
+                metadata: {
+                  product_type: 'tactical_provision',
+                  deposit_percent: '10',
+                  full_price_cents: TACTICAL_PROVISION_FULL_PRICE.toString(),
+                },
+              },
+              unit_amount: TACTICAL_PROVISION_DEPOSIT,
+            },
+            quantity: 1,
+          },
+        ],
+        mode: "payment",
+        success_url: `${origin}/shop-success?tactical=true&terrain=${terrainVariant || 'standard'}&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/shop?canceled=true`,
+        metadata,
+        payment_intent_data: {
+          metadata,
+          description: `TACTICAL PROVISION - $1,800 Deposit (10% of $18,000)`,
+        },
+        shipping_address_collection: {
+          allowed_countries: ['US', 'CA', 'GB', 'JP', 'DE', 'FR', 'IT', 'AU'],
+        },
+      };
+      logStep("Creating TACTICAL PROVISION checkout", { deposit: TACTICAL_PROVISION_DEPOSIT, fullPrice: TACTICAL_PROVISION_FULL_PRICE });
+    } else if (isBond) {
       // STRATA BOND - One-time payment for 100 years
       sessionParams = {
         line_items: [
