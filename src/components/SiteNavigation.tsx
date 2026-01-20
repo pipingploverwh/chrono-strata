@@ -247,7 +247,7 @@ export const SiteNavigation = () => {
                 Navigation
               </SheetTitle>
             </div>
-            <LanguageToggle variant="compact" />
+            <LanguageToggle variant="inline" />
           </div>
           
           <p className="text-[10px] font-mono text-strata-silver/50 uppercase tracking-[0.2em] mt-1">
