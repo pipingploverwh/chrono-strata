@@ -16,7 +16,8 @@ import {
   Compass,
   Anchor,
   AlertTriangle,
-  Ship
+  Ship,
+  History
 } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useWeatherData } from "@/hooks/useWeatherData";
@@ -25,6 +26,7 @@ import { useMarineForecast } from "@/hooks/useMarineForecast";
 import { useTemperatureUnit } from "@/hooks/useTemperatureUnit";
 import TemperatureUnitToggle from "@/components/TemperatureUnitToggle";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import WeatherHistoryPanel from "@/components/weather/WeatherHistoryPanel";
 
 interface WeatherOverlayProps {
   isOpen: boolean;
@@ -35,6 +37,7 @@ interface WeatherOverlayProps {
 const WeatherOverlay = ({ isOpen, onClose, compact = false }: WeatherOverlayProps) => {
   const [isExpanded, setIsExpanded] = useState(!compact);
   const [activeTab, setActiveTab] = useState<'weather' | 'marine'>('weather');
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const geolocation = useGeolocation();
   const { weather, loading: weatherLoading, error: weatherError, refetch } = useWeatherData(
     geolocation.latitude ?? undefined,
@@ -261,17 +264,33 @@ const WeatherOverlay = ({ isOpen, onClose, compact = false }: WeatherOverlayProp
                 />
               )}
 
-              {/* Footer */}
-              <div className="relative px-4 py-2 text-center border-t border-strata-steel/20">
+              {/* Footer with History button */}
+              <div className="relative px-4 py-2 border-t border-strata-steel/20">
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-strata-steel/30 to-transparent" />
-                <span className="text-[9px] font-mono text-strata-silver/40 uppercase tracking-wider">
-                  {isNearWater ? 'NOAA Marine Forecast' : 'LAVANDAR Weather Intelligence'}
-                </span>
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-mono text-strata-silver/40 uppercase tracking-wider">
+                    {isNearWater ? 'NOAA Marine Forecast' : 'LAVANDAR Weather Intelligence'}
+                  </span>
+                  <button
+                    onClick={() => setIsHistoryOpen(true)}
+                    className="flex items-center gap-1.5 px-2 py-1 text-[9px] font-mono uppercase tracking-wider text-strata-cyan hover:text-strata-white hover:bg-strata-cyan/10 rounded transition-colors"
+                  >
+                    <History className="w-3 h-3" />
+                    Storm History
+                  </button>
+                </div>
               </div>
             </>
           ) : null}
         </div>
       </motion.div>
+      
+      {/* Weather History Panel */}
+      <WeatherHistoryPanel 
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        initialLocation={geolocation.locationName || undefined}
+      />
     </AnimatePresence>
   );
 };
