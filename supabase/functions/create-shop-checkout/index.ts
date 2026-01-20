@@ -10,6 +10,10 @@ const corsHeaders = {
 // STRATA OWNERSHIP - $176/year (post-first-year billing)
 const STRATA_OWNERSHIP_PRICE = 17600; // cents
 
+// STRATA BOND - $12,500 one-time (100 years prepaid)
+const STRATA_BOND_PRICE = 1250000; // cents
+const STRATA_BOND_YEARS = 100;
+
 const logStep = (step: string, details?: Record<string, unknown>) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[SHOP-CHECKOUT] ${step}${detailsStr}`);
@@ -29,8 +33,10 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const { mode, priceType, terrainVariant, strataZone, coordinates } = await req.json();
-    logStep("Request received", { mode, priceType, terrainVariant, strataZone, coordinates });
+    const { mode, priceType, terrainVariant, strataZone, coordinates, legacyYears } = await req.json();
+    logStep("Request received", { mode, priceType, terrainVariant, strataZone, coordinates, legacyYears });
+
+    const isBond = priceType === 'strata_bond';
 
     // Initialize Stripe
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
@@ -63,49 +69,88 @@ serve(async (req) => {
 
     const origin = req.headers.get("origin") || "https://chrono-strata.lovable.app";
 
-    // Build checkout session for STRATA OWNERSHIP subscription
+    // Build checkout session metadata
     const metadata: Record<string, string> = {
-      product: "strata_ownership",
-      type: "annual_subscription",
+      product: isBond ? "strata_bond" : "strata_ownership",
+      type: isBond ? "century_bond" : "annual_subscription",
       terrain_variant: terrainVariant || "standard",
       strata_zone: strataZone || "Default",
       coordinates_lat: coordinates?.lat?.toString() || "0",
       coordinates_lon: coordinates?.lon?.toString() || "0",
+      legacy_years: (legacyYears || STRATA_BOND_YEARS).toString(),
     };
 
-    const sessionParams: Stripe.Checkout.SessionCreateParams = {
-      line_items: [
-        {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: 'STRATA OWNERSHIP',
-              description: 'Cyber-Physical Weather Shell — Annual Access Protocol',
-              metadata: {
-                product_type: 'strata_ownership',
+    let sessionParams: Stripe.Checkout.SessionCreateParams;
+
+    if (isBond) {
+      // STRATA BOND - One-time payment for 100 years
+      sessionParams = {
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: 'STRATA BOND',
+                description: `Century Protocol — ${STRATA_BOND_YEARS} Years of Ownership. Transferable to children & heirs.`,
+                metadata: {
+                  product_type: 'strata_bond',
+                  years_included: STRATA_BOND_YEARS.toString(),
+                },
+              },
+              unit_amount: STRATA_BOND_PRICE,
+            },
+            quantity: 1,
+          },
+        ],
+        mode: "payment",
+        success_url: `${origin}/shop?success=true&bond=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/shop?canceled=true`,
+        metadata,
+        payment_intent_data: {
+          metadata,
+          description: `STRATA BOND - ${STRATA_BOND_YEARS} Year Generational Access`,
+        },
+        shipping_address_collection: {
+          allowed_countries: ['US', 'CA', 'GB', 'JP', 'DE', 'FR', 'IT', 'AU'],
+        },
+      };
+      logStep("Creating STRATA BOND checkout", { price: STRATA_BOND_PRICE, years: STRATA_BOND_YEARS });
+    } else {
+      // STRATA OWNERSHIP - Annual subscription
+      sessionParams = {
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: 'STRATA OWNERSHIP',
+                description: 'Century Protocol — Annual Weather Shell Access. Part of the 100-year ownership lineage.',
+                metadata: {
+                  product_type: 'strata_ownership',
+                },
+              },
+              unit_amount: STRATA_OWNERSHIP_PRICE,
+              recurring: {
+                interval: 'year',
               },
             },
-            unit_amount: STRATA_OWNERSHIP_PRICE,
-            recurring: {
-              interval: 'year',
-            },
+            quantity: 1,
           },
-          quantity: 1,
-        },
-      ],
-      mode: "subscription",
-      success_url: `${origin}/shop?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/shop?canceled=true`,
-      metadata,
-      subscription_data: {
+        ],
+        mode: "subscription",
+        success_url: `${origin}/shop?success=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/shop?canceled=true`,
         metadata,
-        // First year is at full price, subsequent years auto-renew
-        description: 'STRATA OWNERSHIP - Annual Weather Shell Access',
-      },
-      shipping_address_collection: {
-        allowed_countries: ['US', 'CA', 'GB', 'JP', 'DE', 'FR', 'IT', 'AU'],
-      },
-    };
+        subscription_data: {
+          metadata,
+          description: 'STRATA OWNERSHIP - Annual Century Protocol Access',
+        },
+        shipping_address_collection: {
+          allowed_countries: ['US', 'CA', 'GB', 'JP', 'DE', 'FR', 'IT', 'AU'],
+        },
+      };
+      logStep("Creating STRATA OWNERSHIP checkout", { price: STRATA_OWNERSHIP_PRICE, mode: "subscription" });
+    }
 
     // Add customer info if available
     if (customerId) {
@@ -115,7 +160,7 @@ serve(async (req) => {
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
-    logStep("Checkout session created", { sessionId: session.id, url: session.url, mode: "subscription" });
+    logStep("Checkout session created", { sessionId: session.id, url: session.url, mode: isBond ? "payment" : "subscription" });
 
     return new Response(
       JSON.stringify({ 

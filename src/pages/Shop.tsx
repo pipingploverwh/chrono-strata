@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Check, Droplets, Wind, Shield, Loader2, Zap, Map, Clock, Activity, Anchor, Snowflake, Sun, Building2, ChevronLeft, ChevronRight } from "lucide-react";
+import { ShoppingBag, Check, Droplets, Wind, Shield, Loader2, Zap, Map, Clock, Activity, Anchor, Snowflake, Sun, Building2, ChevronLeft, ChevronRight, Infinity, Users, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -73,14 +73,25 @@ const TERRAIN_VARIANTS = [
   },
 ];
 
-// Strata Ownership - $176/year
+// Strata Ownership - 100 Year Legacy Program
 const STRATA_OWNERSHIP = {
   name: 'STRATA OWNERSHIP',
-  subtitle: 'Cyber-Physical Weather Shell',
+  subtitle: 'Century Protocol — 100 Years of Ownership',
   price: 176,
   interval: 'year',
-  description: 'Vulcanized hydrophobic shell with embedded chronometer display and terrain-mapped HUD. Select your Strata zone.',
-  tagline: 'Fabric as Display. Terrain as Identity.',
+  description: 'Vulcanized hydrophobic shell with embedded chronometer display and terrain-mapped HUD. This is not a limited run — it is the beginning of a 100-year ownership lineage.',
+  tagline: 'A Century of Ownership. Generational Access.',
+  legacyYears: 100,
+};
+
+// STRATA Bond - Upfront generational payment
+const STRATA_BOND = {
+  name: 'STRATA BOND',
+  subtitle: 'Generational Prepaid Access',
+  price: 12500,
+  description: 'Secure 100 years of STRATA ownership upfront. Transfer to children, heirs, or designees. One payment. One century.',
+  savings: 'Save $5,100 vs annual',
+  yearsIncluded: 100,
 };
 
 // Technical specifications
@@ -129,6 +140,7 @@ const Shop = () => {
   const [selectedTerrain, setSelectedTerrain] = useState(TERRAIN_VARIANTS[0]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [systemStatus, setSystemStatus] = useState('NOMINAL');
+  const [selectedPaymentMode, setSelectedPaymentMode] = useState<'annual' | 'bond'>('annual');
 
   const currentIndex = TERRAIN_VARIANTS.findIndex(t => t.id === selectedTerrain.id);
   
@@ -145,7 +157,15 @@ const Shop = () => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('success') === 'true') {
-      toast.success('Strata Ownership activated. Welcome to the protocol.');
+      const isBond = params.get('bond') === 'true';
+      if (isBond) {
+        toast.success('STRATA Bond secured. Welcome to 100 years of ownership.', {
+          description: 'Your generational access has been activated.',
+          duration: 8000,
+        });
+      } else {
+        toast.success('Strata Ownership activated. Welcome to the Century Protocol.');
+      }
       window.history.replaceState({}, '', '/shop');
     }
     if (params.get('canceled') === 'true') {
@@ -161,11 +181,12 @@ const Shop = () => {
     try {
       const { data, error } = await supabase.functions.invoke('create-shop-checkout', {
         body: { 
-          mode: 'subscription',
-          priceType: 'strata_ownership',
+          mode: selectedPaymentMode === 'bond' ? 'payment' : 'subscription',
+          priceType: selectedPaymentMode === 'bond' ? 'strata_bond' : 'strata_ownership',
           terrainVariant: selectedTerrain.id,
           strataZone: selectedTerrain.strataZone,
           coordinates: selectedTerrain.coordinates,
+          legacyYears: STRATA_OWNERSHIP.legacyYears,
         }
       });
 
@@ -401,23 +422,95 @@ const Shop = () => {
             transition={{ delay: 0.3 }}
           >
             <div className="space-y-6">
-              {/* Price Card */}
-              <div className="border border-strata-orange/30 rounded-lg p-6 bg-strata-orange/5">
-                <div className="flex items-center gap-2 mb-4">
-                  <Zap className="w-4 h-4 text-strata-orange" />
-                  <span className="font-mono text-[10px] text-strata-orange uppercase tracking-wider">
-                    Strata Ownership
+              {/* Century Protocol Header */}
+              <div className="border border-strata-cyan/30 rounded-lg p-4 bg-strata-cyan/5">
+                <div className="flex items-center gap-3 mb-2">
+                  <Infinity className="w-5 h-5 text-strata-cyan" />
+                  <span className="font-mono text-xs text-strata-cyan uppercase tracking-wider">
+                    Century Protocol
                   </span>
                 </div>
-                <div className="flex items-baseline gap-2 mb-2">
-                  <span className="text-5xl font-mono text-strata-white">
-                    ${STRATA_OWNERSHIP.price}
-                  </span>
-                  <span className="text-strata-silver font-mono text-sm">/{STRATA_OWNERSHIP.interval}</span>
-                </div>
-                <p className="text-strata-silver/60 font-mono text-[10px] uppercase tracking-wider">
-                  Post-first-year billing
+                <p className="text-strata-silver/80 text-xs font-mono">
+                  This is not a limited run. This is the start of <span className="text-strata-white">100 years</span> of ownership.
                 </p>
+              </div>
+
+              {/* Payment Mode Toggle */}
+              <div className="space-y-3">
+                <span className="font-mono text-[10px] text-strata-silver/60 uppercase tracking-[0.2em]">
+                  Select Ownership Mode
+                </span>
+                
+                {/* Annual Option */}
+                <button
+                  onClick={() => setSelectedPaymentMode('annual')}
+                  className={`w-full text-left border rounded-lg p-4 transition-all ${
+                    selectedPaymentMode === 'annual'
+                      ? 'border-strata-orange bg-strata-orange/10'
+                      : 'border-strata-steel/30 bg-strata-charcoal/20 hover:border-strata-steel/50'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Clock className={`w-4 h-4 ${selectedPaymentMode === 'annual' ? 'text-strata-orange' : 'text-strata-silver/60'}`} />
+                      <span className={`font-mono text-sm uppercase tracking-wider ${selectedPaymentMode === 'annual' ? 'text-strata-orange' : 'text-strata-silver'}`}>
+                        Annual
+                      </span>
+                    </div>
+                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                      selectedPaymentMode === 'annual' ? 'border-strata-orange' : 'border-strata-steel/50'
+                    }`}>
+                      {selectedPaymentMode === 'annual' && <div className="w-2 h-2 rounded-full bg-strata-orange" />}
+                    </div>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className={`text-3xl font-mono ${selectedPaymentMode === 'annual' ? 'text-strata-white' : 'text-strata-silver'}`}>
+                      ${STRATA_OWNERSHIP.price}
+                    </span>
+                    <span className="text-strata-silver/60 font-mono text-xs">/year</span>
+                  </div>
+                  <p className="text-strata-silver/50 font-mono text-[9px] mt-1">Post-first-year billing</p>
+                </button>
+                
+                {/* Bond Option */}
+                <button
+                  onClick={() => setSelectedPaymentMode('bond')}
+                  className={`w-full text-left border rounded-lg p-4 transition-all ${
+                    selectedPaymentMode === 'bond'
+                      ? 'border-strata-lume bg-strata-lume/10'
+                      : 'border-strata-steel/30 bg-strata-charcoal/20 hover:border-strata-steel/50'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Gift className={`w-4 h-4 ${selectedPaymentMode === 'bond' ? 'text-strata-lume' : 'text-strata-silver/60'}`} />
+                      <span className={`font-mono text-sm uppercase tracking-wider ${selectedPaymentMode === 'bond' ? 'text-strata-lume' : 'text-strata-silver'}`}>
+                        STRATA Bond
+                      </span>
+                      <Badge className="bg-strata-lume/20 text-strata-lume border-strata-lume/30 font-mono text-[8px] px-1.5 py-0">
+                        LEGACY
+                      </Badge>
+                    </div>
+                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                      selectedPaymentMode === 'bond' ? 'border-strata-lume' : 'border-strata-steel/50'
+                    }`}>
+                      {selectedPaymentMode === 'bond' && <div className="w-2 h-2 rounded-full bg-strata-lume" />}
+                    </div>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className={`text-3xl font-mono ${selectedPaymentMode === 'bond' ? 'text-strata-white' : 'text-strata-silver'}`}>
+                      ${STRATA_BOND.price.toLocaleString()}
+                    </span>
+                    <span className="text-strata-silver/60 font-mono text-xs">one-time</span>
+                  </div>
+                  <p className="text-strata-silver/50 font-mono text-[9px] mt-1">{STRATA_BOND.savings} • 100 years prepaid</p>
+                  <div className="flex items-center gap-2 mt-2 pt-2 border-t border-strata-steel/20">
+                    <Users className={`w-3 h-3 ${selectedPaymentMode === 'bond' ? 'text-strata-lume/80' : 'text-strata-silver/40'}`} />
+                    <span className={`font-mono text-[9px] ${selectedPaymentMode === 'bond' ? 'text-strata-lume/80' : 'text-strata-silver/40'}`}>
+                      Transferable to children & heirs
+                    </span>
+                  </div>
+                </button>
               </div>
 
               {/* Selected Terrain */}
@@ -497,12 +590,21 @@ const Shop = () => {
                 onClick={handleSubscribe}
                 disabled={isProcessing}
                 size="lg"
-                className="w-full py-6 text-sm font-mono uppercase tracking-[0.2em] bg-strata-orange hover:bg-strata-orange/90 text-strata-black transition-all"
+                className={`w-full py-6 text-sm font-mono uppercase tracking-[0.2em] transition-all ${
+                  selectedPaymentMode === 'bond' 
+                    ? 'bg-strata-lume hover:bg-strata-lume/90 text-strata-black' 
+                    : 'bg-strata-orange hover:bg-strata-orange/90 text-strata-black'
+                }`}
               >
                 {isProcessing ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-3 animate-spin" />
                     Initiating Protocol...
+                  </>
+                ) : selectedPaymentMode === 'bond' ? (
+                  <>
+                    <Gift className="w-4 h-4 mr-3" />
+                    Secure STRATA Bond — ${STRATA_BOND.price.toLocaleString()}
                   </>
                 ) : (
                   <>
@@ -520,13 +622,13 @@ const Shop = () => {
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1">
-                  <Check className="w-3 h-3" />
-                  Limited Run
+                  <Infinity className="w-3 h-3" />
+                  100-Year Legacy
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1">
-                  <Check className="w-3 h-3" />
-                  Annual Access
+                  <Users className="w-3 h-3" />
+                  Generational
                 </span>
               </div>
             </div>
