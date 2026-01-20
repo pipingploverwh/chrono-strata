@@ -162,7 +162,7 @@ const StrataWorldFive = () => {
         {/* Footer */}
         <div className="text-center mt-16">
           <p className="text-xs text-slate-600 font-mono tracking-wider">
-            DESIGNED BY ARIELLE ASSOULINE-LICHTEN · STRATA COLLECTION
+            STRATA COLLECTION
           </p>
         </div>
       </div>

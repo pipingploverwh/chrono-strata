@@ -252,7 +252,7 @@ const StrataGate = () => {
                 STRATA WORLD CLOCK
               </p>
               <p className="text-[10px] font-mono text-zinc-600 tracking-widest">
-                DESIGNED BY ARIELLE ASSOULINE-LICHTEN
+                STRATA COLLECTION
               </p>
             </div>
           </div>
@@ -496,7 +496,7 @@ const StrataGate = () => {
           {/* Bottom security bar */}
           <div className="border-t border-zinc-800 px-4 py-2 flex items-center justify-between">
             <span className="text-[9px] font-mono text-zinc-600 tracking-widest">
-              AAL SECURITY PROTOCOL v2.0
+              SECURITY PROTOCOL v2.0
             </span>
             <div className="flex items-center gap-1">
               <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />

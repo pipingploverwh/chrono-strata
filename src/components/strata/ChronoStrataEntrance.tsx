@@ -606,7 +606,7 @@ const ChronoStrataEntrance = () => {
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] font-mono text-slate-600">
             <span>CHRONO STRATA × LAVANDAR</span>
             <span>7 STRATA • REAL-TIME GLOBAL CONDITIONS</span>
-            <span>DESIGNED BY AAL</span>
+            <span>STRATA COLLECTION</span>
           </div>
         </footer>
       </div>

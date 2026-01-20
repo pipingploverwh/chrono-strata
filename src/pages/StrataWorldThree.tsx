@@ -78,7 +78,7 @@ const StrataWorldThree = () => {
             Three Time Zones
           </h1>
           <p className="text-slate-400 max-w-xl mx-auto text-lg font-light">
-            Elegant world clock designed by AAL. Track three cities with precision.
+            Elegant world clock. Track three cities with precision.
           </p>
         </div>
 
@@ -157,7 +157,7 @@ const StrataWorldThree = () => {
         {/* Footer */}
         <div className="text-center mt-16">
           <p className="text-xs text-slate-600 font-mono tracking-wider">
-            DESIGNED BY ARIELLE ASSOULINE-LICHTEN · STRATA COLLECTION
+            STRATA COLLECTION
           </p>
         </div>
       </div>
