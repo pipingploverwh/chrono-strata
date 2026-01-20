@@ -122,8 +122,7 @@ const EQUIPMENT_SPECS_KEYS = [
   { key: 'weight', labelKey: 'spec.weight', valueKey: 'spec.weight.value', descKey: 'spec.weight.desc' },
 ];
 
-// Acquisition flow steps
-type AcquisitionStep = 'idle' | 'terrain' | 'verify' | 'execute';
+// Payment mode types - sorted by commitment level
 
 // Payment mode types - sorted by commitment level
 type PaymentMode = 'annual' | 'bond' | 'tactical';
@@ -189,7 +188,6 @@ const Shop = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [systemStatus, setSystemStatus] = useState('NOMINAL');
   const [selectedPaymentMode, setSelectedPaymentMode] = useState<'annual' | 'bond' | 'tactical'>('annual');
-  const [acquisitionStep, setAcquisitionStep] = useState<AcquisitionStep>('idle');
   const [isTerrainTransitioning, setIsTerrainTransitioning] = useState(false);
   const [isBondHovered, setIsBondHovered] = useState(false);
   const [isRitualOpen, setIsRitualOpen] = useState(false);
@@ -807,266 +805,37 @@ const Shop = () => {
                 ))}
               </div>
 
-              {/* TACTICAL ACQUISITION FLOW */}
+              {/* CHECKOUT BUTTON */}
               <div className="space-y-4">
-                {/* Main CTA - INITIATE ACQUISITION */}
-                <AnimatePresence mode="wait">
-                  {acquisitionStep === 'idle' && (
-                    <motion.button
-                      key="initiate"
-                      onClick={() => setIsRitualOpen(true)}
-                      className="w-full relative overflow-hidden group"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                    >
-                      {/* Safety Orange background with warning stripes */}
-                      <div className="absolute inset-0 bg-orange-500" />
-                      <div className="absolute inset-0 opacity-20" style={{
-                        backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.3) 10px, rgba(0,0,0,0.3) 20px)'
-                      }} />
-                      
-                      {/* Content */}
-                      <div className="relative py-5 px-6 flex items-center justify-center gap-4">
-                        <AlertTriangle className="w-5 h-5 text-black animate-pulse" />
-                        <span className="text-lg font-mono font-black uppercase tracking-[0.3em] text-black">
-                          {t('acquisition.initiate')}
-                        </span>
-                        <AlertTriangle className="w-5 h-5 text-black animate-pulse" />
-                      </div>
-                      
-                      {/* Hover effect - glow */}
-                      <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
-                      
-                      {/* Border effect */}
-                      <div className="absolute inset-0 border-4 border-black/40" />
-                    </motion.button>
-                  )}
-
-                  {/* Step 1: Confirm Terrain */}
-                  {acquisitionStep === 'terrain' && (
-                    <motion.div
-                      key="terrain-step"
-                      className="border-2 border-orange-500 bg-strata-black p-4 space-y-4"
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                    >
-                      {/* Header */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
-                          <span className="font-mono text-[10px] text-orange-500 uppercase tracking-[0.3em]">
-                            {t('acquisition.launchSequence')} — 1/3
-                          </span>
-                        </div>
-                        <button 
-                          onClick={() => setAcquisitionStep('idle')}
-                          className="p-1 hover:bg-strata-steel/20 rounded transition-colors"
-                        >
-                          <X className="w-4 h-4 text-strata-silver/60" />
-                        </button>
-                      </div>
-                      
-                      {/* Content */}
-                      <div className="py-3 border-y border-strata-steel/30">
-                        <p className="font-mono text-xs text-strata-silver uppercase tracking-wider mb-3">
-                          {t('acquisition.step1')}
-                        </p>
-                        <div className={`flex items-center gap-3 p-3 bg-${selectedTerrain.color}/10 border border-${selectedTerrain.color}/40 rounded`}>
-                          <TerrainIcon className={`w-5 h-5 text-${selectedTerrain.color}`} />
-                          <div>
-                            <p className={`text-${selectedTerrain.color} font-mono font-semibold`}>{selectedTerrain.name}</p>
-                            <p className="text-strata-silver/60 font-mono text-[10px]">{selectedTerrain.strataZone}</p>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Actions */}
-                      <div className="flex items-center gap-3">
-                        <button 
-                          onClick={() => setAcquisitionStep('idle')}
-                          className="flex-1 py-3 border border-strata-steel/40 text-strata-silver font-mono text-xs uppercase tracking-wider hover:bg-strata-steel/10 transition-colors"
-                        >
-                          {t('acquisition.abort')}
-                        </button>
-                        <button 
-                          onClick={() => setAcquisitionStep('verify')}
-                          className="flex-1 py-3 bg-orange-500 text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-orange-400 transition-colors flex items-center justify-center gap-2"
-                        >
-                          <Lock className="w-3 h-3" />
-                          {t('acquisition.confirm')}
-                          <ArrowRight className="w-3 h-3" />
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* Step 2: Verify Strata ID */}
-                  {acquisitionStep === 'verify' && (
-                    <motion.div
-                      key="verify-step"
-                      className="border-2 border-strata-cyan bg-strata-black p-4 space-y-4"
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                    >
-                      {/* Header */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-2 h-2 rounded-full bg-strata-cyan animate-pulse" />
-                          <span className="font-mono text-[10px] text-strata-cyan uppercase tracking-[0.3em]">
-                            {t('acquisition.launchSequence')} — 2/3
-                          </span>
-                        </div>
-                        <button 
-                          onClick={() => setAcquisitionStep('idle')}
-                          className="p-1 hover:bg-strata-steel/20 rounded transition-colors"
-                        >
-                          <X className="w-4 h-4 text-strata-silver/60" />
-                        </button>
-                      </div>
-                      
-                      {/* Terrain Locked Indicator */}
-                      <div className="flex items-center gap-2 px-3 py-2 bg-strata-lume/10 border border-strata-lume/30 rounded">
-                        <Check className="w-4 h-4 text-strata-lume" />
-                        <span className="font-mono text-[10px] text-strata-lume uppercase tracking-wider">
-                          {t('acquisition.terrainLocked')}: {selectedTerrain.name}
-                        </span>
-                      </div>
-                      
-                      {/* Content */}
-                      <div className="py-3 border-y border-strata-steel/30">
-                        <p className="font-mono text-xs text-strata-silver uppercase tracking-wider mb-3">
-                          {t('acquisition.step2')}
-                        </p>
-                        <div className="flex items-center gap-3 p-3 bg-strata-cyan/10 border border-strata-cyan/40 rounded">
-                          <Shield className="w-5 h-5 text-strata-cyan" />
-                          <div>
-                            <p className="text-strata-cyan font-mono font-semibold">
-                              {selectedPaymentMode === 'bond' ? t('shop.strataBond') : t('shop.annual')}
-                            </p>
-                            <p className="text-strata-silver/60 font-mono text-[10px]">
-                              {selectedPaymentMode === 'bond' 
-                                ? `$${STRATA_BOND.price.toLocaleString()} — 100 ${t('shop.yearsOwnership')}`
-                                : `$${STRATA_OWNERSHIP.price}${t('shop.perYear')}`
-                              }
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Actions */}
-                      <div className="flex items-center gap-3">
-                        <button 
-                          onClick={() => setAcquisitionStep('terrain')}
-                          className="flex-1 py-3 border border-strata-steel/40 text-strata-silver font-mono text-xs uppercase tracking-wider hover:bg-strata-steel/10 transition-colors"
-                        >
-                          {t('acquisition.abort')}
-                        </button>
-                        <button 
-                          onClick={() => setAcquisitionStep('execute')}
-                          className="flex-1 py-3 bg-strata-cyan text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-strata-cyan/90 transition-colors flex items-center justify-center gap-2"
-                        >
-                          <Check className="w-3 h-3" />
-                          {t('acquisition.proceed')}
-                          <ArrowRight className="w-3 h-3" />
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* Step 3: Execute Payment */}
-                  {acquisitionStep === 'execute' && (
-                    <motion.div
-                      key="execute-step"
-                      className="border-2 border-strata-lume bg-strata-black p-4 space-y-4"
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                    >
-                      {/* Header */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-2 h-2 rounded-full bg-strata-lume animate-pulse" />
-                          <span className="font-mono text-[10px] text-strata-lume uppercase tracking-[0.3em]">
-                            {t('acquisition.launchSequence')} — 3/3
-                          </span>
-                        </div>
-                        <button 
-                          onClick={() => setAcquisitionStep('idle')}
-                          className="p-1 hover:bg-strata-steel/20 rounded transition-colors"
-                        >
-                          <X className="w-4 h-4 text-strata-silver/60" />
-                        </button>
-                      </div>
-                      
-                      {/* Status Indicators */}
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 px-3 py-2 bg-strata-lume/10 border border-strata-lume/30 rounded">
-                          <Check className="w-4 h-4 text-strata-lume" />
-                          <span className="font-mono text-[10px] text-strata-lume uppercase tracking-wider">
-                            {t('acquisition.terrainLocked')}: {selectedTerrain.name}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 px-3 py-2 bg-strata-lume/10 border border-strata-lume/30 rounded">
-                          <Check className="w-4 h-4 text-strata-lume" />
-                          <span className="font-mono text-[10px] text-strata-lume uppercase tracking-wider">
-                            {t('acquisition.idVerified')}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      {/* Content */}
-                      <div className="py-3 border-y border-strata-steel/30">
-                        <p className="font-mono text-xs text-strata-silver uppercase tracking-wider mb-3">
-                          {t('acquisition.step3')}
-                        </p>
-                        <div className="text-center py-2">
-                          <p className="text-strata-lume font-mono text-2xl font-bold">
-                            {selectedPaymentMode === 'bond' 
-                              ? `$${STRATA_BOND.price.toLocaleString()}`
-                              : `$${STRATA_OWNERSHIP.price}${t('shop.perYear')}`
-                            }
-                          </p>
-                          <p className="text-strata-silver/60 font-mono text-[10px] mt-1">
-                            {t('acquisition.systemArmed')}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      {/* Actions */}
-                      <div className="flex items-center gap-3">
-                        <button 
-                          onClick={() => setAcquisitionStep('idle')}
-                          className="flex-1 py-3 border border-strata-steel/40 text-strata-silver font-mono text-xs uppercase tracking-wider hover:bg-strata-steel/10 transition-colors"
-                        >
-                          {t('acquisition.abort')}
-                        </button>
-                        <button 
-                          onClick={() => {
-                            handleSubscribe();
-                            setAcquisitionStep('idle');
-                          }}
-                          disabled={isProcessing}
-                          className="flex-1 py-3 bg-strata-lume text-black font-mono text-xs font-black uppercase tracking-wider hover:bg-strata-lume/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-                        >
-                          {isProcessing ? (
-                            <>
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                              {t('shop.initiating')}
-                            </>
-                          ) : (
-                            <>
-                              <Zap className="w-4 h-4" />
-                              {t('acquisition.execute')}
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <motion.button
+                  onClick={() => setIsRitualOpen(true)}
+                  className="w-full relative overflow-hidden group"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                >
+                  {/* Safety Orange background with warning stripes */}
+                  <div className="absolute inset-0 bg-strata-orange" />
+                  <div className="absolute inset-0 opacity-20" style={{
+                    backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.3) 10px, rgba(0,0,0,0.3) 20px)'
+                  }} />
+                  
+                  {/* Content */}
+                  <div className="relative py-5 px-6 flex items-center justify-center gap-4">
+                    <AlertTriangle className="w-5 h-5 text-black animate-pulse" />
+                    <span className="text-lg font-mono font-black uppercase tracking-[0.3em] text-black">
+                      {t('acquisition.initiate')}
+                    </span>
+                    <AlertTriangle className="w-5 h-5 text-black animate-pulse" />
+                  </div>
+                  
+                  {/* Hover effect - glow */}
+                  <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
+                  
+                  {/* Border effect */}
+                  <div className="absolute inset-0 border-4 border-black/40" />
+                </motion.button>
               </div>
 
               {/* Trust signals */}
