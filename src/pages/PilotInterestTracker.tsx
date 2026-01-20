@@ -83,24 +83,31 @@ export default function PilotInterestTracker() {
     e.preventDefault();
     setIsSubmitting(true);
 
+    const applicationData = {
+      company_name: formData.company_name.trim(),
+      company_size: formData.company_size,
+      industry: formData.industry,
+      contact_name: formData.contact_name.trim(),
+      contact_email: formData.contact_email.trim().toLowerCase(),
+      contact_title: formData.contact_title.trim() || null,
+      use_case: formData.use_case,
+      use_case_details: formData.use_case_details.trim() || null,
+      desired_timeline: formData.desired_timeline,
+      budget_range: formData.budget_range || null,
+      current_solution: formData.current_solution.trim() || null
+    };
+
     try {
       const { error } = await supabase
         .from('pilot_applications')
-        .insert({
-          company_name: formData.company_name.trim(),
-          company_size: formData.company_size,
-          industry: formData.industry,
-          contact_name: formData.contact_name.trim(),
-          contact_email: formData.contact_email.trim().toLowerCase(),
-          contact_title: formData.contact_title.trim() || null,
-          use_case: formData.use_case,
-          use_case_details: formData.use_case_details.trim() || null,
-          desired_timeline: formData.desired_timeline,
-          budget_range: formData.budget_range || null,
-          current_solution: formData.current_solution.trim() || null
-        });
+        .insert(applicationData);
 
       if (error) throw error;
+
+      // Send admin notification email (fire and forget)
+      supabase.functions.invoke('notify-pilot-application', {
+        body: applicationData
+      }).catch(err => console.error('Failed to send admin notification:', err));
 
       setSubmitted(true);
       toast.success('Pilot application submitted successfully!');
