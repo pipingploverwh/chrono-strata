@@ -331,6 +331,7 @@ const KidsCollection = () => {
   const { t } = useLanguage();
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [bundleSize, setBundleSize] = useState('S (6-7)');
   const { formatTemp } = useTemperatureUnit();
   const { latitude, longitude, hasLocation, requestLocation } = useGeolocation();
   const { weather, loading: weatherLoading } = useWeatherData(
@@ -369,6 +370,37 @@ const KidsCollection = () => {
     } catch (error) {
       console.error('Checkout error:', error);
       toast.error('Unable to start checkout. Please try again.');
+    } finally {
+      setIsProcessing(false);
+      setProcessingId(null);
+    }
+  };
+
+  const handleBundleCheckout = async () => {
+    setIsProcessing(true);
+    setProcessingId('kids_bundle');
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('create-shop-checkout', {
+        body: { 
+          mode: 'subscription',
+          priceType: 'kids_bundle',
+          terrainVariant: 'polar_junior',
+          strataZone: 'Complete Explorer Kit',
+          size: bundleSize,
+        }
+      });
+
+      if (error) throw error;
+      
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
+    } catch (error) {
+      console.error('Bundle checkout error:', error);
+      toast.error('Unable to start bundle checkout. Please try again.');
     } finally {
       setIsProcessing(false);
       setProcessingId(null);
@@ -477,22 +509,77 @@ const KidsCollection = () => {
           transition={{ delay: 0.5 }}
         >
           <Badge className="bg-white/20 text-white border-white/30 mb-4">
-            Bundle & Save
+            Bundle & Save $63
           </Badge>
           <h2 className="text-3xl md:text-4xl font-instrument mb-3">
             Complete Explorer Kit
           </h2>
           <p className="text-lavender-100 max-w-xl mx-auto mb-6">
             Get the full collection—Shell, Cashmere Interior, Pants & Boots—for $399/year. 
-            Save $63 compared to individual items.
+            Everything your young explorer needs.
           </p>
-          <Button
-            size="lg"
-            className="bg-white text-lavender-600 hover:bg-lavender-50 font-semibold rounded-xl shadow-lg"
-          >
-            Get the Bundle
-            <ArrowRight className="w-5 h-5 ml-2" />
-          </Button>
+          
+          {/* Bundle size selector */}
+          <div className="flex flex-wrap justify-center gap-2 mb-6">
+            {['2T', '3T', '4T', 'XS (4-5)', 'S (6-7)', 'M (8-9)', 'L (10-12)'].map((size) => (
+              <button
+                key={size}
+                onClick={() => setBundleSize(size)}
+                className={`
+                  px-3 py-1.5 rounded-lg font-mono text-xs transition-all
+                  ${bundleSize === size 
+                    ? 'bg-white text-lavender-600' 
+                    : 'bg-white/20 text-white hover:bg-white/30'
+                  }
+                `}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="text-left">
+              <div className="text-sm text-lavender-200 line-through">$462/year</div>
+              <div className="text-3xl font-bold">$399<span className="text-lg font-normal">/year</span></div>
+            </div>
+            
+            <Button
+              onClick={handleBundleCheckout}
+              disabled={isProcessing && processingId === 'kids_bundle'}
+              size="lg"
+              className="bg-white text-lavender-600 hover:bg-lavender-50 font-semibold rounded-xl shadow-lg min-w-[200px]"
+            >
+              {isProcessing && processingId === 'kids_bundle' ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>
+                  Get the Bundle
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </>
+              )}
+            </Button>
+          </div>
+
+          {/* Bundle includes */}
+          <div className="mt-8 flex flex-wrap justify-center gap-4 text-sm text-lavender-100">
+            <div className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4" />
+              <span>Polar Junior Shell</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4" />
+              <span>Cashmere Interior</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4" />
+              <span>Explorer Pants</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4" />
+              <span>Pathfinder Boots</span>
+            </div>
+          </div>
         </motion.div>
 
         {/* Back to Shop */}
