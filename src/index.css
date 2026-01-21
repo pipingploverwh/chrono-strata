@@ -562,3 +562,65 @@ html {
 .animate-fade {
   animation: fade-in 300ms ease;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   PRINT SYSTEM — LAVANDAR branded print styles
+   ═══════════════════════════════════════════════════════════════ */
+@media print {
+  /* Reset for print */
+  body {
+    background: white !important;
+    color: #18181b !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide non-printable elements */
+  .no-print,
+  nav,
+  footer:not(.print-footer),
+  .print-hide {
+    display: none !important;
+  }
+
+  /* Show print-only elements */
+  .print-only,
+  .print-header,
+  .print-footer {
+    display: block !important;
+  }
+
+  /* Page setup */
+  @page {
+    margin: 15mm;
+    size: A4;
+  }
+
+  /* Print document container */
+  .print-document {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    background: white;
+    color: #18181b;
+  }
+
+  /* Ensure colors print */
+  .print-document * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Avoid page breaks inside important elements */
+  .print-section,
+  table,
+  figure {
+    break-inside: avoid;
+  }
+
+  /* Force page break before */
+  .print-page-break {
+    break-before: page;
+  }
+}
