@@ -74,6 +74,7 @@ import ChronoStrataGate from "./pages/ChronoStrataGate";
 import Shop from "./pages/Shop";
 import ShopSuccess from "./pages/ShopSuccess";
 import KidsStrataShell from "./pages/KidsStrataShell";
+import KidsBundleSuccess from "./pages/KidsBundleSuccess";
 import HackerNewsPost from "./pages/HackerNewsPost";
 import CEOLetter from "./pages/CEOLetter";
 import BattleCards from "./pages/BattleCards";
@@ -142,6 +143,7 @@ const App = () => (
                 <Route path="/world-7" element={<StrataWorldSeven />} />
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/shop-success" element={<ShopSuccess />} />
+                <Route path="/kids-bundle-success" element={<KidsBundleSuccess />} />
                 <Route path="/kids" element={<KidsStrataShell />} />
                 <Route path="/kids-collection" element={<KidsCollection />} />
                 <Route path="/hn" element={<HackerNewsPost />} />
