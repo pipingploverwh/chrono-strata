@@ -24,6 +24,7 @@ const linkCategories: LinkCategory[] = [
       { label: "Platform Home", path: "/", description: "Main landing page" },
       { label: "Executive Summary", path: "/vc", description: "Investor overview" },
       { label: "Acquisition Pitch", path: "/acquisition-pitch", description: "Strategic acquisition deck" },
+      { label: "Hacker News Post", path: "/hn", description: "Paul Graham-style essay on building with Lovable" },
     ],
   },
   {
