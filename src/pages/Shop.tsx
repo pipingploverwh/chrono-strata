@@ -904,7 +904,7 @@ const Shop = () => {
           transition={{ delay: 0.5 }}
         >
           <Link 
-            to="/kids"
+            to="/kids-collection"
             className="block bg-gradient-to-r from-lavender-500/10 via-lavender-400/5 to-lavender-500/10 border border-lavender-400/30 rounded-xl p-6 hover:border-lavender-400/60 transition-all group"
           >
             <div className="flex items-center justify-between">
@@ -917,10 +917,10 @@ const Shop = () => {
                     Junior Collection
                   </p>
                   <h3 className="text-xl font-instrument text-strata-white">
-                    STRATA Shell — Polar Junior
+                    STRATA Kids — Full Collection
                   </h3>
                   <p className="text-strata-silver/60 text-sm mt-1">
-                    Ages 4-12 • White rubberized shell with lavender emblem • $148/year
+                    Ages 2+ • Shell, Cashmere Interiors, Pants & Boots • From $88/year
                   </p>
                 </div>
               </div>
