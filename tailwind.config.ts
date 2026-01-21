@@ -145,6 +145,9 @@ export default {
         '18': '4.5rem',
         '22': '5.5rem',
       },
+      transitionTimingFunction: {
+        'lavender-soft': 'cubic-bezier(0.22, 1, 0.36, 1)',
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -158,11 +161,21 @@ export default {
           from: { opacity: "0" },
           to: { opacity: "1" },
         },
+        "ritual-reveal": {
+          "0%": { opacity: "0", transform: "scale(0.95) translateY(10px)" },
+          "100%": { opacity: "1", transform: "scale(1) translateY(0)" },
+        },
+        "glass-shimmer": {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade": "fade-in 0.3s ease",
+        "ritual-reveal": "ritual-reveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards",
+        "glass-shimmer": "glass-shimmer 3s infinite linear",
       },
     },
   },
