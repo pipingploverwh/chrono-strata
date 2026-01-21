@@ -73,6 +73,7 @@ import ChronoStrataGate from "./pages/ChronoStrataGate";
 import Shop from "./pages/Shop";
 import ShopSuccess from "./pages/ShopSuccess";
 import KidsStrataShell from "./pages/KidsStrataShell";
+import HackerNewsPost from "./pages/HackerNewsPost";
 
 const queryClient = new QueryClient();
 
@@ -139,6 +140,7 @@ const App = () => (
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/shop-success" element={<ShopSuccess />} />
                 <Route path="/kids" element={<KidsStrataShell />} />
+                <Route path="/hn" element={<HackerNewsPost />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />
