@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
+import KidsCollection from "@/pages/KidsCollection";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -142,6 +143,7 @@ const App = () => (
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/shop-success" element={<ShopSuccess />} />
                 <Route path="/kids" element={<KidsStrataShell />} />
+                <Route path="/kids-collection" element={<KidsCollection />} />
                 <Route path="/hn" element={<HackerNewsPost />} />
                 <Route path="/ceo-letter" element={<CEOLetter />} />
                 <Route path="/battle-cards" element={<BattleCards />} />
