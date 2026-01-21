@@ -78,6 +78,7 @@ import KidsBundleSuccess from "./pages/KidsBundleSuccess";
 import HackerNewsPost from "./pages/HackerNewsPost";
 import CEOLetter from "./pages/CEOLetter";
 import BattleCards from "./pages/BattleCards";
+import EventPage from "./pages/EventPage";
 
 const queryClient = new QueryClient();
 
@@ -149,6 +150,7 @@ const App = () => (
                 <Route path="/hn" element={<HackerNewsPost />} />
                 <Route path="/ceo-letter" element={<CEOLetter />} />
                 <Route path="/battle-cards" element={<BattleCards />} />
+                <Route path="/event" element={<EventPage />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />
