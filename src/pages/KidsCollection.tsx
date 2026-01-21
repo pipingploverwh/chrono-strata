@@ -14,6 +14,9 @@ import { Link } from "react-router-dom";
 
 // Import product images
 import kidsShellImage from "@/assets/kids-strata-shell-white.jpg";
+import kidsCashmereImage from "@/assets/kids-cashmere-interior.jpg";
+import kidsPantsImage from "@/assets/kids-explorer-pants.jpg";
+import kidsBootsImage from "@/assets/kids-pathfinder-boots.jpg";
 
 // Kids product configurations
 const KIDS_PRODUCTS = {
@@ -52,7 +55,7 @@ const KIDS_PRODUCTS = {
       { icon: Shield, label: 'Temperature regulating' },
     ],
     sizes: ['2T', '3T', '4T', 'XS (4-5)', 'S (6-7)', 'M (8-9)', 'L (10-12)'],
-    image: null, // Placeholder
+    image: kidsCashmereImage,
     link: '/kids/cashmere',
   },
   pants: {
@@ -71,7 +74,7 @@ const KIDS_PRODUCTS = {
       { icon: Heart, label: 'Ultra-durable fabric' },
     ],
     sizes: ['2T', '3T', '4T', 'XS (4-5)', 'S (6-7)', 'M (8-9)', 'L (10-12)'],
-    image: null, // Placeholder
+    image: kidsPantsImage,
     link: '/kids/pants',
   },
   boots: {
@@ -90,7 +93,7 @@ const KIDS_PRODUCTS = {
       { icon: Shield, label: 'Ankle support' },
     ],
     sizes: ['5C', '6C', '7C', '8C', '9C', '10C', '11C', '12C', '13C', '1Y', '2Y', '3Y'],
-    image: null, // Placeholder
+    image: kidsBootsImage,
     link: '/kids/boots',
   },
 };
