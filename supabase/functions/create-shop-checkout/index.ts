@@ -122,7 +122,7 @@ serve(async (req) => {
           },
         ],
         mode: "subscription",
-        success_url: `${origin}/shop-success?bundle=true&kids=true&size=${encodeURIComponent(size || 'S')}&session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${origin}/kids-bundle-success?size=${encodeURIComponent(size || 'S')}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/kids-collection?canceled=true`,
         metadata,
         subscription_data: {
