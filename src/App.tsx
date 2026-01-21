@@ -75,6 +75,7 @@ import ShopSuccess from "./pages/ShopSuccess";
 import KidsStrataShell from "./pages/KidsStrataShell";
 import HackerNewsPost from "./pages/HackerNewsPost";
 import CEOLetter from "./pages/CEOLetter";
+import BattleCards from "./pages/BattleCards";
 
 const queryClient = new QueryClient();
 
@@ -143,6 +144,7 @@ const App = () => (
                 <Route path="/kids" element={<KidsStrataShell />} />
                 <Route path="/hn" element={<HackerNewsPost />} />
                 <Route path="/ceo-letter" element={<CEOLetter />} />
+                <Route path="/battle-cards" element={<BattleCards />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />

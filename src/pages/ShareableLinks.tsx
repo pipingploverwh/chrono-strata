@@ -62,6 +62,7 @@ const linkCategories: LinkCategory[] = [
     links: [
       { label: "CEO Open Letter", path: "/ceo-letter", description: "Letter to the Lovable team" },
       { label: "LinkedIn CEO Page", path: "/linkedin-ceo", description: "Executive presence and enterprise philosophy" },
+      { label: "Battle Cards", path: "/battle-cards", description: "Competitive intelligence cheat sheets for EliseAI & Monogoto" },
     ],
   },
   {
