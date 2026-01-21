@@ -227,6 +227,43 @@ const HackerNewsPost = () => {
               question is whether you have something worth building.
             </p>
 
+            {/* CEO Letter Section */}
+            <div className="mt-10 p-4 bg-[#fff8f0] border border-[#ff6600]/20">
+              <h3 className="text-base font-normal mb-3">A Note to the Lovable Team</h3>
+              <p className="text-sm mb-3">
+                What excites us most is a core architectural shift: <strong>business 
+                logic lives in tools, not prompts.</strong> By pairing a stateless UI 
+                with server-side reasoning, we're able to move faster, stay more 
+                reliable, and build systems that actually scale beyond demos.
+              </p>
+              <div className="text-xs space-y-1 mb-3">
+                <p className="font-medium">Live operational demos:</p>
+                <ul className="list-none space-y-1">
+                  <li>
+                    <a href="https://sunshine-sync-tool.lovable.app/strata" target="_blank" rel="noopener noreferrer" className="text-[#ff6600] hover:underline">
+                      Strata NFL War Room
+                    </a>
+                    {" "}— Stadium operations analytics
+                  </li>
+                  <li>
+                    <a href="https://sunshine-sync-tool.lovable.app/beena-rr3" target="_blank" rel="noopener noreferrer" className="text-[#ff6600] hover:underline">
+                      Beena RR3 Auditor
+                    </a>
+                    {" "}— AI-powered compliance auditing
+                  </li>
+                  <li>
+                    <a href="https://sunshine-sync-tool.lovable.app/aerospace" target="_blank" rel="noopener noreferrer" className="text-[#ff6600] hover:underline">
+                      Aerospace Defense Grid
+                    </a>
+                    {" "}— Defense-grade situational awareness
+                  </li>
+                </ul>
+              </div>
+              <p className="text-xs text-[#828282]">
+                — Ben Rubin, CEO
+              </p>
+            </div>
+
             <p className="text-[#828282] mt-8 pt-4 border-t border-[#e0e0e0]">
               <a 
                 href="https://chrono-strata.lovable.app" 
@@ -236,6 +273,13 @@ const HackerNewsPost = () => {
               >
                 Live demo: chrono-strata.lovable.app
                 <ExternalLink className="w-3 h-3" />
+              </a>
+              {" | "}
+              <a 
+                href="/ceo-letter" 
+                className="text-[#ff6600] hover:underline"
+              >
+                Read the full CEO letter
               </a>
             </p>
           </div>
