@@ -22,6 +22,10 @@ const TACTICAL_PROVISION_DEPOSIT = 180000; // cents ($1,800 = 10% deposit)
 const KIDS_SHELL_PRICE_ID = "price_1SriqHPxsKYUGDko5fyfF7re";
 const KIDS_SHELL_PRICE = 14800; // cents ($148)
 
+// KIDS BUNDLE - $399/year - Complete Explorer Kit
+const KIDS_BUNDLE_PRICE_ID = "price_1Ss7BlPxsKYUGDko9zUm0ZJs";
+const KIDS_BUNDLE_PRICE = 39900; // cents ($399)
+
 const logStep = (step: string, details?: Record<string, unknown>) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[SHOP-CHECKOUT] ${step}${detailsStr}`);
@@ -47,6 +51,7 @@ serve(async (req) => {
     const isBond = priceType === 'strata_bond';
     const isTactical = priceType === 'tactical_provision';
     const isKidsShell = priceType === 'kids_shell';
+    const isKidsBundle = priceType === 'kids_bundle';
 
     // Initialize Stripe
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
@@ -81,13 +86,19 @@ serve(async (req) => {
 
     // Build checkout session metadata
     const metadata: Record<string, string> = {
-      product: isKidsShell ? "kids_shell" : isTactical ? "tactical_provision" : isBond ? "strata_bond" : "strata_ownership",
-      type: isKidsShell ? "kids_annual_subscription" : isTactical ? "physical_deposit" : isBond ? "century_bond" : "annual_subscription",
+      product: isKidsBundle ? "kids_bundle" : isKidsShell ? "kids_shell" : isTactical ? "tactical_provision" : isBond ? "strata_bond" : "strata_ownership",
+      type: isKidsBundle ? "kids_annual_bundle" : isKidsShell ? "kids_annual_subscription" : isTactical ? "physical_deposit" : isBond ? "century_bond" : "annual_subscription",
       terrain_variant: terrainVariant || "standard",
       strata_zone: strataZone || "Default",
       coordinates_lat: coordinates?.lat?.toString() || "0",
       coordinates_lon: coordinates?.lon?.toString() || "0",
       legacy_years: (legacyYears || STRATA_BOND_YEARS).toString(),
+      ...(isKidsBundle && {
+        size: size || "S (6-7)",
+        collection: "junior",
+        bundle_items: "shell,cashmere,pants,boots",
+        savings: "63",
+      }),
       ...(isKidsShell && {
         size: size || "S (6-7)",
         collection: "junior",
@@ -101,7 +112,29 @@ serve(async (req) => {
 
     let sessionParams: Stripe.Checkout.SessionCreateParams;
 
-    if (isKidsShell) {
+    if (isKidsBundle) {
+      // KIDS BUNDLE - $399/year subscription (Complete Explorer Kit)
+      sessionParams = {
+        line_items: [
+          {
+            price: KIDS_BUNDLE_PRICE_ID,
+            quantity: 1,
+          },
+        ],
+        mode: "subscription",
+        success_url: `${origin}/shop-success?bundle=true&kids=true&size=${encodeURIComponent(size || 'S')}&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/kids-collection?canceled=true`,
+        metadata,
+        subscription_data: {
+          metadata,
+          description: `Complete Explorer Kit - Kids Bundle (${size || 'S (6-7)'})`,
+        },
+        shipping_address_collection: {
+          allowed_countries: ['US', 'CA', 'GB', 'JP', 'DE', 'FR', 'IT', 'AU'],
+        },
+      };
+      logStep("Creating KIDS BUNDLE checkout", { price: KIDS_BUNDLE_PRICE, size, mode: "subscription" });
+    } else if (isKidsShell) {
       // KIDS SHELL - $148/year subscription
       sessionParams = {
         line_items: [
@@ -112,7 +145,7 @@ serve(async (req) => {
         ],
         mode: "subscription",
         success_url: `${origin}/shop-success?kids=true&size=${encodeURIComponent(size || 'S')}&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${origin}/kids?canceled=true`,
+        cancel_url: `${origin}/kids-collection?canceled=true`,
         metadata,
         subscription_data: {
           metadata,
