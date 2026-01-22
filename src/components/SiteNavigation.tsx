@@ -1,9 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, Gauge, Plane, Anchor, HardHat, CalendarDays, ScrollText, Rocket, Map, ChevronRight, Brain, Activity, FileCheck, Mail, ShieldCheck, User, Building2, Compass, X } from "lucide-react";
+import { Home, Gauge, Plane, Anchor, HardHat, CalendarDays, ScrollText, Rocket, Map, ChevronRight, Brain, Activity, FileCheck, Mail, ShieldCheck, User, Building2, Compass, X, Beaker } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import LanguageToggle from "@/components/LanguageToggle";
+import RoleSelector from "@/components/RoleSelector";
 interface NavItem {
   path: string;
   label: string;
@@ -11,7 +12,7 @@ interface NavItem {
   icon: React.ComponentType<{
     className?: string;
   }>;
-  category: "main" | "industry" | "system" | "tools";
+  category: "main" | "industry" | "system" | "tools" | "labs";
   isPublic?: boolean;
 }
 const navItems: NavItem[] = [
@@ -38,11 +39,11 @@ const navItems: NavItem[] = [
   category: "main",
   isPublic: true
 },
-// Industry Verticals - Public
+// Industry Verticals - Public (Aviation as Beachhead)
 {
   path: "/aviation",
   label: "Aviation",
-  description: "Pilot Weather Briefing System",
+  description: "Flight Operations Intelligence — Primary Beachhead",
   icon: Plane,
   category: "industry",
   isPublic: true
@@ -110,6 +111,15 @@ const navItems: NavItem[] = [
   description: "Complete Navigation Index",
   icon: Map,
   category: "system",
+  isPublic: true
+},
+// Labs - Experimental Sandbox
+{
+  path: "/labs",
+  label: "Labs",
+  description: "R&D Sandbox • Experimental Features",
+  icon: Beaker,
+  category: "labs",
   isPublic: true
 }];
 
@@ -182,6 +192,7 @@ export const SiteNavigation = () => {
   const mainItems = navItems.filter(item => item.category === "main" && item.isPublic !== false);
   const industryItems = navItems.filter(item => item.category === "industry" && item.isPublic !== false);
   const systemItems = navItems.filter(item => item.category === "system" && item.isPublic !== false);
+  const labsItems = navItems.filter(item => item.category === "labs" && item.isPublic !== false);
   const currentPage = navItems.find(i => i.path === location.pathname);
   return <Sheet>
       <SheetTrigger asChild>
@@ -247,7 +258,10 @@ export const SiteNavigation = () => {
                 Navigation
               </SheetTitle>
             </div>
-            <LanguageToggle variant="inline" />
+            <div className="flex items-center gap-3">
+              <RoleSelector variant="compact" />
+              <LanguageToggle variant="inline" />
+            </div>
           </div>
           
           <p className="text-[10px] font-mono text-strata-silver/50 uppercase tracking-[0.2em] mt-1">
@@ -334,6 +348,9 @@ export const SiteNavigation = () => {
 
           {/* System */}
           <NavSection title="System" items={systemItems} location={location} accentColor="strata-lume" compact />
+
+          {/* Labs - Sandboxed R&D */}
+          <NavSection title="Labs • R&D" items={labsItems} location={location} accentColor="lavender" compact />
         </nav>
 
         {/* Footer with geometric pattern */}

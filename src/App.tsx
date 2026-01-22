@@ -79,6 +79,8 @@ import HackerNewsPost from "./pages/HackerNewsPost";
 import CEOLetter from "./pages/CEOLetter";
 import BattleCards from "./pages/BattleCards";
 import EventPage from "./pages/EventPage";
+import Labs from "./pages/Labs";
+import ApparelBlueprint from "./pages/ApparelBlueprint";
 
 const queryClient = new QueryClient();
 
@@ -151,6 +153,9 @@ const App = () => (
                 <Route path="/ceo-letter" element={<CEOLetter />} />
                 <Route path="/battle-cards" element={<BattleCards />} />
                 <Route path="/event" element={<EventPage />} />
+                <Route path="/labs" element={<Labs />} />
+                <Route path="/apparel-blueprint" element={<ApparelBlueprint />} />
+                <Route path="/thermal-viz" element={<ThermalMusicVisualizer />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />
