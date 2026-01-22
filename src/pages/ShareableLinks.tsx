@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Check, Copy, ExternalLink } from "lucide-react";
+import { Check, Copy, ExternalLink, Lightbulb, Archive } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const BASE_URL = "https://chrono-strata.lovable.app";
 
@@ -16,6 +17,117 @@ interface LinkCategory {
   title: string;
   links: LinkItem[];
 }
+
+interface ArchivedIdea {
+  title: string;
+  date: string;
+  items: string[];
+}
+
+const archivedIdeas: ArchivedIdea[] = [
+  {
+    title: "Platform Architecture",
+    date: "Mar 11",
+    items: [
+      "Stability robustness",
+      "Modularity—Multiple resources",
+      "API's, XBlocks mobile views",
+      "Studio usability",
+    ],
+  },
+  {
+    title: "Product Concepts",
+    date: "Jan 26",
+    items: [
+      "iCard—synch your native card that allows you to share with others",
+      "Codeconnect: Jobs pipeline for Highschool",
+      "Class finder",
+    ],
+  },
+  {
+    title: "EdTech & Self-Organization",
+    date: "Dec 11",
+    items: [
+      "Learners self organize",
+      "Owning self and presence on the web",
+      "Narration of what has been done",
+      "Twitter persistence",
+      "George Siemens, Jim Groom",
+      "Buy your own domain",
+      "Ds106: Build your own domain digital story telling",
+      "Build a resource beyond class",
+      "Where does student live?",
+      "Social network theory in educational settings",
+    ],
+  },
+  {
+    title: "Faculty & Learning Networks",
+    date: "Dec 11",
+    items: [
+      "What do faculty interactions look like? Reciprocation?",
+      "Tumblr, Reddit, Digital student",
+      "Pathway to online learning",
+      "ERGM for network analysis",
+      "How do we group into smaller discussions?",
+      "Prompted screenings",
+      "Content places",
+      "Profile photo",
+      "Sean Lipp, Zack Pardos",
+    ],
+  },
+  {
+    title: "Course Design Philosophy",
+    date: "Dec 11",
+    items: [
+      "Change jobs every 4 years",
+      "Mixing course types",
+      "Hybrid, Blended, adaptive, experiential, student centered, competency based reduces cost curve",
+      "Marginal revolution university",
+      "Commodity versus innovation",
+    ],
+  },
+  {
+    title: "Academic Experience",
+    date: "Dec 11",
+    items: [
+      "Faculty as mentors",
+      "Undergrad research",
+      "Cross-cultural experience",
+      "Risk, creativity, fail",
+      "Structured pathways through multiple institutions",
+      "One transcript, multiple places",
+      "Value: Tracking through a career",
+      "Certify experiences",
+      "Credentialing",
+    ],
+  },
+  {
+    title: "Intelligent Tutoring",
+    date: "Dec 11",
+    items: [
+      "Symbolic wrong answer correction",
+      "Why should I take this course?",
+      "Function generators, graders",
+      "Reuse of resources—Gart Courtneyer rearrange reuse at every level of granularity",
+      "Recommender engine—Prichard paper",
+      "Indirect crowd sourcing",
+      "Spontaneous commenting on problems—human reviewed",
+      "Collect and mine",
+      "Economical specific wrong answer response. Display to authors. A 3 part problem 1 hour or less",
+    ],
+  },
+  {
+    title: "Learning Analytics",
+    date: "Dec 11",
+    items: [
+      "What utilization will help you—Felix and Carlos",
+      "Context of data—hw, quiz, test",
+      "Scripts: Add affect of students",
+      "Visualizer—what is student doing now",
+      "Education researchers classify as asking, letting off steam, answer, swooshing—simply guessing",
+    ],
+  },
+];
 
 const linkCategories: LinkCategory[] = [
   {
@@ -220,6 +332,47 @@ ${BASE_URL}/kraft-case-study
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        {/* Idea Archive Section */}
+        <div className="mt-12">
+          <div className="flex items-center gap-3 mb-6">
+            <Archive className="h-6 w-6 text-primary" />
+            <h2 className="text-2xl font-bold text-foreground">Idea Archive</h2>
+          </div>
+          <p className="text-muted-foreground mb-6">
+            Historical insights, product concepts, and research notes from the founder's archive.
+          </p>
+          
+          <Accordion type="multiple" className="space-y-3">
+            {archivedIdeas.map((idea, index) => (
+              <AccordionItem 
+                key={index} 
+                value={`idea-${index}`}
+                className="border border-border rounded-lg px-4 bg-card"
+              >
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <Lightbulb className="h-4 w-4 text-amber-500" />
+                    <span className="font-medium text-foreground">{idea.title}</span>
+                    <span className="text-xs text-muted-foreground">{idea.date}</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <ul className="space-y-2 pl-7">
+                    {idea.items.map((item, itemIndex) => (
+                      <li 
+                        key={itemIndex}
+                        className="text-sm text-muted-foreground list-disc marker:text-primary"
+                      >
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
       </div>
     </div>
