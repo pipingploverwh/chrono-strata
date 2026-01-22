@@ -14,20 +14,18 @@ import {
   Users,
   BarChart3,
   ChevronRight,
-  Megaphone
+  
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import lavandarLogo from "@/assets/lavandar-logo.png";
 import WeatherGate from "@/components/WeatherGate";
-import EventCommandOverlay from "@/components/strata/EventCommandOverlay";
-import useEventOverlay from "@/hooks/useEventOverlay";
 
 
 const LavandarHome = () => {
   const navigate = useNavigate();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [weatherGranted, setWeatherGranted] = useState(false);
-  const eventOverlay = useEventOverlay();
+  
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -105,13 +103,6 @@ const LavandarHome = () => {
             </div>
             <div className="hidden md:flex items-center gap-8">
               <Link to="/strata" className="text-sm text-neutral-400 hover:text-white transition-colors">STRATA</Link>
-              <button
-                onClick={eventOverlay.open}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-lavender-500/20 to-purple-500/20 border border-lavender-500/30 hover:border-lavender-400 transition-colors group"
-              >
-                <Megaphone className="w-4 h-4 text-lavender-400" />
-                <span className="text-xs font-mono text-lavender-300 group-hover:text-lavender-200">Events</span>
-              </button>
               <Button 
                 onClick={() => navigate("/recruiter-outreach")}
                 className="bg-purple-600 hover:bg-purple-700 text-white text-xs tracking-wider uppercase px-6"
@@ -277,27 +268,12 @@ const LavandarHome = () => {
 
   // If already granted, show content directly
   if (weatherGranted) {
-    return (
-      <>
-        {content}
-        <EventCommandOverlay 
-          isOpen={eventOverlay.isOpen} 
-          onClose={eventOverlay.close}
-          initialEvent="club"
-        />
-      </>
-    );
+    return content;
   }
 
-  // Otherwise wrap in weather gate
   return (
     <WeatherGate onGranted={handleWeatherGranted}>
       {content}
-      <EventCommandOverlay 
-        isOpen={eventOverlay.isOpen} 
-        onClose={eventOverlay.close}
-        initialEvent="club"
-      />
     </WeatherGate>
   );
 };
