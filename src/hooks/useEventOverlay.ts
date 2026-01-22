@@ -1,23 +1,25 @@
 import { useState, useEffect, useCallback } from "react";
 
-const SESSION_KEY = "strata_event_dismissed";
-
+/**
+ * Announcement Entrance Overlay Hook
+ * 
+ * Template for full-screen event/announcement overlays.
+ * Behavior:
+ * - Appears immediately on entrance (0s delay)
+ * - Shows on every visit (no session persistence)
+ * - Can be manually triggered via open/toggle
+ * 
+ * Usage:
+ *   const { isOpen, open, close, toggle } = useEventOverlay();
+ *   // isOpen will be true immediately on mount
+ */
 export const useEventOverlay = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [hasAutoShown, setHasAutoShown] = useState(false);
 
-  // Check if we should auto-show (once per session)
+  // Show immediately on mount - no delay, no session check
   useEffect(() => {
-    const dismissed = sessionStorage.getItem(SESSION_KEY);
-    if (!dismissed && !hasAutoShown) {
-      // Delay auto-show for better UX
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-        setHasAutoShown(true);
-      }, 3000); // Show after 3 seconds
-      return () => clearTimeout(timer);
-    }
-  }, [hasAutoShown]);
+    setIsOpen(true);
+  }, []);
 
   const open = useCallback(() => {
     setIsOpen(true);
@@ -25,16 +27,10 @@ export const useEventOverlay = () => {
 
   const close = useCallback(() => {
     setIsOpen(false);
-    sessionStorage.setItem(SESSION_KEY, "true");
   }, []);
 
   const toggle = useCallback(() => {
-    setIsOpen((prev) => {
-      if (prev) {
-        sessionStorage.setItem(SESSION_KEY, "true");
-      }
-      return !prev;
-    });
+    setIsOpen((prev) => !prev);
   }, []);
 
   return {
