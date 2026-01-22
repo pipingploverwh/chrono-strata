@@ -1,9 +1,10 @@
-import { useState } from "react";
-import { Check, Copy, ExternalLink, Lightbulb, Archive } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Check, Copy, ExternalLink, Lightbulb, Archive, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Input } from "@/components/ui/input";
 
 const BASE_URL = "https://chrono-strata.lovable.app";
 
@@ -127,6 +128,36 @@ const archivedIdeas: ArchivedIdea[] = [
       "Education researchers classify as asking, letting off steam, answer, swooshing—simply guessing",
     ],
   },
+  {
+    title: "Eucalyptus & Bush Knowledge",
+    date: "Sep 17",
+    items: [
+      "Eucalyptus, Bush taka, Jibong",
+      "Trees require fires. Last fire was 10 years ago. Too long ago.",
+      "Sydney red gum. Sap is antiseptic",
+      "Tribal warrior",
+      "Margaret Campbell. Walkabout on the rocks",
+      "Botanical gardens aboriginal guide",
+      "Wallamby pine 10 Friday",
+    ],
+  },
+  {
+    title: "Sydney Architecture & History",
+    date: "Sep 11",
+    items: [
+      "Dawes, Campbell",
+      "Walsh Bay rats goats island",
+      "Sydney Dance Co. Boranga",
+      "Seidler Blues Pt tower ugly",
+      "The egg Brett Wiley",
+      "Garrison church Argyle St blasted with dynamite",
+      "Observatory Hill Yelliwball",
+      "Bridge 6m rivets. Largest single arc bridge 1923-1932",
+      "Lunar park from Adelaide Coney Island",
+      "Darling Harbor largest IMAX",
+      "Chinatown",
+    ],
+  },
 ];
 
 const linkCategories: LinkCategory[] = [
@@ -214,6 +245,30 @@ const CopyButton = ({ text, label }: { text: string; label: string }) => {
 };
 
 const ShareableLinks = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredIdeas = useMemo(() => {
+    if (!searchQuery.trim()) return archivedIdeas;
+    
+    const query = searchQuery.toLowerCase();
+    return archivedIdeas
+      .map((idea) => ({
+        ...idea,
+        items: idea.items.filter((item) => 
+          item.toLowerCase().includes(query) || 
+          idea.title.toLowerCase().includes(query)
+        ),
+      }))
+      .filter((idea) => 
+        idea.items.length > 0 || idea.title.toLowerCase().includes(query)
+      );
+  }, [searchQuery]);
+
+  const totalMatches = useMemo(() => {
+    if (!searchQuery.trim()) return 0;
+    return filteredIdeas.reduce((acc, idea) => acc + idea.items.length, 0);
+  }, [filteredIdeas, searchQuery]);
+
   const copyAllLinks = async () => {
     const allLinks = linkCategories
       .map((category) => {
@@ -336,16 +391,44 @@ ${BASE_URL}/kraft-case-study
 
         {/* Idea Archive Section */}
         <div className="mt-12">
-          <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center gap-3 mb-4">
             <Archive className="h-6 w-6 text-primary" />
             <h2 className="text-2xl font-bold text-foreground">Idea Archive</h2>
           </div>
-          <p className="text-muted-foreground mb-6">
+          <p className="text-muted-foreground mb-4">
             Historical insights, product concepts, and research notes from the founder's archive.
           </p>
           
-          <Accordion type="multiple" className="space-y-3">
-            {archivedIdeas.map((idea, index) => (
+          {/* Search Input */}
+          <div className="relative mb-6">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search insights..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-10"
+            />
+            {searchQuery && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                onClick={() => setSearchQuery("")}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+
+          {searchQuery && (
+            <p className="text-sm text-muted-foreground mb-4">
+              Found <span className="font-medium text-foreground">{totalMatches}</span> insight{totalMatches !== 1 ? 's' : ''} across{' '}
+              <span className="font-medium text-foreground">{filteredIdeas.length}</span> categor{filteredIdeas.length !== 1 ? 'ies' : 'y'}
+            </p>
+          )}
+          
+          <Accordion type="multiple" defaultValue={searchQuery ? filteredIdeas.map((_, i) => `idea-${i}`) : []} className="space-y-3">
+            {filteredIdeas.map((idea, index) => (
               <AccordionItem 
                 key={index} 
                 value={`idea-${index}`}
@@ -353,9 +436,14 @@ ${BASE_URL}/kraft-case-study
               >
                 <AccordionTrigger className="hover:no-underline">
                   <div className="flex items-center gap-3">
-                    <Lightbulb className="h-4 w-4 text-amber-500" />
+                    <Lightbulb className="h-4 w-4 text-primary" />
                     <span className="font-medium text-foreground">{idea.title}</span>
                     <span className="text-xs text-muted-foreground">{idea.date}</span>
+                    {searchQuery && (
+                      <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
+                        {idea.items.length} match{idea.items.length !== 1 ? 'es' : ''}
+                      </span>
+                    )}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
@@ -373,6 +461,13 @@ ${BASE_URL}/kraft-case-study
               </AccordionItem>
             ))}
           </Accordion>
+
+          {searchQuery && filteredIdeas.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground">
+              <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p>No insights found for "{searchQuery}"</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
