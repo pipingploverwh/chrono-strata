@@ -5,6 +5,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Badge } from "@/components/ui/badge";
 import LanguageToggle from "@/components/LanguageToggle";
 import RoleSelector from "@/components/RoleSelector";
+import { useUserRole, UserRole } from "@/hooks/useUserRole";
+
 interface NavItem {
   path: string;
   label: string;
@@ -14,7 +16,9 @@ interface NavItem {
   }>;
   category: "main" | "industry" | "system" | "tools" | "labs";
   isPublic?: boolean;
+  roles?: UserRole[]; // Which roles can see this item
 }
+
 const navItems: NavItem[] = [
 // Main - Public
 {
@@ -23,21 +27,24 @@ const navItems: NavItem[] = [
   description: "Strategic Overview & Analytics Dashboard",
   icon: Brain,
   category: "main",
-  isPublic: true
+  isPublic: true,
+  roles: ["operator", "technical", "executive"]
 }, {
   path: "/strata",
   label: "STRATA Instrument",
   description: "Core Weather Intelligence Dashboard",
   icon: Gauge,
   category: "main",
-  isPublic: true
+  isPublic: true,
+  roles: ["operator", "technical"] // Technical tool - not for executives
 }, {
   path: "/launch",
   label: "Location Select",
   description: "Observation Point Initialization",
   icon: Rocket,
   category: "main",
-  isPublic: true
+  isPublic: true,
+  roles: ["operator", "technical"]
 },
 // Industry Verticals - Public (Aviation as Beachhead)
 {
@@ -46,28 +53,32 @@ const navItems: NavItem[] = [
   description: "Flight Operations Intelligence — Primary Beachhead",
   icon: Plane,
   category: "industry",
-  isPublic: true
+  isPublic: true,
+  roles: ["operator", "technical", "executive"] // Primary beachhead - all roles
 }, {
   path: "/marine",
   label: "Marine",
   description: "Maritime Weather Intelligence",
   icon: Anchor,
   category: "industry",
-  isPublic: true
+  isPublic: true,
+  roles: ["operator", "technical"]
 }, {
   path: "/construction",
   label: "Construction",
   description: "Jobsite Weather Monitoring",
   icon: HardHat,
   category: "industry",
-  isPublic: true
+  isPublic: true,
+  roles: ["operator", "technical"]
 }, {
   path: "/events",
   label: "Events",
   description: "Venue Weather Operations",
   icon: CalendarDays,
   category: "industry",
-  isPublic: true
+  isPublic: true,
+  roles: ["operator", "technical", "executive"]
 },
 // Protected Routes - Hidden from public nav
 {
@@ -76,51 +87,58 @@ const navItems: NavItem[] = [
   description: "94% Accuracy Proof-of-Concept",
   icon: FileCheck,
   category: "main",
-  isPublic: false
+  isPublic: false,
+  roles: ["technical", "executive"]
 }, {
   path: "/recruiter-outreach",
   label: "Recruiter Outreach",
   description: "Technical Recruiter Email Generator",
   icon: Mail,
   category: "tools",
-  isPublic: false
+  isPublic: false,
+  roles: ["executive"]
 }, {
   path: "/security",
   label: "Security Test Suite",
   description: "AI Security & Compliance Dashboard",
   icon: ShieldCheck,
   category: "tools",
-  isPublic: false
+  isPublic: false,
+  roles: ["technical"]
 }, {
   path: "/portfolio",
   label: "Portfolio",
   description: "Projects & Skills Showcase",
   icon: User,
   category: "tools",
-  isPublic: false
+  isPublic: false,
+  roles: ["executive"]
 }, {
   path: "/logs",
   label: "System Logs",
   description: "Atmospheric Data History",
   icon: ScrollText,
   category: "system",
-  isPublic: false
+  isPublic: false,
+  roles: ["technical"]
 }, {
   path: "/sitemap",
   label: "Site Map",
   description: "Complete Navigation Index",
   icon: Map,
   category: "system",
-  isPublic: true
+  isPublic: true,
+  roles: ["operator", "technical", "executive"]
 },
-// Labs - Experimental Sandbox
+// Labs - Sandboxed R&D
 {
   path: "/labs",
   label: "Labs",
   description: "R&D Sandbox • Experimental Features",
   icon: Beaker,
   category: "labs",
-  isPublic: true
+  isPublic: true,
+  roles: ["technical"] // Only technical users see R&D sandbox
 }];
 
 // Precision Corner Accent component
@@ -187,12 +205,19 @@ const KumaGlassPanel = ({
   </div>;
 export const SiteNavigation = () => {
   const location = useLocation();
+  const { role } = useUserRole();
 
-  // Only show public items in navigation
-  const mainItems = navItems.filter(item => item.category === "main" && item.isPublic !== false);
-  const industryItems = navItems.filter(item => item.category === "industry" && item.isPublic !== false);
-  const systemItems = navItems.filter(item => item.category === "system" && item.isPublic !== false);
-  const labsItems = navItems.filter(item => item.category === "labs" && item.isPublic !== false);
+  // Filter items by public visibility AND user role
+  const filterByRole = (item: NavItem) => {
+    if (item.isPublic === false) return false;
+    if (!item.roles) return true; // No role restriction = all roles can see
+    return item.roles.includes(role);
+  };
+
+  const mainItems = navItems.filter(item => item.category === "main" && filterByRole(item));
+  const industryItems = navItems.filter(item => item.category === "industry" && filterByRole(item));
+  const systemItems = navItems.filter(item => item.category === "system" && filterByRole(item));
+  const labsItems = navItems.filter(item => item.category === "labs" && filterByRole(item));
   const currentPage = navItems.find(i => i.path === location.pathname);
   return <Sheet>
       <SheetTrigger asChild>
