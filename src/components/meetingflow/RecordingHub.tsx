@@ -13,6 +13,8 @@ interface RecordingHubProps {
   onSessionSelect: (session: MeetingSession) => void;
   onSessionDelete: (id: string) => void;
   onRecordingComplete: (session: MeetingSession, transcript: string) => void;
+  externalRecordingTrigger?: boolean;
+  onRecordingStateChange?: (isRecording: boolean) => void;
 }
 
 export function RecordingHub({
@@ -21,6 +23,8 @@ export function RecordingHub({
   onSessionSelect,
   onSessionDelete,
   onRecordingComplete,
+  externalRecordingTrigger,
+  onRecordingStateChange,
 }: RecordingHubProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
