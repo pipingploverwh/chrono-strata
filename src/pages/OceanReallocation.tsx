@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Anchor, ExternalLink, FileText, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Anchor, ExternalLink, FileText, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import BiologicalStewardshipPanel from "@/components/ocean/BiologicalStewardshipPanel";
 import StrategicExtractionPanel from "@/components/ocean/StrategicExtractionPanel";
 import TCEFrictionMeter from "@/components/ocean/TCEFrictionMeter";
+import OceanReallocationExport from "@/components/ocean/OceanReallocationExport";
+import FederalResearchContext from "@/components/ocean/FederalResearchContext";
 
 const OceanReallocation = () => {
   const [policyPosition, setPolicyPosition] = useState(65); // Default towards extraction
+  const [showResearch, setShowResearch] = useState(false);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -33,7 +36,8 @@ const OceanReallocation = () => {
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <OceanReallocationExport policyPosition={policyPosition} />
             <Badge variant="outline" className="text-[9px] font-mono border-amber-500/30 text-amber-400">
               <AlertTriangle className="w-3 h-3 mr-1" />
               SCENARIO PLANNING
@@ -171,6 +175,27 @@ const OceanReallocation = () => {
 
           {/* Right: Strategic Extraction (New) */}
           <StrategicExtractionPanel />
+        </div>
+
+        {/* Federal Research Context (Collapsible) */}
+        <div className="mt-8">
+          <Button
+            variant="ghost"
+            onClick={() => setShowResearch(!showResearch)}
+            className="w-full justify-between text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground mb-4"
+          >
+            <span className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Federal Research & Policy Context
+            </span>
+            {showResearch ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+          </Button>
+          
+          {showResearch && <FederalResearchContext />}
         </div>
 
         {/* Bottom Context Bar */}
