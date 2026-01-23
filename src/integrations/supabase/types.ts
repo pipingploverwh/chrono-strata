@@ -14,6 +14,360 @@ export type Database = {
   }
   public: {
     Tables: {
+      compliance_documents: {
+        Row: {
+          category: string | null
+          completed_date: string | null
+          created_at: string
+          document_name: string
+          document_type: string
+          due_date: string | null
+          file_url: string | null
+          id: string
+          metadata: Json | null
+          notes: string | null
+          shipment_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          completed_date?: string | null
+          created_at?: string
+          document_name: string
+          document_type: string
+          due_date?: string | null
+          file_url?: string | null
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          shipment_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          completed_date?: string | null
+          created_at?: string
+          document_name?: string
+          document_type?: string
+          due_date?: string | null
+          file_url?: string | null
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          shipment_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_documents_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_permits: {
+        Row: {
+          application_date: string | null
+          approval_date: string | null
+          created_at: string
+          document_url: string | null
+          expiration_date: string | null
+          id: string
+          is_required: boolean | null
+          issuing_authority: string
+          jurisdiction: Database["public"]["Enums"]["jurisdiction_type"]
+          metadata: Json | null
+          notes: string | null
+          permit_name: string
+          permit_type: string
+          reference_number: string | null
+          shipment_id: string
+          status: Database["public"]["Enums"]["permit_status"]
+          updated_at: string
+        }
+        Insert: {
+          application_date?: string | null
+          approval_date?: string | null
+          created_at?: string
+          document_url?: string | null
+          expiration_date?: string | null
+          id?: string
+          is_required?: boolean | null
+          issuing_authority: string
+          jurisdiction: Database["public"]["Enums"]["jurisdiction_type"]
+          metadata?: Json | null
+          notes?: string | null
+          permit_name: string
+          permit_type: string
+          reference_number?: string | null
+          shipment_id: string
+          status?: Database["public"]["Enums"]["permit_status"]
+          updated_at?: string
+        }
+        Update: {
+          application_date?: string | null
+          approval_date?: string | null
+          created_at?: string
+          document_url?: string | null
+          expiration_date?: string | null
+          id?: string
+          is_required?: boolean | null
+          issuing_authority?: string
+          jurisdiction?: Database["public"]["Enums"]["jurisdiction_type"]
+          metadata?: Json | null
+          notes?: string | null
+          permit_name?: string
+          permit_type?: string
+          reference_number?: string | null
+          shipment_id?: string
+          status?: Database["public"]["Enums"]["permit_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_permits_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_phase_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          notes: string | null
+          performed_by: string | null
+          phase: Database["public"]["Enums"]["shipment_phase"]
+          shipment_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          performed_by?: string | null
+          phase: Database["public"]["Enums"]["shipment_phase"]
+          shipment_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          performed_by?: string | null
+          phase?: Database["public"]["Enums"]["shipment_phase"]
+          shipment_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_phase_logs_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_risks: {
+        Row: {
+          created_at: string
+          id: string
+          impact: string
+          likelihood: string
+          metadata: Json | null
+          mitigation_status: string | null
+          mitigation_strategy: string | null
+          owner: string | null
+          risk_category: string
+          risk_description: string
+          shipment_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          impact?: string
+          likelihood?: string
+          metadata?: Json | null
+          mitigation_status?: string | null
+          mitigation_strategy?: string | null
+          owner?: string | null
+          risk_category: string
+          risk_description: string
+          shipment_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          impact?: string
+          likelihood?: string
+          metadata?: Json | null
+          mitigation_status?: string | null
+          mitigation_strategy?: string | null
+          owner?: string | null
+          risk_category?: string
+          risk_description?: string
+          shipment_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_risks_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_shipments: {
+        Row: {
+          actual_ship_date: string | null
+          batch_id: string | null
+          created_at: string
+          current_phase: Database["public"]["Enums"]["shipment_phase"]
+          description: string | null
+          destination_country: string
+          destination_entity: string | null
+          estimated_value: number | null
+          id: string
+          linked_transaction_id: string | null
+          metadata: Json | null
+          origin_country: string
+          origin_state: string
+          phase_started_at: string | null
+          product_type: string
+          quantity: string | null
+          shipment_reference: string
+          status: string
+          target_ship_date: string | null
+          thc_concentration: number | null
+          updated_at: string
+          use_case: string
+        }
+        Insert: {
+          actual_ship_date?: string | null
+          batch_id?: string | null
+          created_at?: string
+          current_phase?: Database["public"]["Enums"]["shipment_phase"]
+          description?: string | null
+          destination_country: string
+          destination_entity?: string | null
+          estimated_value?: number | null
+          id?: string
+          linked_transaction_id?: string | null
+          metadata?: Json | null
+          origin_country?: string
+          origin_state: string
+          phase_started_at?: string | null
+          product_type: string
+          quantity?: string | null
+          shipment_reference: string
+          status?: string
+          target_ship_date?: string | null
+          thc_concentration?: number | null
+          updated_at?: string
+          use_case: string
+        }
+        Update: {
+          actual_ship_date?: string | null
+          batch_id?: string | null
+          created_at?: string
+          current_phase?: Database["public"]["Enums"]["shipment_phase"]
+          description?: string | null
+          destination_country?: string
+          destination_entity?: string | null
+          estimated_value?: number | null
+          id?: string
+          linked_transaction_id?: string | null
+          metadata?: Json | null
+          origin_country?: string
+          origin_state?: string
+          phase_started_at?: string | null
+          product_type?: string
+          quantity?: string | null
+          shipment_reference?: string
+          status?: string
+          target_ship_date?: string | null
+          thc_concentration?: number | null
+          updated_at?: string
+          use_case?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_shipments_linked_transaction_id_fkey"
+            columns: ["linked_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "financial_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_stakeholders: {
+        Row: {
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          id: string
+          jurisdiction: string | null
+          metadata: Json | null
+          organization_name: string
+          role_description: string | null
+          shipment_id: string
+          stakeholder_type: Database["public"]["Enums"]["stakeholder_type"]
+          status: string | null
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          jurisdiction?: string | null
+          metadata?: Json | null
+          organization_name: string
+          role_description?: string | null
+          shipment_id: string
+          stakeholder_type: Database["public"]["Enums"]["stakeholder_type"]
+          status?: string | null
+        }
+        Update: {
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          jurisdiction?: string | null
+          metadata?: Json | null
+          organization_name?: string
+          role_description?: string | null
+          shipment_id?: string
+          stakeholder_type?: Database["public"]["Enums"]["stakeholder_type"]
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_stakeholders_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       configuration_orders: {
         Row: {
           accessories: string[] | null
@@ -760,6 +1114,32 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      jurisdiction_type:
+        | "us_federal"
+        | "us_state"
+        | "destination_country"
+        | "international"
+      permit_status:
+        | "not_started"
+        | "in_progress"
+        | "submitted"
+        | "approved"
+        | "denied"
+        | "expired"
+      shipment_phase:
+        | "legal_clearance"
+        | "regulatory_approvals"
+        | "contracts_compliance"
+        | "logistics_engagement"
+        | "cross_border_transport"
+        | "post_delivery"
+      stakeholder_type:
+        | "regulator"
+        | "legal_counsel"
+        | "logistics"
+        | "clinical"
+        | "customs"
+        | "lab"
       transaction_status: "Completed" | "Pending" | "Failed"
       transaction_type: "Premium" | "Claim" | "Adjustment" | "Rebate"
     }
@@ -890,6 +1270,36 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      jurisdiction_type: [
+        "us_federal",
+        "us_state",
+        "destination_country",
+        "international",
+      ],
+      permit_status: [
+        "not_started",
+        "in_progress",
+        "submitted",
+        "approved",
+        "denied",
+        "expired",
+      ],
+      shipment_phase: [
+        "legal_clearance",
+        "regulatory_approvals",
+        "contracts_compliance",
+        "logistics_engagement",
+        "cross_border_transport",
+        "post_delivery",
+      ],
+      stakeholder_type: [
+        "regulator",
+        "legal_counsel",
+        "logistics",
+        "clinical",
+        "customs",
+        "lab",
+      ],
       transaction_status: ["Completed", "Pending", "Failed"],
       transaction_type: ["Premium", "Claim", "Adjustment", "Rebate"],
     },
