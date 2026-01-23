@@ -8,6 +8,7 @@ import StrategicExtractionPanel from "@/components/ocean/StrategicExtractionPane
 import TCEFrictionMeter from "@/components/ocean/TCEFrictionMeter";
 import OceanReallocationExport from "@/components/ocean/OceanReallocationExport";
 import FederalResearchContext from "@/components/ocean/FederalResearchContext";
+import AIContextAnalysis from "@/components/ocean/AIContextAnalysis";
 
 const OceanReallocation = () => {
   const [policyPosition, setPolicyPosition] = useState(65); // Default towards extraction
@@ -175,6 +176,11 @@ const OceanReallocation = () => {
 
           {/* Right: Strategic Extraction (New) */}
           <StrategicExtractionPanel />
+        </div>
+
+        {/* AI Context Analysis */}
+        <div className="mt-8">
+          <AIContextAnalysis policyPosition={policyPosition} />
         </div>
 
         {/* Federal Research Context (Collapsible) */}
