@@ -7,6 +7,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import PrivateNotesPanel from "@/components/PrivateNotesPanel";
 
 const ForMoran = () => {
   const journeyMilestones = [
@@ -221,6 +222,21 @@ const ForMoran = () => {
               </Button>
             </Link>
           </div>
+        </section>
+
+        {/* Moran's Notes Section */}
+        <section className="space-y-6">
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            💬 Your Notes & Feedback
+          </h2>
+          <p className="text-muted-foreground">
+            Leave private notes as you explore. Only you can see these - use them to 
+            track questions, ideas, or feedback for our next conversation.
+          </p>
+          <PrivateNotesPanel 
+            pagePath="/for-moran" 
+            featureContext="ForMoran Overview"
+          />
         </section>
 
         {/* Personal Note */}

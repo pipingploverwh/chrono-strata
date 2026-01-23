@@ -768,6 +768,36 @@ export type Database = {
         }
         Relationships: []
       }
+      private_notes: {
+        Row: {
+          content: string
+          created_at: string
+          feature_context: string | null
+          id: string
+          page_path: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          feature_context?: string | null
+          id?: string
+          page_path: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          feature_context?: string | null
+          id?: string
+          page_path?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       scheduled_emails: {
         Row: {
           created_at: string
