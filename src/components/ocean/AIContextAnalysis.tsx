@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Sparkles, RefreshCw, AlertCircle, ExternalLink } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Sparkles, RefreshCw, AlertCircle, ExternalLink, Newspaper, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,10 +9,23 @@ interface AIContextAnalysisProps {
   policyPosition: number;
 }
 
+interface NewsItem {
+  id: string;
+  title: string;
+  description: string;
+  url: string;
+  source: string;
+}
+
 const AIContextAnalysis = ({ policyPosition }: AIContextAnalysisProps) => {
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // News feed state
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
+  const [isLoadingNews, setIsLoadingNews] = useState(false);
+  const [newsError, setNewsError] = useState<string | null>(null);
 
   const fetchAnalysis = async () => {
     setIsLoading(true);
@@ -49,6 +62,39 @@ const AIContextAnalysis = ({ policyPosition }: AIContextAnalysisProps) => {
     }
   };
 
+  const fetchNews = async () => {
+    setIsLoadingNews(true);
+    setNewsError(null);
+
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("ocean-news-feed", {
+        body: {
+          topic: "critical minerals deep sea mining US policy 2026",
+        },
+      });
+
+      if (fnError) {
+        throw new Error(fnError.message);
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      setNewsItems(data.items || []);
+    } catch (err) {
+      console.error("News feed error:", err);
+      setNewsError(err instanceof Error ? err.message : "Failed to fetch news");
+    } finally {
+      setIsLoadingNews(false);
+    }
+  };
+
+  // Auto-fetch news on mount
+  useEffect(() => {
+    fetchNews();
+  }, []);
+
   return (
     <div className="bg-surface-1 border border-border rounded-lg overflow-hidden">
       {/* Header */}
@@ -69,7 +115,73 @@ const AIContextAnalysis = ({ policyPosition }: AIContextAnalysisProps) => {
         </p>
       </div>
 
-      {/* Content */}
+      {/* News Feed Section */}
+      <div className="border-b border-border p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Newspaper className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="text-[10px] font-mono uppercase tracking-widest text-cyan-400">
+              Live News Feed
+            </span>
+          </div>
+          <Button
+            onClick={fetchNews}
+            variant="ghost"
+            size="sm"
+            className="h-6 px-2 text-[9px]"
+            disabled={isLoadingNews}
+          >
+            {isLoadingNews ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+          </Button>
+        </div>
+
+        {isLoadingNews && newsItems.length === 0 && (
+          <div className="flex items-center justify-center py-4">
+            <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
+            <span className="ml-2 text-[10px] text-muted-foreground">Fetching headlines...</span>
+          </div>
+        )}
+
+        {newsError && (
+          <div className="text-[10px] text-amber-400 py-2">
+            News unavailable: {newsError}
+          </div>
+        )}
+
+        {newsItems.length > 0 && (
+          <div className="space-y-2">
+            {newsItems.map((item) => (
+              <a
+                key={item.id}
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block p-2 bg-surface-2/50 hover:bg-surface-2 rounded border border-border/50 transition-colors group"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] text-foreground font-medium line-clamp-2 group-hover:text-lavender transition-colors">
+                      {item.title}
+                    </p>
+                    <p className="text-[9px] text-muted-foreground mt-0.5">
+                      {item.source}
+                    </p>
+                  </div>
+                  <ExternalLink className="w-3 h-3 text-muted-foreground shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
+
+        {!isLoadingNews && newsItems.length === 0 && !newsError && (
+          <p className="text-[10px] text-muted-foreground text-center py-3">
+            No recent headlines found
+          </p>
+        )}
+      </div>
+
+      {/* Analysis Content */}
       <div className="p-4">
         {!analysis && !isLoading && !error && (
           <div className="text-center py-6">
