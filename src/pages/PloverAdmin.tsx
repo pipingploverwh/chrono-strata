@@ -23,8 +23,10 @@ import {
   Activity,
   Waves,
   Sun,
-  Moon
+  Moon,
+  Map
 } from "lucide-react";
+import NestingSiteMap from "@/components/plover/NestingSiteMap";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -375,10 +377,17 @@ function StatCard({
 }
 
 function ConservationPanel({ t }: { t: typeof translations.en }) {
+  const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"map" | "list">("map");
+  
   const activeNests = NESTING_SITES.filter(n => n.status === "active");
   const totalEggs = NESTING_SITES.reduce((sum, n) => sum + n.eggs, 0);
   const totalChicks = NESTING_SITES.reduce((sum, n) => sum + n.chicks, 0);
   const threats = NESTING_SITES.filter(n => n.threats.length > 0);
+
+  const handleSiteSelect = (site: NestingSite | null) => {
+    setSelectedSiteId(site?.id || null);
+  };
 
   return (
     <div className="space-y-6">
@@ -390,54 +399,99 @@ function ConservationPanel({ t }: { t: typeof translations.en }) {
         <StatCard label={t.threatsDetected} value={threats.length} icon={AlertTriangle} alert={threats.length > 0} />
       </div>
 
-      {/* Nesting Sites List */}
-      <Card className="bg-neutral-900/50 border-neutral-800">
-        <div className="p-4 border-b border-neutral-800 flex items-center justify-between">
-          <h3 className="font-mono text-sm uppercase tracking-wider text-white">Nesting Sites</h3>
-          <Button variant="ghost" size="sm" className="text-cyan-400 hover:text-cyan-300">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Site
+      {/* View Toggle */}
+      <div className="flex items-center justify-between">
+        <h3 className="font-mono text-sm uppercase tracking-wider text-white">Monitoring Zones</h3>
+        <div className="flex items-center gap-1 bg-neutral-900 rounded p-1">
+          <Button
+            variant={viewMode === "map" ? "secondary" : "ghost"}
+            size="sm"
+            onClick={() => setViewMode("map")}
+            className="h-7 px-3 text-xs"
+          >
+            <Map className="w-3 h-3 mr-1.5" />
+            Map
+          </Button>
+          <Button
+            variant={viewMode === "list" ? "secondary" : "ghost"}
+            size="sm"
+            onClick={() => setViewMode("list")}
+            className="h-7 px-3 text-xs"
+          >
+            <FileText className="w-3 h-3 mr-1.5" />
+            List
           </Button>
         </div>
-        <ScrollArea className="h-[300px]">
-          <div className="divide-y divide-neutral-800">
-            {NESTING_SITES.map(site => (
-              <div key={site.id} className="p-4 hover:bg-neutral-800/50 transition-colors">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-mono text-xs text-cyan-400">{site.id.toUpperCase()}</span>
-                      <Badge variant="outline" className={`text-[10px] ${
-                        site.status === 'active' ? 'border-emerald-500/50 text-emerald-400' :
-                        site.status === 'fledged' ? 'border-cyan-500/50 text-cyan-400' :
-                        site.status === 'abandoned' ? 'border-red-500/50 text-red-400' :
-                        'border-amber-500/50 text-amber-400'
-                      }`}>
-                        {site.status}
-                      </Badge>
-                    </div>
-                    <p className="text-white font-medium">{site.zone}</p>
-                    <p className="text-xs text-neutral-500 mt-1">
-                      {site.eggs} eggs • {site.chicks} chicks
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-mono text-neutral-600">
-                      Last check: {new Date(site.lastCheck).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                    {site.threats.length > 0 && (
-                      <div className="flex items-center gap-1 mt-1 text-amber-400">
-                        <AlertTriangle className="w-3 h-3" />
-                        <span className="text-[10px]">{site.threats.join(', ')}</span>
+      </div>
+
+      {/* Map View */}
+      {viewMode === "map" && (
+        <NestingSiteMap 
+          sites={NESTING_SITES}
+          onSiteSelect={handleSiteSelect}
+          selectedSiteId={selectedSiteId}
+        />
+      )}
+
+      {/* List View */}
+      {viewMode === "list" && (
+        <Card className="bg-neutral-900/50 border-neutral-800">
+          <div className="p-4 border-b border-neutral-800 flex items-center justify-between">
+            <span className="text-xs text-neutral-500">{NESTING_SITES.length} sites monitored</span>
+            <Button variant="ghost" size="sm" className="text-cyan-400 hover:text-cyan-300">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Site
+            </Button>
+          </div>
+          <ScrollArea className="h-[400px]">
+            <div className="divide-y divide-neutral-800">
+              {NESTING_SITES.map(site => (
+                <div 
+                  key={site.id} 
+                  className={`p-4 hover:bg-neutral-800/50 transition-colors cursor-pointer ${
+                    selectedSiteId === site.id ? 'bg-cyan-500/5 border-l-2 border-l-cyan-500' : ''
+                  }`}
+                  onClick={() => setSelectedSiteId(selectedSiteId === site.id ? null : site.id)}
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-mono text-xs text-cyan-400">{site.id.toUpperCase()}</span>
+                        <Badge variant="outline" className={`text-[10px] ${
+                          site.status === 'active' ? 'border-emerald-500/50 text-emerald-400' :
+                          site.status === 'fledged' ? 'border-cyan-500/50 text-cyan-400' :
+                          site.status === 'abandoned' ? 'border-red-500/50 text-red-400' :
+                          'border-amber-500/50 text-amber-400'
+                        }`}>
+                          {site.status}
+                        </Badge>
                       </div>
-                    )}
+                      <p className="text-white font-medium">{site.zone}</p>
+                      <p className="text-xs text-neutral-500 mt-1">
+                        {site.eggs} eggs • {site.chicks} chicks
+                      </p>
+                      <p className="text-[10px] font-mono text-neutral-600 mt-1">
+                        {site.coordinates.lat.toFixed(4)}°N, {Math.abs(site.coordinates.lon).toFixed(4)}°W
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] font-mono text-neutral-600">
+                        Last check: {new Date(site.lastCheck).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                      {site.threats.length > 0 && (
+                        <div className="flex items-center gap-1 mt-1 text-amber-400">
+                          <AlertTriangle className="w-3 h-3" />
+                          <span className="text-[10px]">{site.threats.join(', ')}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
-      </Card>
+              ))}
+            </div>
+          </ScrollArea>
+        </Card>
+      )}
     </div>
   );
 }
