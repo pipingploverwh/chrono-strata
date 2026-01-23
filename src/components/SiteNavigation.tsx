@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, Gauge, Plane, Anchor, HardHat, CalendarDays, ScrollText, Rocket, Map, ChevronRight, Brain, Activity, FileCheck, Mail, ShieldCheck, User, Building2, Compass, X, Beaker, Scale, Bird } from "lucide-react";
+import { Home, Gauge, Plane, Anchor, HardHat, CalendarDays, ScrollText, Rocket, Map, ChevronRight, Brain, Activity, FileCheck, Mail, ShieldCheck, User, Building2, Compass, X, Beaker, Scale, Bird, Ship } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import LanguageToggle from "@/components/LanguageToggle";
@@ -92,6 +92,14 @@ const navItems: NavItem[] = [
   label: "Plover Admin",
   description: "Wellfleet Harbor Unified Operations",
   icon: Bird,
+  category: "industry",
+  isPublic: true,
+  roles: ["operator", "technical", "executive"]
+}, {
+  path: "/ocean-reallocation",
+  label: "Ocean Assets",
+  description: "NOAA Strategic Pivot Analysis • TCE Framework",
+  icon: Ship,
   category: "industry",
   isPublic: true,
   roles: ["operator", "technical", "executive"]
