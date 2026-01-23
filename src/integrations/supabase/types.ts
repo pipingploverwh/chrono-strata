@@ -536,6 +536,103 @@ export type Database = {
         }
         Relationships: []
       }
+      meeting_prompts: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          session_id: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          session_id: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          session_id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_prompts_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "meeting_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meeting_sessions: {
+        Row: {
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      meeting_transcripts: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          session_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          session_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_transcripts_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "meeting_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       nesting_sites: {
         Row: {
           chicks: number | null
