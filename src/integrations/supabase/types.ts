@@ -836,6 +836,51 @@ export type Database = {
         }
         Relationships: []
       }
+      threat_logs: {
+        Row: {
+          alert_sent: boolean | null
+          alert_sent_at: string | null
+          chicks: number | null
+          created_at: string
+          eggs: number | null
+          id: string
+          latitude: number
+          longitude: number
+          observer_notes: string | null
+          site_id: string
+          site_name: string
+          threat_level: string
+        }
+        Insert: {
+          alert_sent?: boolean | null
+          alert_sent_at?: string | null
+          chicks?: number | null
+          created_at?: string
+          eggs?: number | null
+          id?: string
+          latitude: number
+          longitude: number
+          observer_notes?: string | null
+          site_id: string
+          site_name: string
+          threat_level: string
+        }
+        Update: {
+          alert_sent?: boolean | null
+          alert_sent_at?: string | null
+          chicks?: number | null
+          created_at?: string
+          eggs?: number | null
+          id?: string
+          latitude?: number
+          longitude?: number
+          observer_notes?: string | null
+          site_id?: string
+          site_name?: string
+          threat_level?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

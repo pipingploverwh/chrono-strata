@@ -86,3 +86,6 @@ verify_jwt = false
 
 [functions.odoo-scheduled-sync]
 verify_jwt = false
+
+[functions.plover-threat-alert]
+verify_jwt = false
