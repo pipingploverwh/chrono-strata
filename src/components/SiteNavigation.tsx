@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, Gauge, Plane, Anchor, HardHat, CalendarDays, ScrollText, Rocket, Map, ChevronRight, Brain, Activity, FileCheck, Mail, ShieldCheck, User, Building2, Compass, X, Beaker } from "lucide-react";
+import { Home, Gauge, Plane, Anchor, HardHat, CalendarDays, ScrollText, Rocket, Map, ChevronRight, Brain, Activity, FileCheck, Mail, ShieldCheck, User, Building2, Compass, X, Beaker, Scale } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import LanguageToggle from "@/components/LanguageToggle";
@@ -76,6 +76,14 @@ const navItems: NavItem[] = [
   label: "Events",
   description: "Venue Weather Operations",
   icon: CalendarDays,
+  category: "industry",
+  isPublic: true,
+  roles: ["operator", "technical", "executive"]
+}, {
+  path: "/compliance-hub",
+  label: "Compliance Hub",
+  description: "Cross-Border Regulatory Operations",
+  icon: Scale,
   category: "industry",
   isPublic: true,
   roles: ["operator", "technical", "executive"]
