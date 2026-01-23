@@ -81,6 +81,7 @@ import BattleCards from "./pages/BattleCards";
 import EventPage from "./pages/EventPage";
 import Labs from "./pages/Labs";
 import ApparelBlueprint from "./pages/ApparelBlueprint";
+import ComplianceHub from "./pages/ComplianceHub";
 
 const queryClient = new QueryClient();
 
@@ -156,6 +157,7 @@ const App = () => (
                 <Route path="/labs" element={<Labs />} />
                 <Route path="/apparel-blueprint" element={<ApparelBlueprint />} />
                 <Route path="/thermal-viz" element={<ThermalMusicVisualizer />} />
+                <Route path="/compliance-hub" element={<ComplianceHub />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />
