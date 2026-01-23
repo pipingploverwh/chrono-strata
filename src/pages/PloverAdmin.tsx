@@ -30,6 +30,7 @@ import {
 import NestingSiteMap from "@/components/plover/NestingSiteMap";
 import ThreatLogsPanel from "@/components/plover/ThreatLogsPanel";
 import ThreatLevelSelector from "@/components/plover/ThreatLevelSelector";
+import NestingTimeline from "@/components/plover/NestingTimeline";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -540,6 +541,14 @@ function ConservationPanel({ t }: { t: typeof translations.en }) {
           </ScrollArea>
         </Card>
       )}
+
+      {/* Nesting Timeline */}
+      <div className="mt-6">
+        <NestingTimeline 
+          sites={sites} 
+          onSelectSite={(siteId) => setSelectedSiteId(siteId)}
+        />
+      </div>
 
       {/* Threat Logs Panel */}
       <div className="mt-6">
