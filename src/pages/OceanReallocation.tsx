@@ -9,6 +9,7 @@ import TCEFrictionMeter from "@/components/ocean/TCEFrictionMeter";
 import OceanReallocationExport from "@/components/ocean/OceanReallocationExport";
 import FederalResearchContext from "@/components/ocean/FederalResearchContext";
 import AIContextAnalysis from "@/components/ocean/AIContextAnalysis";
+import PolicyTimeline from "@/components/ocean/PolicyTimeline";
 
 const OceanReallocation = () => {
   const [policyPosition, setPolicyPosition] = useState(65); // Default towards extraction
@@ -181,6 +182,11 @@ const OceanReallocation = () => {
         {/* AI Context Analysis */}
         <div className="mt-8">
           <AIContextAnalysis policyPosition={policyPosition} />
+        </div>
+
+        {/* Policy Evolution Timeline */}
+        <div className="mt-8 bg-surface-1 border border-border rounded-lg p-6">
+          <PolicyTimeline />
         </div>
 
         {/* Federal Research Context (Collapsible) */}
