@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import PrivateNotesPanel from "@/components/PrivateNotesPanel";
+import { QuickTourTrigger } from "@/components/QuickTour";
 
 const ForMoran = () => {
   const journeyMilestones = [
@@ -47,16 +48,19 @@ const ForMoran = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       {/* Personal Header */}
-      <header className="border-b border-border/30 bg-card/30 backdrop-blur-sm">
+      <header className="border-b border-border/30 bg-card/30 backdrop-blur-sm" data-tour="welcome">
         <div className="container mx-auto px-6 py-8">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <Heart className="w-6 h-6 text-primary" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Heart className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-semibold">For Moran 💜</h1>
+                <p className="text-muted-foreground">A window into five years of building something real</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-semibold">For Moran 💜</h1>
-              <p className="text-muted-foreground">A window into five years of building something real</p>
-            </div>
+            <QuickTourTrigger />
           </div>
         </div>
       </header>
@@ -108,7 +112,7 @@ const ForMoran = () => {
         </motion.section>
 
         {/* The Business Model - Value Creation Terms */}
-        <section className="space-y-6">
+        <section className="space-y-6" data-tour="weather-intel">
           <h2 className="text-2xl font-bold">The Value Creation Model</h2>
           <p className="text-muted-foreground max-w-2xl">
             Using your Hetz Ventures lens - here's how this creates value:
@@ -247,7 +251,7 @@ const ForMoran = () => {
         </section>
 
         {/* Technical Contributors - Rob Rubin PhD */}
-        <section className="space-y-6">
+        <section className="space-y-6" data-tour="technical-advisory">
           <div className="flex items-center gap-3">
             <GraduationCap className="w-6 h-6 text-violet-500" />
             <h2 className="text-2xl font-bold">Technical Advisory & Support</h2>
@@ -336,7 +340,7 @@ const ForMoran = () => {
         </section>
 
         {/* Moran's Notes Section */}
-        <section className="space-y-6">
+        <section className="space-y-6" data-tour="private-notes">
           <h2 className="text-2xl font-bold flex items-center gap-2">
             💬 Your Notes & Feedback
           </h2>

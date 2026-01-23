@@ -10,6 +10,7 @@ import { SiteNavigation, SiteMapPage } from "@/components/SiteNavigation";
 import SkipLinks from "@/components/SkipLinks";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
+import { QuickTourProvider } from "@/components/QuickTour";
 // ProtectedRoute import removed - all routes are now public
 import AcquisitionPitch from "./pages/AcquisitionPitch";
 import LavandarHome from "./pages/LavandarHome";
@@ -96,6 +97,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <GlobalWeatherProvider>
+          <QuickTourProvider>
           {/* Smooth scroll to top on route changes */}
           <ScrollToTop />
           
@@ -196,6 +198,7 @@ const App = () => (
             <Footer />
           </div>
           <SiteNavigation />
+          </QuickTourProvider>
           </GlobalWeatherProvider>
         </BrowserRouter>
       </TooltipProvider>
