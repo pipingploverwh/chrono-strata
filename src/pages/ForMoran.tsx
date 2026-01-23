@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   Heart, Clock, Lightbulb, TrendingUp, Shield, Users, 
-  ArrowRight, Sparkles, Building2, Plane, Ship, Cloud
+  ArrowRight, Sparkles, Building2, Plane, Ship, Cloud,
+  GitBranch, GraduationCap, FileCode, Server
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -222,6 +223,95 @@ const ForMoran = () => {
               </Button>
             </Link>
           </div>
+        </section>
+
+        {/* Technical Contributors - Rob Rubin PhD */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3">
+            <GraduationCap className="w-6 h-6 text-violet-500" />
+            <h2 className="text-2xl font-bold">Technical Advisory & Support</h2>
+          </div>
+          <p className="text-muted-foreground max-w-2xl">
+            Key technical contributions and scoping work that shaped the platform architecture.
+          </p>
+
+          <Card className="bg-card/50 border-violet-500/20">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-violet-500/10 flex items-center justify-center">
+                  <GraduationCap className="w-5 h-5 text-violet-500" />
+                </div>
+                Rob Rubin, PhD
+              </CardTitle>
+              <Badge variant="outline" className="w-fit text-xs font-mono">
+                Technical Advisor • Architecture & Scoping
+              </Badge>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="p-4 bg-muted/30 rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <GitBranch className="w-4 h-4 text-orange-500" />
+                    <span className="font-medium text-sm">GitLab Contributions</span>
+                  </div>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• CI/CD pipeline architecture design</li>
+                    <li>• Multi-environment deployment strategy</li>
+                    <li>• Security review & hardening protocols</li>
+                  </ul>
+                </div>
+
+                <div className="p-4 bg-muted/30 rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FileCode className="w-4 h-4 text-slate-400" />
+                    <span className="font-medium text-sm">GitHub Services</span>
+                  </div>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Repository structure & branching strategy</li>
+                    <li>• Actions workflows for automated testing</li>
+                    <li>• Code review standards & documentation</li>
+                  </ul>
+                </div>
+
+                <div className="p-4 bg-muted/30 rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Server className="w-4 h-4 text-blue-500" />
+                    <span className="font-medium text-sm">Technical Scoping</span>
+                  </div>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Edge function architecture planning</li>
+                    <li>• Database schema optimization</li>
+                    <li>• API design & rate limiting strategy</li>
+                  </ul>
+                </div>
+
+                <div className="p-4 bg-muted/30 rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Shield className="w-4 h-4 text-emerald-500" />
+                    <span className="font-medium text-sm">Advisory Services</span>
+                  </div>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• RLS policy review & implementation</li>
+                    <li>• Multi-model AI gateway architecture</li>
+                    <li>• Scalability assessment & roadmap</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-border/30">
+                <p className="text-xs text-muted-foreground italic">
+                  These contributions span 2022–2025, providing critical technical foundation 
+                  for enterprise-grade deployment. Documentation available upon request.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <PrivateNotesPanel 
+            pagePath="/for-moran" 
+            featureContext="Rob Rubin PhD Technical Advisory"
+            className="max-w-2xl"
+          />
         </section>
 
         {/* Moran's Notes Section */}
