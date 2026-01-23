@@ -24,9 +24,12 @@ import {
   Waves,
   Sun,
   Moon,
-  Map
+  Map,
+  Bell
 } from "lucide-react";
 import NestingSiteMap from "@/components/plover/NestingSiteMap";
+import ThreatLogsPanel from "@/components/plover/ThreatLogsPanel";
+import ThreatLevelSelector from "@/components/plover/ThreatLevelSelector";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -363,8 +366,9 @@ function StatCard({
 function ConservationPanel({ t }: { t: typeof translations.en }) {
   const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"map" | "list">("map");
+  const [threatEditSite, setThreatEditSite] = useState<NestingSiteDisplay | null>(null);
   
-  const { sites, loading, logCheck } = useNestingSites();
+  const { sites, loading, logCheck, updateSite } = useNestingSites();
   
   const activeNests = sites.filter(n => n.status === "active");
   const totalEggs = sites.reduce((sum, n) => sum + n.eggs, 0);
@@ -377,6 +381,17 @@ function ConservationPanel({ t }: { t: typeof translations.en }) {
 
   const handleLogCheck = (siteId: string) => {
     logCheck(siteId);
+  };
+
+  const handleUpdateThreat = async (
+    siteId: string,
+    threatLevel: "low" | "medium" | "high",
+    notes?: string
+  ) => {
+    await updateSite(siteId, {
+      threat_level: threatLevel,
+      observer_notes: notes,
+    });
   };
 
   return (
@@ -485,18 +500,38 @@ function ConservationPanel({ t }: { t: typeof translations.en }) {
                           <span className="text-[10px]">{site.threats.join(', ')}</span>
                         </div>
                       )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="mt-2 h-6 text-[10px] text-cyan-400 hover:text-cyan-300"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleLogCheck(site.id);
-                        }}
-                      >
-                        <Eye className="w-3 h-3 mr-1" />
-                        Log Check
-                      </Button>
+                      <div className="flex items-center gap-1 mt-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 text-[10px] text-cyan-400 hover:text-cyan-300"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleLogCheck(site.id);
+                          }}
+                        >
+                          <Eye className="w-3 h-3 mr-1" />
+                          Log Check
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className={`h-6 text-[10px] ${
+                            site.threatLevel === 'high' 
+                              ? 'text-red-400 hover:text-red-300' 
+                              : site.threatLevel === 'medium'
+                                ? 'text-amber-400 hover:text-amber-300'
+                                : 'text-neutral-400 hover:text-neutral-300'
+                          }`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setThreatEditSite(site);
+                          }}
+                        >
+                          <Shield className="w-3 h-3 mr-1" />
+                          Threat
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -505,6 +540,26 @@ function ConservationPanel({ t }: { t: typeof translations.en }) {
           </ScrollArea>
         </Card>
       )}
+
+      {/* Threat Logs Panel */}
+      <div className="mt-6">
+        <h3 className="font-mono text-sm uppercase tracking-wider text-white mb-4 flex items-center gap-2">
+          <Bell className="w-4 h-4 text-red-400" />
+          Threat Alert History
+        </h3>
+        <ThreatLogsPanel />
+      </div>
+
+      {/* Threat Level Selector Modal */}
+      <AnimatePresence>
+        {threatEditSite && (
+          <ThreatLevelSelector
+            site={threatEditSite}
+            onUpdateThreat={handleUpdateThreat}
+            onClose={() => setThreatEditSite(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
