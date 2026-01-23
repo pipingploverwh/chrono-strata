@@ -536,6 +536,54 @@ export type Database = {
         }
         Relationships: []
       }
+      nesting_sites: {
+        Row: {
+          chicks: number | null
+          created_at: string
+          eggs: number | null
+          id: string
+          last_check: string | null
+          latitude: number
+          longitude: number
+          name: string
+          observer_notes: string | null
+          site_id: string
+          status: string
+          threat_level: string | null
+          updated_at: string
+        }
+        Insert: {
+          chicks?: number | null
+          created_at?: string
+          eggs?: number | null
+          id?: string
+          last_check?: string | null
+          latitude: number
+          longitude: number
+          name: string
+          observer_notes?: string | null
+          site_id: string
+          status?: string
+          threat_level?: string | null
+          updated_at?: string
+        }
+        Update: {
+          chicks?: number | null
+          created_at?: string
+          eggs?: number | null
+          id?: string
+          last_check?: string | null
+          latitude?: number
+          longitude?: number
+          name?: string
+          observer_notes?: string | null
+          site_id?: string
+          status?: string
+          threat_level?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           email: string
