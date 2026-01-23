@@ -82,7 +82,7 @@ import EventPage from "./pages/EventPage";
 import Labs from "./pages/Labs";
 import ApparelBlueprint from "./pages/ApparelBlueprint";
 import ComplianceHub from "./pages/ComplianceHub";
-
+import PloverAdmin from "./pages/PloverAdmin";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -158,6 +158,7 @@ const App = () => (
                 <Route path="/apparel-blueprint" element={<ApparelBlueprint />} />
                 <Route path="/thermal-viz" element={<ThermalMusicVisualizer />} />
                 <Route path="/compliance-hub" element={<ComplianceHub />} />
+                <Route path="/plover-admin" element={<PloverAdmin />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />

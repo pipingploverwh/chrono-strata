@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, Gauge, Plane, Anchor, HardHat, CalendarDays, ScrollText, Rocket, Map, ChevronRight, Brain, Activity, FileCheck, Mail, ShieldCheck, User, Building2, Compass, X, Beaker, Scale } from "lucide-react";
+import { Home, Gauge, Plane, Anchor, HardHat, CalendarDays, ScrollText, Rocket, Map, ChevronRight, Brain, Activity, FileCheck, Mail, ShieldCheck, User, Building2, Compass, X, Beaker, Scale, Bird } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import LanguageToggle from "@/components/LanguageToggle";
@@ -84,6 +84,14 @@ const navItems: NavItem[] = [
   label: "Compliance Hub",
   description: "Cross-Border Regulatory Operations",
   icon: Scale,
+  category: "industry",
+  isPublic: true,
+  roles: ["operator", "technical", "executive"]
+}, {
+  path: "/plover-admin",
+  label: "Plover Admin",
+  description: "Wellfleet Harbor Unified Operations",
+  icon: Bird,
   category: "industry",
   isPublic: true,
   roles: ["operator", "technical", "executive"]
