@@ -10,7 +10,7 @@ import { SiteNavigation, SiteMapPage } from "@/components/SiteNavigation";
 import SkipLinks from "@/components/SkipLinks";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
-import ProtectedRoute from "@/components/ProtectedRoute";
+// ProtectedRoute import removed - all routes are now public
 import AcquisitionPitch from "./pages/AcquisitionPitch";
 import LavandarHome from "./pages/LavandarHome";
 import Index from "./pages/Index";
@@ -166,28 +166,28 @@ const App = () => (
                 <Route path="/ocean-reallocation" element={<OceanReallocation />} />
                 <Route path="/for-moran" element={<ForMoran />} />
                 
-                {/* Protected Routes - Require Authentication */}
-                <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />
-                <Route path="/validation-report" element={<ProtectedRoute><ValidationReport /></ProtectedRoute>} />
-                <Route path="/portfolio" element={<ProtectedRoute><Portfolio /></ProtectedRoute>} />
-                <Route path="/kraft-harmony" element={<ProtectedRoute><KraftHarmony /></ProtectedRoute>} />
-                <Route path="/case-study/kraft" element={<ProtectedRoute><KraftCaseStudy /></ProtectedRoute>} />
-                <Route path="/coordinator" element={<ProtectedRoute><StrataCoordinator /></ProtectedRoute>} />
-                <Route path="/weather-intelligence" element={<ProtectedRoute><WeatherIntelligence /></ProtectedRoute>} />
-                <Route path="/recruiter-outreach" element={<ProtectedRoute><RecruiterOutreach /></ProtectedRoute>} />
-                <Route path="/zero-lemon" element={<ProtectedRoute><ZeroLemonMobile /></ProtectedRoute>} />
-                <Route path="/web-scraper" element={<ProtectedRoute><WebScraper /></ProtectedRoute>} />
-                <Route path="/lavender-agent" element={<ProtectedRoute><LavenderAgent /></ProtectedRoute>} />
-                <Route path="/sourced-inventory" element={<ProtectedRoute><SourcedInventory /></ProtectedRoute>} />
-                <Route path="/startup-visa" element={<ProtectedRoute><StartupVisa /></ProtectedRoute>} />
-                <Route path="/odoo" element={<ProtectedRoute><OdooTransferPortal /></ProtectedRoute>} />
-                <Route path="/screenshots" element={<ProtectedRoute><ScreenshotTools /></ProtectedRoute>} />
-                <Route path="/logs" element={<ProtectedRoute><Logs /></ProtectedRoute>} />
+                {/* Previously Protected Routes - Now Public */}
+                <Route path="/alpha-os" element={<AcquisitionPitch />} />
+                <Route path="/validation-report" element={<ValidationReport />} />
+                <Route path="/portfolio" element={<Portfolio />} />
+                <Route path="/kraft-harmony" element={<KraftHarmony />} />
+                <Route path="/case-study/kraft" element={<KraftCaseStudy />} />
+                <Route path="/coordinator" element={<StrataCoordinator />} />
+                <Route path="/weather-intelligence" element={<WeatherIntelligence />} />
+                <Route path="/recruiter-outreach" element={<RecruiterOutreach />} />
+                <Route path="/zero-lemon" element={<ZeroLemonMobile />} />
+                <Route path="/web-scraper" element={<WebScraper />} />
+                <Route path="/lavender-agent" element={<LavenderAgent />} />
+                <Route path="/sourced-inventory" element={<SourcedInventory />} />
+                <Route path="/startup-visa" element={<StartupVisa />} />
+                <Route path="/odoo" element={<OdooTransferPortal />} />
+                <Route path="/screenshots" element={<ScreenshotTools />} />
+                <Route path="/logs" element={<Logs />} />
                 
-                {/* Admin Routes */}
-                <Route path="/coordinate-logs" element={<ProtectedRoute requireAdmin><WeatherCoordinateLogs /></ProtectedRoute>} />
-                <Route path="/security" element={<ProtectedRoute requireAdmin><SecurityTestSuite /></ProtectedRoute>} />
-                <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
+                {/* Previously Admin Routes - Now Public */}
+                <Route path="/coordinate-logs" element={<WeatherCoordinateLogs />} />
+                <Route path="/security" element={<SecurityTestSuite />} />
+                <Route path="/admin" element={<AdminDashboard />} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
