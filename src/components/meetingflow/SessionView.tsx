@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { MeetingSession, MeetingPrompt, MeetingTranscript } from "@/hooks/useMeetingSessions";
+import { PromptSettings } from "@/components/meetingflow/SettingsPanel";
 
 interface SessionViewProps {
   session: MeetingSession;
@@ -17,6 +18,7 @@ interface SessionViewProps {
   onUpdateSession: (id: string, updates: Partial<MeetingSession>) => Promise<MeetingSession | null>;
   onSavePrompts: (sessionId: string, prompts: { title: string; content: string }[]) => Promise<MeetingPrompt[] | null>;
   onSaveTranscript: (sessionId: string, content: string) => Promise<MeetingTranscript | null>;
+  promptSettings?: PromptSettings;
 }
 
 export function SessionView({
@@ -27,6 +29,7 @@ export function SessionView({
   onUpdateSession,
   onSavePrompts,
   onSaveTranscript,
+  promptSettings,
 }: SessionViewProps) {
   const [title, setTitle] = useState(session.title);
   const [transcriptContent, setTranscriptContent] = useState(transcript?.content || "");
