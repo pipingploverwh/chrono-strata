@@ -48,40 +48,61 @@ const ForMoran = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       {/* Personal Header */}
       <header className="border-b border-border/30 bg-card/30 backdrop-blur-sm">
-        <div className="container mx-auto px-6 py-6">
-          <div className="flex items-center gap-3">
-            <Heart className="w-6 h-6 text-rose-500" />
+        <div className="container mx-auto px-6 py-8">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Heart className="w-6 h-6 text-primary" />
+            </div>
             <div>
-              <h1 className="text-xl font-semibold">For Moran</h1>
-              <p className="text-sm text-muted-foreground">A window into five years of building</p>
+              <h1 className="text-2xl font-semibold">For Moran 💜</h1>
+              <p className="text-muted-foreground">A window into five years of building something real</p>
             </div>
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-6 py-12 space-y-16">
+        {/* Welcome Message */}
+        <motion.section 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-3xl"
+        >
+          <Card className="bg-primary/5 border-primary/20 p-6">
+            <p className="text-lg leading-relaxed">
+              Hi love — this page is just for you. I wanted to show you what I've been building 
+              these past five years in a way that makes sense. You've been patient through all 
+              the late nights, and I want you to see <span className="text-foreground font-semibold">why</span>.
+            </p>
+          </Card>
+        </motion.section>
+
         {/* The Elevator Pitch - In Her Language */}
         <motion.section 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
           className="max-w-3xl"
         >
           <h2 className="text-3xl font-bold mb-6">What I've Been Building</h2>
           <div className="prose prose-lg text-muted-foreground space-y-4">
             <p>
               Remember how at <span className="text-foreground font-medium">Wasteless</span> you helped grocery 
-              retailers reduce waste with dynamic pricing? LAVANDAR does something similar, but for 
-              <span className="text-foreground font-medium"> operational decisions</span> across industries.
+              retailers reduce food waste with dynamic pricing? <span className="text-foreground font-medium">LAVANDAR</span> does 
+              something similar, but for <span className="text-foreground font-medium">operational decisions</span> across industries.
             </p>
             <p>
               Think of it like this: A pilot deciding whether to fly, a ship captain planning a route, 
-              a construction manager scheduling outdoor work - they all need to understand weather, 
+              a construction manager scheduling outdoor work — they all need real-time intelligence, 
               but they need it <span className="text-foreground font-medium">translated into their context</span>.
             </p>
             <p>
               That's what this platform does. It takes complex data (weather, regulations, market signals) 
-              and turns it into <span className="text-foreground font-medium">clear business recommendations</span> - 
-              like how you turned inventory data into pricing decisions at Wasteless.
+              and turns it into <span className="text-foreground font-medium">clear business recommendations</span> — 
+              exactly like how you turned inventory data into pricing decisions.
+            </p>
+            <p className="text-foreground font-medium pt-2">
+              The difference? This is enterprise SaaS with real paying customers. Not a side project.
             </p>
           </div>
         </motion.section>
@@ -263,8 +284,8 @@ const ForMoran = () => {
 
                 <div className="p-4 bg-muted/30 rounded-lg border border-border/50">
                   <div className="flex items-center gap-2 mb-2">
-                    <FileCode className="w-4 h-4 text-slate-400" />
-                    <span className="font-medium text-sm">GitHub Services</span>
+                    <FileCode className="w-4 h-4 text-foreground/60" />
+                    <span className="font-medium text-sm">pipingploverwh GitHub</span>
                   </div>
                   <ul className="text-sm text-muted-foreground space-y-1">
                     <li>• Repository structure & branching strategy</li>
@@ -336,11 +357,25 @@ const ForMoran = () => {
           transition={{ delay: 0.5 }}
           className="max-w-2xl border-t border-border/30 pt-8"
         >
-          <p className="text-muted-foreground italic">
-            I wanted you to see where the nights and weekends went. This isn't just code - 
-            it's years of learning, iterating, and building something that actually works. 
-            Thank you for your patience and support through all of it. 💜
-          </p>
+          <Card className="bg-card/50 border-primary/20 p-6">
+            <div className="flex items-start gap-4">
+              <Heart className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+              <div className="space-y-3">
+                <p className="text-muted-foreground">
+                  I wanted you to see where the nights and weekends went. This isn't just code — 
+                  it's years of learning, iterating, and building something that actually works.
+                </p>
+                <p className="text-muted-foreground">
+                  You've seen the spreadsheets, the pitch decks, the investor calls. This is the product 
+                  behind all of that. Real infrastructure. Real customers. Real potential.
+                </p>
+                <p className="text-foreground font-medium">
+                  Thank you for your patience and support through all of it. I couldn't have done 
+                  this without you. 💜
+                </p>
+              </div>
+            </div>
+          </Card>
         </motion.section>
       </main>
     </div>
