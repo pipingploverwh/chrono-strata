@@ -41,17 +41,7 @@ import { supabase } from "@/integrations/supabase/client";
 // ============= GATE RITUAL STATE =============
 type GatePhase = "sealed" | "scanning" | "verified" | "open";
 
-// ============= MOCK DATA STRUCTURES =============
-interface NestingSite {
-  id: string;
-  zone: string;
-  status: "active" | "fledged" | "abandoned" | "monitoring";
-  eggs: number;
-  chicks: number;
-  lastCheck: string;
-  threats: string[];
-  coordinates: { lat: number; lon: number };
-}
+import { useNestingSites, NestingSiteDisplay } from "@/hooks/useNestingSites";
 
 interface DockSlip {
   id: string;
@@ -74,13 +64,7 @@ interface InventoryItem {
   supplier: string;
 }
 
-// ============= MOCK DATA =============
-const NESTING_SITES: NestingSite[] = [
-  { id: "pp-001", zone: "Newcomb Hollow", status: "active", eggs: 4, chicks: 0, lastCheck: "2026-01-23T08:30:00", threats: ["predator_tracks"], coordinates: { lat: 41.9234, lon: -69.9612 } },
-  { id: "pp-002", zone: "Marconi Beach", status: "active", eggs: 3, chicks: 1, lastCheck: "2026-01-23T07:15:00", threats: [], coordinates: { lat: 41.8912, lon: -69.9567 } },
-  { id: "pp-003", zone: "LeCount Hollow", status: "fledged", eggs: 0, chicks: 0, lastCheck: "2026-01-22T16:00:00", threats: [], coordinates: { lat: 41.9089, lon: -69.9523 } },
-  { id: "pp-004", zone: "White Crest", status: "monitoring", eggs: 0, chicks: 0, lastCheck: "2026-01-23T09:00:00", threats: ["human_activity"], coordinates: { lat: 41.8756, lon: -69.9489 } },
-];
+// Mock data for nesting sites removed - now using useNestingSites hook
 
 const DOCK_SLIPS: DockSlip[] = [
   { id: "slip-a1", number: "A-1", status: "occupied", vessel: "Sea Witch", owner: "R. Atwood", size: "large", monthlyRate: 850 },
@@ -380,13 +364,19 @@ function ConservationPanel({ t }: { t: typeof translations.en }) {
   const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"map" | "list">("map");
   
-  const activeNests = NESTING_SITES.filter(n => n.status === "active");
-  const totalEggs = NESTING_SITES.reduce((sum, n) => sum + n.eggs, 0);
-  const totalChicks = NESTING_SITES.reduce((sum, n) => sum + n.chicks, 0);
-  const threats = NESTING_SITES.filter(n => n.threats.length > 0);
+  const { sites, loading, logCheck } = useNestingSites();
+  
+  const activeNests = sites.filter(n => n.status === "active");
+  const totalEggs = sites.reduce((sum, n) => sum + n.eggs, 0);
+  const totalChicks = sites.reduce((sum, n) => sum + n.chicks, 0);
+  const threats = sites.filter(n => n.threats.length > 0);
 
-  const handleSiteSelect = (site: NestingSite | null) => {
+  const handleSiteSelect = (site: NestingSiteDisplay | null) => {
     setSelectedSiteId(site?.id || null);
+  };
+
+  const handleLogCheck = (siteId: string) => {
+    logCheck(siteId);
   };
 
   return (
@@ -427,9 +417,11 @@ function ConservationPanel({ t }: { t: typeof translations.en }) {
       {/* Map View */}
       {viewMode === "map" && (
         <NestingSiteMap 
-          sites={NESTING_SITES}
+          sites={sites}
           onSiteSelect={handleSiteSelect}
           selectedSiteId={selectedSiteId}
+          onLogCheck={handleLogCheck}
+          loading={loading}
         />
       )}
 
@@ -437,7 +429,7 @@ function ConservationPanel({ t }: { t: typeof translations.en }) {
       {viewMode === "list" && (
         <Card className="bg-neutral-900/50 border-neutral-800">
           <div className="p-4 border-b border-neutral-800 flex items-center justify-between">
-            <span className="text-xs text-neutral-500">{NESTING_SITES.length} sites monitored</span>
+            <span className="text-xs text-neutral-500">{sites.length} sites monitored</span>
             <Button variant="ghost" size="sm" className="text-cyan-400 hover:text-cyan-300">
               <Plus className="w-4 h-4 mr-2" />
               Add Site
@@ -445,7 +437,7 @@ function ConservationPanel({ t }: { t: typeof translations.en }) {
           </div>
           <ScrollArea className="h-[400px]">
             <div className="divide-y divide-neutral-800">
-              {NESTING_SITES.map(site => (
+              {sites.map(site => (
                 <div 
                   key={site.id} 
                   className={`p-4 hover:bg-neutral-800/50 transition-colors cursor-pointer ${
@@ -465,6 +457,15 @@ function ConservationPanel({ t }: { t: typeof translations.en }) {
                         }`}>
                           {site.status}
                         </Badge>
+                        {site.threatLevel !== 'low' && (
+                          <Badge variant="outline" className={`text-[10px] ${
+                            site.threatLevel === 'high' 
+                              ? 'border-red-500/50 text-red-400' 
+                              : 'border-amber-500/50 text-amber-400'
+                          }`}>
+                            {site.threatLevel} threat
+                          </Badge>
+                        )}
                       </div>
                       <p className="text-white font-medium">{site.zone}</p>
                       <p className="text-xs text-neutral-500 mt-1">
@@ -484,6 +485,18 @@ function ConservationPanel({ t }: { t: typeof translations.en }) {
                           <span className="text-[10px]">{site.threats.join(', ')}</span>
                         </div>
                       )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="mt-2 h-6 text-[10px] text-cyan-400 hover:text-cyan-300"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleLogCheck(site.id);
+                        }}
+                      >
+                        <Eye className="w-3 h-3 mr-1" />
+                        Log Check
+                      </Button>
                     </div>
                   </div>
                 </div>

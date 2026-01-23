@@ -10,29 +10,25 @@ import {
   Wind,
   X,
   ExternalLink,
-  Clock
+  Clock,
+  Loader2
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { NestingSiteDisplay } from "@/hooks/useNestingSites";
 
 // ============= TYPES =============
-interface NestingSite {
-  id: string;
-  zone: string;
-  status: "active" | "fledged" | "abandoned" | "monitoring";
-  eggs: number;
-  chicks: number;
-  lastCheck: string;
-  threats: string[];
-  coordinates: { lat: number; lon: number };
-}
+// Re-export for backwards compatibility
+export type NestingSite = NestingSiteDisplay;
 
 interface MapProps {
-  sites: NestingSite[];
-  onSiteSelect?: (site: NestingSite | null) => void;
+  sites: NestingSiteDisplay[];
+  onSiteSelect?: (site: NestingSiteDisplay | null) => void;
   selectedSiteId?: string | null;
+  onLogCheck?: (siteId: string) => void;
+  loading?: boolean;
 }
 
 // Cape Cod bounding box (outer cape focus)
@@ -223,7 +219,15 @@ function SiteMarker({
   );
 }
 
-function SiteDetailPanel({ site, onClose }: { site: NestingSite; onClose: () => void }) {
+function SiteDetailPanel({ 
+  site, 
+  onClose, 
+  onLogCheck 
+}: { 
+  site: NestingSite; 
+  onClose: () => void;
+  onLogCheck?: (siteId: string) => void;
+}) {
   const colors = getStatusColor(site.status);
   
   return (
@@ -276,6 +280,22 @@ function SiteDetailPanel({ site, onClose }: { site: NestingSite; onClose: () => 
           </div>
         </div>
 
+        {/* Threat Level Badge */}
+        {site.threatLevel && site.threatLevel !== "low" && (
+          <div className="px-4 pb-3">
+            <Badge 
+              variant="outline" 
+              className={`text-[10px] ${
+                site.threatLevel === "high" 
+                  ? "border-red-500/50 text-red-400 bg-red-500/10" 
+                  : "border-amber-500/50 text-amber-400 bg-amber-500/10"
+              }`}
+            >
+              {site.threatLevel.toUpperCase()} THREAT
+            </Badge>
+          </div>
+        )}
+
         {/* Coordinates */}
         <div className="px-4 pb-3">
           <div className="flex items-center gap-2 text-xs font-mono text-neutral-500">
@@ -297,6 +317,14 @@ function SiteDetailPanel({ site, onClose }: { site: NestingSite; onClose: () => 
           </div>
         </div>
 
+        {/* Observer Notes */}
+        {site.observerNotes && (
+          <div className="px-4 pb-3">
+            <p className="text-[10px] font-mono uppercase text-neutral-500 mb-1">Observer Notes</p>
+            <p className="text-xs text-neutral-400 leading-relaxed">{site.observerNotes}</p>
+          </div>
+        )}
+
         {/* Threats */}
         {site.threats.length > 0 && (
           <div className="px-4 pb-4">
@@ -316,6 +344,7 @@ function SiteDetailPanel({ site, onClose }: { site: NestingSite; onClose: () => 
             variant="outline" 
             size="sm" 
             className="flex-1 text-xs border-neutral-700 hover:bg-neutral-800"
+            onClick={() => onLogCheck?.(site.id)}
           >
             <Eye className="w-3 h-3 mr-2" />
             Log Check
@@ -396,7 +425,7 @@ function MapControls({ onZoomIn, onZoomOut, onReset }: { onZoomIn: () => void; o
   );
 }
 
-export default function NestingSiteMap({ sites, onSiteSelect, selectedSiteId }: MapProps) {
+export default function NestingSiteMap({ sites, onSiteSelect, selectedSiteId, onLogCheck, loading }: MapProps) {
   const [selectedSite, setSelectedSite] = useState<NestingSite | null>(null);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -431,6 +460,17 @@ export default function NestingSiteMap({ sites, onSiteSelect, selectedSiteId }: 
 
   const SVG_WIDTH = 500;
   const SVG_HEIGHT = 500;
+
+  if (loading) {
+    return (
+      <Card className="bg-neutral-900/50 border-neutral-800 h-[568px] flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 text-cyan-400 animate-spin mx-auto mb-3" />
+          <p className="text-sm text-neutral-500 font-mono">Loading nesting sites...</p>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="bg-neutral-900/50 border-neutral-800 overflow-hidden relative">
@@ -595,7 +635,11 @@ export default function NestingSiteMap({ sites, onSiteSelect, selectedSiteId }: 
         {/* Site Detail Panel */}
         <AnimatePresence>
           {selectedSite && (
-            <SiteDetailPanel site={selectedSite} onClose={handleClose} />
+            <SiteDetailPanel 
+              site={selectedSite} 
+              onClose={handleClose} 
+              onLogCheck={onLogCheck}
+            />
           )}
         </AnimatePresence>
 
