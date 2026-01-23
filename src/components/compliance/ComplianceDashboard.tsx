@@ -15,12 +15,14 @@ import {
   Search,
   Filter,
   Download,
-  RefreshCw
+  RefreshCw,
+  Plus
 } from "lucide-react";
 import { ComplianceStats } from "./ComplianceStats";
 import { ShipmentCard } from "./ShipmentCard";
 import { ShipmentDetailsSheet } from "./ShipmentDetailsSheet";
 import { JurisdictionGuide } from "./JurisdictionGuide";
+import { CreateShipmentWizard } from "./CreateShipmentWizard";
 import { useComplianceShipments } from "@/hooks/useComplianceData";
 
 export function ComplianceDashboard() {
@@ -28,6 +30,7 @@ export function ComplianceDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [destinationFilter, setDestinationFilter] = useState<string>("all");
+  const [createWizardOpen, setCreateWizardOpen] = useState(false);
 
   const { data: shipments, isLoading, refetch } = useComplianceShipments(
     statusFilter !== "all" || destinationFilter !== "all"
@@ -103,6 +106,14 @@ export function ComplianceDashboard() {
               >
                 <Download className="w-4 h-4 mr-2" />
                 Export CSV
+              </Button>
+              <Button 
+                size="sm"
+                onClick={() => setCreateWizardOpen(true)}
+                className="bg-cyan-600 hover:bg-cyan-700"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                New Shipment
               </Button>
             </div>
           </div>
@@ -195,6 +206,12 @@ export function ComplianceDashboard() {
       <ShipmentDetailsSheet
         shipmentId={selectedShipmentId}
         onClose={() => setSelectedShipmentId(null)}
+      />
+
+      {/* Create Shipment Wizard */}
+      <CreateShipmentWizard
+        open={createWizardOpen}
+        onOpenChange={setCreateWizardOpen}
       />
     </div>
   );
