@@ -85,6 +85,7 @@ import ComplianceHub from "./pages/ComplianceHub";
 import PloverAdmin from "./pages/PloverAdmin";
 import MeetingFlow from "./pages/MeetingFlow";
 import OceanReallocation from "./pages/OceanReallocation";
+import ForMoran from "./pages/ForMoran";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -163,6 +164,7 @@ const App = () => (
                 <Route path="/plover-admin" element={<PloverAdmin />} />
                 <Route path="/meetingflow" element={<MeetingFlow />} />
                 <Route path="/ocean-reallocation" element={<OceanReallocation />} />
+                <Route path="/for-moran" element={<ForMoran />} />
                 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/alpha-os" element={<ProtectedRoute><AcquisitionPitch /></ProtectedRoute>} />

@@ -1,0 +1,244 @@
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { 
+  Heart, Clock, Lightbulb, TrendingUp, Shield, Users, 
+  ArrowRight, Sparkles, Building2, Plane, Ship, Cloud
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+
+const ForMoran = () => {
+  const journeyMilestones = [
+    {
+      year: "2021",
+      title: "The Seed",
+      description: "Started building tools to help people make better decisions with real-time data. Scout Ventures saw the potential.",
+      icon: <Lightbulb className="w-5 h-5" />
+    },
+    {
+      year: "2022",
+      title: "Finding Product-Market Fit",
+      description: "Discovered that weather intelligence was the wedge - everyone needs it, few do it well.",
+      icon: <Cloud className="w-5 h-5" />
+    },
+    {
+      year: "2023",
+      title: "Enterprise Validation",
+      description: "Aviation and maritime operators started using the platform. Real revenue, real impact.",
+      icon: <Plane className="w-5 h-5" />
+    },
+    {
+      year: "2024",
+      title: "AI Integration",
+      description: "Added multi-model AI to turn raw data into actionable insights. The platform became intelligent.",
+      icon: <Sparkles className="w-5 h-5" />
+    },
+    {
+      year: "2025-26",
+      title: "Scale",
+      description: "12 edge functions, 7 database tables, 3 AI tiers. Ready for enterprise deployment.",
+      icon: <TrendingUp className="w-5 h-5" />
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      {/* Personal Header */}
+      <header className="border-b border-border/30 bg-card/30 backdrop-blur-sm">
+        <div className="container mx-auto px-6 py-6">
+          <div className="flex items-center gap-3">
+            <Heart className="w-6 h-6 text-rose-500" />
+            <div>
+              <h1 className="text-xl font-semibold">For Moran</h1>
+              <p className="text-sm text-muted-foreground">A window into five years of building</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="container mx-auto px-6 py-12 space-y-16">
+        {/* The Elevator Pitch - In Her Language */}
+        <motion.section 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-3xl"
+        >
+          <h2 className="text-3xl font-bold mb-6">What I've Been Building</h2>
+          <div className="prose prose-lg text-muted-foreground space-y-4">
+            <p>
+              Remember how at <span className="text-foreground font-medium">Wasteless</span> you helped grocery 
+              retailers reduce waste with dynamic pricing? LAVANDAR does something similar, but for 
+              <span className="text-foreground font-medium"> operational decisions</span> across industries.
+            </p>
+            <p>
+              Think of it like this: A pilot deciding whether to fly, a ship captain planning a route, 
+              a construction manager scheduling outdoor work - they all need to understand weather, 
+              but they need it <span className="text-foreground font-medium">translated into their context</span>.
+            </p>
+            <p>
+              That's what this platform does. It takes complex data (weather, regulations, market signals) 
+              and turns it into <span className="text-foreground font-medium">clear business recommendations</span> - 
+              like how you turned inventory data into pricing decisions at Wasteless.
+            </p>
+          </div>
+        </motion.section>
+
+        {/* The Business Model - Value Creation Terms */}
+        <section className="space-y-6">
+          <h2 className="text-2xl font-bold">The Value Creation Model</h2>
+          <p className="text-muted-foreground max-w-2xl">
+            Using your Hetz Ventures lens - here's how this creates value:
+          </p>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card className="bg-card/50 border-emerald-500/20">
+              <CardHeader>
+                <Building2 className="w-8 h-8 text-emerald-500 mb-2" />
+                <CardTitle className="text-lg">B2B SaaS</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground">
+                Enterprise subscriptions for aviation, maritime, and construction. 
+                Recurring revenue with expansion potential as customers add modules.
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/50 border-blue-500/20">
+              <CardHeader>
+                <Shield className="w-8 h-8 text-blue-500 mb-2" />
+                <CardTitle className="text-lg">Moat: Data + AI</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground">
+                Proprietary weather interpretation layer + multi-model AI gateway. 
+                The more customers use it, the smarter it gets.
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/50 border-amber-500/20">
+              <CardHeader>
+                <Users className="w-8 h-8 text-amber-500 mb-2" />
+                <CardTitle className="text-lg">Beachhead: Aviation</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground">
+                Starting with aviation (high willingness to pay for safety). 
+                Then maritime, then construction. Classic wedge strategy.
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* 5-Year Journey Timeline */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3">
+            <Clock className="w-6 h-6 text-primary" />
+            <h2 className="text-2xl font-bold">Five Years of Building</h2>
+          </div>
+
+          <div className="relative">
+            <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-primary/50 to-primary/10" />
+            
+            <div className="space-y-8">
+              {journeyMilestones.map((milestone, index) => (
+                <motion.div
+                  key={milestone.year}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.15 }}
+                  className="relative pl-20"
+                >
+                  <div className="absolute left-4 top-1 w-8 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary">
+                    {milestone.icon}
+                  </div>
+                  <Badge variant="outline" className="mb-2 font-mono">{milestone.year}</Badge>
+                  <h3 className="font-semibold text-lg">{milestone.title}</h3>
+                  <p className="text-muted-foreground">{milestone.description}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* What You'd Recognize */}
+        <section className="space-y-6">
+          <h2 className="text-2xl font-bold">What You'd Recognize</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-card/50">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <span className="text-2xl">🎯</span>
+                  Like Wasteless's Dynamic Pricing
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-muted-foreground">
+                You helped retailers price products based on expiration data in real-time. 
+                I'm helping operators make decisions based on weather data in real-time. 
+                Same pattern: <span className="text-foreground">turn data into action before it's too late</span>.
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/50">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <span className="text-2xl">🤝</span>
+                  Like Hetz's Portfolio Approach
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-muted-foreground">
+                You saw dozens of startups at Hetz. This one has what survives: 
+                <span className="text-foreground"> real customers, real revenue, and a clear path to scale</span>. 
+                Not a PowerPoint - a working platform.
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Explore the Platform */}
+        <section className="space-y-6">
+          <h2 className="text-2xl font-bold">See It Yourself</h2>
+          <div className="flex flex-wrap gap-4">
+            <Link to="/aviation">
+              <Button className="gap-2">
+                <Plane className="w-4 h-4" />
+                Aviation Dashboard
+              </Button>
+            </Link>
+            <Link to="/marine">
+              <Button variant="outline" className="gap-2">
+                <Ship className="w-4 h-4" />
+                Marine Operations
+              </Button>
+            </Link>
+            <Link to="/exec">
+              <Button variant="outline" className="gap-2">
+                <TrendingUp className="w-4 h-4" />
+                Executive Summary
+              </Button>
+            </Link>
+            <Link to="/ocean-reallocation">
+              <Button variant="ghost" className="gap-2">
+                Policy Analysis Demo
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
+        </section>
+
+        {/* Personal Note */}
+        <motion.section 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="max-w-2xl border-t border-border/30 pt-8"
+        >
+          <p className="text-muted-foreground italic">
+            I wanted you to see where the nights and weekends went. This isn't just code - 
+            it's years of learning, iterating, and building something that actually works. 
+            Thank you for your patience and support through all of it. 💜
+          </p>
+        </motion.section>
+      </main>
+    </div>
+  );
+};
+
+export default ForMoran;
