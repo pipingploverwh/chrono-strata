@@ -13,8 +13,8 @@ interface MarketIndex {
   updatedAt: string;
 }
 
-// Use Financial Modeling Prep API (free tier available)
-const FMP_BASE_URL = 'https://financialmodelingprep.com/api/v3';
+// Yahoo Finance public API (no API key required)
+const YAHOO_FINANCE_URL = 'https://query1.finance.yahoo.com/v7/finance/quote';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -22,45 +22,57 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const FMP_API_KEY = Deno.env.get('FMP_API_KEY');
-    
-    // Define indices to fetch
+    // Define indices to fetch - Yahoo Finance symbols
     const indices = [
-      { symbol: '^GSPC', name: 'S&P 500' },
-      { symbol: '^DJI', name: 'Dow Jones' },
-      { symbol: '^IXIC', name: 'NASDAQ' },
-      { symbol: '^VIX', name: 'VIX' },
-      { symbol: '^RUT', name: 'Russell 2000' },
+      { symbol: '%5EGSPC', displaySymbol: '^GSPC', name: 'S&P 500' },
+      { symbol: '%5EDJI', displaySymbol: '^DJI', name: 'Dow Jones' },
+      { symbol: '%5EIXIC', displaySymbol: '^IXIC', name: 'NASDAQ' },
+      { symbol: '%5EVIX', displaySymbol: '^VIX', name: 'VIX' },
+      { symbol: '%5ERUT', displaySymbol: '^RUT', name: 'Russell 2000' },
     ];
 
     let marketData: MarketIndex[] = [];
 
-    if (FMP_API_KEY) {
-      // Use FMP API if key is available
-      try {
-        const symbols = indices.map(i => i.symbol).join(',');
-        const response = await fetch(
-          `${FMP_BASE_URL}/quote/${encodeURIComponent(symbols)}?apikey=${FMP_API_KEY}`
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          marketData = data.map((item: any) => ({
-            symbol: item.symbol,
-            name: indices.find(i => i.symbol === item.symbol)?.name || item.name,
-            price: item.price,
-            change: item.change,
-            changePercent: item.changesPercentage,
-            previousClose: item.previousClose,
-            updatedAt: new Date().toISOString(),
-          }));
+    // Try Yahoo Finance first (no API key needed)
+    try {
+      const symbols = indices.map(i => i.symbol).join(',');
+      const response = await fetch(
+        `${YAHOO_FINANCE_URL}?symbols=${symbols}`,
+        {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          },
         }
-      } catch (e) {
-        console.error('FMP API error:', e);
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const quotes = data.quoteResponse?.result || [];
+        
+        marketData = quotes.map((quote: any) => {
+          const indexInfo = indices.find(i => 
+            quote.symbol === i.displaySymbol || 
+            quote.symbol === i.symbol.replace('%5E', '^')
+          );
+          
+          return {
+            symbol: indexInfo?.displaySymbol || quote.symbol,
+            name: indexInfo?.name || quote.shortName || quote.symbol,
+            price: quote.regularMarketPrice || 0,
+            change: quote.regularMarketChange || 0,
+            changePercent: quote.regularMarketChangePercent || 0,
+            previousClose: quote.regularMarketPreviousClose || 0,
+            updatedAt: new Date().toISOString(),
+          };
+        });
+        
+        console.log(`Yahoo Finance returned ${marketData.length} indices`);
       }
+    } catch (e) {
+      console.error('Yahoo Finance API error:', e);
     }
 
-    // Fallback to AI-generated estimates if no API key or API fails
+    // Fallback to AI-generated estimates if Yahoo fails
     if (marketData.length === 0) {
       console.log('Using AI-generated market estimates');
       
@@ -74,7 +86,7 @@ Deno.serve(async (req) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'google/gemini-2.5-flash',
+            model: 'google/gemini-3-flash-preview',
             messages: [
               {
                 role: 'system',
@@ -135,7 +147,7 @@ Deno.serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         indices: marketData,
-        source: marketData.length > 0 && Deno.env.get('FMP_API_KEY') ? 'live' : 'estimated',
+        source: marketData.length > 0 ? 'yahoo-finance' : 'estimated',
         generatedAt: new Date().toISOString(),
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

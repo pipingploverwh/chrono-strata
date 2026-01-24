@@ -301,6 +301,10 @@ const BriefingCards = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speakingCardId, setSpeakingCardId] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  
+  // Auto-read mode state
+  const [autoReadEnabled, setAutoReadEnabled] = useState(false);
+  const autoReadRef = useRef(false);
 
   const fetchBriefing = useCallback(async () => {
     setIsLoading(true);
@@ -339,10 +343,10 @@ const BriefingCards = () => {
     setIsMarketLoading(false);
   }, []);
 
-  // Text-to-speech function
-  const speakCard = useCallback(async (card: BriefingCard) => {
-    // If already speaking this card, stop
-    if (speakingCardId === card.id && isSpeaking) {
+  // Text-to-speech function with auto-read support
+  const speakCard = useCallback(async (card: BriefingCard, isAutoRead = false): Promise<void> => {
+    // If already speaking this card (and not auto-read), stop
+    if (speakingCardId === card.id && isSpeaking && !isAutoRead) {
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
@@ -370,50 +374,87 @@ const BriefingCards = () => {
     setIsSpeaking(true);
     setSpeakingCardId(card.id);
 
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/briefing-tts`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({ text: textToSpeak }),
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/briefing-tts`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            },
+            body: JSON.stringify({ text: textToSpeak }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('TTS request failed');
         }
-      );
 
-      if (!response.ok) {
-        throw new Error('TTS request failed');
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        
+        const audio = new Audio(audioUrl);
+        audioRef.current = audio;
+        
+        audio.onended = () => {
+          setIsSpeaking(false);
+          setSpeakingCardId(null);
+          URL.revokeObjectURL(audioUrl);
+          resolve();
+        };
+
+        audio.onerror = () => {
+          setIsSpeaking(false);
+          setSpeakingCardId(null);
+          toast.error('Failed to play audio');
+          reject(new Error('Audio playback failed'));
+        };
+
+        await audio.play();
+      } catch (error) {
+        console.error('TTS error:', error);
+        setIsSpeaking(false);
+        setSpeakingCardId(null);
+        toast.error('Voice synthesis unavailable');
+        reject(error);
       }
-
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      
-      const audio = new Audio(audioUrl);
-      audioRef.current = audio;
-      
-      audio.onended = () => {
-        setIsSpeaking(false);
-        setSpeakingCardId(null);
-        URL.revokeObjectURL(audioUrl);
-      };
-
-      audio.onerror = () => {
-        setIsSpeaking(false);
-        setSpeakingCardId(null);
-        toast.error('Failed to play audio');
-      };
-
-      await audio.play();
-    } catch (error) {
-      console.error('TTS error:', error);
-      setIsSpeaking(false);
-      setSpeakingCardId(null);
-      toast.error('Voice synthesis unavailable');
-    }
+    });
   }, [speakingCardId, isSpeaking]);
+
+  // Auto-read effect - speaks current card when index changes
+  useEffect(() => {
+    autoReadRef.current = autoReadEnabled;
+  }, [autoReadEnabled]);
+
+  useEffect(() => {
+    if (autoReadRef.current && cards[currentIndex] && !isLoading) {
+      // Small delay to let card animation complete
+      const timer = setTimeout(() => {
+        if (autoReadRef.current) {
+          speakCard(cards[currentIndex], true);
+        }
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [currentIndex, cards, isLoading, speakCard]);
+
+  // Toggle auto-read mode
+  const toggleAutoRead = useCallback(() => {
+    setAutoReadEnabled(prev => {
+      const newState = !prev;
+      if (!newState && audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+        setIsSpeaking(false);
+        setSpeakingCardId(null);
+      }
+      toast.success(newState ? 'Auto-read enabled' : 'Auto-read disabled');
+      return newState;
+    });
+  }, []);
 
   useEffect(() => {
     fetchBriefing();
@@ -453,11 +494,14 @@ const BriefingCards = () => {
       } else if (e.key === 's' && cards[currentIndex]) {
         e.preventDefault();
         speakCard(cards[currentIndex]);
+      } else if (e.key === 'a') {
+        e.preventDefault();
+        toggleAutoRead();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [cards.length, currentIndex, speakCard]);
+  }, [cards.length, currentIndex, speakCard, toggleAutoRead]);
 
   return (
     <div className="min-h-screen bg-zinc-950 relative overflow-hidden">
@@ -535,6 +579,18 @@ const BriefingCards = () => {
                 {isSpeaking ? 'Stop' : 'Listen'}
               </Button>
             )}
+            <Button
+              size="sm"
+              variant={autoReadEnabled ? "default" : "ghost"}
+              onClick={toggleAutoRead}
+              className={autoReadEnabled 
+                ? "bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border border-amber-500/30" 
+                : "text-zinc-400 hover:text-white"
+              }
+            >
+              {autoReadEnabled ? <Play className="w-4 h-4 mr-1" /> : <Pause className="w-4 h-4 mr-1" />}
+              Auto
+            </Button>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-zinc-500">
@@ -621,7 +677,7 @@ const BriefingCards = () => {
 
         {/* Swipe hint */}
         <p className="text-center text-[10px] text-zinc-600 mt-4">
-          Swipe cards or use arrow keys • Press S to speak • Tap dots to jump
+          Swipe or arrow keys • S to speak • A for auto-read • Dots to jump
         </p>
 
         {/* Quick Links */}
