@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   TrendingUp, TrendingDown, Minus, Brain, 
   RefreshCw, ChevronRight, Sparkles, Building2,
   Cpu, Fuel, Heart, AlertTriangle, LineChart, Calendar,
-  ThumbsUp, ThumbsDown, CloudSun, Newspaper, Flag, Shield
+  ThumbsUp, ThumbsDown, CloudSun, Newspaper, Flag, Shield,
+  Cloud, ExternalLink
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -278,6 +280,23 @@ const EconomicForecast = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-12"
         >
+          {/* Navigation */}
+          <div className="flex items-center justify-between mb-8">
+            <Link 
+              to="/weather-showcase" 
+              className="text-zinc-500 hover:text-emerald-400 transition-colors text-xs font-mono uppercase tracking-wider flex items-center gap-2"
+            >
+              <Cloud className="w-4 h-4" />
+              Weather Showcase
+            </Link>
+            <Link 
+              to="/" 
+              className="text-zinc-600 hover:text-white transition-colors text-xs font-mono uppercase tracking-wider"
+            >
+              LAVANDAR →
+            </Link>
+          </div>
+
           {/* Presidential seal placeholder */}
           <div className="flex items-center justify-center gap-3 mb-6">
             <Shield className="w-8 h-8 text-emerald-500" />
