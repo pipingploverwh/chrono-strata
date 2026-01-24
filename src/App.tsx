@@ -89,6 +89,7 @@ import OceanReallocation from "./pages/OceanReallocation";
 import ForMoran from "./pages/ForMoran";
 import NortheastWeather from "./pages/NortheastWeather";
 import EconomicForecast from "./pages/EconomicForecast";
+import CannabisDirectory from "./pages/CannabisDirectory";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -171,6 +172,7 @@ const App = () => (
                 <Route path="/for-moran" element={<ForMoran />} />
                 <Route path="/northeast" element={<NortheastWeather />} />
                 <Route path="/forecast" element={<EconomicForecast />} />
+                <Route path="/cannabis" element={<CannabisDirectory />} />
                 
                 {/* Previously Protected Routes - Now Public */}
                 <Route path="/alpha-os" element={<AcquisitionPitch />} />

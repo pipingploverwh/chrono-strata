@@ -104,3 +104,9 @@ verify_jwt = false
 
 [functions.ip-geolocation]
 verify_jwt = false
+
+[functions.cannabis-recommend]
+verify_jwt = false
+
+[functions.dispensary-search]
+verify_jwt = false
