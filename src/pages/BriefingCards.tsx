@@ -1,11 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { motion, AnimatePresence, PanInfo } from "framer-motion";
+import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from "framer-motion";
 import {
   Newspaper, TrendingUp, Cloud, HelpCircle, Landmark, Building2,
-  ChevronLeft, ChevronRight, RefreshCw, Star, AlertTriangle, CheckCircle,
-  Minus, Clock, Zap, ArrowUp, ArrowDown, Shuffle, Layers, Eye,
-  ThumbsUp, ThumbsDown, Bookmark, Share2, Volume2, VolumeX, Pause, Play,
-  TrendingDown, Activity
+  ChevronLeft, ChevronRight, RefreshCw, Star, Clock, Zap, ArrowUp, ArrowDown,
+  Minus, Shuffle, Volume2, VolumeX, Pause, Play, TrendingDown, Activity,
+  Compass
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -43,103 +42,194 @@ interface MarketIndex {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ARCHITECTURAL ELEMENTS - Presidential/Executive Style
+// SMOOTH SPRING CONFIGS - AAL Motion Language
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const PresidentialSeal = () => (
-  <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03]">
-    <div className="w-[600px] h-[600px] rounded-full border-[3px] border-amber-400/50" />
-    <div className="absolute w-[500px] h-[500px] rounded-full border border-amber-400/30" />
-    <Star className="absolute w-32 h-32 text-amber-400/20" />
+const springConfig = {
+  gentle: { type: "spring" as const, stiffness: 120, damping: 20 },
+  smooth: { type: "spring" as const, stiffness: 200, damping: 25 },
+  snappy: { type: "spring" as const, stiffness: 300, damping: 30 },
+  float: { type: "spring" as const, stiffness: 80, damping: 15 },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ARCHITECTURAL ELEMENTS - AAL Glass & Precision
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const GlassPanel = ({ 
+  children, 
+  className = "",
+  intensity = 1 
+}: { 
+  children: React.ReactNode; 
+  className?: string;
+  intensity?: 1 | 2 | 3;
+}) => (
+  <div className={`
+    relative overflow-hidden rounded-2xl
+    bg-[hsl(var(--kuma-glass-${intensity}))]
+    backdrop-blur-[12px]
+    border border-white/[0.06]
+    shadow-[0_8px_32px_-8px_hsl(0_0%_0%/0.3)]
+    ${className}
+  `}>
+    {/* Shimmer effect */}
+    <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] via-transparent to-transparent pointer-events-none" />
+    {children}
   </div>
 );
 
-const GoldStripe = ({ position }: { position: 'top' | 'bottom' }) => (
-  <div className={`absolute ${position === 'top' ? 'top-0' : 'bottom-0'} left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500/40 to-transparent`} />
-);
+const GeometricAccent = ({ position = "top-left" }: { position?: "top-left" | "top-right" | "bottom-left" | "bottom-right" }) => {
+  const positionClasses = {
+    "top-left": "top-0 left-0",
+    "top-right": "top-0 right-0 rotate-90",
+    "bottom-left": "bottom-0 left-0 -rotate-90",
+    "bottom-right": "bottom-0 right-0 rotate-180",
+  };
+  
+  return (
+    <div className={`absolute ${positionClasses[position]} w-8 h-8 pointer-events-none`}>
+      <svg viewBox="0 0 32 32" className="w-full h-full">
+        <path 
+          d="M0 0 L32 0 L32 4 L4 4 L4 32 L0 32 Z" 
+          fill="currentColor" 
+          className="text-emerald-500/20"
+        />
+      </svg>
+    </div>
+  );
+};
 
-const ColumnLines = ({ count = 20 }: { count?: number }) => (
-  <div className="absolute inset-0 flex justify-between pointer-events-none overflow-hidden opacity-10">
+const VerticalSlats = ({ count = 12 }: { count?: number }) => (
+  <div className="absolute inset-0 flex justify-between pointer-events-none overflow-hidden">
     {[...Array(count)].map((_, i) => (
-      <div key={i} className="w-px bg-gradient-to-b from-transparent via-amber-500/20 to-transparent" />
+      <motion.div 
+        key={i} 
+        className="w-px bg-gradient-to-b from-transparent via-emerald-500/5 to-transparent"
+        initial={{ opacity: 0, scaleY: 0 }}
+        animate={{ opacity: 1, scaleY: 1 }}
+        transition={{ delay: i * 0.03, duration: 0.8, ease: "easeOut" }}
+      />
     ))}
   </div>
 );
 
+const RuledLines = () => (
+  <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
+    {[...Array(8)].map((_, i) => (
+      <div 
+        key={i} 
+        className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-zinc-500/10 to-transparent"
+        style={{ top: `${(i + 1) * 12}%` }}
+      />
+    ))}
+  </div>
+);
+
+const LumeGlow = () => (
+  <div className="absolute inset-0 pointer-events-none">
+    <div className="absolute top-0 left-1/4 w-1/2 h-32 bg-gradient-to-b from-emerald-500/8 to-transparent blur-3xl" />
+    <div className="absolute bottom-0 right-1/4 w-1/2 h-24 bg-gradient-to-t from-emerald-500/5 to-transparent blur-2xl" />
+  </div>
+);
+
 // ═══════════════════════════════════════════════════════════════════════════════
-// MARKET TICKER COMPONENT
+// MARKET TICKER COMPONENT - Smooth AAL Style
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const MarketTicker = ({ indices, isLoading }: { indices: MarketIndex[]; isLoading: boolean }) => {
   if (isLoading) {
     return (
-      <div className="flex items-center gap-4 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="flex-shrink-0 px-3 py-2 rounded-lg bg-zinc-800/50 animate-pulse">
-            <div className="w-16 h-3 bg-zinc-700 rounded mb-1" />
-            <div className="w-12 h-4 bg-zinc-700 rounded" />
-          </div>
+          <motion.div 
+            key={i} 
+            className="flex-shrink-0 px-4 py-3 rounded-xl bg-white/[0.02] border border-white/[0.04]"
+            animate={{ opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
+          >
+            <div className="w-14 h-2.5 bg-zinc-700/50 rounded-full mb-2" />
+            <div className="w-10 h-3.5 bg-zinc-700/50 rounded-full" />
+          </motion.div>
         ))}
       </div>
     );
   }
 
   return (
-    <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
-      {indices.map((index) => {
+    <motion.div 
+      className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={springConfig.smooth}
+    >
+      {indices.map((index, i) => {
         const isPositive = index.change >= 0;
         return (
-          <div
+          <motion.div
             key={index.symbol}
-            className="flex-shrink-0 px-3 py-2 rounded-lg bg-zinc-800/50 border border-zinc-700/50 hover:border-zinc-600 transition-colors"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...springConfig.gentle, delay: i * 0.05 }}
+            whileHover={{ scale: 1.02, y: -2 }}
+            className="flex-shrink-0 px-4 py-3 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-emerald-500/20 transition-colors duration-300"
           >
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium text-zinc-400">{index.name}</span>
-              {isPositive ? (
-                <TrendingUp className="w-3 h-3 text-emerald-400" />
-              ) : (
-                <TrendingDown className="w-3 h-3 text-rose-400" />
-              )}
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[10px] font-medium tracking-wider text-zinc-400 uppercase">{index.name}</span>
+              <motion.div
+                animate={{ rotate: isPositive ? 0 : 180 }}
+                transition={{ type: "spring", stiffness: 200 }}
+              >
+                {isPositive ? (
+                  <TrendingUp className="w-3 h-3 text-emerald-400" />
+                ) : (
+                  <TrendingDown className="w-3 h-3 text-rose-400" />
+                )}
+              </motion.div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-mono text-white">
+              <span className="text-sm font-light text-white tracking-wide font-mono">
                 {index.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
-              <span className={`text-xs font-mono ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
+              <span className={`text-[10px] font-mono ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
                 {isPositive ? '+' : ''}{index.changePercent.toFixed(2)}%
               </span>
             </div>
-          </div>
+          </motion.div>
         );
       })}
-    </div>
+    </motion.div>
   );
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// CARD COMPONENT
+// CATEGORY & SENTIMENT CONFIG
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const categoryConfig = {
-  current_events: { icon: Newspaper, color: 'from-blue-600 to-blue-800', accent: 'text-blue-400', bg: 'bg-blue-500/10' },
-  business: { icon: Building2, color: 'from-emerald-600 to-emerald-800', accent: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-  weather: { icon: Cloud, color: 'from-sky-600 to-sky-800', accent: 'text-sky-400', bg: 'bg-sky-500/10' },
-  question: { icon: HelpCircle, color: 'from-violet-600 to-violet-800', accent: 'text-violet-400', bg: 'bg-violet-500/10' },
-  policy: { icon: Landmark, color: 'from-amber-600 to-amber-800', accent: 'text-amber-400', bg: 'bg-amber-500/10' },
+  current_events: { icon: Newspaper, gradient: 'from-blue-500/20 to-blue-600/10', accent: 'text-blue-400', ring: 'ring-blue-500/20' },
+  business: { icon: Building2, gradient: 'from-emerald-500/20 to-emerald-600/10', accent: 'text-emerald-400', ring: 'ring-emerald-500/20' },
+  weather: { icon: Cloud, gradient: 'from-sky-500/20 to-sky-600/10', accent: 'text-sky-400', ring: 'ring-sky-500/20' },
+  question: { icon: HelpCircle, gradient: 'from-violet-500/20 to-violet-600/10', accent: 'text-violet-400', ring: 'ring-violet-500/20' },
+  policy: { icon: Landmark, gradient: 'from-amber-500/20 to-amber-600/10', accent: 'text-amber-400', ring: 'ring-amber-500/20' },
 };
 
 const sentimentConfig = {
-  positive: { icon: ArrowUp, color: 'text-emerald-400', bg: 'bg-emerald-500/20' },
-  neutral: { icon: Minus, color: 'text-zinc-400', bg: 'bg-zinc-500/20' },
-  negative: { icon: ArrowDown, color: 'text-rose-400', bg: 'bg-rose-500/20' },
-  mixed: { icon: Shuffle, color: 'text-amber-400', bg: 'bg-amber-500/20' },
+  positive: { icon: ArrowUp, color: 'text-emerald-400', bg: 'bg-emerald-500/10 ring-1 ring-emerald-500/20' },
+  neutral: { icon: Minus, color: 'text-zinc-400', bg: 'bg-zinc-500/10 ring-1 ring-zinc-500/20' },
+  negative: { icon: ArrowDown, color: 'text-rose-400', bg: 'bg-rose-500/10 ring-1 ring-rose-500/20' },
+  mixed: { icon: Shuffle, color: 'text-amber-400', bg: 'bg-amber-500/10 ring-1 ring-amber-500/20' },
 };
 
 const importanceConfig = {
-  high: { label: 'PRIORITY', color: 'bg-rose-500/20 text-rose-300 border-rose-500/30' },
-  medium: { label: 'NOTABLE', color: 'bg-amber-500/20 text-amber-300 border-amber-500/30' },
-  low: { label: 'FYI', color: 'bg-zinc-500/20 text-zinc-300 border-zinc-500/30' },
+  high: { label: 'PRIORITY', color: 'bg-rose-500/10 text-rose-300 ring-1 ring-rose-500/20' },
+  medium: { label: 'NOTABLE', color: 'bg-amber-500/10 text-amber-300 ring-1 ring-amber-500/20' },
+  low: { label: 'FYI', color: 'bg-zinc-500/10 text-zinc-300 ring-1 ring-zinc-500/20' },
 };
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// BRIEFING CARD COMPONENT - Smooth Glass AAL
+// ═══════════════════════════════════════════════════════════════════════════════
 
 const BriefingCardComponent = ({ 
   card, 
@@ -162,6 +252,10 @@ const BriefingCardComponent = ({
   const CategoryIcon = config.icon;
   const SentimentIcon = sentiment.icon;
 
+  const x = useMotionValue(0);
+  const rotate = useTransform(x, [-200, 200], [-8, 8]);
+  const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0.5, 0.8, 1, 0.8, 0.5]);
+
   const handleDragEnd = (_: any, info: PanInfo) => {
     if (info.offset.x > 100) {
       onSwipeRight();
@@ -174,111 +268,163 @@ const BriefingCardComponent = ({
     <motion.div
       drag={isActive ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.7}
+      dragElastic={0.15}
       onDragEnd={handleDragEnd}
+      style={{ x, rotate, opacity: isActive ? opacity : 0.3 }}
       className="absolute inset-0 cursor-grab active:cursor-grabbing"
-      initial={{ scale: 0.95, opacity: 0 }}
-      animate={{ scale: isActive ? 1 : 0.95, opacity: isActive ? 1 : 0.5 }}
-      exit={{ scale: 0.9, opacity: 0 }}
-      transition={{ duration: 0.3 }}
+      initial={{ scale: 0.92, opacity: 0, y: 20 }}
+      animate={{ 
+        scale: isActive ? 1 : 0.92, 
+        opacity: isActive ? 1 : 0,
+        y: isActive ? 0 : 20 
+      }}
+      exit={{ scale: 0.88, opacity: 0, y: -20, transition: { duration: 0.2 } }}
+      transition={springConfig.smooth}
     >
-      <div className={`relative h-full rounded-2xl overflow-hidden bg-gradient-to-br ${config.color} shadow-2xl`}>
-        {/* Gold border effect */}
-        <div className="absolute inset-0 rounded-2xl border-2 border-amber-500/20 pointer-events-none" />
-        <GoldStripe position="top" />
+      <GlassPanel className="h-full" intensity={2}>
+        {/* Geometric Accents */}
+        <GeometricAccent position="top-left" />
+        <GeometricAccent position="bottom-right" />
+        
+        {/* Category Gradient Overlay */}
+        <div className={`absolute inset-0 bg-gradient-to-br ${config.gradient} pointer-events-none`} />
+        
+        {/* Ruled Surface Lines */}
+        <RuledLines />
         
         {/* Content */}
         <div className="relative h-full p-6 flex flex-col">
           {/* Header */}
-          <div className="flex items-start justify-between mb-4">
+          <motion.div 
+            className="flex items-start justify-between mb-5"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...springConfig.gentle, delay: 0.1 }}
+          >
             <div className="flex items-center gap-3">
-              <div className={`p-3 rounded-xl ${config.bg} backdrop-blur-sm`}>
-                <CategoryIcon className="w-6 h-6 text-white" />
-              </div>
+              <motion.div 
+                className={`p-3 rounded-xl bg-white/[0.04] backdrop-blur-sm ring-1 ${config.ring}`}
+                whileHover={{ scale: 1.05 }}
+                transition={springConfig.snappy}
+              >
+                <CategoryIcon className={`w-5 h-5 ${config.accent}`} />
+              </motion.div>
               <div>
-                <div className="text-[10px] uppercase tracking-widest text-white/60">
+                <div className="text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-0.5">
                   {card.category.replace('_', ' ')}
                 </div>
-                <h3 className="text-lg font-medium text-white">{card.title}</h3>
+                <h3 className="text-base font-medium text-white/90">{card.title}</h3>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Badge className={`text-[9px] border ${importance.color}`}>
+              <Badge className={`text-[8px] tracking-wider px-2 py-0.5 border-0 ${importance.color}`}>
                 {importance.label}
               </Badge>
-              <div className={`p-1.5 rounded-full ${sentiment.bg}`}>
-                <SentimentIcon className={`w-4 h-4 ${sentiment.color}`} />
-              </div>
+              <motion.div 
+                className={`p-1.5 rounded-lg ${sentiment.bg}`}
+                animate={isSpeaking ? { scale: [1, 1.1, 1] } : {}}
+                transition={{ duration: 0.5, repeat: isSpeaking ? Infinity : 0 }}
+              >
+                <SentimentIcon className={`w-3.5 h-3.5 ${sentiment.color}`} />
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Headline */}
-          <div className="mb-4">
-            <h2 className="text-2xl font-light text-white leading-tight">
+          <motion.div 
+            className="mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ ...springConfig.gentle, delay: 0.15 }}
+          >
+            <h2 className="text-xl font-light text-white leading-relaxed tracking-wide">
               {card.headline}
             </h2>
-          </div>
+          </motion.div>
 
           {/* Summary */}
-          <p className="text-base text-white/80 leading-relaxed mb-4 flex-shrink-0">
+          <motion.p 
+            className="text-sm text-zinc-400 leading-relaxed mb-5 flex-shrink-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ ...springConfig.gentle, delay: 0.2 }}
+          >
             {card.summary}
-          </p>
+          </motion.p>
 
           {/* Details */}
           <div className="flex-1 overflow-hidden">
-            <div className="space-y-2 mb-4">
+            <motion.div 
+              className="space-y-2.5 mb-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ ...springConfig.gentle, delay: 0.25 }}
+            >
               {card.details?.slice(0, 4).map((detail, idx) => (
-                <div key={idx} className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
-                  <span className="text-sm text-white/70">{detail}</span>
-                </div>
+                <motion.div 
+                  key={idx} 
+                  className="flex items-start gap-2.5"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ ...springConfig.gentle, delay: 0.3 + idx * 0.05 }}
+                >
+                  <div className="w-1 h-1 rounded-full bg-emerald-400/60 mt-2 flex-shrink-0" />
+                  <span className="text-sm text-zinc-400/90">{detail}</span>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
 
             {/* Action Items */}
             {card.actionItems && card.actionItems.length > 0 && (
-              <div className="p-3 rounded-lg bg-black/20 backdrop-blur-sm">
-                <div className="text-[10px] uppercase tracking-wider text-amber-300 mb-2">Action Items</div>
+              <motion.div 
+                className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.04]"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ ...springConfig.gentle, delay: 0.4 }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap className="w-3 h-3 text-emerald-400" />
+                  <span className="text-[9px] uppercase tracking-[0.15em] text-emerald-400/80">Action Items</span>
+                </div>
                 {card.actionItems.slice(0, 2).map((action, idx) => (
-                  <div key={idx} className="flex items-center gap-2 text-sm text-white/80">
-                    <Zap className="w-3 h-3 text-amber-400" />
+                  <div key={idx} className="text-sm text-zinc-300/80 mb-1 last:mb-0">
                     {action}
                   </div>
                 ))}
-              </div>
+              </motion.div>
             )}
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between pt-4 border-t border-white/10 mt-auto">
-            <div className="flex items-center gap-2 text-xs text-white/50">
+          <motion.div 
+            className="flex items-center justify-between pt-4 border-t border-white/[0.04] mt-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ ...springConfig.gentle, delay: 0.45 }}
+          >
+            <div className="flex items-center gap-2 text-[10px] text-zinc-600">
               <Clock className="w-3 h-3" />
-              {card.source || 'Intelligence Brief'}
+              <span className="tracking-wide">{card.source || 'Intelligence Brief'}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSpeak();
-                }}
-                className={`text-white/50 hover:text-white hover:bg-white/10 p-2 h-8 ${isSpeaking ? 'text-amber-400' : ''}`}
-              >
-                {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-              </Button>
-              <Button size="sm" variant="ghost" className="text-white/50 hover:text-white hover:bg-white/10 p-2 h-8">
-                <ThumbsUp className="w-4 h-4" />
-              </Button>
-              <Button size="sm" variant="ghost" className="text-white/50 hover:text-white hover:bg-white/10 p-2 h-8">
-                <Bookmark className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
+            <motion.button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onSpeak();
+              }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              transition={springConfig.snappy}
+              className={`p-2 rounded-lg transition-colors ${
+                isSpeaking 
+                  ? 'bg-emerald-500/20 text-emerald-400' 
+                  : 'bg-white/[0.02] text-zinc-500 hover:text-white hover:bg-white/[0.04]'
+              }`}
+            >
+              {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            </motion.button>
+          </motion.div>
         </div>
-
-        <GoldStripe position="bottom" />
-      </div>
+      </GlassPanel>
     </motion.div>
   );
 };
@@ -291,7 +437,6 @@ const BriefingCards = () => {
   const [cards, setCards] = useState<BriefingCard[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'stack' | 'carousel'>('stack');
   
   // Market data state
   const [marketIndices, setMarketIndices] = useState<MarketIndex[]>([]);
@@ -349,7 +494,6 @@ const BriefingCards = () => {
 
   // Text-to-speech function with auto-read support
   const speakCard = useCallback(async (card: BriefingCard, isAutoRead = false): Promise<void> => {
-    // If already speaking this card (and not auto-read), stop
     if (speakingCardId === card.id && isSpeaking && !isAutoRead) {
       if (audioRef.current) {
         audioRef.current.pause();
@@ -360,13 +504,11 @@ const BriefingCards = () => {
       return;
     }
 
-    // Stop any existing audio
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
     }
 
-    // Build the text to speak
     const textToSpeak = `
       ${card.category.replace('_', ' ')} briefing. ${card.importance} priority.
       ${card.title}. ${card.headline}.
@@ -393,9 +535,7 @@ const BriefingCards = () => {
           }
         );
 
-        if (!response.ok) {
-          throw new Error('TTS request failed');
-        }
+        if (!response.ok) throw new Error('TTS request failed');
 
         const audioBlob = await response.blob();
         const audioUrl = URL.createObjectURL(audioBlob);
@@ -408,11 +548,9 @@ const BriefingCards = () => {
           setSpeakingCardId(null);
           URL.revokeObjectURL(audioUrl);
           
-          // Auto-advance to next card if enabled
           if (autoAdvanceRef.current) {
             setCurrentIndex((prev) => {
               const nextIdx = prev + 1;
-              // Stop at the last card
               if (nextIdx >= cards.length) {
                 setAutoAdvanceEnabled(false);
                 autoAdvanceRef.current = false;
@@ -444,7 +582,6 @@ const BriefingCards = () => {
     });
   }, [speakingCardId, isSpeaking, cards.length]);
 
-  // Keep refs in sync with state
   useEffect(() => {
     autoReadRef.current = autoReadEnabled;
   }, [autoReadEnabled]);
@@ -455,17 +592,15 @@ const BriefingCards = () => {
 
   useEffect(() => {
     if (autoReadRef.current && cards[currentIndex] && !isLoading) {
-      // Small delay to let card animation complete
       const timer = setTimeout(() => {
         if (autoReadRef.current) {
           speakCard(cards[currentIndex], true);
         }
-      }, 300);
+      }, 400);
       return () => clearTimeout(timer);
     }
   }, [currentIndex, cards, isLoading, speakCard]);
 
-  // Toggle auto-read mode
   const toggleAutoRead = useCallback(() => {
     setAutoReadEnabled(prev => {
       const newState = !prev;
@@ -475,7 +610,6 @@ const BriefingCards = () => {
         setIsSpeaking(false);
         setSpeakingCardId(null);
       }
-      // Disable auto-advance if auto-read is disabled
       if (!newState) {
         setAutoAdvanceEnabled(false);
       }
@@ -484,22 +618,18 @@ const BriefingCards = () => {
     });
   }, []);
 
-  // Toggle continuous auto-advance mode (auto-read + auto-advance)
   const toggleAutoAdvance = useCallback(() => {
     setAutoAdvanceEnabled(prev => {
       const newState = !prev;
       if (newState) {
-        // Enable auto-read when enabling auto-advance
         setAutoReadEnabled(true);
-        toast.success('Continuous mode enabled - will read and advance automatically');
-        // Start reading the current card if not already speaking
+        toast.success('Continuous mode enabled');
         if (cards[currentIndex] && !isSpeaking) {
           setTimeout(() => {
             speakCard(cards[currentIndex], true);
-          }, 300);
+          }, 400);
         }
       } else {
-        // Stop current audio when disabling
         if (audioRef.current) {
           audioRef.current.pause();
           audioRef.current = null;
@@ -515,13 +645,10 @@ const BriefingCards = () => {
   useEffect(() => {
     fetchBriefing();
     fetchMarketData();
-    
-    // Refresh market data every 5 minutes
     const marketInterval = setInterval(fetchMarketData, 5 * 60 * 1000);
     return () => clearInterval(marketInterval);
   }, [fetchBriefing, fetchMarketData]);
 
-  // Cleanup audio on unmount
   useEffect(() => {
     return () => {
       if (audioRef.current) {
@@ -530,15 +657,9 @@ const BriefingCards = () => {
     };
   }, []);
 
-  const nextCard = () => {
-    setCurrentIndex((prev) => (prev + 1) % cards.length);
-  };
+  const nextCard = () => setCurrentIndex((prev) => (prev + 1) % cards.length);
+  const prevCard = () => setCurrentIndex((prev) => (prev - 1 + cards.length) % cards.length);
 
-  const prevCard = () => {
-    setCurrentIndex((prev) => (prev - 1 + cards.length) % cards.length);
-  };
-
-  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight' || e.key === ' ') {
@@ -560,34 +681,39 @@ const BriefingCards = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [cards.length, currentIndex, speakCard, toggleAutoRead]);
+  }, [cards.length, currentIndex, speakCard, toggleAutoRead, toggleAutoAdvance]);
 
   return (
     <div className="min-h-screen bg-zinc-950 relative overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black" />
-        <ColumnLines count={24} />
-        <PresidentialSeal />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(251,191,36,0.03),transparent_50%)]" />
+        <VerticalSlats count={20} />
+        <LumeGlow />
       </div>
 
-      <div className="relative z-10 max-w-lg mx-auto px-4 py-6">
+      <div className="relative z-10 max-w-lg mx-auto px-4 py-8">
         {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }} 
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-4"
+          transition={springConfig.gentle}
+          className="text-center mb-6"
         >
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="h-px w-8 bg-gradient-to-r from-transparent to-amber-500/50" />
-            <Star className="w-4 h-4 text-amber-400" />
-            <div className="h-px w-8 bg-gradient-to-l from-transparent to-amber-500/50" />
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <div className="h-px w-12 bg-gradient-to-r from-transparent to-emerald-500/30" />
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            >
+              <Compass className="w-4 h-4 text-emerald-400/60" />
+            </motion.div>
+            <div className="h-px w-12 bg-gradient-to-l from-transparent to-emerald-500/30" />
           </div>
-          <h1 className="text-2xl font-extralight text-white tracking-wide">
-            Executive Briefing
+          <h1 className="text-2xl font-light text-white tracking-[0.1em]">
+            EXECUTIVE BRIEFING
           </h1>
-          <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 mt-1">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-600 mt-2">
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </p>
         </motion.div>
@@ -596,98 +722,90 @@ const BriefingCards = () => {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mb-4"
+          transition={{ ...springConfig.gentle, delay: 0.1 }}
+          className="mb-6"
         >
-          <div className="flex items-center gap-2 mb-2">
-            <Activity className="w-3 h-3 text-amber-400" />
-            <span className="text-[10px] uppercase tracking-wider text-zinc-500">Live Markets</span>
-            <Button
-              size="sm"
-              variant="ghost"
+          <div className="flex items-center gap-2 mb-3">
+            <Activity className="w-3 h-3 text-emerald-400/60" />
+            <span className="text-[9px] uppercase tracking-[0.2em] text-zinc-600">Live Markets</span>
+            <motion.button
               onClick={fetchMarketData}
               disabled={isMarketLoading}
-              className="ml-auto text-zinc-500 hover:text-white h-5 px-1"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="ml-auto text-zinc-600 hover:text-emerald-400 transition-colors p-1"
             >
               <RefreshCw className={`w-3 h-3 ${isMarketLoading ? 'animate-spin' : ''}`} />
-            </Button>
+            </motion.button>
           </div>
           <MarketTicker indices={marketIndices} isLoading={isMarketLoading} />
         </motion.div>
 
         {/* Controls */}
-        <div className="flex items-center justify-between mb-4">
+        <motion.div 
+          className="flex items-center justify-between mb-5"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ ...springConfig.gentle, delay: 0.15 }}
+        >
           <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setViewMode(viewMode === 'stack' ? 'carousel' : 'stack')}
-              className="text-zinc-400 hover:text-white"
-            >
-              <Layers className="w-4 h-4 mr-1" />
-              {viewMode === 'stack' ? 'Stack' : 'Carousel'}
-            </Button>
-            {cards[currentIndex] && (
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => speakCard(cards[currentIndex])}
-                className={`text-zinc-400 hover:text-white ${isSpeaking ? 'text-amber-400' : ''}`}
-              >
-                {isSpeaking ? <VolumeX className="w-4 h-4 mr-1" /> : <Volume2 className="w-4 h-4 mr-1" />}
-                {isSpeaking ? 'Stop' : 'Listen'}
-              </Button>
-            )}
-            <Button
-              size="sm"
-              variant={autoReadEnabled ? "default" : "ghost"}
+            <motion.button
               onClick={toggleAutoRead}
-              className={autoReadEnabled 
-                ? "bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border border-amber-500/30" 
-                : "text-zinc-400 hover:text-white"
-              }
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+                autoReadEnabled 
+                  ? 'bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20' 
+                  : 'bg-white/[0.02] text-zinc-500 hover:text-white ring-1 ring-white/[0.04]'
+              }`}
             >
-              {autoReadEnabled ? <Play className="w-4 h-4 mr-1" /> : <Pause className="w-4 h-4 mr-1" />}
+              {autoReadEnabled ? <Play className="w-3 h-3" /> : <Pause className="w-3 h-3" />}
               Auto
-            </Button>
-            <Button
-              size="sm"
-              variant={autoAdvanceEnabled ? "default" : "ghost"}
+            </motion.button>
+            <motion.button
               onClick={toggleAutoAdvance}
-              className={autoAdvanceEnabled 
-                ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30" 
-                : "text-zinc-400 hover:text-white"
-              }
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+                autoAdvanceEnabled 
+                  ? 'bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20' 
+                  : 'bg-white/[0.02] text-zinc-500 hover:text-white ring-1 ring-white/[0.04]'
+              }`}
             >
-              <RefreshCw className={`w-4 h-4 mr-1 ${autoAdvanceEnabled ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3 h-3 ${autoAdvanceEnabled ? 'animate-spin' : ''}`} />
               Loop
-            </Button>
+            </motion.button>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-zinc-500">
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] text-zinc-600 tracking-wider font-mono">
               {currentIndex + 1} / {cards.length || '—'}
             </span>
-            <Button
-              size="sm"
-              variant="ghost"
+            <motion.button
               onClick={fetchBriefing}
               disabled={isLoading}
-              className="text-zinc-400 hover:text-white"
+              whileHover={{ scale: 1.1, rotate: 180 }}
+              whileTap={{ scale: 0.9 }}
+              className="text-zinc-600 hover:text-emerald-400 transition-colors p-1"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-            </Button>
+              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Card Stack */}
-        <div className="relative h-[520px] mb-6">
+        <div className="relative h-[500px] mb-8">
           {isLoading ? (
-            <div className="absolute inset-0 flex items-center justify-center">
+            <GlassPanel className="absolute inset-0 flex items-center justify-center" intensity={1}>
               <div className="text-center">
-                <RefreshCw className="w-8 h-8 text-amber-400 animate-spin mx-auto mb-3" />
-                <p className="text-sm text-zinc-500">Preparing your briefing...</p>
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                >
+                  <RefreshCw className="w-8 h-8 text-emerald-400/60 mx-auto mb-4" />
+                </motion.div>
+                <p className="text-sm text-zinc-600 tracking-wide">Preparing your briefing...</p>
               </div>
-            </div>
+            </GlassPanel>
           ) : (
             <AnimatePresence mode="popLayout">
               {cards.map((card, index) => (
@@ -706,65 +824,82 @@ const BriefingCards = () => {
         </div>
 
         {/* Navigation */}
-        <div className="flex items-center justify-between">
-          <Button
-            size="lg"
-            variant="outline"
+        <motion.div 
+          className="flex items-center justify-between"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ ...springConfig.gentle, delay: 0.2 }}
+        >
+          <motion.button
             onClick={prevCard}
             disabled={cards.length === 0}
-            className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
+            whileHover={{ scale: 1.05, x: -2 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-3 rounded-xl bg-white/[0.02] text-zinc-400 hover:text-white hover:bg-white/[0.04] ring-1 ring-white/[0.04] transition-all disabled:opacity-30"
           >
             <ChevronLeft className="w-5 h-5" />
-          </Button>
+          </motion.button>
 
-          {/* Dots */}
+          {/* Progress Dots */}
           <div className="flex items-center gap-1.5">
             {cards.slice(0, 10).map((_, idx) => (
-              <button
+              <motion.button
                 key={idx}
                 onClick={() => setCurrentIndex(idx)}
-                className={`w-2 h-2 rounded-full transition-all ${
+                whileHover={{ scale: 1.3 }}
+                whileTap={{ scale: 0.9 }}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
                   idx === currentIndex 
-                    ? 'bg-amber-400 w-4' 
-                    : 'bg-zinc-600 hover:bg-zinc-500'
+                    ? 'bg-emerald-400 w-6' 
+                    : 'bg-zinc-700 w-1.5 hover:bg-zinc-600'
                 }`}
               />
             ))}
             {cards.length > 10 && (
-              <span className="text-xs text-zinc-600">+{cards.length - 10}</span>
+              <span className="text-[10px] text-zinc-700 ml-1">+{cards.length - 10}</span>
             )}
           </div>
 
-          <Button
-            size="lg"
-            variant="outline"
+          <motion.button
             onClick={nextCard}
             disabled={cards.length === 0}
-            className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
+            whileHover={{ scale: 1.05, x: 2 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-3 rounded-xl bg-white/[0.02] text-zinc-400 hover:text-white hover:bg-white/[0.04] ring-1 ring-white/[0.04] transition-all disabled:opacity-30"
           >
             <ChevronRight className="w-5 h-5" />
-          </Button>
-        </div>
+          </motion.button>
+        </motion.div>
 
-        {/* Swipe hint */}
-        <p className="text-center text-[10px] text-zinc-600 mt-4">
-          Swipe or arrow keys • S to speak • A for auto-read • C for continuous mode
-        </p>
+        {/* Keyboard Hints */}
+        <motion.p 
+          className="text-center text-[9px] text-zinc-700 mt-6 tracking-wider"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          ← → NAVIGATE • S SPEAK • A AUTO-READ • C CONTINUOUS
+        </motion.p>
 
         {/* Quick Links */}
-        <div className="flex items-center justify-center gap-4 mt-6 pt-6 border-t border-zinc-800/50">
-          <Link to="/forecast" className="text-xs text-zinc-500 hover:text-amber-400 transition-colors">
-            Economic Forecast
+        <motion.div 
+          className="flex items-center justify-center gap-6 mt-8 pt-6 border-t border-white/[0.03]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+        >
+          <Link to="/forecast" className="text-[10px] text-zinc-600 hover:text-emerald-400 transition-colors tracking-wider">
+            FORECAST
           </Link>
-          <span className="text-zinc-700">•</span>
-          <Link to="/northeast" className="text-xs text-zinc-500 hover:text-amber-400 transition-colors">
-            Weather Intel
+          <span className="w-1 h-1 rounded-full bg-zinc-800" />
+          <Link to="/northeast" className="text-[10px] text-zinc-600 hover:text-emerald-400 transition-colors tracking-wider">
+            WEATHER
           </Link>
-          <span className="text-zinc-700">•</span>
-          <Link to="/" className="text-xs text-zinc-500 hover:text-amber-400 transition-colors">
-            Dashboard
+          <span className="w-1 h-1 rounded-full bg-zinc-800" />
+          <Link to="/" className="text-[10px] text-zinc-600 hover:text-emerald-400 transition-colors tracking-wider">
+            DASHBOARD
           </Link>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
