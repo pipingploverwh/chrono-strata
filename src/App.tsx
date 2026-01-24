@@ -88,6 +88,7 @@ import MeetingFlow from "./pages/MeetingFlow";
 import OceanReallocation from "./pages/OceanReallocation";
 import ForMoran from "./pages/ForMoran";
 import NortheastWeather from "./pages/NortheastWeather";
+import EconomicForecast from "./pages/EconomicForecast";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -169,6 +170,7 @@ const App = () => (
                 <Route path="/ocean-reallocation" element={<OceanReallocation />} />
                 <Route path="/for-moran" element={<ForMoran />} />
                 <Route path="/northeast" element={<NortheastWeather />} />
+                <Route path="/forecast" element={<EconomicForecast />} />
                 
                 {/* Previously Protected Routes - Now Public */}
                 <Route path="/alpha-os" element={<AcquisitionPitch />} />
