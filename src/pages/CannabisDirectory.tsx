@@ -384,6 +384,157 @@ const DispensaryCard = ({ dispensary, index }: { dispensary: Dispensary; index: 
   </motion.div>
 );
 
+// Consumption method data matching edge function
+const CONSUMPTION_METHODS = {
+  inhalation: {
+    label: "Inhalation",
+    icon: "💨",
+    onsetTime: "0-15 minutes",
+    duration: "2-4 hours",
+    bestFor: ["Quick relief", "Acute symptoms", "Precise dosing control"],
+    description: "Smoking or vaporizing provides the fastest onset, ideal for breakthrough pain or panic attacks.",
+    bioavailability: "30-50%"
+  },
+  ingestion: {
+    label: "Ingestion (Edibles)",
+    icon: "🍪",
+    onsetTime: "30-120 minutes",
+    duration: "6-12 hours",
+    bestFor: ["Long-lasting relief", "Sleep issues", "Chronic conditions"],
+    description: "Edibles provide extended relief but require patience. Effects are stronger due to liver metabolism.",
+    bioavailability: "10-20%"
+  },
+  sublingual: {
+    label: "Sublingual",
+    icon: "💧",
+    onsetTime: "15-45 minutes",
+    duration: "4-8 hours",
+    bestFor: ["Moderate onset speed", "Consistent dosing", "Discreet use"],
+    description: "Tinctures and strips absorbed under the tongue offer a balance between speed and duration.",
+    bioavailability: "20-35%"
+  },
+  topical: {
+    label: "Topical",
+    icon: "🧴",
+    onsetTime: "15-60 minutes",
+    duration: "2-6 hours",
+    bestFor: ["Localized pain", "Skin conditions", "Non-psychoactive relief"],
+    description: "Creams and balms provide targeted relief without systemic effects or intoxication.",
+    bioavailability: "Localized"
+  }
+};
+
+type ConsumptionMethodKey = keyof typeof CONSUMPTION_METHODS;
+
+const ConsumptionMethodSelector = ({ 
+  selectedMethod, 
+  onSelect 
+}: { 
+  selectedMethod: ConsumptionMethodKey | null; 
+  onSelect: (method: ConsumptionMethodKey) => void;
+}) => (
+  <GlassPanel className="p-5">
+    <div className="flex items-center gap-2 mb-4">
+      <Clock className="w-4 h-4 text-emerald-400" />
+      <span className="text-sm font-light text-white">Consumption Method</span>
+      <span className="text-[10px] text-zinc-500 ml-auto">Select preferred delivery</span>
+    </div>
+    
+    <div className="grid grid-cols-2 gap-2 mb-4">
+      {(Object.entries(CONSUMPTION_METHODS) as [ConsumptionMethodKey, typeof CONSUMPTION_METHODS[ConsumptionMethodKey]][]).map(([key, method]) => (
+        <motion.button
+          key={key}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => onSelect(key)}
+          className={`relative p-3 rounded-lg border transition-all duration-300 text-left ${
+            selectedMethod === key 
+              ? "bg-emerald-950/60 border-emerald-500/50" 
+              : "bg-zinc-900/40 border-zinc-800/50 hover:border-zinc-700/50"
+          }`}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-lg">{method.icon}</span>
+            <span className={`text-xs font-light ${selectedMethod === key ? 'text-white' : 'text-zinc-300'}`}>
+              {method.label}
+            </span>
+          </div>
+          <div className="flex items-center gap-3 text-[10px]">
+            <div className="flex items-center gap-1">
+              <Zap className="w-2.5 h-2.5 text-amber-400" />
+              <span className="text-zinc-400">{method.onsetTime}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Clock className="w-2.5 h-2.5 text-violet-400" />
+              <span className="text-zinc-400">{method.duration}</span>
+            </div>
+          </div>
+          {selectedMethod === key && (
+            <motion.div
+              layoutId="method-indicator"
+              className="absolute top-2 right-2"
+              initial={false}
+            >
+              <Check className="w-3 h-3 text-emerald-400" />
+            </motion.div>
+          )}
+        </motion.button>
+      ))}
+    </div>
+
+    {/* Expanded Details */}
+    <AnimatePresence mode="wait">
+      {selectedMethod && (
+        <motion.div
+          key={selectedMethod}
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          className="overflow-hidden"
+        >
+          <div className="p-4 rounded-lg bg-zinc-800/30 border border-zinc-800/50">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xl">{CONSUMPTION_METHODS[selectedMethod].icon}</span>
+              <div>
+                <h4 className="text-sm text-white">{CONSUMPTION_METHODS[selectedMethod].label}</h4>
+                <div className="flex items-center gap-2 text-[10px] text-zinc-500">
+                  <span>Bioavailability: {CONSUMPTION_METHODS[selectedMethod].bioavailability}</span>
+                </div>
+              </div>
+            </div>
+            
+            <p className="text-xs text-zinc-400 mb-3 leading-relaxed">
+              {CONSUMPTION_METHODS[selectedMethod].description}
+            </p>
+            
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div className="p-2 rounded bg-amber-500/10 border border-amber-500/20">
+                <div className="text-[9px] uppercase tracking-wider text-amber-400/80 mb-1">Onset Time</div>
+                <div className="text-sm text-amber-300">{CONSUMPTION_METHODS[selectedMethod].onsetTime}</div>
+              </div>
+              <div className="p-2 rounded bg-violet-500/10 border border-violet-500/20">
+                <div className="text-[9px] uppercase tracking-wider text-violet-400/80 mb-1">Duration</div>
+                <div className="text-sm text-violet-300">{CONSUMPTION_METHODS[selectedMethod].duration}</div>
+              </div>
+            </div>
+            
+            <div>
+              <div className="text-[9px] uppercase tracking-wider text-zinc-500 mb-2">Best For</div>
+              <div className="flex flex-wrap gap-1">
+                {CONSUMPTION_METHODS[selectedMethod].bestFor.map((use) => (
+                  <Badge key={use} className="text-[9px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
+                    {use}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </GlassPanel>
+);
+
 const TerpeneInfoCard = ({ terpenes }: { terpenes: TerpeneInfo[] }) => (
   <GlassPanel variant="accent" className="p-4 mt-4">
     <div className="flex items-center gap-2 mb-3">
@@ -414,6 +565,7 @@ const TerpeneInfoCard = ({ terpenes }: { terpenes: TerpeneInfo[] }) => (
 
 const CannabisDirectory = () => {
   const [selectedCondition, setSelectedCondition] = useState<string | null>(null);
+  const [selectedConsumptionMethod, setSelectedConsumptionMethod] = useState<ConsumptionMethodKey | null>(null);
   const [recommendations, setRecommendations] = useState<RecommendationResult | null>(null);
   const [dispensaries, setDispensaries] = useState<Dispensary[]>([]);
   const [isLoadingRecs, setIsLoadingRecs] = useState(false);
@@ -632,6 +784,12 @@ const CannabisDirectory = () => {
                 )}
               </Button>
             </GlassPanel>
+
+            {/* Consumption Method Selector */}
+            <ConsumptionMethodSelector 
+              selectedMethod={selectedConsumptionMethod}
+              onSelect={setSelectedConsumptionMethod}
+            />
 
             {/* Recommendations Results */}
             <AnimatePresence>
