@@ -25,6 +25,46 @@ const CANNABINOID_DATA = {
   THCV: { type: "Psychoactive (low doses)", benefits: ["Appetite Suppression", "Energy", "Focus", "Bone Health"] },
 };
 
+// Consumption methods with onset times and duration
+const CONSUMPTION_METHODS = {
+  inhalation: {
+    name: "Inhalation",
+    description: "Smoking dried flower or vaporization at lower temperatures without combustion. The safest and healthiest way to consume cannabis with minimal onset time. Common forms include dried flower and concentrated cannabis.",
+    onsetTime: "0-15 minutes",
+    duration: "2-4 hours",
+    bioavailability: "High (10-35%)",
+    bestFor: ["Immediate relief", "Precise dosing", "Acute symptoms"],
+    considerations: ["Respiratory sensitivity", "Odor", "Short duration"],
+  },
+  ingestion: {
+    name: "Ingestion (Edibles)",
+    description: "Cannabis-infused products produce stronger physical and psychoactive effects. After breakdown in the gastrointestinal tract and passing through the liver, active cannabinoids enter the bloodstream.",
+    onsetTime: "1-2 hours",
+    duration: "4-8 hours",
+    bioavailability: "Low (4-12%)",
+    bestFor: ["Long-lasting relief", "Chronic conditions", "Discrete consumption"],
+    considerations: ["Delayed onset", "Difficult to dose", "Stronger effects"],
+  },
+  sublingual: {
+    name: "Sublingual",
+    description: "Cannabis products like tinctures, infused liquids, and soluble tablets placed under the tongue. Patients can avoid intestinal absorption with faster onset than most edibles.",
+    onsetTime: "30-60 minutes",
+    duration: "4-8 hours",
+    bioavailability: "Medium (12-25%)",
+    bestFor: ["Moderate onset", "Precise dosing", "Discrete use"],
+    considerations: ["Taste", "Must hold under tongue", "Alcohol-based tinctures may burn"],
+  },
+  topical: {
+    name: "Topical",
+    description: "Infused products including creams, lotions, ointments, and patches. Targeted for physical relief like inflammation, skin irritation, and localized pain. Most topicals only affect the applied area.",
+    onsetTime: "15-20 minutes",
+    duration: "Up to 12 hours",
+    bioavailability: "Local only (transdermal patches systemic)",
+    bestFor: ["Localized pain", "Skin conditions", "Inflammation", "Non-psychoactive relief"],
+    considerations: ["No psychoactive effects", "Limited to application site", "May stain clothing"],
+  },
+};
+
 // Condition-to-strain-profile mapping
 const CONDITION_PROFILES: Record<string, { terpenes: string[]; cannabinoids: string[]; strainType: string }> = {
   pain: { terpenes: ["myrcene", "caryophyllene", "linalool"], cannabinoids: ["THC", "CBD"], strainType: "indica" },
@@ -54,13 +94,16 @@ serve(async (req) => {
 
     const profile = CONDITION_PROFILES[condition?.toLowerCase()] || CONDITION_PROFILES.pain;
     
-    const systemPrompt = `You are a knowledgeable medical cannabis consultant and budtender. You provide evidence-based recommendations for cannabis strains based on medical conditions, terpene profiles, and cannabinoid content.
+    const systemPrompt = `You are a knowledgeable medical cannabis consultant and budtender. You provide evidence-based recommendations for cannabis strains based on medical conditions, terpene profiles, cannabinoid content, and optimal consumption methods.
 
 TERPENE DATABASE:
 ${JSON.stringify(TERPENE_DATA, null, 2)}
 
 CANNABINOID DATABASE:
 ${JSON.stringify(CANNABINOID_DATA, null, 2)}
+
+CONSUMPTION METHODS DATABASE:
+${JSON.stringify(CONSUMPTION_METHODS, null, 2)}
 
 CONDITION PROFILE FOR "${condition}":
 - Recommended Terpenes: ${profile.terpenes.join(", ")}
@@ -77,6 +120,13 @@ You must respond with a valid JSON object containing exactly 3 strain recommenda
 - description: 2-sentence description of effects
 - bestFor: Primary use case
 - potentialSideEffects: array of 1-2 common side effects
+- recommendedConsumption: object with { method: string, onsetTime: string, duration: string, reasoning: string } - recommend the best consumption method for this strain and condition
+
+Also include a "consumptionGuidance" object at the root level with:
+- primaryMethod: The most appropriate consumption method for the condition
+- alternativeMethod: A secondary option
+- reasoning: Why this method is recommended for the condition (2 sentences)
+- doseGuidance: General dosing advice for new patients
 
 Respond ONLY with valid JSON, no markdown or explanation.`;
 
@@ -137,6 +187,7 @@ Respond ONLY with valid JSON, no markdown or explanation.`;
             description: "A balanced hybrid known for full-body relaxation with gentle cerebral invigoration. Popular for daytime use with manageable effects.",
             bestFor: "Chronic Pain & Stress",
             potentialSideEffects: ["Dry Mouth", "Dry Eyes"],
+            recommendedConsumption: { method: "Inhalation", onsetTime: "0-15 minutes", duration: "2-4 hours", reasoning: "Fast onset for breakthrough pain relief with controllable dosing." },
           },
           {
             name: "Granddaddy Purple",
@@ -148,6 +199,7 @@ Respond ONLY with valid JSON, no markdown or explanation.`;
             description: "A potent indica with deep relaxation effects ideal for evening use. Known for its grape and berry aroma profile.",
             bestFor: "Insomnia & Chronic Pain",
             potentialSideEffects: ["Drowsiness", "Dry Mouth"],
+            recommendedConsumption: { method: "Ingestion", onsetTime: "1-2 hours", duration: "4-8 hours", reasoning: "Extended duration for full-night sleep support without re-dosing." },
           },
           {
             name: "Harlequin",
@@ -159,8 +211,15 @@ Respond ONLY with valid JSON, no markdown or explanation.`;
             description: "A high-CBD strain offering relief without intense psychoactive effects. Excellent for daytime therapeutic use.",
             bestFor: "Anxiety & Inflammation",
             potentialSideEffects: ["Mild Relaxation"],
+            recommendedConsumption: { method: "Sublingual", onsetTime: "30-60 minutes", duration: "4-8 hours", reasoning: "Balanced onset for sustained anxiety management without cognitive impairment." },
           },
         ],
+        consumptionGuidance: {
+          primaryMethod: "Inhalation",
+          alternativeMethod: "Sublingual",
+          reasoning: "Inhalation provides rapid symptom relief ideal for acute episodes. Sublingual offers a middle-ground with moderate onset and duration for maintenance dosing.",
+          doseGuidance: "Start with 2.5-5mg THC equivalent for new patients. Wait 2 hours before re-dosing with edibles, 15 minutes with inhalation.",
+        },
       };
     }
 
@@ -172,6 +231,13 @@ Respond ONLY with valid JSON, no markdown or explanation.`;
         strainType: profile.strainType,
       },
       recommendations: recommendations.strains || recommendations,
+      consumptionMethods: CONSUMPTION_METHODS,
+      consumptionGuidance: recommendations.consumptionGuidance || {
+        primaryMethod: "Inhalation",
+        alternativeMethod: "Sublingual",
+        reasoning: "Inhalation provides rapid symptom relief. Sublingual offers moderate onset with longer duration.",
+        doseGuidance: "Start low (2.5-5mg THC) and go slow. Wait appropriate time based on consumption method before re-dosing.",
+      },
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
