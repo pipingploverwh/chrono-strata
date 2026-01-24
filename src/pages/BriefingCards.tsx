@@ -2,9 +2,9 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from "framer-motion";
 import {
   Newspaper, TrendingUp, Cloud, HelpCircle, Landmark, Building2,
-  ChevronLeft, ChevronRight, RefreshCw, Star, Clock, Zap, ArrowUp, ArrowDown,
+  ChevronLeft, ChevronRight, RefreshCw, Clock, Zap, ArrowUp, ArrowDown,
   Minus, Shuffle, Volume2, VolumeX, Pause, Play, TrendingDown, Activity,
-  Compass
+  Compass, Bookmark, BookmarkCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -238,6 +238,8 @@ const BriefingCardComponent = ({
   onSwipeRight,
   onSpeak,
   isSpeaking,
+  isBookmarked,
+  onToggleBookmark,
 }: { 
   card: BriefingCard; 
   isActive: boolean;
@@ -245,6 +247,8 @@ const BriefingCardComponent = ({
   onSwipeRight: () => void;
   onSpeak: () => void;
   isSpeaking: boolean;
+  isBookmarked: boolean;
+  onToggleBookmark: () => void;
 }) => {
   const config = categoryConfig[card.category] || categoryConfig.current_events;
   const sentiment = sentimentConfig[card.sentiment] || sentimentConfig.neutral;
@@ -406,22 +410,40 @@ const BriefingCardComponent = ({
               <Clock className="w-3 h-3" />
               <span className="tracking-wide">{card.source || 'Intelligence Brief'}</span>
             </div>
-            <motion.button 
-              onClick={(e) => {
-                e.stopPropagation();
-                onSpeak();
-              }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              transition={springConfig.snappy}
-              className={`p-2 rounded-lg transition-colors ${
-                isSpeaking 
-                  ? 'bg-emerald-500/20 text-emerald-400' 
-                  : 'bg-white/[0.02] text-zinc-500 hover:text-white hover:bg-white/[0.04]'
-              }`}
-            >
-              {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-            </motion.button>
+            <div className="flex items-center gap-1">
+              <motion.button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleBookmark();
+                }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                transition={springConfig.snappy}
+                className={`p-2 rounded-lg transition-colors ${
+                  isBookmarked 
+                    ? 'bg-amber-500/20 text-amber-400' 
+                    : 'bg-white/[0.02] text-zinc-500 hover:text-white hover:bg-white/[0.04]'
+                }`}
+              >
+                {isBookmarked ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+              </motion.button>
+              <motion.button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSpeak();
+                }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                transition={springConfig.snappy}
+                className={`p-2 rounded-lg transition-colors ${
+                  isSpeaking 
+                    ? 'bg-emerald-500/20 text-emerald-400' 
+                    : 'bg-white/[0.02] text-zinc-500 hover:text-white hover:bg-white/[0.04]'
+                }`}
+              >
+                {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+              </motion.button>
+            </div>
           </motion.div>
         </div>
       </GlassPanel>
@@ -454,6 +476,63 @@ const BriefingCards = () => {
   // Continuous auto-advance mode state
   const [autoAdvanceEnabled, setAutoAdvanceEnabled] = useState(false);
   const autoAdvanceRef = useRef(false);
+  
+  // Bookmark state
+  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
+  const sessionId = useRef(`session-${Date.now()}`);
+
+  // Fetch existing bookmarks on mount
+  const fetchBookmarks = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('bookmarked_briefings')
+        .select('card_id');
+      
+      if (error) throw error;
+      setBookmarkedIds(new Set(data?.map(b => b.card_id) || []));
+    } catch (err) {
+      console.error('Error fetching bookmarks:', err);
+    }
+  }, []);
+
+  const toggleBookmark = useCallback(async (card: BriefingCard) => {
+    const isCurrentlyBookmarked = bookmarkedIds.has(card.id);
+    
+    try {
+      if (isCurrentlyBookmarked) {
+        // Remove bookmark
+        const { error } = await supabase
+          .from('bookmarked_briefings')
+          .delete()
+          .eq('card_id', card.id);
+        
+        if (error) throw error;
+        setBookmarkedIds(prev => {
+          const next = new Set(prev);
+          next.delete(card.id);
+          return next;
+        });
+        toast.success('Bookmark removed');
+      } else {
+        // Add bookmark
+        const cardDataJson = JSON.parse(JSON.stringify(card));
+        const { error } = await supabase
+          .from('bookmarked_briefings')
+          .insert([{
+            session_id: sessionId.current,
+            card_id: card.id,
+            card_data: cardDataJson,
+          }]);
+        
+        if (error) throw error;
+        setBookmarkedIds(prev => new Set([...prev, card.id]));
+        toast.success('Card bookmarked');
+      }
+    } catch (err) {
+      console.error('Bookmark error:', err);
+      toast.error('Failed to update bookmark');
+    }
+  }, [bookmarkedIds]);
 
   const fetchBriefing = useCallback(async () => {
     setIsLoading(true);
@@ -645,9 +724,10 @@ const BriefingCards = () => {
   useEffect(() => {
     fetchBriefing();
     fetchMarketData();
+    fetchBookmarks();
     const marketInterval = setInterval(fetchMarketData, 5 * 60 * 1000);
     return () => clearInterval(marketInterval);
-  }, [fetchBriefing, fetchMarketData]);
+  }, [fetchBriefing, fetchMarketData, fetchBookmarks]);
 
   useEffect(() => {
     return () => {
@@ -817,6 +897,8 @@ const BriefingCards = () => {
                   onSwipeRight={prevCard}
                   onSpeak={() => speakCard(card)}
                   isSpeaking={speakingCardId === card.id && isSpeaking}
+                  isBookmarked={bookmarkedIds.has(card.id)}
+                  onToggleBookmark={() => toggleBookmark(card)}
                 />
               ))}
             </AnimatePresence>
@@ -883,11 +965,16 @@ const BriefingCards = () => {
 
         {/* Quick Links */}
         <motion.div 
-          className="flex items-center justify-center gap-6 mt-8 pt-6 border-t border-white/[0.03]"
+          className="flex items-center justify-center gap-4 mt-8 pt-6 border-t border-white/[0.03] flex-wrap"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
         >
+          <Link to="/briefing/bookmarks" className="flex items-center gap-1 text-[10px] text-zinc-600 hover:text-amber-400 transition-colors tracking-wider">
+            <Bookmark className="w-3 h-3" />
+            SAVED ({bookmarkedIds.size})
+          </Link>
+          <span className="w-1 h-1 rounded-full bg-zinc-800" />
           <Link to="/forecast" className="text-[10px] text-zinc-600 hover:text-emerald-400 transition-colors tracking-wider">
             FORECAST
           </Link>

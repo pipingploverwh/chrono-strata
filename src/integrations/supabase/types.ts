@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      bookmarked_briefings: {
+        Row: {
+          card_data: Json
+          card_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          session_id: string
+          user_id: string | null
+        }
+        Insert: {
+          card_data: Json
+          card_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          session_id: string
+          user_id?: string | null
+        }
+        Update: {
+          card_data?: Json
+          card_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          session_id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       compliance_documents: {
         Row: {
           category: string | null
