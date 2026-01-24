@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   TrendingUp, TrendingDown, Minus, Brain, Shield, Zap, 
   RefreshCw, Clock, ChevronRight, Sparkles, Building2,
-  Cpu, Fuel, Heart, AlertTriangle, LineChart, Calendar
+  Cpu, Fuel, Heart, AlertTriangle, LineChart, Calendar,
+  ThumbsUp, ThumbsDown, CloudSun, Newspaper, Flag
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +26,14 @@ interface SectorOutlook {
   reason: string;
 }
 
+interface TrumpIdea {
+  idea: string;
+  reason: string;
+  marketImpact: "bullish" | "bearish" | "neutral";
+  weatherLink?: string;
+  newsSource?: string;
+}
+
 interface Forecast {
   headline: string;
   sentiment: "bullish" | "bearish" | "mixed";
@@ -39,6 +48,8 @@ interface Forecast {
   aiInsight: string;
   riskFactors: string[];
   generatedAt: string;
+  trumpWillLike?: TrumpIdea[];
+  trumpWillNotLike?: TrumpIdea[];
 }
 
 const moodColors = {
@@ -152,6 +163,61 @@ const SectorPill = ({ name, data }: { name: string; data: SectorOutlook }) => {
         <span className="text-sm font-medium capitalize">{name}</span>
       </div>
       <p className="text-xs opacity-70">{data.reason}</p>
+    </motion.div>
+  );
+};
+
+const TrumpIdeaCard = ({ idea, isLike }: { idea: TrumpIdea; isLike: boolean }) => {
+  const impactColors = {
+    bullish: "text-emerald-400",
+    bearish: "text-red-400",
+    neutral: "text-amber-400",
+  };
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      whileHover={{ scale: 1.02 }}
+      className={`p-4 rounded-xl border backdrop-blur-sm ${
+        isLike 
+          ? "bg-gradient-to-br from-red-500/10 to-orange-500/10 border-red-500/30" 
+          : "bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border-blue-500/30"
+      }`}
+    >
+      <div className="flex items-start gap-3">
+        <div className={`p-2 rounded-full ${isLike ? "bg-red-500/20" : "bg-blue-500/20"}`}>
+          {isLike ? (
+            <ThumbsUp className="w-4 h-4 text-red-400" />
+          ) : (
+            <ThumbsDown className="w-4 h-4 text-blue-400" />
+          )}
+        </div>
+        <div className="flex-1">
+          <p className="text-white font-medium text-sm mb-1">{idea.idea}</p>
+          <p className="text-white/60 text-xs mb-2">{idea.reason}</p>
+          <div className="flex items-center gap-3 text-xs">
+            <span className={`flex items-center gap-1 ${impactColors[idea.marketImpact]}`}>
+              {idea.marketImpact === "bullish" ? <TrendingUp className="w-3 h-3" /> : 
+               idea.marketImpact === "bearish" ? <TrendingDown className="w-3 h-3" /> :
+               <Minus className="w-3 h-3" />}
+              {idea.marketImpact}
+            </span>
+            {idea.weatherLink && (
+              <span className="flex items-center gap-1 text-sky-400">
+                <CloudSun className="w-3 h-3" />
+                {idea.weatherLink}
+              </span>
+            )}
+            {idea.newsSource && (
+              <span className="flex items-center gap-1 text-purple-400">
+                <Newspaper className="w-3 h-3" />
+                {idea.newsSource}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
     </motion.div>
   );
 };
@@ -331,6 +397,49 @@ const EconomicForecast = () => {
               </div>
             </Card>
 
+            {/* Trump Policy Analysis Section */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 px-1">
+                <Flag className="w-4 h-4 text-red-400" />
+                <h3 className="text-sm font-medium text-white/70 uppercase tracking-wider">
+                  Trump Policy Radar
+                </h3>
+                <Badge variant="outline" className="text-[9px] ml-auto border-white/20 text-white/40">
+                  AI + Weather + News
+                </Badge>
+              </div>
+
+              {/* Ideas Trump Will Like */}
+              {forecast.trumpWillLike && forecast.trumpWillLike.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs text-red-400/80 font-medium flex items-center gap-2 px-1">
+                    <ThumbsUp className="w-3 h-3" />
+                    What Trump Will Champion
+                  </p>
+                  <div className="space-y-2">
+                    {forecast.trumpWillLike.map((idea, i) => (
+                      <TrumpIdeaCard key={i} idea={idea} isLike={true} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Ideas Trump Will Not Like */}
+              {forecast.trumpWillNotLike && forecast.trumpWillNotLike.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs text-blue-400/80 font-medium flex items-center gap-2 px-1">
+                    <ThumbsDown className="w-3 h-3" />
+                    What Trump Will Oppose
+                  </p>
+                  <div className="space-y-2">
+                    {forecast.trumpWillNotLike.map((idea, i) => (
+                      <TrumpIdeaCard key={i} idea={idea} isLike={false} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Footer */}
             <div className="text-center space-y-2 pt-4">
               <div className="flex items-center justify-center gap-2 text-white/30 text-xs">
@@ -363,11 +472,21 @@ const getFallbackForecast = (): Forecast => ({
   sectors: {
     tech: { outlook: "bullish", reason: "AI spending continues despite valuation concerns" },
     finance: { outlook: "neutral", reason: "Rate cuts helping but loan growth sluggish" },
-    energy: { outlook: "bearish", reason: "Global demand worries persist" },
-    healthcare: { outlook: "bullish", reason: "Defensive plays gain favor" },
+    energy: { outlook: "bullish", reason: "Drill baby drill policy boosting production" },
+    healthcare: { outlook: "neutral", reason: "Drug pricing uncertainty lingers" },
   },
-  aiInsight: "This week favors staying invested but keeping some cash ready. Tech remains the leader, but don't chase the highest flyers. Consider adding quality dividend stocks for balance.",
-  riskFactors: ["Trade policy shifts", "Fed rate path uncertainty", "AI valuation concerns"],
+  aiInsight: "This week favors staying invested but keeping some cash ready. Energy and crypto benefit from policy tailwinds. Watch for tariff announcements that could shake markets.",
+  riskFactors: ["Trade war escalation", "Fed rate uncertainty", "China retaliation risks"],
+  trumpWillLike: [
+    { idea: "Expand Gulf Coast drilling permits", reason: "Aligns with energy independence and job creation agenda", marketImpact: "bullish", weatherLink: "Mild Gulf weather supports operations" },
+    { idea: "25% tariff on Chinese EVs", reason: "Protects US auto industry, punishes China", marketImpact: "neutral", weatherLink: "Winter demand for domestic vehicles rising" },
+    { idea: "Bitcoin strategic reserve expansion", reason: "Champions crypto as American innovation", marketImpact: "bullish", weatherLink: "Cold weather increases mining efficiency" }
+  ],
+  trumpWillNotLike: [
+    { idea: "Fed signals more rate hikes", reason: "Constrains economic growth he promised", marketImpact: "bearish", newsSource: "WSJ, Bloomberg" },
+    { idea: "EU carbon border tax on US exports", reason: "Foreign climate rules penalizing American businesses", marketImpact: "bearish", newsSource: "Reuters, FT" },
+    { idea: "Tech companies moving AI labs abroad", reason: "American innovation leaving for better incentives", marketImpact: "bearish", newsSource: "TechCrunch, NYT" }
+  ],
   generatedAt: new Date().toISOString(),
 });
 

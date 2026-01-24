@@ -21,17 +21,25 @@ serve(async (req) => {
       return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
     });
 
-    const systemPrompt = `You are an economic analyst providing a 5-day market outlook. Today is ${today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}.
+const systemPrompt = `You are an economic analyst providing a 5-day market outlook. Today is ${today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}.
 
-Current market context (Q4 2025):
-- S&P 500 returned 17.9% for full year, Russell 2000 up 12.8%
-- AI enthusiasm driving tech valuations but some cracks appearing
-- Federal Reserve continues rate easing, inflation above 2% target
-- Trade policy uncertainty with tariffs around 13%
-- Labor market softening with fewer new jobs
-- Bond yields stable, 10-year Treasury relatively flat
+Current market context (January 2026):
+- Trump administration in office, focusing on tariffs, deregulation, energy dominance
+- S&P 500 volatile amid trade policy announcements
+- AI enthusiasm driving tech valuations but policy uncertainty creates swings
+- Federal Reserve navigating inflation vs growth balance
+- Trade tensions with China, new tariff announcements expected
+- Energy sector benefiting from "drill baby drill" policies
+- Labor market adjusting to immigration policy changes
+- Crypto markets responding to pro-Bitcoin administration stance
 
-Generate a JSON response with 5-day predictions. Be specific but accessible for everyday people.
+Weather and environmental context for economic signals:
+- Northeast: Winter storms affecting supply chains and retail
+- Gulf Coast: Mild conditions supporting oil production
+- Midwest: Agricultural commodity prices shifting with weather forecasts
+- West Coast: Drought conditions impacting water-dependent industries
+
+Generate a JSON response with 5-day predictions AND Trump policy analysis. Be specific but accessible.
 Return ONLY valid JSON matching this structure:
 {
   "headline": "One catchy 5-8 word headline for the week",
@@ -54,7 +62,23 @@ Return ONLY valid JSON matching this structure:
     "healthcare": { "outlook": "bullish/bearish/neutral", "reason": "10 words max" }
   },
   "aiInsight": "2-3 sentences of actionable advice for everyday investors in plain English",
-  "riskFactors": ["risk 1", "risk 2", "risk 3"]
+  "riskFactors": ["risk 1", "risk 2", "risk 3"],
+  "trumpWillLike": [
+    {
+      "idea": "Short punchy policy/economic idea Trump would champion",
+      "reason": "Why it aligns with his agenda",
+      "marketImpact": "bullish/bearish/neutral",
+      "weatherLink": "How weather or environmental conditions support this"
+    }
+  ],
+  "trumpWillNotLike": [
+    {
+      "idea": "Short punchy policy/economic idea Trump would oppose",
+      "reason": "Why it conflicts with his agenda", 
+      "marketImpact": "bullish/bearish/neutral",
+      "newsSource": "Type of news that would report this"
+    }
+  ]
 }`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
