@@ -92,3 +92,15 @@ verify_jwt = false
 
 [functions.generate-prompts]
 verify_jwt = false
+
+[functions.economic-forecast]
+verify_jwt = false
+
+[functions.ocean-context-analysis]
+verify_jwt = false
+
+[functions.ocean-news-feed]
+verify_jwt = false
+
+[functions.ip-geolocation]
+verify_jwt = false
