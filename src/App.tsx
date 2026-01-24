@@ -91,6 +91,7 @@ import NortheastWeather from "./pages/NortheastWeather";
 import EconomicForecast from "./pages/EconomicForecast";
 import CannabisDirectory from "./pages/CannabisDirectory";
 import BriefingCards from "./pages/BriefingCards";
+import BriefingBookmarks from "./pages/BriefingBookmarks";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -175,6 +176,7 @@ const App = () => (
                 <Route path="/forecast" element={<EconomicForecast />} />
                 <Route path="/cannabis" element={<CannabisDirectory />} />
                 <Route path="/briefing" element={<BriefingCards />} />
+                <Route path="/briefing/bookmarks" element={<BriefingBookmarks />} />
                 
                 {/* Previously Protected Routes - Now Public */}
                 <Route path="/alpha-os" element={<AcquisitionPitch />} />
