@@ -39,6 +39,14 @@ interface MarketIndex {
   changePercent: number;
   previousClose: number;
   updatedAt: string;
+  region?: 'americas' | 'europe' | 'asia' | 'volatility';
+  alertLevel?: 'normal' | 'warning' | 'critical';
+  alertReason?: string;
+}
+
+interface MarketAlerts {
+  critical: number;
+  warning: number;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -137,68 +145,249 @@ const LumeGlow = () => (
 // MARKET TICKER COMPONENT - Smooth AAL Style
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const MarketTicker = ({ indices, isLoading }: { indices: MarketIndex[]; isLoading: boolean }) => {
+const regionLabels = {
+  americas: { label: 'AMERICAS', flag: '🌎' },
+  europe: { label: 'EUROPE', flag: '🌍' },
+  asia: { label: 'ASIA-PAC', flag: '🌏' },
+  volatility: { label: 'VOLATILITY', flag: '⚡' },
+};
+
+const alertStyles = {
+  critical: { 
+    border: 'border-rose-500/50 ring-2 ring-rose-500/30', 
+    bg: 'bg-rose-500/10',
+    pulse: true 
+  },
+  warning: { 
+    border: 'border-amber-500/40 ring-1 ring-amber-500/20', 
+    bg: 'bg-amber-500/5',
+    pulse: false 
+  },
+  normal: { 
+    border: 'border-white/[0.05]', 
+    bg: 'bg-white/[0.02]',
+    pulse: false 
+  },
+};
+
+const GlobalMarketTicker = ({ 
+  indices, 
+  alerts,
+  isLoading 
+}: { 
+  indices: MarketIndex[]; 
+  alerts: MarketAlerts;
+  isLoading: boolean 
+}) => {
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  
+  const filteredIndices = selectedRegion 
+    ? indices.filter(i => i.region === selectedRegion)
+    : indices;
+
+  // Group by region for display
+  const regions = ['americas', 'europe', 'asia', 'volatility'] as const;
+  
   if (isLoading) {
     return (
-      <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
-        {[1, 2, 3, 4].map((i) => (
-          <motion.div 
-            key={i} 
-            className="flex-shrink-0 px-4 py-3 rounded-xl bg-white/[0.02] border border-white/[0.04]"
-            animate={{ opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
-          >
-            <div className="w-14 h-2.5 bg-zinc-700/50 rounded-full mb-2" />
-            <div className="w-10 h-3.5 bg-zinc-700/50 rounded-full" />
-          </motion.div>
-        ))}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          {[1, 2, 3, 4].map((i) => (
+            <motion.div 
+              key={i} 
+              className="h-6 w-16 rounded-full bg-white/[0.02] border border-white/[0.04]"
+              animate={{ opacity: [0.3, 0.6, 0.3] }}
+              transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.1 }}
+            />
+          ))}
+        </div>
+        <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <motion.div 
+              key={i} 
+              className="flex-shrink-0 px-4 py-3 rounded-xl bg-white/[0.02] border border-white/[0.04]"
+              animate={{ opacity: [0.3, 0.6, 0.3] }}
+              transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
+            >
+              <div className="w-14 h-2.5 bg-zinc-700/50 rounded-full mb-2" />
+              <div className="w-10 h-3.5 bg-zinc-700/50 rounded-full" />
+            </motion.div>
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <motion.div 
-      className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={springConfig.smooth}
-    >
-      {indices.map((index, i) => {
-        const isPositive = index.change >= 0;
-        return (
+    <div className="space-y-3">
+      {/* Alert Banner */}
+      <AnimatePresence>
+        {(alerts.critical > 0 || alerts.warning > 0) && (
           <motion.div
-            key={index.symbol}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ ...springConfig.gentle, delay: i * 0.05 }}
-            whileHover={{ scale: 1.02, y: -2 }}
-            className="flex-shrink-0 px-4 py-3 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-emerald-500/20 transition-colors duration-300"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className={`flex items-center gap-3 px-4 py-2 rounded-lg ${
+              alerts.critical > 0 
+                ? 'bg-rose-500/10 border border-rose-500/30' 
+                : 'bg-amber-500/10 border border-amber-500/30'
+            }`}
           >
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] font-medium tracking-wider text-zinc-400 uppercase">{index.name}</span>
-              <motion.div
-                animate={{ rotate: isPositive ? 0 : 180 }}
-                transition={{ type: "spring", stiffness: 200 }}
-              >
-                {isPositive ? (
-                  <TrendingUp className="w-3 h-3 text-emerald-400" />
-                ) : (
-                  <TrendingDown className="w-3 h-3 text-rose-400" />
-                )}
-              </motion.div>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-light text-white tracking-wide font-mono">
-                {index.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </span>
-              <span className={`text-[10px] font-mono ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
-                {isPositive ? '+' : ''}{index.changePercent.toFixed(2)}%
-              </span>
-            </div>
+            <motion.div
+              animate={{ scale: alerts.critical > 0 ? [1, 1.2, 1] : 1 }}
+              transition={{ duration: 0.5, repeat: alerts.critical > 0 ? Infinity : 0, repeatDelay: 1 }}
+            >
+              <Activity className={`w-4 h-4 ${alerts.critical > 0 ? 'text-rose-400' : 'text-amber-400'}`} />
+            </motion.div>
+            <span className={`text-xs font-medium tracking-wide ${
+              alerts.critical > 0 ? 'text-rose-300' : 'text-amber-300'
+            }`}>
+              {alerts.critical > 0 
+                ? `${alerts.critical} CRITICAL ALERT${alerts.critical > 1 ? 'S' : ''} - IMMEDIATE REVIEW REQUIRED`
+                : `${alerts.warning} MARKET WARNING${alerts.warning > 1 ? 'S' : ''}`
+              }
+            </span>
           </motion.div>
-        );
-      })}
-    </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Region Filter Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+        <motion.button
+          onClick={() => setSelectedRegion(null)}
+          className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[10px] font-medium tracking-wider transition-all duration-200 ${
+            selectedRegion === null
+              ? 'bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30'
+              : 'bg-white/[0.02] text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.04]'
+          }`}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          ALL MARKETS
+        </motion.button>
+        {regions.map(region => {
+          const regionIndices = indices.filter(i => i.region === region);
+          const hasAlert = regionIndices.some(i => i.alertLevel !== 'normal');
+          const hasCritical = regionIndices.some(i => i.alertLevel === 'critical');
+          
+          return (
+            <motion.button
+              key={region}
+              onClick={() => setSelectedRegion(region)}
+              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[10px] font-medium tracking-wider transition-all duration-200 flex items-center gap-1.5 ${
+                selectedRegion === region
+                  ? 'bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30'
+                  : 'bg-white/[0.02] text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.04]'
+              }`}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <span>{regionLabels[region].flag}</span>
+              <span>{regionLabels[region].label}</span>
+              {hasAlert && (
+                <motion.span 
+                  className={`w-1.5 h-1.5 rounded-full ${hasCritical ? 'bg-rose-500' : 'bg-amber-500'}`}
+                  animate={hasCritical ? { scale: [1, 1.5, 1] } : {}}
+                  transition={{ duration: 0.6, repeat: Infinity }}
+                />
+              )}
+            </motion.button>
+          );
+        })}
+      </div>
+
+      {/* Market Cards */}
+      <motion.div 
+        className="flex items-stretch gap-3 overflow-x-auto pb-2 scrollbar-hide"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={springConfig.smooth}
+      >
+        {filteredIndices.map((index, i) => {
+          const isPositive = index.change >= 0;
+          const alertLevel = index.alertLevel || 'normal';
+          const style = alertStyles[alertLevel];
+          
+          return (
+            <motion.div
+              key={index.symbol}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ ...springConfig.gentle, delay: i * 0.03 }}
+              whileHover={{ scale: 1.02, y: -2 }}
+              className={`flex-shrink-0 px-4 py-3 rounded-xl ${style.bg} border ${style.border} transition-colors duration-300 min-w-[120px]`}
+            >
+              {/* Alert Pulse */}
+              {style.pulse && (
+                <motion.div
+                  className="absolute inset-0 rounded-xl bg-rose-500/20"
+                  animate={{ opacity: [0, 0.3, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
+              )}
+              
+              <div className="relative">
+                {/* Region & Alert Badge */}
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <span className="text-[9px] font-medium tracking-wider text-zinc-500 uppercase">
+                    {regionLabels[index.region || 'americas'].flag}
+                  </span>
+                  {alertLevel !== 'normal' && (
+                    <motion.span 
+                      className={`text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider ${
+                        alertLevel === 'critical' 
+                          ? 'bg-rose-500/30 text-rose-300' 
+                          : 'bg-amber-500/30 text-amber-300'
+                      }`}
+                      animate={alertLevel === 'critical' ? { opacity: [1, 0.6, 1] } : {}}
+                      transition={{ duration: 0.8, repeat: Infinity }}
+                    >
+                      {alertLevel === 'critical' ? '⚠ CRITICAL' : '⚡ ALERT'}
+                    </motion.span>
+                  )}
+                </div>
+
+                {/* Index Name */}
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className="text-[10px] font-medium tracking-wider text-zinc-300 uppercase truncate">{index.name}</span>
+                  <motion.div
+                    animate={{ rotate: isPositive ? 0 : 180 }}
+                    transition={{ type: "spring", stiffness: 200 }}
+                  >
+                    {isPositive ? (
+                      <TrendingUp className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                    ) : (
+                      <TrendingDown className="w-3 h-3 text-rose-400 flex-shrink-0" />
+                    )}
+                  </motion.div>
+                </div>
+
+                {/* Price & Change */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-light text-white tracking-wide font-mono">
+                    {index.price.toLocaleString('en-US', { minimumFractionDigits: index.price < 100 ? 2 : 0, maximumFractionDigits: index.price < 100 ? 2 : 0 })}
+                  </span>
+                  <span className={`text-[10px] font-mono font-medium ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    {isPositive ? '+' : ''}{index.changePercent.toFixed(2)}%
+                  </span>
+                </div>
+
+                {/* Alert Reason */}
+                {index.alertReason && (
+                  <motion.p 
+                    className="text-[9px] text-zinc-400 mt-1.5 leading-tight"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    {index.alertReason}
+                  </motion.p>
+                )}
+              </div>
+            </motion.div>
+          );
+        })}
+      </motion.div>
+    </div>
   );
 };
 
@@ -462,6 +651,7 @@ const BriefingCards = () => {
   
   // Market data state
   const [marketIndices, setMarketIndices] = useState<MarketIndex[]>([]);
+  const [marketAlerts, setMarketAlerts] = useState<MarketAlerts>({ critical: 0, warning: 0 });
   const [isMarketLoading, setIsMarketLoading] = useState(true);
   
   // TTS state
@@ -564,6 +754,18 @@ const BriefingCards = () => {
       
       if (data.indices && data.indices.length > 0) {
         setMarketIndices(data.indices);
+        setMarketAlerts(data.alerts || { critical: 0, warning: 0 });
+        
+        // Toast alert for critical market events
+        if (data.alerts?.critical > 0) {
+          toast.error(`🚨 ${data.alerts.critical} critical market alert${data.alerts.critical > 1 ? 's' : ''} detected!`, {
+            duration: 6000,
+          });
+        } else if (data.alerts?.warning > 0) {
+          toast.warning(`⚡ ${data.alerts.warning} market warning${data.alerts.warning > 1 ? 's' : ''}`, {
+            duration: 4000,
+          });
+        }
       }
     } catch (err) {
       console.error('Market data fetch error:', err);
@@ -818,7 +1020,7 @@ const BriefingCards = () => {
               <RefreshCw className={`w-3 h-3 ${isMarketLoading ? 'animate-spin' : ''}`} />
             </motion.button>
           </div>
-          <MarketTicker indices={marketIndices} isLoading={isMarketLoading} />
+          <GlobalMarketTicker indices={marketIndices} alerts={marketAlerts} isLoading={isMarketLoading} />
         </motion.div>
 
         {/* Controls */}
