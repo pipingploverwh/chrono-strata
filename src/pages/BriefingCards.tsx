@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import {
   Newspaper, TrendingUp, Cloud, HelpCircle, Landmark, Building2,
   ChevronLeft, ChevronRight, RefreshCw, Star, AlertTriangle, CheckCircle,
   Minus, Clock, Zap, ArrowUp, ArrowDown, Shuffle, Layers, Eye,
-  ThumbsUp, ThumbsDown, Bookmark, Share2, Volume2
+  ThumbsUp, ThumbsDown, Bookmark, Share2, Volume2, VolumeX, Pause, Play,
+  TrendingDown, Activity
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +32,16 @@ interface BriefingCard {
   relatedTopics?: string[];
 }
 
+interface MarketIndex {
+  symbol: string;
+  name: string;
+  price: number;
+  change: number;
+  changePercent: number;
+  previousClose: number;
+  updatedAt: string;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // ARCHITECTURAL ELEMENTS - Presidential/Executive Style
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -54,6 +65,56 @@ const ColumnLines = ({ count = 20 }: { count?: number }) => (
     ))}
   </div>
 );
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MARKET TICKER COMPONENT
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const MarketTicker = ({ indices, isLoading }: { indices: MarketIndex[]; isLoading: boolean }) => {
+  if (isLoading) {
+    return (
+      <div className="flex items-center gap-4 overflow-x-auto pb-2 scrollbar-hide">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="flex-shrink-0 px-3 py-2 rounded-lg bg-zinc-800/50 animate-pulse">
+            <div className="w-16 h-3 bg-zinc-700 rounded mb-1" />
+            <div className="w-12 h-4 bg-zinc-700 rounded" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+      {indices.map((index) => {
+        const isPositive = index.change >= 0;
+        return (
+          <div
+            key={index.symbol}
+            className="flex-shrink-0 px-3 py-2 rounded-lg bg-zinc-800/50 border border-zinc-700/50 hover:border-zinc-600 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-medium text-zinc-400">{index.name}</span>
+              {isPositive ? (
+                <TrendingUp className="w-3 h-3 text-emerald-400" />
+              ) : (
+                <TrendingDown className="w-3 h-3 text-rose-400" />
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-mono text-white">
+                {index.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+              <span className={`text-xs font-mono ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
+                {isPositive ? '+' : ''}{index.changePercent.toFixed(2)}%
+              </span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // CARD COMPONENT
@@ -85,11 +146,15 @@ const BriefingCardComponent = ({
   isActive,
   onSwipeLeft,
   onSwipeRight,
+  onSpeak,
+  isSpeaking,
 }: { 
   card: BriefingCard; 
   isActive: boolean;
   onSwipeLeft: () => void;
   onSwipeRight: () => void;
+  onSpeak: () => void;
+  isSpeaking: boolean;
 }) => {
   const config = categoryConfig[card.category] || categoryConfig.current_events;
   const sentiment = sentimentConfig[card.sentiment] || sentimentConfig.neutral;
@@ -191,6 +256,17 @@ const BriefingCardComponent = ({
               {card.source || 'Intelligence Brief'}
             </div>
             <div className="flex items-center gap-2">
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSpeak();
+                }}
+                className={`text-white/50 hover:text-white hover:bg-white/10 p-2 h-8 ${isSpeaking ? 'text-amber-400' : ''}`}
+              >
+                {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+              </Button>
               <Button size="sm" variant="ghost" className="text-white/50 hover:text-white hover:bg-white/10 p-2 h-8">
                 <ThumbsUp className="w-4 h-4" />
               </Button>
@@ -216,6 +292,15 @@ const BriefingCards = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'stack' | 'carousel'>('stack');
+  
+  // Market data state
+  const [marketIndices, setMarketIndices] = useState<MarketIndex[]>([]);
+  const [isMarketLoading, setIsMarketLoading] = useState(true);
+  
+  // TTS state
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [speakingCardId, setSpeakingCardId] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const fetchBriefing = useCallback(async () => {
     setIsLoading(true);
@@ -238,9 +323,115 @@ const BriefingCards = () => {
     setIsLoading(false);
   }, []);
 
+  const fetchMarketData = useCallback(async () => {
+    setIsMarketLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('market-data');
+      
+      if (error) throw error;
+      
+      if (data.indices && data.indices.length > 0) {
+        setMarketIndices(data.indices);
+      }
+    } catch (err) {
+      console.error('Market data fetch error:', err);
+    }
+    setIsMarketLoading(false);
+  }, []);
+
+  // Text-to-speech function
+  const speakCard = useCallback(async (card: BriefingCard) => {
+    // If already speaking this card, stop
+    if (speakingCardId === card.id && isSpeaking) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      setIsSpeaking(false);
+      setSpeakingCardId(null);
+      return;
+    }
+
+    // Stop any existing audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+
+    // Build the text to speak
+    const textToSpeak = `
+      ${card.category.replace('_', ' ')} briefing. ${card.importance} priority.
+      ${card.title}. ${card.headline}.
+      ${card.summary}
+      ${card.details?.slice(0, 3).join('. ')}.
+      ${card.actionItems && card.actionItems.length > 0 ? `Action items: ${card.actionItems.slice(0, 2).join('. ')}` : ''}
+    `.trim();
+
+    setIsSpeaking(true);
+    setSpeakingCardId(card.id);
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/briefing-tts`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ text: textToSpeak }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('TTS request failed');
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+      
+      audio.onended = () => {
+        setIsSpeaking(false);
+        setSpeakingCardId(null);
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      audio.onerror = () => {
+        setIsSpeaking(false);
+        setSpeakingCardId(null);
+        toast.error('Failed to play audio');
+      };
+
+      await audio.play();
+    } catch (error) {
+      console.error('TTS error:', error);
+      setIsSpeaking(false);
+      setSpeakingCardId(null);
+      toast.error('Voice synthesis unavailable');
+    }
+  }, [speakingCardId, isSpeaking]);
+
   useEffect(() => {
     fetchBriefing();
-  }, [fetchBriefing]);
+    fetchMarketData();
+    
+    // Refresh market data every 5 minutes
+    const marketInterval = setInterval(fetchMarketData, 5 * 60 * 1000);
+    return () => clearInterval(marketInterval);
+  }, [fetchBriefing, fetchMarketData]);
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, []);
 
   const nextCard = () => {
     setCurrentIndex((prev) => (prev + 1) % cards.length);
@@ -259,11 +450,14 @@ const BriefingCards = () => {
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault();
         prevCard();
+      } else if (e.key === 's' && cards[currentIndex]) {
+        e.preventDefault();
+        speakCard(cards[currentIndex]);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [cards.length]);
+  }, [cards.length, currentIndex, speakCard]);
 
   return (
     <div className="min-h-screen bg-zinc-950 relative overflow-hidden">
@@ -280,7 +474,7 @@ const BriefingCards = () => {
         <motion.div 
           initial={{ opacity: 0, y: -20 }} 
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-6"
+          className="text-center mb-4"
         >
           <div className="flex items-center justify-center gap-2 mb-2">
             <div className="h-px w-8 bg-gradient-to-r from-transparent to-amber-500/50" />
@@ -295,6 +489,29 @@ const BriefingCards = () => {
           </p>
         </motion.div>
 
+        {/* Market Ticker */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-4"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <Activity className="w-3 h-3 text-amber-400" />
+            <span className="text-[10px] uppercase tracking-wider text-zinc-500">Live Markets</span>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={fetchMarketData}
+              disabled={isMarketLoading}
+              className="ml-auto text-zinc-500 hover:text-white h-5 px-1"
+            >
+              <RefreshCw className={`w-3 h-3 ${isMarketLoading ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
+          <MarketTicker indices={marketIndices} isLoading={isMarketLoading} />
+        </motion.div>
+
         {/* Controls */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -307,6 +524,17 @@ const BriefingCards = () => {
               <Layers className="w-4 h-4 mr-1" />
               {viewMode === 'stack' ? 'Stack' : 'Carousel'}
             </Button>
+            {cards[currentIndex] && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => speakCard(cards[currentIndex])}
+                className={`text-zinc-400 hover:text-white ${isSpeaking ? 'text-amber-400' : ''}`}
+              >
+                {isSpeaking ? <VolumeX className="w-4 h-4 mr-1" /> : <Volume2 className="w-4 h-4 mr-1" />}
+                {isSpeaking ? 'Stop' : 'Listen'}
+              </Button>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-zinc-500">
@@ -342,6 +570,8 @@ const BriefingCards = () => {
                   isActive={index === currentIndex}
                   onSwipeLeft={nextCard}
                   onSwipeRight={prevCard}
+                  onSpeak={() => speakCard(card)}
+                  isSpeaking={speakingCardId === card.id && isSpeaking}
                 />
               ))}
             </AnimatePresence>
@@ -391,7 +621,7 @@ const BriefingCards = () => {
 
         {/* Swipe hint */}
         <p className="text-center text-[10px] text-zinc-600 mt-4">
-          Swipe cards or use arrow keys • Tap dots to jump
+          Swipe cards or use arrow keys • Press S to speak • Tap dots to jump
         </p>
 
         {/* Quick Links */}

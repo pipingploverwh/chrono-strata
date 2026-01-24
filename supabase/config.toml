@@ -1,5 +1,11 @@
 project_id = "gcujdymsfxsyejfkvroq"
 
+[functions.briefing-tts]
+verify_jwt = false
+
+[functions.market-data]
+verify_jwt = false
+
 [functions.ai-harmony]
 verify_jwt = false
 
