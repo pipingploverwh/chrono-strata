@@ -90,6 +90,7 @@ import ForMoran from "./pages/ForMoran";
 import NortheastWeather from "./pages/NortheastWeather";
 import EconomicForecast from "./pages/EconomicForecast";
 import CannabisDirectory from "./pages/CannabisDirectory";
+import BriefingCards from "./pages/BriefingCards";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -173,6 +174,7 @@ const App = () => (
                 <Route path="/northeast" element={<NortheastWeather />} />
                 <Route path="/forecast" element={<EconomicForecast />} />
                 <Route path="/cannabis" element={<CannabisDirectory />} />
+                <Route path="/briefing" element={<BriefingCards />} />
                 
                 {/* Previously Protected Routes - Now Public */}
                 <Route path="/alpha-os" element={<AcquisitionPitch />} />
