@@ -110,3 +110,6 @@ verify_jwt = false
 
 [functions.dispensary-search]
 verify_jwt = false
+
+[functions.briefing-cards]
+verify_jwt = false
