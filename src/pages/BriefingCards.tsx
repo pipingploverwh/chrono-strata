@@ -305,6 +305,10 @@ const BriefingCards = () => {
   // Auto-read mode state
   const [autoReadEnabled, setAutoReadEnabled] = useState(false);
   const autoReadRef = useRef(false);
+  
+  // Continuous auto-advance mode state
+  const [autoAdvanceEnabled, setAutoAdvanceEnabled] = useState(false);
+  const autoAdvanceRef = useRef(false);
 
   const fetchBriefing = useCallback(async () => {
     setIsLoading(true);
@@ -403,6 +407,22 @@ const BriefingCards = () => {
           setIsSpeaking(false);
           setSpeakingCardId(null);
           URL.revokeObjectURL(audioUrl);
+          
+          // Auto-advance to next card if enabled
+          if (autoAdvanceRef.current) {
+            setCurrentIndex((prev) => {
+              const nextIdx = prev + 1;
+              // Stop at the last card
+              if (nextIdx >= cards.length) {
+                setAutoAdvanceEnabled(false);
+                autoAdvanceRef.current = false;
+                toast.success('Briefing complete');
+                return prev;
+              }
+              return nextIdx;
+            });
+          }
+          
           resolve();
         };
 
@@ -422,12 +442,16 @@ const BriefingCards = () => {
         reject(error);
       }
     });
-  }, [speakingCardId, isSpeaking]);
+  }, [speakingCardId, isSpeaking, cards.length]);
 
-  // Auto-read effect - speaks current card when index changes
+  // Keep refs in sync with state
   useEffect(() => {
     autoReadRef.current = autoReadEnabled;
   }, [autoReadEnabled]);
+  
+  useEffect(() => {
+    autoAdvanceRef.current = autoAdvanceEnabled;
+  }, [autoAdvanceEnabled]);
 
   useEffect(() => {
     if (autoReadRef.current && cards[currentIndex] && !isLoading) {
@@ -451,10 +475,42 @@ const BriefingCards = () => {
         setIsSpeaking(false);
         setSpeakingCardId(null);
       }
+      // Disable auto-advance if auto-read is disabled
+      if (!newState) {
+        setAutoAdvanceEnabled(false);
+      }
       toast.success(newState ? 'Auto-read enabled' : 'Auto-read disabled');
       return newState;
     });
   }, []);
+
+  // Toggle continuous auto-advance mode (auto-read + auto-advance)
+  const toggleAutoAdvance = useCallback(() => {
+    setAutoAdvanceEnabled(prev => {
+      const newState = !prev;
+      if (newState) {
+        // Enable auto-read when enabling auto-advance
+        setAutoReadEnabled(true);
+        toast.success('Continuous mode enabled - will read and advance automatically');
+        // Start reading the current card if not already speaking
+        if (cards[currentIndex] && !isSpeaking) {
+          setTimeout(() => {
+            speakCard(cards[currentIndex], true);
+          }, 300);
+        }
+      } else {
+        // Stop current audio when disabling
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current = null;
+          setIsSpeaking(false);
+          setSpeakingCardId(null);
+        }
+        toast.success('Continuous mode disabled');
+      }
+      return newState;
+    });
+  }, [cards, currentIndex, isSpeaking, speakCard]);
 
   useEffect(() => {
     fetchBriefing();
@@ -497,6 +553,9 @@ const BriefingCards = () => {
       } else if (e.key === 'a') {
         e.preventDefault();
         toggleAutoRead();
+      } else if (e.key === 'c') {
+        e.preventDefault();
+        toggleAutoAdvance();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -591,6 +650,18 @@ const BriefingCards = () => {
               {autoReadEnabled ? <Play className="w-4 h-4 mr-1" /> : <Pause className="w-4 h-4 mr-1" />}
               Auto
             </Button>
+            <Button
+              size="sm"
+              variant={autoAdvanceEnabled ? "default" : "ghost"}
+              onClick={toggleAutoAdvance}
+              className={autoAdvanceEnabled 
+                ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30" 
+                : "text-zinc-400 hover:text-white"
+              }
+            >
+              <RefreshCw className={`w-4 h-4 mr-1 ${autoAdvanceEnabled ? 'animate-spin' : ''}`} />
+              Loop
+            </Button>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-zinc-500">
@@ -677,7 +748,7 @@ const BriefingCards = () => {
 
         {/* Swipe hint */}
         <p className="text-center text-[10px] text-zinc-600 mt-4">
-          Swipe or arrow keys • S to speak • A for auto-read • Dots to jump
+          Swipe or arrow keys • S to speak • A for auto-read • C for continuous mode
         </p>
 
         {/* Quick Links */}
