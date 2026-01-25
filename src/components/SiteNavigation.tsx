@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, Gauge, Plane, Anchor, HardHat, CalendarDays, ScrollText, Rocket, Map, ChevronRight, Brain, Activity, FileCheck, Mail, ShieldCheck, User, Building2, Compass, X, Beaker, Scale, Bird, Ship } from "lucide-react";
+import { Home, Gauge, Plane, Anchor, HardHat, CalendarDays, ScrollText, Rocket, Map, ChevronRight, Brain, Activity, FileCheck, Mail, ShieldCheck, User, Building2, Compass, X, Beaker, Scale, Bird, Ship, FileText } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import LanguageToggle from "@/components/LanguageToggle";
@@ -36,7 +36,15 @@ const navItems: NavItem[] = [
   icon: Gauge,
   category: "main",
   isPublic: true,
-  roles: ["operator", "technical"] // Technical tool - not for executives
+  roles: ["operator", "technical"]
+}, {
+  path: "/briefing",
+  label: "Executive Briefing",
+  description: "Daily Intelligence Cards & Market Overview",
+  icon: FileText,
+  category: "main",
+  isPublic: true,
+  roles: ["operator", "technical", "executive"]
 }, {
   path: "/launch",
   label: "Location Select",
