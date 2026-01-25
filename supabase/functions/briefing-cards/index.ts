@@ -93,14 +93,27 @@ ${selectedQuestions.map((q, i) => `${i + 7}. Q&A: "${q}"`).join('\n')}
 
 Be specific with numbers, dates, and names. If something is uncertain, say so. Never make up statistics.`;
 
-    // Use Lovable AI via Supabase AI gateway
-    const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
-    const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
+    // Use Lovable AI via the proper gateway
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
-    const response = await fetch(`${SUPABASE_URL}/functions/v1/ai`, {
+    if (!LOVABLE_API_KEY) {
+      console.log('No Lovable API key configured, using fallback cards');
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          cards: generateFallbackCards(today),
+          generatedAt: new Date().toISOString(),
+          questionsAnswered: selectedQuestions,
+          source: 'fallback',
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    const response = await fetch('https://api.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

@@ -4,8 +4,9 @@ import {
   Newspaper, TrendingUp, Cloud, HelpCircle, Landmark, Building2,
   ChevronLeft, ChevronRight, RefreshCw, Clock, Zap, ArrowUp, ArrowDown,
   Minus, Shuffle, Volume2, VolumeX, Pause, Play, TrendingDown, Activity,
-  Compass, Bookmark, BookmarkCheck
+  Compass, Bookmark, BookmarkCheck, BarChart3
 } from "lucide-react";
+import { IndexHistoryChart } from "@/components/market/IndexHistoryChart";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
@@ -180,7 +181,7 @@ const GlobalMarketTicker = ({
   isLoading: boolean 
 }) => {
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
-  
+  const [selectedIndex, setSelectedIndex] = useState<MarketIndex | null>(null);
   const filteredIndices = selectedRegion 
     ? indices.filter(i => i.region === selectedRegion)
     : indices;
@@ -315,7 +316,8 @@ const GlobalMarketTicker = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ ...springConfig.gentle, delay: i * 0.03 }}
               whileHover={{ scale: 1.02, y: -2 }}
-              className={`flex-shrink-0 px-4 py-3 rounded-xl ${style.bg} border ${style.border} transition-colors duration-300 min-w-[120px]`}
+              onClick={() => setSelectedIndex(index)}
+              className={`flex-shrink-0 px-4 py-3 rounded-xl ${style.bg} border ${style.border} transition-colors duration-300 min-w-[120px] cursor-pointer group relative`}
             >
               {/* Alert Pulse */}
               {style.pulse && (
@@ -332,7 +334,7 @@ const GlobalMarketTicker = ({
                   <span className="text-[9px] font-medium tracking-wider text-zinc-500 uppercase">
                     {regionLabels[index.region || 'americas'].flag}
                   </span>
-                  {alertLevel !== 'normal' && (
+                  {alertLevel !== 'normal' ? (
                     <motion.span 
                       className={`text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider ${
                         alertLevel === 'critical' 
@@ -344,6 +346,12 @@ const GlobalMarketTicker = ({
                     >
                       {alertLevel === 'critical' ? '⚠ CRITICAL' : '⚡ ALERT'}
                     </motion.span>
+                  ) : (
+                    <motion.div
+                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <BarChart3 className="w-3 h-3 text-emerald-400" />
+                    </motion.div>
                   )}
                 </div>
 
@@ -382,11 +390,27 @@ const GlobalMarketTicker = ({
                     {index.alertReason}
                   </motion.p>
                 )}
+                
+                {/* Chart hint on hover */}
+                <motion.div
+                  className="absolute -bottom-1 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <span className="text-[8px] text-emerald-400/60 tracking-wider">VIEW CHART</span>
+                </motion.div>
               </div>
             </motion.div>
           );
         })}
       </motion.div>
+      
+      {/* Historical Chart Modal */}
+      {selectedIndex && (
+        <IndexHistoryChart
+          index={selectedIndex}
+          isOpen={!!selectedIndex}
+          onClose={() => setSelectedIndex(null)}
+        />
+      )}
     </div>
   );
 };
