@@ -17,6 +17,7 @@ export interface BriefingCard {
   sentiment: 'positive' | 'neutral' | 'negative' | 'mixed';
   importance: 'high' | 'medium' | 'low';
   source?: string;
+  sourceUrl?: string;
   timestamp: string;
   actionItems?: string[];
   relatedTopics?: string[];
@@ -213,11 +214,23 @@ const BriefingCardItem = ({
             animate={{ opacity: 1 }}
             transition={{ ...springConfig.gentle, delay: 0.45 }}
           >
-            <div className="flex items-center gap-2 text-[10px] text-zinc-600">
-              <Clock className="w-3 h-3" />
-              <span className="tracking-wide">{card.source || 'Intelligence Brief'}</span>
+            <div className="flex items-center gap-2 text-[10px] text-zinc-600 min-w-0 flex-1 mr-3">
+              <Clock className="w-3 h-3 flex-shrink-0" />
+              {card.sourceUrl ? (
+                <a 
+                  href={card.sourceUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="tracking-wide hover:text-emerald-400 transition-colors truncate underline underline-offset-2 decoration-zinc-700 hover:decoration-emerald-400"
+                >
+                  {card.source || 'Read Source'}
+                </a>
+              ) : (
+                <span className="tracking-wide truncate">{card.source || 'Intelligence Brief'}</span>
+              )}
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 flex-shrink-0">
               <motion.button 
                 onClick={(e) => { e.stopPropagation(); onToggleBookmark(); }}
                 whileHover={{ scale: 1.1 }}
