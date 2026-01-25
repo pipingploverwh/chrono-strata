@@ -1,36 +1,22 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from "framer-motion";
-import {
-  Newspaper, TrendingUp, Cloud, HelpCircle, Landmark, Building2,
-  ChevronLeft, ChevronRight, RefreshCw, Clock, Zap, ArrowUp, ArrowDown,
-  Minus, Shuffle, Volume2, VolumeX, Pause, Play, TrendingDown, Activity,
-  Compass, Bookmark, BookmarkCheck, BarChart3
+import { motion } from "framer-motion";
+import { 
+  Compass, RefreshCw, Play, Pause, Bookmark, 
+  Layers, FileText, Activity
 } from "lucide-react";
-import { IndexHistoryChart } from "@/components/market/IndexHistoryChart";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Link } from "react-router-dom";
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// TYPES
-// ═══════════════════════════════════════════════════════════════════════════════
-
-interface BriefingCard {
-  id: string;
-  category: 'current_events' | 'business' | 'weather' | 'question' | 'policy';
-  title: string;
-  headline: string;
-  summary: string;
-  details: string[];
-  sentiment: 'positive' | 'neutral' | 'negative' | 'mixed';
-  importance: 'high' | 'medium' | 'low';
-  source?: string;
-  timestamp: string;
-  actionItems?: string[];
-  relatedTopics?: string[];
-}
+import { 
+  VerticalSlats, 
+  LumeGlow, 
+  CommandZone,
+  springConfig 
+} from "@/components/briefing";
+import { MarketAlertBadge } from "@/components/briefing/MarketAlertBadge";
+import { BriefingCardStack } from "@/components/briefing/BriefingCardStack";
+import type { BriefingCard } from "@/components/briefing/BriefingCardStack";
 
 interface MarketIndex {
   symbol: string;
@@ -50,630 +36,13 @@ interface MarketAlerts {
   warning: number;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// SMOOTH SPRING CONFIGS - AAL Motion Language
-// ═══════════════════════════════════════════════════════════════════════════════
-
-const springConfig = {
-  gentle: { type: "spring" as const, stiffness: 120, damping: 20 },
-  smooth: { type: "spring" as const, stiffness: 200, damping: 25 },
-  snappy: { type: "spring" as const, stiffness: 300, damping: 30 },
-  float: { type: "spring" as const, stiffness: 80, damping: 15 },
-};
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// ARCHITECTURAL ELEMENTS - AAL Glass & Precision
-// ═══════════════════════════════════════════════════════════════════════════════
-
-const GlassPanel = ({ 
-  children, 
-  className = "",
-  intensity = 1 
-}: { 
-  children: React.ReactNode; 
-  className?: string;
-  intensity?: 1 | 2 | 3;
-}) => (
-  <div className={`
-    relative overflow-hidden rounded-2xl
-    bg-[hsl(var(--kuma-glass-${intensity}))]
-    backdrop-blur-[12px]
-    border border-white/[0.06]
-    shadow-[0_8px_32px_-8px_hsl(0_0%_0%/0.3)]
-    ${className}
-  `}>
-    {/* Shimmer effect */}
-    <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] via-transparent to-transparent pointer-events-none" />
-    {children}
-  </div>
-);
-
-const GeometricAccent = ({ position = "top-left" }: { position?: "top-left" | "top-right" | "bottom-left" | "bottom-right" }) => {
-  const positionClasses = {
-    "top-left": "top-0 left-0",
-    "top-right": "top-0 right-0 rotate-90",
-    "bottom-left": "bottom-0 left-0 -rotate-90",
-    "bottom-right": "bottom-0 right-0 rotate-180",
-  };
-  
-  return (
-    <div className={`absolute ${positionClasses[position]} w-8 h-8 pointer-events-none`}>
-      <svg viewBox="0 0 32 32" className="w-full h-full">
-        <path 
-          d="M0 0 L32 0 L32 4 L4 4 L4 32 L0 32 Z" 
-          fill="currentColor" 
-          className="text-emerald-500/20"
-        />
-      </svg>
-    </div>
-  );
-};
-
-const VerticalSlats = ({ count = 12 }: { count?: number }) => (
-  <div className="absolute inset-0 flex justify-between pointer-events-none overflow-hidden">
-    {[...Array(count)].map((_, i) => (
-      <motion.div 
-        key={i} 
-        className="w-px bg-gradient-to-b from-transparent via-emerald-500/5 to-transparent"
-        initial={{ opacity: 0, scaleY: 0 }}
-        animate={{ opacity: 1, scaleY: 1 }}
-        transition={{ delay: i * 0.03, duration: 0.8, ease: "easeOut" }}
-      />
-    ))}
-  </div>
-);
-
-const RuledLines = () => (
-  <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
-    {[...Array(8)].map((_, i) => (
-      <div 
-        key={i} 
-        className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-zinc-500/10 to-transparent"
-        style={{ top: `${(i + 1) * 12}%` }}
-      />
-    ))}
-  </div>
-);
-
-const LumeGlow = () => (
-  <div className="absolute inset-0 pointer-events-none">
-    <div className="absolute top-0 left-1/4 w-1/2 h-32 bg-gradient-to-b from-emerald-500/8 to-transparent blur-3xl" />
-    <div className="absolute bottom-0 right-1/4 w-1/2 h-24 bg-gradient-to-t from-emerald-500/5 to-transparent blur-2xl" />
-  </div>
-);
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// MARKET TICKER COMPONENT - Smooth AAL Style
-// ═══════════════════════════════════════════════════════════════════════════════
-
-const regionLabels = {
-  americas: { label: 'AMERICAS', flag: '🌎' },
-  europe: { label: 'EUROPE', flag: '🌍' },
-  asia: { label: 'ASIA-PAC', flag: '🌏' },
-  volatility: { label: 'VOLATILITY', flag: '⚡' },
-};
-
-const alertStyles = {
-  critical: { 
-    border: 'border-rose-500/50 ring-2 ring-rose-500/30', 
-    bg: 'bg-rose-500/10',
-    pulse: true 
-  },
-  warning: { 
-    border: 'border-amber-500/40 ring-1 ring-amber-500/20', 
-    bg: 'bg-amber-500/5',
-    pulse: false 
-  },
-  normal: { 
-    border: 'border-white/[0.05]', 
-    bg: 'bg-white/[0.02]',
-    pulse: false 
-  },
-};
-
-const GlobalMarketTicker = ({ 
-  indices, 
-  alerts,
-  isLoading 
-}: { 
-  indices: MarketIndex[]; 
-  alerts: MarketAlerts;
-  isLoading: boolean 
-}) => {
-  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
-  const [selectedIndex, setSelectedIndex] = useState<MarketIndex | null>(null);
-  const filteredIndices = selectedRegion 
-    ? indices.filter(i => i.region === selectedRegion)
-    : indices;
-
-  // Group by region for display
-  const regions = ['americas', 'europe', 'asia', 'volatility'] as const;
-  
-  if (isLoading) {
-    return (
-      <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          {[1, 2, 3, 4].map((i) => (
-            <motion.div 
-              key={i} 
-              className="h-6 w-16 rounded-full bg-white/[0.02] border border-white/[0.04]"
-              animate={{ opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.1 }}
-            />
-          ))}
-        </div>
-        <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <motion.div 
-              key={i} 
-              className="flex-shrink-0 px-4 py-3 rounded-xl bg-white/[0.02] border border-white/[0.04]"
-              animate={{ opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
-            >
-              <div className="w-14 h-2.5 bg-zinc-700/50 rounded-full mb-2" />
-              <div className="w-10 h-3.5 bg-zinc-700/50 rounded-full" />
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-3">
-      {/* Alert Banner */}
-      <AnimatePresence>
-        {(alerts.critical > 0 || alerts.warning > 0) && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className={`flex items-center gap-3 px-4 py-2 rounded-lg ${
-              alerts.critical > 0 
-                ? 'bg-rose-500/10 border border-rose-500/30' 
-                : 'bg-amber-500/10 border border-amber-500/30'
-            }`}
-          >
-            <motion.div
-              animate={{ scale: alerts.critical > 0 ? [1, 1.2, 1] : 1 }}
-              transition={{ duration: 0.5, repeat: alerts.critical > 0 ? Infinity : 0, repeatDelay: 1 }}
-            >
-              <Activity className={`w-4 h-4 ${alerts.critical > 0 ? 'text-rose-400' : 'text-amber-400'}`} />
-            </motion.div>
-            <span className={`text-xs font-medium tracking-wide ${
-              alerts.critical > 0 ? 'text-rose-300' : 'text-amber-300'
-            }`}>
-              {alerts.critical > 0 
-                ? `${alerts.critical} CRITICAL ALERT${alerts.critical > 1 ? 'S' : ''} - IMMEDIATE REVIEW REQUIRED`
-                : `${alerts.warning} MARKET WARNING${alerts.warning > 1 ? 'S' : ''}`
-              }
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Region Filter Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
-        <motion.button
-          onClick={() => setSelectedRegion(null)}
-          className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[10px] font-medium tracking-wider transition-all duration-200 ${
-            selectedRegion === null
-              ? 'bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30'
-              : 'bg-white/[0.02] text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.04]'
-          }`}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          ALL MARKETS
-        </motion.button>
-        {regions.map(region => {
-          const regionIndices = indices.filter(i => i.region === region);
-          const hasAlert = regionIndices.some(i => i.alertLevel !== 'normal');
-          const hasCritical = regionIndices.some(i => i.alertLevel === 'critical');
-          
-          return (
-            <motion.button
-              key={region}
-              onClick={() => setSelectedRegion(region)}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[10px] font-medium tracking-wider transition-all duration-200 flex items-center gap-1.5 ${
-                selectedRegion === region
-                  ? 'bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30'
-                  : 'bg-white/[0.02] text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.04]'
-              }`}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <span>{regionLabels[region].flag}</span>
-              <span>{regionLabels[region].label}</span>
-              {hasAlert && (
-                <motion.span 
-                  className={`w-1.5 h-1.5 rounded-full ${hasCritical ? 'bg-rose-500' : 'bg-amber-500'}`}
-                  animate={hasCritical ? { scale: [1, 1.5, 1] } : {}}
-                  transition={{ duration: 0.6, repeat: Infinity }}
-                />
-              )}
-            </motion.button>
-          );
-        })}
-      </div>
-
-      {/* Market Cards */}
-      <motion.div 
-        className="flex items-stretch gap-3 overflow-x-auto pb-2 scrollbar-hide"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={springConfig.smooth}
-      >
-        {filteredIndices.map((index, i) => {
-          const isPositive = index.change >= 0;
-          const alertLevel = index.alertLevel || 'normal';
-          const style = alertStyles[alertLevel];
-          
-          return (
-            <motion.div
-              key={index.symbol}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ ...springConfig.gentle, delay: i * 0.03 }}
-              whileHover={{ scale: 1.02, y: -2 }}
-              onClick={() => setSelectedIndex(index)}
-              className={`flex-shrink-0 px-4 py-3 rounded-xl ${style.bg} border ${style.border} transition-colors duration-300 min-w-[120px] cursor-pointer group relative`}
-            >
-              {/* Alert Pulse */}
-              {style.pulse && (
-                <motion.div
-                  className="absolute inset-0 rounded-xl bg-rose-500/20"
-                  animate={{ opacity: [0, 0.3, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                />
-              )}
-              
-              <div className="relative">
-                {/* Region & Alert Badge */}
-                <div className="flex items-center justify-between gap-2 mb-1.5">
-                  <span className="text-[9px] font-medium tracking-wider text-zinc-500 uppercase">
-                    {regionLabels[index.region || 'americas'].flag}
-                  </span>
-                  {alertLevel !== 'normal' ? (
-                    <motion.span 
-                      className={`text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wider ${
-                        alertLevel === 'critical' 
-                          ? 'bg-rose-500/30 text-rose-300' 
-                          : 'bg-amber-500/30 text-amber-300'
-                      }`}
-                      animate={alertLevel === 'critical' ? { opacity: [1, 0.6, 1] } : {}}
-                      transition={{ duration: 0.8, repeat: Infinity }}
-                    >
-                      {alertLevel === 'critical' ? '⚠ CRITICAL' : '⚡ ALERT'}
-                    </motion.span>
-                  ) : (
-                    <motion.div
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <BarChart3 className="w-3 h-3 text-emerald-400" />
-                    </motion.div>
-                  )}
-                </div>
-
-                {/* Index Name */}
-                <div className="flex items-center gap-1.5 mb-1">
-                  <span className="text-[10px] font-medium tracking-wider text-zinc-300 uppercase truncate">{index.name}</span>
-                  <motion.div
-                    animate={{ rotate: isPositive ? 0 : 180 }}
-                    transition={{ type: "spring", stiffness: 200 }}
-                  >
-                    {isPositive ? (
-                      <TrendingUp className="w-3 h-3 text-emerald-400 flex-shrink-0" />
-                    ) : (
-                      <TrendingDown className="w-3 h-3 text-rose-400 flex-shrink-0" />
-                    )}
-                  </motion.div>
-                </div>
-
-                {/* Price & Change */}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-light text-white tracking-wide font-mono">
-                    {index.price.toLocaleString('en-US', { minimumFractionDigits: index.price < 100 ? 2 : 0, maximumFractionDigits: index.price < 100 ? 2 : 0 })}
-                  </span>
-                  <span className={`text-[10px] font-mono font-medium ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
-                    {isPositive ? '+' : ''}{index.changePercent.toFixed(2)}%
-                  </span>
-                </div>
-
-                {/* Alert Reason */}
-                {index.alertReason && (
-                  <motion.p 
-                    className="text-[9px] text-zinc-400 mt-1.5 leading-tight"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                  >
-                    {index.alertReason}
-                  </motion.p>
-                )}
-                
-                {/* Chart hint on hover */}
-                <motion.div
-                  className="absolute -bottom-1 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <span className="text-[8px] text-emerald-400/60 tracking-wider">VIEW CHART</span>
-                </motion.div>
-              </div>
-            </motion.div>
-          );
-        })}
-      </motion.div>
-      
-      {/* Historical Chart Modal */}
-      {selectedIndex && (
-        <IndexHistoryChart
-          index={selectedIndex}
-          isOpen={!!selectedIndex}
-          onClose={() => setSelectedIndex(null)}
-        />
-      )}
-    </div>
-  );
-};
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// CATEGORY & SENTIMENT CONFIG
-// ═══════════════════════════════════════════════════════════════════════════════
-
-const categoryConfig = {
-  current_events: { icon: Newspaper, gradient: 'from-blue-500/20 to-blue-600/10', accent: 'text-blue-400', ring: 'ring-blue-500/20' },
-  business: { icon: Building2, gradient: 'from-emerald-500/20 to-emerald-600/10', accent: 'text-emerald-400', ring: 'ring-emerald-500/20' },
-  weather: { icon: Cloud, gradient: 'from-sky-500/20 to-sky-600/10', accent: 'text-sky-400', ring: 'ring-sky-500/20' },
-  question: { icon: HelpCircle, gradient: 'from-violet-500/20 to-violet-600/10', accent: 'text-violet-400', ring: 'ring-violet-500/20' },
-  policy: { icon: Landmark, gradient: 'from-amber-500/20 to-amber-600/10', accent: 'text-amber-400', ring: 'ring-amber-500/20' },
-};
-
-const sentimentConfig = {
-  positive: { icon: ArrowUp, color: 'text-emerald-400', bg: 'bg-emerald-500/10 ring-1 ring-emerald-500/20' },
-  neutral: { icon: Minus, color: 'text-zinc-400', bg: 'bg-zinc-500/10 ring-1 ring-zinc-500/20' },
-  negative: { icon: ArrowDown, color: 'text-rose-400', bg: 'bg-rose-500/10 ring-1 ring-rose-500/20' },
-  mixed: { icon: Shuffle, color: 'text-amber-400', bg: 'bg-amber-500/10 ring-1 ring-amber-500/20' },
-};
-
-const importanceConfig = {
-  high: { label: 'PRIORITY', color: 'bg-rose-500/10 text-rose-300 ring-1 ring-rose-500/20' },
-  medium: { label: 'NOTABLE', color: 'bg-amber-500/10 text-amber-300 ring-1 ring-amber-500/20' },
-  low: { label: 'FYI', color: 'bg-zinc-500/10 text-zinc-300 ring-1 ring-zinc-500/20' },
-};
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// BRIEFING CARD COMPONENT - Smooth Glass AAL
-// ═══════════════════════════════════════════════════════════════════════════════
-
-const BriefingCardComponent = ({ 
-  card, 
-  isActive,
-  onSwipeLeft,
-  onSwipeRight,
-  onSpeak,
-  isSpeaking,
-  isBookmarked,
-  onToggleBookmark,
-}: { 
-  card: BriefingCard; 
-  isActive: boolean;
-  onSwipeLeft: () => void;
-  onSwipeRight: () => void;
-  onSpeak: () => void;
-  isSpeaking: boolean;
-  isBookmarked: boolean;
-  onToggleBookmark: () => void;
-}) => {
-  const config = categoryConfig[card.category] || categoryConfig.current_events;
-  const sentiment = sentimentConfig[card.sentiment] || sentimentConfig.neutral;
-  const importance = importanceConfig[card.importance] || importanceConfig.medium;
-  const CategoryIcon = config.icon;
-  const SentimentIcon = sentiment.icon;
-
-  const x = useMotionValue(0);
-  const rotate = useTransform(x, [-200, 200], [-8, 8]);
-  const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0.5, 0.8, 1, 0.8, 0.5]);
-
-  const handleDragEnd = (_: any, info: PanInfo) => {
-    if (info.offset.x > 100) {
-      onSwipeRight();
-    } else if (info.offset.x < -100) {
-      onSwipeLeft();
-    }
-  };
-
-  return (
-    <motion.div
-      drag={isActive ? "x" : false}
-      dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.15}
-      onDragEnd={handleDragEnd}
-      style={{ x, rotate, opacity: isActive ? opacity : 0.3 }}
-      className="absolute inset-0 cursor-grab active:cursor-grabbing"
-      initial={{ scale: 0.92, opacity: 0, y: 20 }}
-      animate={{ 
-        scale: isActive ? 1 : 0.92, 
-        opacity: isActive ? 1 : 0,
-        y: isActive ? 0 : 20 
-      }}
-      exit={{ scale: 0.88, opacity: 0, y: -20, transition: { duration: 0.2 } }}
-      transition={springConfig.smooth}
-    >
-      <GlassPanel className="h-full" intensity={2}>
-        {/* Geometric Accents */}
-        <GeometricAccent position="top-left" />
-        <GeometricAccent position="bottom-right" />
-        
-        {/* Category Gradient Overlay */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${config.gradient} pointer-events-none`} />
-        
-        {/* Ruled Surface Lines */}
-        <RuledLines />
-        
-        {/* Content */}
-        <div className="relative h-full p-6 flex flex-col">
-          {/* Header */}
-          <motion.div 
-            className="flex items-start justify-between mb-5"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ ...springConfig.gentle, delay: 0.1 }}
-          >
-            <div className="flex items-center gap-3">
-              <motion.div 
-                className={`p-3 rounded-xl bg-white/[0.04] backdrop-blur-sm ring-1 ${config.ring}`}
-                whileHover={{ scale: 1.05 }}
-                transition={springConfig.snappy}
-              >
-                <CategoryIcon className={`w-5 h-5 ${config.accent}`} />
-              </motion.div>
-              <div>
-                <div className="text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-0.5">
-                  {card.category.replace('_', ' ')}
-                </div>
-                <h3 className="text-base font-medium text-white/90">{card.title}</h3>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge className={`text-[8px] tracking-wider px-2 py-0.5 border-0 ${importance.color}`}>
-                {importance.label}
-              </Badge>
-              <motion.div 
-                className={`p-1.5 rounded-lg ${sentiment.bg}`}
-                animate={isSpeaking ? { scale: [1, 1.1, 1] } : {}}
-                transition={{ duration: 0.5, repeat: isSpeaking ? Infinity : 0 }}
-              >
-                <SentimentIcon className={`w-3.5 h-3.5 ${sentiment.color}`} />
-              </motion.div>
-            </div>
-          </motion.div>
-
-          {/* Headline */}
-          <motion.div 
-            className="mb-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ ...springConfig.gentle, delay: 0.15 }}
-          >
-            <h2 className="text-xl font-light text-white leading-relaxed tracking-wide">
-              {card.headline}
-            </h2>
-          </motion.div>
-
-          {/* Summary */}
-          <motion.p 
-            className="text-sm text-zinc-400 leading-relaxed mb-5 flex-shrink-0"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ ...springConfig.gentle, delay: 0.2 }}
-          >
-            {card.summary}
-          </motion.p>
-
-          {/* Details */}
-          <div className="flex-1 overflow-hidden">
-            <motion.div 
-              className="space-y-2.5 mb-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ ...springConfig.gentle, delay: 0.25 }}
-            >
-              {card.details?.slice(0, 4).map((detail, idx) => (
-                <motion.div 
-                  key={idx} 
-                  className="flex items-start gap-2.5"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ ...springConfig.gentle, delay: 0.3 + idx * 0.05 }}
-                >
-                  <div className="w-1 h-1 rounded-full bg-emerald-400/60 mt-2 flex-shrink-0" />
-                  <span className="text-sm text-zinc-400/90">{detail}</span>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            {/* Action Items */}
-            {card.actionItems && card.actionItems.length > 0 && (
-              <motion.div 
-                className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.04]"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ ...springConfig.gentle, delay: 0.4 }}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <Zap className="w-3 h-3 text-emerald-400" />
-                  <span className="text-[9px] uppercase tracking-[0.15em] text-emerald-400/80">Action Items</span>
-                </div>
-                {card.actionItems.slice(0, 2).map((action, idx) => (
-                  <div key={idx} className="text-sm text-zinc-300/80 mb-1 last:mb-0">
-                    {action}
-                  </div>
-                ))}
-              </motion.div>
-            )}
-          </div>
-
-          {/* Footer */}
-          <motion.div 
-            className="flex items-center justify-between pt-4 border-t border-white/[0.04] mt-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ ...springConfig.gentle, delay: 0.45 }}
-          >
-            <div className="flex items-center gap-2 text-[10px] text-zinc-600">
-              <Clock className="w-3 h-3" />
-              <span className="tracking-wide">{card.source || 'Intelligence Brief'}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <motion.button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleBookmark();
-                }}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                transition={springConfig.snappy}
-                className={`p-2 rounded-lg transition-colors ${
-                  isBookmarked 
-                    ? 'bg-amber-500/20 text-amber-400' 
-                    : 'bg-white/[0.02] text-zinc-500 hover:text-white hover:bg-white/[0.04]'
-                }`}
-              >
-                {isBookmarked ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
-              </motion.button>
-              <motion.button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSpeak();
-                }}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                transition={springConfig.snappy}
-                className={`p-2 rounded-lg transition-colors ${
-                  isSpeaking 
-                    ? 'bg-emerald-500/20 text-emerald-400' 
-                    : 'bg-white/[0.02] text-zinc-500 hover:text-white hover:bg-white/[0.04]'
-                }`}
-              >
-                {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-              </motion.button>
-            </div>
-          </motion.div>
-        </div>
-      </GlassPanel>
-    </motion.div>
-  );
-};
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// MAIN COMPONENT
-// ═══════════════════════════════════════════════════════════════════════════════
-
 const BriefingCards = () => {
+  // Card state
   const [cards, setCards] = useState<BriefingCard[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Market data state
+  // Market state
   const [marketIndices, setMarketIndices] = useState<MarketIndex[]>([]);
   const [marketAlerts, setMarketAlerts] = useState<MarketAlerts>({ critical: 0, warning: 0 });
   const [isMarketLoading, setIsMarketLoading] = useState(true);
@@ -683,19 +52,17 @@ const BriefingCards = () => {
   const [speakingCardId, setSpeakingCardId] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
-  // Auto-read mode state
+  // Auto modes
   const [autoReadEnabled, setAutoReadEnabled] = useState(false);
-  const autoReadRef = useRef(false);
-  
-  // Continuous auto-advance mode state
   const [autoAdvanceEnabled, setAutoAdvanceEnabled] = useState(false);
+  const autoReadRef = useRef(false);
   const autoAdvanceRef = useRef(false);
   
-  // Bookmark state
+  // Bookmarks
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const sessionId = useRef(`session-${Date.now()}`);
 
-  // Fetch existing bookmarks on mount
+  // Fetch bookmarks
   const fetchBookmarks = useCallback(async () => {
     try {
       const { data, error } = await supabase
@@ -714,7 +81,6 @@ const BriefingCards = () => {
     
     try {
       if (isCurrentlyBookmarked) {
-        // Remove bookmark
         const { error } = await supabase
           .from('bookmarked_briefings')
           .delete()
@@ -728,7 +94,6 @@ const BriefingCards = () => {
         });
         toast.success('Bookmark removed');
       } else {
-        // Add bookmark
         const cardDataJson = JSON.parse(JSON.stringify(card));
         const { error } = await supabase
           .from('bookmarked_briefings')
@@ -748,6 +113,7 @@ const BriefingCards = () => {
     }
   }, [bookmarkedIds]);
 
+  // Fetch briefing cards
   const fetchBriefing = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -769,6 +135,7 @@ const BriefingCards = () => {
     setIsLoading(false);
   }, []);
 
+  // Fetch market data
   const fetchMarketData = useCallback(async () => {
     setIsMarketLoading(true);
     try {
@@ -780,7 +147,6 @@ const BriefingCards = () => {
         setMarketIndices(data.indices);
         setMarketAlerts(data.alerts || { critical: 0, warning: 0 });
         
-        // Toast alert for critical market events
         if (data.alerts?.critical > 0) {
           toast.error(`🚨 ${data.alerts.critical} critical market alert${data.alerts.critical > 1 ? 's' : ''} detected!`, {
             duration: 6000,
@@ -797,7 +163,7 @@ const BriefingCards = () => {
     setIsMarketLoading(false);
   }, []);
 
-  // Text-to-speech function with auto-read support
+  // Text-to-speech
   const speakCard = useCallback(async (card: BriefingCard, isAutoRead = false): Promise<void> => {
     if (speakingCardId === card.id && isSpeaking && !isAutoRead) {
       if (audioRef.current) {
@@ -887,6 +253,7 @@ const BriefingCards = () => {
     });
   }, [speakingCardId, isSpeaking, cards.length]);
 
+  // Sync refs
   useEffect(() => {
     autoReadRef.current = autoReadEnabled;
   }, [autoReadEnabled]);
@@ -895,6 +262,7 @@ const BriefingCards = () => {
     autoAdvanceRef.current = autoAdvanceEnabled;
   }, [autoAdvanceEnabled]);
 
+  // Auto-read on card change
   useEffect(() => {
     if (autoReadRef.current && cards[currentIndex] && !isLoading) {
       const timer = setTimeout(() => {
@@ -947,6 +315,7 @@ const BriefingCards = () => {
     });
   }, [cards, currentIndex, isSpeaking, speakCard]);
 
+  // Initial fetch
   useEffect(() => {
     fetchBriefing();
     fetchMarketData();
@@ -955,6 +324,7 @@ const BriefingCards = () => {
     return () => clearInterval(marketInterval);
   }, [fetchBriefing, fetchMarketData, fetchBookmarks]);
 
+  // Cleanup audio
   useEffect(() => {
     return () => {
       if (audioRef.current) {
@@ -963,9 +333,11 @@ const BriefingCards = () => {
     };
   }, []);
 
+  // Navigation
   const nextCard = () => setCurrentIndex((prev) => (prev + 1) % cards.length);
   const prevCard = () => setCurrentIndex((prev) => (prev - 1 + cards.length) % cards.length);
 
+  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight' || e.key === ' ') {
@@ -994,225 +366,193 @@ const BriefingCards = () => {
       {/* Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black" />
-        <VerticalSlats count={20} />
+        <VerticalSlats count={24} />
         <LumeGlow />
       </div>
 
-      <div className="relative z-10 max-w-lg mx-auto px-4 py-8">
-        {/* Header */}
-        <motion.div 
+      <div className="relative z-10 max-w-4xl mx-auto px-4 py-6">
+        
+        {/* ═══════════════════════════════════════════════════════════════════════ */}
+        {/* COMMAND HEADER */}
+        {/* ═══════════════════════════════════════════════════════════════════════ */}
+        
+        <motion.header 
           initial={{ opacity: 0, y: -20 }} 
           animate={{ opacity: 1, y: 0 }}
           transition={springConfig.gentle}
-          className="text-center mb-6"
-        >
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <div className="h-px w-12 bg-gradient-to-r from-transparent to-emerald-500/30" />
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            >
-              <Compass className="w-4 h-4 text-emerald-400/60" />
-            </motion.div>
-            <div className="h-px w-12 bg-gradient-to-l from-transparent to-emerald-500/30" />
-          </div>
-          <h1 className="text-2xl font-light text-white tracking-[0.1em]">
-            EXECUTIVE BRIEFING
-          </h1>
-          <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-600 mt-2">
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-          </p>
-        </motion.div>
-
-        {/* Market Ticker */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ ...springConfig.gentle, delay: 0.1 }}
           className="mb-6"
         >
-          <div className="flex items-center gap-2 mb-3">
-            <Activity className="w-3 h-3 text-emerald-400/60" />
-            <span className="text-[9px] uppercase tracking-[0.2em] text-zinc-600">Live Markets</span>
-            <motion.button
-              onClick={fetchMarketData}
-              disabled={isMarketLoading}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="ml-auto text-zinc-600 hover:text-emerald-400 transition-colors p-1"
-            >
-              <RefreshCw className={`w-3 h-3 ${isMarketLoading ? 'animate-spin' : ''}`} />
-            </motion.button>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              >
+                <Compass className="w-5 h-5 text-emerald-400/60" />
+              </motion.div>
+              <div>
+                <h1 className="text-xl font-light text-white tracking-[0.1em]">
+                  EXECUTIVE BRIEFING
+                </h1>
+                <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-600">
+                  {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono text-zinc-600">
+                {currentIndex + 1} / {cards.length || '—'}
+              </span>
+              <motion.button
+                onClick={fetchBriefing}
+                disabled={isLoading}
+                whileHover={{ scale: 1.1, rotate: 180 }}
+                whileTap={{ scale: 0.9 }}
+                className="p-2 rounded-lg bg-white/[0.02] text-zinc-600 hover:text-emerald-400 transition-colors"
+              >
+                <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              </motion.button>
+            </div>
           </div>
-          <GlobalMarketTicker indices={marketIndices} alerts={marketAlerts} isLoading={isMarketLoading} />
-        </motion.div>
+          
+          {/* Market Badge */}
+          <MarketAlertBadge 
+            indices={marketIndices}
+            alerts={marketAlerts}
+            isLoading={isMarketLoading}
+            onRefresh={fetchMarketData}
+          />
+        </motion.header>
 
-        {/* Controls */}
-        <motion.div 
-          className="flex items-center justify-between mb-5"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ ...springConfig.gentle, delay: 0.15 }}
-        >
-          <div className="flex items-center gap-2">
+        {/* ═══════════════════════════════════════════════════════════════════════ */}
+        {/* CONTROL ZONE */}
+        {/* ═══════════════════════════════════════════════════════════════════════ */}
+        
+        <CommandZone title="Playback Controls" icon={Activity} className="mb-6">
+          <div className="flex items-center gap-3 flex-wrap">
             <motion.button
               onClick={toggleAutoRead}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs transition-all ${
                 autoReadEnabled 
-                  ? 'bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20' 
-                  : 'bg-white/[0.02] text-zinc-500 hover:text-white ring-1 ring-white/[0.04]'
+                  ? 'bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30' 
+                  : 'bg-white/[0.02] text-zinc-500 hover:text-white ring-1 ring-white/[0.06]'
               }`}
             >
-              {autoReadEnabled ? <Play className="w-3 h-3" /> : <Pause className="w-3 h-3" />}
-              Auto
+              {autoReadEnabled ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+              <span>Auto-Read</span>
+              <kbd className="hidden sm:inline text-[9px] px-1 py-0.5 rounded bg-white/[0.05] text-zinc-600 ml-1">A</kbd>
             </motion.button>
+            
             <motion.button
               onClick={toggleAutoAdvance}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs transition-all ${
                 autoAdvanceEnabled 
-                  ? 'bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20' 
-                  : 'bg-white/[0.02] text-zinc-500 hover:text-white ring-1 ring-white/[0.04]'
+                  ? 'bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30' 
+                  : 'bg-white/[0.02] text-zinc-500 hover:text-white ring-1 ring-white/[0.06]'
               }`}
             >
-              <RefreshCw className={`w-3 h-3 ${autoAdvanceEnabled ? 'animate-spin' : ''}`} />
-              Loop
+              <RefreshCw className={`w-3.5 h-3.5 ${autoAdvanceEnabled ? 'animate-spin' : ''}`} />
+              <span>Continuous</span>
+              <kbd className="hidden sm:inline text-[9px] px-1 py-0.5 rounded bg-white/[0.05] text-zinc-600 ml-1">C</kbd>
             </motion.button>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-[10px] text-zinc-600 tracking-wider font-mono">
-              {currentIndex + 1} / {cards.length || '—'}
-            </span>
-            <motion.button
-              onClick={fetchBriefing}
-              disabled={isLoading}
-              whileHover={{ scale: 1.1, rotate: 180 }}
-              whileTap={{ scale: 0.9 }}
-              className="text-zinc-600 hover:text-emerald-400 transition-colors p-1"
+
+            <div className="flex-1" />
+            
+            <Link 
+              to="/briefing/bookmarks" 
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs bg-white/[0.02] text-zinc-500 hover:text-amber-400 ring-1 ring-white/[0.06] transition-colors"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-            </motion.button>
+              <Bookmark className="w-3.5 h-3.5" />
+              <span>Saved</span>
+              {bookmarkedIds.size > 0 && (
+                <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[10px]">
+                  {bookmarkedIds.size}
+                </span>
+              )}
+            </Link>
           </div>
-        </motion.div>
+        </CommandZone>
 
-        {/* Card Stack */}
-        <div className="relative h-[500px] mb-8">
-          {isLoading ? (
-            <GlassPanel className="absolute inset-0 flex items-center justify-center" intensity={1}>
-              <div className="text-center">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                >
-                  <RefreshCw className="w-8 h-8 text-emerald-400/60 mx-auto mb-4" />
-                </motion.div>
-                <p className="text-sm text-zinc-600 tracking-wide">Preparing your briefing...</p>
+        {/* ═══════════════════════════════════════════════════════════════════════ */}
+        {/* BRIEFING ZONE */}
+        {/* ═══════════════════════════════════════════════════════════════════════ */}
+        
+        <CommandZone title="Intelligence Cards" icon={FileText} className="mb-6">
+          <BriefingCardStack
+            cards={cards}
+            currentIndex={currentIndex}
+            onNext={nextCard}
+            onPrev={prevCard}
+            onIndexChange={setCurrentIndex}
+            onSpeak={speakCard}
+            speakingCardId={speakingCardId}
+            isSpeaking={isSpeaking}
+            bookmarkedIds={bookmarkedIds}
+            onToggleBookmark={toggleBookmark}
+            isLoading={isLoading}
+          />
+        </CommandZone>
+
+        {/* ═══════════════════════════════════════════════════════════════════════ */}
+        {/* CONTEXT ZONE */}
+        {/* ═══════════════════════════════════════════════════════════════════════ */}
+        
+        <CommandZone title="Session Info" icon={Layers} collapsible defaultOpen={false}>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+              <div className="text-[9px] uppercase tracking-wider text-zinc-600 mb-1">Cards Loaded</div>
+              <div className="text-lg font-light text-white">{cards.length}</div>
+            </div>
+            <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+              <div className="text-[9px] uppercase tracking-wider text-zinc-600 mb-1">Bookmarked</div>
+              <div className="text-lg font-light text-amber-400">{bookmarkedIds.size}</div>
+            </div>
+            <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+              <div className="text-[9px] uppercase tracking-wider text-zinc-600 mb-1">Markets</div>
+              <div className="text-lg font-light text-white">{marketIndices.length}</div>
+            </div>
+            <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+              <div className="text-[9px] uppercase tracking-wider text-zinc-600 mb-1">Alerts</div>
+              <div className={`text-lg font-light ${marketAlerts.critical > 0 ? 'text-rose-400' : marketAlerts.warning > 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                {marketAlerts.critical + marketAlerts.warning}
               </div>
-            </GlassPanel>
-          ) : (
-            <AnimatePresence mode="popLayout">
-              {cards.map((card, index) => (
-                <BriefingCardComponent
-                  key={card.id}
-                  card={card}
-                  isActive={index === currentIndex}
-                  onSwipeLeft={nextCard}
-                  onSwipeRight={prevCard}
-                  onSpeak={() => speakCard(card)}
-                  isSpeaking={speakingCardId === card.id && isSpeaking}
-                  isBookmarked={bookmarkedIds.has(card.id)}
-                  onToggleBookmark={() => toggleBookmark(card)}
-                />
-              ))}
-            </AnimatePresence>
-          )}
-        </div>
-
-        {/* Navigation */}
-        <motion.div 
-          className="flex items-center justify-between"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ ...springConfig.gentle, delay: 0.2 }}
-        >
-          <motion.button
-            onClick={prevCard}
-            disabled={cards.length === 0}
-            whileHover={{ scale: 1.05, x: -2 }}
-            whileTap={{ scale: 0.95 }}
-            className="p-3 rounded-xl bg-white/[0.02] text-zinc-400 hover:text-white hover:bg-white/[0.04] ring-1 ring-white/[0.04] transition-all disabled:opacity-30"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </motion.button>
-
-          {/* Progress Dots */}
-          <div className="flex items-center gap-1.5">
-            {cards.slice(0, 10).map((_, idx) => (
-              <motion.button
-                key={idx}
-                onClick={() => setCurrentIndex(idx)}
-                whileHover={{ scale: 1.3 }}
-                whileTap={{ scale: 0.9 }}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  idx === currentIndex 
-                    ? 'bg-emerald-400 w-6' 
-                    : 'bg-zinc-700 w-1.5 hover:bg-zinc-600'
-                }`}
-              />
-            ))}
-            {cards.length > 10 && (
-              <span className="text-[10px] text-zinc-700 ml-1">+{cards.length - 10}</span>
-            )}
+            </div>
           </div>
+        </CommandZone>
 
-          <motion.button
-            onClick={nextCard}
-            disabled={cards.length === 0}
-            whileHover={{ scale: 1.05, x: 2 }}
-            whileTap={{ scale: 0.95 }}
-            className="p-3 rounded-xl bg-white/[0.02] text-zinc-400 hover:text-white hover:bg-white/[0.04] ring-1 ring-white/[0.04] transition-all disabled:opacity-30"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </motion.button>
-        </motion.div>
-
-        {/* Keyboard Hints */}
-        <motion.p 
-          className="text-center text-[9px] text-zinc-700 mt-6 tracking-wider"
+        {/* ═══════════════════════════════════════════════════════════════════════ */}
+        {/* FOOTER */}
+        {/* ═══════════════════════════════════════════════════════════════════════ */}
+        
+        <motion.footer 
+          className="mt-8 pt-6 border-t border-white/[0.03]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          ← → NAVIGATE • S SPEAK • A AUTO-READ • C CONTINUOUS
-        </motion.p>
-
-        {/* Quick Links */}
-        <motion.div 
-          className="flex items-center justify-center gap-4 mt-8 pt-6 border-t border-white/[0.03] flex-wrap"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-        >
-          <Link to="/briefing/bookmarks" className="flex items-center gap-1 text-[10px] text-zinc-600 hover:text-amber-400 transition-colors tracking-wider">
-            <Bookmark className="w-3 h-3" />
-            SAVED ({bookmarkedIds.size})
-          </Link>
-          <span className="w-1 h-1 rounded-full bg-zinc-800" />
-          <Link to="/forecast" className="text-[10px] text-zinc-600 hover:text-emerald-400 transition-colors tracking-wider">
-            FORECAST
-          </Link>
-          <span className="w-1 h-1 rounded-full bg-zinc-800" />
-          <Link to="/northeast" className="text-[10px] text-zinc-600 hover:text-emerald-400 transition-colors tracking-wider">
-            WEATHER
-          </Link>
-          <span className="w-1 h-1 rounded-full bg-zinc-800" />
-          <Link to="/" className="text-[10px] text-zinc-600 hover:text-emerald-400 transition-colors tracking-wider">
-            DASHBOARD
-          </Link>
-        </motion.div>
+          <p className="text-center text-[9px] text-zinc-700 tracking-wider mb-4">
+            ← → NAVIGATE • S SPEAK • A AUTO-READ • C CONTINUOUS
+          </p>
+          
+          <div className="flex items-center justify-center gap-6 flex-wrap">
+            <Link to="/forecast" className="text-[10px] text-zinc-600 hover:text-emerald-400 transition-colors tracking-wider">
+              FORECAST
+            </Link>
+            <span className="w-1 h-1 rounded-full bg-zinc-800" />
+            <Link to="/northeast" className="text-[10px] text-zinc-600 hover:text-emerald-400 transition-colors tracking-wider">
+              WEATHER
+            </Link>
+            <span className="w-1 h-1 rounded-full bg-zinc-800" />
+            <Link to="/" className="text-[10px] text-zinc-600 hover:text-emerald-400 transition-colors tracking-wider">
+              DASHBOARD
+            </Link>
+          </div>
+        </motion.footer>
       </div>
     </div>
   );
