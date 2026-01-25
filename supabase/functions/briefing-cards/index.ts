@@ -130,7 +130,19 @@ Be specific with numbers, dates, and names. If something is uncertain, say so. N
     if (!response.ok) {
       const error = await response.text();
       console.error('AI API error:', error);
-      throw new Error(`AI request failed: ${response.status}`);
+      // Gracefully return fallback cards instead of throwing
+      console.log('Using fallback cards due to AI API error');
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          cards: generateFallbackCards(today),
+          generatedAt: new Date().toISOString(),
+          questionsAnswered: selectedQuestions,
+          source: 'fallback',
+          note: 'Using cached briefing data',
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const data = await response.json();
