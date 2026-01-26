@@ -24,6 +24,15 @@ interface LabProject {
 
 const LAB_PROJECTS: LabProject[] = [
   {
+    id: 'aal-auth',
+    name: 'AAL Geometric Authentication',
+    description: 'Multi-method auth system with Email, Magic Link, Google OAuth, and Enterprise SSO',
+    classification: 'r-and-d',
+    icon: Sparkles,
+    path: '/auth',
+    status: 'archived',
+  },
+  {
     id: 'thermal-visualizer',
     name: 'Thermal Music Visualizer',
     description: 'Audio-reactive temperature visualization with psychoacoustic mapping',
