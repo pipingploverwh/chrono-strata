@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Check, Droplets, Wind, Shield, Loader2, Zap, Map, Clock, Activity, Anchor, Snowflake, Sun, Building2, ChevronLeft, ChevronRight, Infinity, Users, Gift, Thermometer, AlertTriangle, ArrowRight, Lock, X, Fingerprint, Package, Sparkles, Ruler } from "lucide-react";
+import { ShoppingBag, Check, Droplets, Wind, Shield, Loader2, Zap, Map, Clock, Activity, Anchor, Snowflake, Sun, Building2, ChevronLeft, ChevronRight, Infinity, Users, Gift, Thermometer, AlertTriangle, ArrowRight, Lock, X, Fingerprint, Package, Sparkles, Ruler, FlaskConical } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,8 @@ import { AddToCartPrompt } from "@/components/shop/AddToCartPrompt";
 import { LearnMoreSection } from "@/components/navigation/LearnMoreSection";
 import { SizingTool } from "@/components/shop/SizingTool";
 import { InFeedAd, AD_SLOTS } from "@/components/ads";
+import { ThermalWeatherWidget } from "@/components/shop/ThermalWeatherWidget";
+import { MiniCart } from "@/components/shop/MiniCart";
 
 // Import terrain-specific jacket renders
 import strataShellHUD from "@/assets/strata-shell-hud-jacket.jpg";
@@ -191,7 +193,7 @@ const Shop = () => {
   const [selectedTerrainId, setSelectedTerrainId] = useState(TERRAIN_VARIANTS_BASE[0].id);
   const [isProcessing, setIsProcessing] = useState(false);
   const [systemStatus, setSystemStatus] = useState('NOMINAL');
-  const [selectedPaymentMode, setSelectedPaymentMode] = useState<'annual' | 'bond' | 'tactical'>('annual');
+  const [selectedPaymentMode, setSelectedPaymentMode] = useState<'tactical'>('tactical'); // Only presale now
   const [isTerrainTransitioning, setIsTerrainTransitioning] = useState(false);
   const [isBondHovered, setIsBondHovered] = useState(false);
   const [isRitualOpen, setIsRitualOpen] = useState(false);
@@ -199,6 +201,15 @@ const Shop = () => {
   const [dimmedBackground, setDimmedBackground] = useState(false);
   const [isSizingOpen, setIsSizingOpen] = useState(false);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [isMiniCartOpen, setIsMiniCartOpen] = useState(false);
+  const [cartItem, setCartItem] = useState<{
+    id: string;
+    name: string;
+    variant: string;
+    price: number;
+    priceLabel: string;
+    image?: string;
+  } | null>(null);
   
   // Get the selected terrain with translations
   const selectedTerrain = TERRAIN_VARIANTS.find(v => v.id === selectedTerrainId) || TERRAIN_VARIANTS[0];
@@ -214,10 +225,10 @@ const Shop = () => {
     }
   };
   
-  // Dim lights when Bond is hovered/selected
+  // Dim lights when tactical is selected (presale mode)
   useEffect(() => {
-    setDimmedBackground(isBondHovered || selectedPaymentMode === 'bond');
-  }, [isBondHovered, selectedPaymentMode]);
+    setDimmedBackground(selectedPaymentMode === 'tactical');
+  }, [selectedPaymentMode]);
   
   // Weather and temperature
   const { unit, toggleUnit, formatTemp } = useTemperatureUnit();
@@ -249,15 +260,10 @@ const Shop = () => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('success') === 'true') {
-      const isBond = params.get('bond') === 'true';
-      if (isBond) {
-        toast.success('STRATA Bond secured. Welcome to 100 years of ownership.', {
-          description: 'Your generational access has been activated.',
-          duration: 8000,
-        });
-      } else {
-        toast.success('Strata Ownership activated. Welcome to the Century Protocol.');
-      }
+      toast.success('Presale allocation secured!', {
+        description: 'Your manufacturing slot has been reserved.',
+        duration: 8000,
+      });
       window.history.replaceState({}, '', '/shop');
     }
     if (params.get('canceled') === 'true') {
@@ -271,25 +277,11 @@ const Shop = () => {
     setSystemStatus('INITIATING');
     
     try {
-      const getPriceType = () => {
-        switch (selectedPaymentMode) {
-          case 'tactical': return 'tactical_provision';
-          case 'bond': return 'strata_bond';
-          default: return 'strata_ownership';
-        }
-      };
-      
-      const getMode = () => {
-        // Tactical uses payment mode for deposit
-        // Bond uses payment mode for one-time
-        // Annual uses subscription mode
-        return selectedPaymentMode === 'annual' ? 'subscription' : 'payment';
-      };
-      
+      // Only tactical/presale mode now
       const { data, error } = await supabase.functions.invoke('create-shop-checkout', {
         body: { 
-          mode: getMode(),
-          priceType: getPriceType(),
+          mode: 'payment',
+          priceType: 'tactical_provision',
           terrainVariant: selectedTerrain.id,
           strataZone: selectedTerrain.strataZone,
           coordinates: selectedTerrain.coordinates,
@@ -316,30 +308,37 @@ const Shop = () => {
     }
   };
 
-  // Calculate price for AcquisitionRitual
-  const getCurrentPrice = () => {
-    switch (selectedPaymentMode) {
-      case 'tactical': return TACTICAL_PROVISION.fullPrice;
-      case 'bond': return STRATA_BOND.price;
-      default: return STRATA_OWNERSHIP.price;
-    }
-  };
+  // Calculate price for AcquisitionRitual - only tactical now
+  const getCurrentPrice = () => TACTICAL_PROVISION.fullPrice;
 
   const TerrainIcon = selectedTerrain.icon;
 
   // Get product name for prompt
-  const getProductName = () => {
-    switch (selectedPaymentMode) {
-      case 'tactical': return TACTICAL_PROVISION.name;
-      case 'bond': return STRATA_BOND.name;
-      default: return STRATA_OWNERSHIP.name;
-    }
-  };
+  const getProductName = () => TACTICAL_PROVISION.name;
 
-  // Handle soft add-to-cart flow
-  const handleInitiateAcquisition = () => {
+  // Handle soft add-to-cart flow - now shows mini cart first
+  const handleInitiateAcquisition = useCallback(() => {
+    // Add to cart and show mini cart
+    const newCartItem = {
+      id: `${selectedTerrain.id}-${selectedPaymentMode}-${Date.now()}`,
+      name: TACTICAL_PROVISION.name,
+      variant: selectedTerrain.name,
+      price: TACTICAL_PROVISION.depositPrice,
+      priceLabel: `$${TACTICAL_PROVISION.depositPrice.toLocaleString()} deposit`,
+      image: selectedTerrain.image,
+    };
+    setCartItem(newCartItem);
+    setIsMiniCartOpen(true);
+  }, [selectedTerrain, selectedPaymentMode]);
+
+  const handleMiniCartClose = useCallback(() => {
+    setIsMiniCartOpen(false);
+  }, []);
+
+  const handleMiniCartCheckout = useCallback(() => {
+    setIsMiniCartOpen(false);
     setIsPromptOpen(true);
-  };
+  }, []);
 
   const handlePromptConfirm = () => {
     setIsPromptOpen(false);
@@ -373,7 +372,15 @@ const Shop = () => {
         onCancel={handlePromptCancel}
       />
 
-      {/* Acquisition Ritual Modal */}
+      {/* Mini Cart with 3-second auto-dismiss */}
+      <MiniCart
+        isOpen={isMiniCartOpen}
+        item={cartItem}
+        onClose={handleMiniCartClose}
+        onCheckout={handleMiniCartCheckout}
+        autoDismissMs={3000}
+      />
+
       <AcquisitionRitual
         isOpen={isRitualOpen}
         onClose={() => setIsRitualOpen(false)}
@@ -654,135 +661,89 @@ const Shop = () => {
                 </p>
               </div>
 
-              {/* Payment Mode Toggle */}
-              <div className="space-y-3">
-                <span className="font-mono text-[10px] text-strata-silver/60 uppercase tracking-[0.2em]">
-                  {t('shop.selectOwnershipMode')}
-                </span>
-                
-                {/* Annual Option */}
-                <button
-                  onClick={() => setSelectedPaymentMode('annual')}
-                  className={`w-full text-left border rounded-lg p-4 transition-all ${
-                    selectedPaymentMode === 'annual'
-                      ? 'border-strata-orange bg-strata-orange/10'
-                      : 'border-strata-steel/30 bg-strata-charcoal/20 hover:border-strata-steel/50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <Clock className={`w-4 h-4 ${selectedPaymentMode === 'annual' ? 'text-strata-orange' : 'text-strata-silver/60'}`} />
-                      <span className={`font-mono text-sm uppercase tracking-wider ${selectedPaymentMode === 'annual' ? 'text-strata-orange' : 'text-strata-silver'}`}>
-                        {t('shop.annual')}
-                      </span>
-                    </div>
-                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                      selectedPaymentMode === 'annual' ? 'border-strata-orange' : 'border-strata-steel/50'
-                    }`}>
-                      {selectedPaymentMode === 'annual' && <div className="w-2 h-2 rounded-full bg-strata-orange" />}
-                    </div>
-                  </div>
-                  <div className="flex items-baseline gap-2">
-                    <span className={`text-3xl font-mono ${selectedPaymentMode === 'annual' ? 'text-strata-white' : 'text-strata-silver'}`}>
-                      ${STRATA_OWNERSHIP.price}
-                    </span>
-                    <span className="text-strata-silver/60 font-mono text-xs">{t('shop.perYear')}</span>
-                  </div>
-                  <p className="text-strata-silver/50 font-mono text-[9px] mt-1">{t('shop.postFirstYear')}</p>
-                </button>
-                
-                {/* Bond Option */}
-                <button
-                  onClick={() => setSelectedPaymentMode('bond')}
-                  className={`w-full text-left border rounded-lg p-4 transition-all ${
-                    selectedPaymentMode === 'bond'
-                      ? 'border-strata-lume bg-strata-lume/10'
-                      : 'border-strata-steel/30 bg-strata-charcoal/20 hover:border-strata-steel/50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <Gift className={`w-4 h-4 ${selectedPaymentMode === 'bond' ? 'text-strata-lume' : 'text-strata-silver/60'}`} />
-                      <span className={`font-mono text-sm uppercase tracking-wider ${selectedPaymentMode === 'bond' ? 'text-strata-lume' : 'text-strata-silver'}`}>
-                        {t('shop.strataBond')}
-                      </span>
-                      <Badge className="bg-strata-lume/20 text-strata-lume border-strata-lume/30 font-mono text-[8px] px-1.5 py-0">
-                        {t('shop.legacy')}
-                      </Badge>
-                    </div>
-                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                      selectedPaymentMode === 'bond' ? 'border-strata-lume' : 'border-strata-steel/50'
-                    }`}>
-                      {selectedPaymentMode === 'bond' && <div className="w-2 h-2 rounded-full bg-strata-lume" />}
-                    </div>
-                  </div>
-                  <div className="flex items-baseline gap-2">
-                    <span className={`text-3xl font-mono ${selectedPaymentMode === 'bond' ? 'text-strata-white' : 'text-strata-silver'}`}>
-                      ${STRATA_BOND.price.toLocaleString()}
-                    </span>
-                    <span className="text-strata-silver/60 font-mono text-xs">{t('shop.oneTime')}</span>
-                  </div>
-                  <p className="text-strata-silver/50 font-mono text-[9px] mt-1">{t('shop.savingsVsAnnual')}</p>
-                  <div className="flex items-center gap-2 mt-2 pt-2 border-t border-strata-steel/20">
-                    <Users className={`w-3 h-3 ${selectedPaymentMode === 'bond' ? 'text-strata-lume/80' : 'text-strata-silver/40'}`} />
-                    <span className={`font-mono text-[9px] ${selectedPaymentMode === 'bond' ? 'text-strata-lume/80' : 'text-strata-silver/40'}`}>
-                      {t('shop.transferable')}
+              {/* Thermal Weather Widget */}
+              <ThermalWeatherWidget 
+                terrainCoordinates={selectedTerrain.coordinates}
+                terrainName={selectedTerrain.name}
+                compact
+              />
+
+              {/* Presale Product Card - Clear CTA */}
+              <div className="border-2 border-strata-orange bg-strata-orange/5 rounded-xl p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Package className="w-5 h-5 text-strata-orange" />
+                    <span className="font-mono text-sm uppercase tracking-wider text-strata-orange font-bold">
+                      Presale — Physical Shell
                     </span>
                   </div>
-                </button>
+                  <Badge className="bg-strata-orange/20 text-strata-orange border-strata-orange/30 font-mono text-[9px] px-2 py-0.5 animate-pulse">
+                    OPEN
+                  </Badge>
+                </div>
                 
-                {/* TACTICAL PROVISION Option - Physical Pre-Order */}
-                <button
-                  onClick={() => setSelectedPaymentMode('tactical')}
-                  className={`w-full text-left border rounded-lg p-4 transition-all ${
-                    selectedPaymentMode === 'tactical'
-                      ? 'border-strata-orange bg-strata-orange/10 ring-2 ring-strata-orange/30'
-                      : 'border-strata-steel/30 bg-strata-charcoal/20 hover:border-strata-steel/50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <Package className={`w-4 h-4 ${selectedPaymentMode === 'tactical' ? 'text-strata-orange' : 'text-strata-silver/60'}`} />
-                      <span className={`font-mono text-sm uppercase tracking-wider ${selectedPaymentMode === 'tactical' ? 'text-strata-orange' : 'text-strata-silver'}`}>
-                        {t('shop.tacticalProvision')}
-                      </span>
-                      <Badge className="bg-strata-orange/20 text-strata-orange border-strata-orange/30 font-mono text-[8px] px-1.5 py-0">
-                        {t('shop.physical')}
-                      </Badge>
-                    </div>
-                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                      selectedPaymentMode === 'tactical' ? 'border-strata-orange' : 'border-strata-steel/50'
-                    }`}>
-                      {selectedPaymentMode === 'tactical' && <div className="w-2 h-2 rounded-full bg-strata-orange" />}
-                    </div>
-                  </div>
+                {/* Price Display */}
+                <div className="mb-4">
                   <div className="flex items-baseline gap-2">
-                    <span className={`text-3xl font-mono ${selectedPaymentMode === 'tactical' ? 'text-strata-white' : 'text-strata-silver'}`}>
+                    <span className="text-4xl font-mono font-bold text-strata-white">
                       ${TACTICAL_PROVISION.fullPrice.toLocaleString()}
                     </span>
-                    <span className="text-strata-silver/60 font-mono text-xs">{t('shop.physicalShell')}</span>
+                    <span className="text-strata-silver/60 font-mono text-sm">total</span>
                   </div>
-                  <div className="mt-2 p-2 bg-strata-steel/10 border border-strata-steel/20 rounded">
-                    <div className="flex items-center justify-between">
-                      <span className={`font-mono text-[10px] uppercase tracking-wider ${selectedPaymentMode === 'tactical' ? 'text-strata-orange' : 'text-strata-silver/60'}`}>
-                        {t('shop.depositToday')}
+                  <p className="font-mono text-xs text-strata-silver/60 mt-1">
+                    STRATA Shell — {selectedTerrain.name} Edition
+                  </p>
+                </div>
+                
+                {/* Deposit Highlight */}
+                <div className="p-4 bg-strata-black/50 border border-strata-orange/30 rounded-lg mb-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="font-mono text-[10px] text-strata-orange uppercase tracking-widest">
+                        Reserve Today
                       </span>
-                      <span className={`font-mono text-lg font-bold ${selectedPaymentMode === 'tactical' ? 'text-strata-white' : 'text-strata-silver'}`}>
+                      <p className="font-mono text-2xl font-bold text-strata-white mt-1">
                         ${TACTICAL_PROVISION.depositPrice.toLocaleString()}
-                      </span>
+                      </p>
                     </div>
-                    <p className="text-strata-silver/40 font-mono text-[9px] mt-1">
-                      {TACTICAL_PROVISION.depositPercent}% {t('shop.depositNote')} — {t('shop.balanceDue')}
+                    <div className="text-right">
+                      <span className="font-mono text-[10px] text-strata-silver/50 uppercase">
+                        {TACTICAL_PROVISION.depositPercent}% Deposit
+                      </span>
+                      <p className="font-mono text-[9px] text-strata-silver/40 mt-1">
+                        Balance due on fabrication
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Lead Time */}
+                <div className="flex items-center gap-2 text-strata-silver/60">
+                  <Clock className="w-4 h-4" />
+                  <span className="font-mono text-xs">
+                    Lead Time: {TACTICAL_PROVISION.leadTime}
+                  </span>
+                </div>
+              </div>
+
+              {/* Labs Link for Other Options */}
+              <Link 
+                to="/labs"
+                className="flex items-center justify-between p-4 bg-strata-charcoal/30 border border-strata-steel/30 rounded-lg hover:border-strata-cyan/40 transition-colors group"
+              >
+                <div className="flex items-center gap-3">
+                  <FlaskConical className="w-5 h-5 text-strata-cyan" />
+                  <div>
+                    <p className="font-mono text-sm text-strata-white group-hover:text-strata-cyan transition-colors">
+                      Explore Labs
+                    </p>
+                    <p className="font-mono text-[10px] text-strata-silver/50">
+                      Annual subscriptions, Bonds & experimental gear
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 mt-2 pt-2 border-t border-strata-steel/20">
-                    <Clock className={`w-3 h-3 ${selectedPaymentMode === 'tactical' ? 'text-strata-orange/80' : 'text-strata-silver/40'}`} />
-                    <span className={`font-mono text-[9px] ${selectedPaymentMode === 'tactical' ? 'text-strata-orange/80' : 'text-strata-silver/40'}`}>
-                      {t('shop.leadTimeLabel')}: {TACTICAL_PROVISION.leadTime}
-                    </span>
-                  </div>
-                </button>
-              </div>
+                </div>
+                <ArrowRight className="w-4 h-4 text-strata-silver/40 group-hover:text-strata-cyan group-hover:translate-x-1 transition-all" />
+              </Link>
 
               {/* Selected Terrain */}
               <div className={`p-4 rounded-lg bg-${selectedTerrain.color}/10 border border-${selectedTerrain.color}/30`}>
@@ -871,36 +832,34 @@ const Shop = () => {
                 )}
               </Button>
 
-              {/* CHECKOUT BUTTON */}
+              {/* PRESALE CTA - Clear and focused */}
               <div className="space-y-4">
                 <motion.button
                   onClick={handleInitiateAcquisition}
-                  className="w-full relative overflow-hidden group"
+                  className="w-full relative overflow-hidden group rounded-xl"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                 >
-                  {/* Safety Orange background with warning stripes */}
-                  <div className="absolute inset-0 bg-strata-orange" />
-                  <div className="absolute inset-0 opacity-20" style={{
-                    backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.3) 10px, rgba(0,0,0,0.3) 20px)'
-                  }} />
+                  {/* Safety Orange background */}
+                  <div className="absolute inset-0 bg-strata-orange rounded-xl" />
                   
                   {/* Content */}
-                  <div className="relative py-5 px-6 flex items-center justify-center gap-4">
-                    <AlertTriangle className="w-5 h-5 text-black animate-pulse" />
-                    <span className="text-lg font-mono font-black uppercase tracking-[0.3em] text-black">
-                      {t('acquisition.initiate')}
+                  <div className="relative py-5 px-6 flex flex-col items-center gap-2">
+                    <div className="flex items-center gap-3">
+                      <ShoppingBag className="w-5 h-5 text-black" />
+                      <span className="text-lg font-mono font-black uppercase tracking-wider text-black">
+                        Reserve Presale — ${TACTICAL_PROVISION.depositPrice.toLocaleString()}
+                      </span>
+                    </div>
+                    <span className="font-mono text-[10px] text-black/70 uppercase tracking-widest">
+                      10% Deposit • Secure Manufacturing Slot
                     </span>
-                    <AlertTriangle className="w-5 h-5 text-black animate-pulse" />
                   </div>
                   
                   {/* Hover effect - glow */}
-                  <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
-                  
-                  {/* Border effect */}
-                  <div className="absolute inset-0 border-4 border-black/40" />
+                  <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors rounded-xl" />
                 </motion.button>
               </div>
 
