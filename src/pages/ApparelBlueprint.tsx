@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Box, 
@@ -8,7 +8,8 @@ import {
   ArrowLeft,
   Palette,
   Maximize2,
-  Sparkles
+  Sparkles,
+  AlertTriangle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,20 @@ import {
   STRATA_COLORWAYS,
   STRATA_SIZES
 } from '@/components/apparel';
+
+// Mobile Safari detection for performance optimizations
+const isMobileSafari = () => {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent;
+  return /iPad|iPhone|iPod/.test(ua) && /WebKit/.test(ua) && !/CriOS/.test(ua);
+};
+
+// Detect low memory conditions
+const isLowMemoryDevice = () => {
+  if (typeof navigator === 'undefined') return false;
+  // @ts-ignore - deviceMemory is not standard
+  return navigator.deviceMemory && navigator.deviceMemory < 4;
+};
 
 type TerrainType = 'standard' | 'marine' | 'polar' | 'desert' | 'urban';
 
@@ -39,11 +54,46 @@ export default function ApparelBlueprint() {
   const [selectedPiece, setSelectedPiece] = useState<string | null>(null);
   const [isAROpen, setIsAROpen] = useState(false);
   const [activeTab, setActiveTab] = useState('3d');
+  
+  // Mobile Safari optimizations
+  const isSafariMobile = useMemo(() => isMobileSafari(), []);
+  const isLowMem = useMemo(() => isLowMemoryDevice(), []);
+  const [performanceMode, setPerformanceMode] = useState<'full' | 'optimized'>(
+    isSafariMobile || isLowMem ? 'optimized' : 'full'
+  );
+  const [showPerformanceWarning, setShowPerformanceWarning] = useState(isSafariMobile);
+
+  // Dismiss warning after 5 seconds
+  useEffect(() => {
+    if (showPerformanceWarning) {
+      const timer = setTimeout(() => setShowPerformanceWarning(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showPerformanceWarning]);
 
   const colorway = STRATA_COLORWAYS[selectedTerrain];
 
   return (
     <div className="min-h-screen bg-zinc-950">
+      {/* Mobile Safari Performance Warning */}
+      {showPerformanceWarning && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="fixed top-0 left-0 right-0 z-50 bg-amber-900/90 text-amber-100 px-4 py-2 flex items-center justify-center gap-2 text-sm"
+        >
+          <AlertTriangle className="w-4 h-4" />
+          <span>Performance mode enabled for mobile Safari</span>
+          <button 
+            onClick={() => setShowPerformanceWarning(false)}
+            className="ml-2 underline hover:no-underline"
+          >
+            Dismiss
+          </button>
+        </motion.div>
+      )}
+
       {/* AR Overlay */}
       <ARPreviewOverlay
         terrain={selectedTerrain}

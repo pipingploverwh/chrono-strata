@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Check, Droplets, Wind, Shield, Loader2, Zap, Map, Clock, Activity, Anchor, Snowflake, Sun, Building2, ChevronLeft, ChevronRight, Infinity, Users, Gift, Thermometer, AlertTriangle, ArrowRight, Lock, X, Fingerprint, Package, Sparkles } from "lucide-react";
+import { ShoppingBag, Check, Droplets, Wind, Shield, Loader2, Zap, Map, Clock, Activity, Anchor, Snowflake, Sun, Building2, ChevronLeft, ChevronRight, Infinity, Users, Gift, Thermometer, AlertTriangle, ArrowRight, Lock, X, Fingerprint, Package, Sparkles, Ruler } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +16,7 @@ import { BondVaultReveal } from "@/components/shop/BondVaultReveal";
 import { AcquisitionRitual } from "@/components/shop/AcquisitionRitual";
 import { AddToCartPrompt } from "@/components/shop/AddToCartPrompt";
 import { LearnMoreSection } from "@/components/navigation/LearnMoreSection";
+import { SizingTool } from "@/components/shop/SizingTool";
 
 // Import terrain-specific jacket renders
 import strataShellHUD from "@/assets/strata-shell-hud-jacket.jpg";
@@ -195,6 +196,8 @@ const Shop = () => {
   const [isRitualOpen, setIsRitualOpen] = useState(false);
   const [isPromptOpen, setIsPromptOpen] = useState(false);
   const [dimmedBackground, setDimmedBackground] = useState(false);
+  const [isSizingOpen, setIsSizingOpen] = useState(false);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
   
   // Get the selected terrain with translations
   const selectedTerrain = TERRAIN_VARIANTS.find(v => v.id === selectedTerrainId) || TERRAIN_VARIANTS[0];
@@ -346,8 +349,17 @@ const Shop = () => {
     setIsPromptOpen(false);
   };
 
-  return (
+    return (
     <div className={`min-h-screen bg-strata-black overflow-hidden transition-all duration-500 ${dimmedBackground ? 'brightness-75' : ''}`}>
+      {/* Sizing Tool */}
+      <SizingTool
+        open={isSizingOpen}
+        onOpenChange={setIsSizingOpen}
+        onSizeSelected={(size) => {
+          setSelectedSize(size);
+          toast.success(`Size ${size} selected for your order`);
+        }}
+      />
       {/* Soft Add-to-Cart Prompt */}
       <AddToCartPrompt
         isOpen={isPromptOpen}
@@ -842,6 +854,21 @@ const Shop = () => {
                   </motion.div>
                 ))}
               </div>
+
+              {/* Sizing Tool Button */}
+              <Button
+                variant="outline"
+                onClick={() => setIsSizingOpen(true)}
+                className="w-full border-strata-cyan/30 text-strata-cyan hover:bg-strata-cyan/10"
+              >
+                <Ruler className="w-4 h-4 mr-2" />
+                Find Your Size
+                {selectedSize && (
+                  <Badge className="ml-2 bg-strata-lume/20 text-strata-lume border-0">
+                    {selectedSize}
+                  </Badge>
+                )}
+              </Button>
 
               {/* CHECKOUT BUTTON */}
               <div className="space-y-4">
