@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 import { INVESTOR_DOCUMENTS, RUBIN_PATENTS } from '@/data/investorDocuments';
 import { useDocumentDownload } from '@/hooks/useDocumentDownload';
 import { InvestorContactForm } from '@/components/investor/InvestorContactForm';
+import { SidebarAd, AD_SLOTS } from '@/components/ads';
 
 const content = {
   en: {
@@ -200,7 +201,8 @@ export default function InvestorHub() {
             })}
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div className="flex gap-8">
+            <div className="flex-1 grid lg:grid-cols-2 gap-8">
             {/* Live Platform Links */}
             <div className="glass-card p-6 rounded-xl">
               <div className="mb-6">
@@ -330,6 +332,10 @@ export default function InvestorHub() {
                 </div>
               )}
             </div>
+            </div>
+            
+            {/* Sidebar Ad - High CPM B2B Finance */}
+            <SidebarAd adSlot={AD_SLOTS.INVESTOR_SIDEBAR} />
           </div>
 
           {/* Patent Portfolio Preview */}

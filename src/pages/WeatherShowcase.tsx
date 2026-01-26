@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { GoogleAdSense, AD_SLOTS } from '@/components/ads';
 
 interface Location {
   city: string;
@@ -328,6 +329,18 @@ const WeatherShowcase = () => {
                 </div>
               </div>
             </GlassPanel>
+
+            {/* Weather Page Ad - High Traffic */}
+            <div className="my-6">
+              <div className="text-[9px] text-zinc-600 uppercase tracking-widest mb-2 text-center">
+                Advertisement
+              </div>
+              <GoogleAdSense
+                adSlot={AD_SLOTS.WEATHER_DISPLAY}
+                adFormat="horizontal"
+                className="bg-zinc-900/30 border border-zinc-800 rounded overflow-hidden"
+              />
+            </div>
 
             {/* Industry Links */}
             <section>

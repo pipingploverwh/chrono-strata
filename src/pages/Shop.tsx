@@ -17,6 +17,7 @@ import { AcquisitionRitual } from "@/components/shop/AcquisitionRitual";
 import { AddToCartPrompt } from "@/components/shop/AddToCartPrompt";
 import { LearnMoreSection } from "@/components/navigation/LearnMoreSection";
 import { SizingTool } from "@/components/shop/SizingTool";
+import { InFeedAd, AD_SLOTS } from "@/components/ads";
 
 // Import terrain-specific jacket renders
 import strataShellHUD from "@/assets/strata-shell-hud-jacket.jpg";
