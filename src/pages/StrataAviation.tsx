@@ -92,11 +92,81 @@ const StrataAviation = () => {
     toast.success("Weather briefing updated");
   }, []);
 
-  const handleVoiceBriefing = () => {
-    toast.info("Voice briefing initializing...", { 
-      description: "TTS audio briefing feature in development" 
-    });
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  const handleVoiceBriefing = useCallback(() => {
+    if ('speechSynthesis' in window) {
+      // Cancel any existing speech
+      window.speechSynthesis.cancel();
+      
+      if (isSpeaking) {
+        setIsSpeaking(false);
+        return;
+      }
+
+      const briefingText = generateBriefingText();
+      const utterance = new SpeechSynthesisUtterance(briefingText);
+      utterance.rate = 0.95;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+      
+      // Try to use a professional voice
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Microsoft') || v.name.includes('Samantha'));
+      if (preferredVoice) utterance.voice = preferredVoice;
+
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+        toast.error("Voice briefing failed");
+      };
+
+      window.speechSynthesis.speak(utterance);
+      toast.success("Voice briefing started", { description: `${selectedAirport.icao} weather briefing` });
+    } else {
+      toast.error("Voice synthesis not supported in this browser");
+    }
+  }, [isSpeaking, selectedAirport.icao]);
+
+  // Runway conditions - defined early for use in briefing text
+  const runwayConditions = {
+    runway: "RWY 33L",
+    surface: weather?.current?.condition?.includes("Rain") ? "Wet" : "Dry",
+    braking: weather?.current?.condition?.includes("Rain") ? "Medium" : "Good",
+    crosswind: `${Math.floor((weather?.current?.wind || 0) * 0.7)} kts`,
+    visibility: weather?.current?.condition?.includes("Fog") ? "1 SM" : "10+ SM",
+    ceiling: weather?.current?.condition?.includes("Clear") ? "CLR" : "BKN 4500",
   };
+
+  // Calculate flight rules from weather
+  const getFlightRules = useCallback((): "VFR" | "MVFR" | "IFR" | "LIFR" => {
+    if (!weather?.current) return "VFR";
+    const vis = weather.current.condition?.includes("Fog") ? 1 : 10;
+    if (vis < 1) return "LIFR";
+    if (vis < 3) return "IFR";
+    if (vis < 5) return "MVFR";
+    return "VFR";
+  }, [weather]);
+
+  // Generate voice briefing text from weather data
+  const generateBriefingText = useCallback(() => {
+    const rules = getFlightRules();
+    const temp = weather?.current?.temp || 0;
+    const wind = weather?.current?.wind || 0;
+    const windDir = weather?.current?.windDirection || 'calm';
+    const condition = weather?.current?.condition || 'clear';
+    
+    return `Aviation weather briefing for ${selectedAirport.name}. ` +
+      `Current conditions: ${rules} flight rules. ` +
+      `Temperature ${temp} degrees Celsius. ` +
+      `Winds from ${windDir} at ${wind} knots. ` +
+      `Sky condition ${condition}. ` +
+      `Runway ${runwayConditions.runway.replace('RWY ', '')} is ${runwayConditions.surface} with ${runwayConditions.braking} braking action. ` +
+      `Visibility ${runwayConditions.visibility}. Ceiling ${runwayConditions.ceiling}. ` +
+      `Altimeter setting 30.12. ` +
+      `End of briefing.`;
+  }, [weather, selectedAirport, runwayConditions, getFlightRules]);
 
   // Generate METAR from real weather data
   const generateMetar = useCallback(() => {
@@ -113,16 +183,6 @@ const StrataAviation = () => {
     
     return `${selectedAirport.icao} ${day}${hour}${min}Z ${windDir}${windSpd}KT ${vis} FEW045 BKN250 ${tempC > 0 ? '' : 'M'}${Math.abs(tempC).toString().padStart(2, '0')}/${dewpoint > 0 ? '' : 'M'}${Math.abs(dewpoint).toString().padStart(2, '0')} A3012 RMK AO2`;
   }, [weather, selectedAirport.icao, currentTime]);
-
-  // Calculate flight rules from weather
-  const getFlightRules = useCallback((): "VFR" | "MVFR" | "IFR" | "LIFR" => {
-    if (!weather?.current) return "VFR";
-    const vis = weather.current.condition?.includes("Fog") ? 1 : 10;
-    if (vis < 1) return "LIFR";
-    if (vis < 3) return "IFR";
-    if (vis < 5) return "MVFR";
-    return "VFR";
-  }, [weather]);
 
   // Altitude layers with real-time simulation
   const altitudeLayers: AltitudeLayer[] = [
@@ -151,15 +211,6 @@ const StrataAviation = () => {
       case "LIFR": return "bg-strata-red/20 text-strata-red";
       default: return "bg-strata-silver/20 text-strata-silver";
     }
-  };
-
-  const runwayConditions = {
-    runway: "RWY 33L",
-    surface: weather?.current?.condition?.includes("Rain") ? "Wet" : "Dry",
-    braking: weather?.current?.condition?.includes("Rain") ? "Medium" : "Good",
-    crosswind: `${Math.floor((weather?.current?.wind || 0) * 0.7)} kts`,
-    visibility: weather?.current?.condition?.includes("Fog") ? "1 SM" : "10+ SM",
-    ceiling: weather?.current?.condition?.includes("Clear") ? "CLR" : "BKN 4500",
   };
 
   const flightRules = getFlightRules();
@@ -223,10 +274,10 @@ const StrataAviation = () => {
               variant="outline"
               size="sm"
               onClick={handleVoiceBriefing}
-              className="border-sky-800 text-sky-400 hover:bg-sky-900/30"
+              className={`border-sky-800 hover:bg-sky-900/30 ${isSpeaking ? 'text-strata-lume border-strata-lume/50' : 'text-sky-400'}`}
             >
-              <Volume2 className="w-4 h-4 mr-1" />
-              Voice Briefing
+              <Volume2 className={`w-4 h-4 mr-1 ${isSpeaking ? 'animate-pulse' : ''}`} />
+              {isSpeaking ? 'Stop Briefing' : 'Voice Briefing'}
             </Button>
             <Button
               variant="outline"
