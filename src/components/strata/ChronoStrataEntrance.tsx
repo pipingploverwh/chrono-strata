@@ -278,10 +278,7 @@ const ChronoStrataEntrance = () => {
   );
 
   const handleEnter = () => {
-    if (!hasAccess) {
-      navigate('/strata-gate');
-      return;
-    }
+    // Gate removed - direct access to STRATA world
     setIsTransitioning(true);
     setTimeout(() => {
       const count = localStorage.getItem('strata_location_count') || '7';

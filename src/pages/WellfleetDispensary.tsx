@@ -1,6 +1,5 @@
 import { MapPin, Clock, Phone, Shield, Globe, Leaf, Flower2, Sparkles, Package, Bird } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import AgeGate from "@/components/AgeGate";
 import { useLanguageState } from "@/hooks/useLanguage";
 
 // Product data with translations
@@ -65,8 +64,7 @@ export default function WellfleetDispensary() {
   const featuredStrains = getFeaturedStrains(t);
 
   return (
-    <AgeGate>
-      <div className="min-h-screen bg-plover-sand">
+    <div className="min-h-screen bg-plover-sand">
         {/* Language Toggle - Fixed Position */}
         <div className="fixed top-4 right-4 z-40">
           <Button
@@ -244,6 +242,5 @@ export default function WellfleetDispensary() {
           </div>
         </footer>
       </div>
-    </AgeGate>
   );
 }
