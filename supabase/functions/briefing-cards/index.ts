@@ -1,4 +1,5 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,6 +20,7 @@ interface BriefingCard {
   timestamp: string;
   actionItems?: string[];
   relatedTopics?: string[];
+  ragContext?: boolean; // Flag if RAG-grounded
 }
 
 interface NewsItem {
@@ -26,6 +28,17 @@ interface NewsItem {
   description: string;
   url: string;
   source: string;
+}
+
+interface RagDocument {
+  id: string;
+  title: string;
+  processed_text: string;
+  document_date: string;
+  entity: string;
+  authority: string;
+  source_name: string;
+  similarity: number;
 }
 
 // Fetch real news from multiple topics using Firecrawl
@@ -87,6 +100,86 @@ async function fetchRealNews(apiKey: string): Promise<NewsItem[]> {
   return allNews;
 }
 
+// RAG: Fetch relevant documents for context grounding
+async function fetchRagContext(
+  query: string, 
+  lovableApiKey: string, 
+  supabaseUrl: string, 
+  supabaseKey: string
+): Promise<RagDocument[]> {
+  try {
+    console.log('Fetching RAG context for briefing...');
+    
+    // Generate query embedding
+    const embeddingResponse = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${lovableApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "text-embedding-3-small",
+        input: query.slice(0, 8000),
+      }),
+    });
+
+    if (!embeddingResponse.ok) {
+      console.log('RAG embedding failed, continuing without context');
+      return [];
+    }
+
+    const embeddingData = await embeddingResponse.json();
+    const queryEmbedding = embeddingData.data?.[0]?.embedding;
+
+    if (!queryEmbedding) {
+      return [];
+    }
+
+    // Search documents
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    const { data: documents, error } = await supabase.rpc("search_documents", {
+      query_embedding: queryEmbedding,
+      match_threshold: 0.4,
+      match_count: 5,
+      filter_entity: null,
+      filter_type: null,
+    });
+
+    if (error) {
+      console.error('RAG search error:', error);
+      return [];
+    }
+
+    console.log(`RAG: Found ${documents?.length || 0} relevant documents`);
+    return documents || [];
+  } catch (err) {
+    console.error('RAG context error:', err);
+    return []; // Graceful degradation
+  }
+}
+
+// Format RAG documents for AI context
+function formatRagContext(documents: RagDocument[]): string {
+  if (documents.length === 0) {
+    return "";
+  }
+
+  const formatted = documents
+    .map((doc, i) => `
+[Document ${i + 1}] (Relevance: ${(doc.similarity * 100).toFixed(1)}%)
+Title: ${doc.title}
+Date: ${doc.document_date}
+Authority: ${doc.authority}
+Source: ${doc.source_name || 'Internal'}
+Content: ${doc.processed_text?.slice(0, 1500) || 'No content'}
+---`)
+    .join('\n');
+
+  return `\n=== INTELLIGENCE DOCUMENT CONTEXT ===
+${formatted}
+=== END DOCUMENT CONTEXT ===\n`;
+}
+
 // Format news items for the AI prompt
 function formatNewsContext(newsItems: NewsItem[]): string {
   if (newsItems.length === 0) {
@@ -116,6 +209,10 @@ Deno.serve(async (req) => {
       day: 'numeric' 
     });
 
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
     // Fetch real news if Firecrawl is configured
     let newsItems: NewsItem[] = [];
     const FIRECRAWL_API_KEY = Deno.env.get('FIRECRAWL_API_KEY');
@@ -127,11 +224,24 @@ Deno.serve(async (req) => {
       console.log('FIRECRAWL_API_KEY not configured, skipping live news');
     }
 
+    // RAG: Fetch relevant intelligence documents for context grounding
+    let ragDocuments: RagDocument[] = [];
+    if (LOVABLE_API_KEY && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+      ragDocuments = await fetchRagContext(
+        "current events, market analysis, policy developments, economic trends",
+        LOVABLE_API_KEY,
+        SUPABASE_URL,
+        SUPABASE_SERVICE_ROLE_KEY
+      );
+    }
+
     const newsContext = formatNewsContext(newsItems);
+    const ragContext = formatRagContext(ragDocuments);
 
     const systemPrompt = `You are a presidential briefing assistant creating Morning Brew-style intelligence cards. Today is ${today}. User location: ${location || 'United States'}.
 
 ${newsContext}
+${ragContext}
 
 STYLE GUIDE (Morning Brew inspired):
 - Write like you're texting a smart friend who's short on time
@@ -139,7 +249,8 @@ STYLE GUIDE (Morning Brew inspired):
 - Use conversational language, not corporate speak
 - Include a dash of wit when appropriate
 - Keep it scannable with bullet points
-- Always cite the actual source from the news feed
+- Always cite the actual source from the news feed or document context
+- If using INTELLIGENCE DOCUMENT CONTEXT, set "ragContext": true on that card
 
 Generate exactly 8 briefing cards in this JSON format:
 {
@@ -153,15 +264,16 @@ Generate exactly 8 briefing cards in this JSON format:
       "details": ["Key point 1", "Key point 2", "Key point 3"],
       "sentiment": "positive|neutral|negative|mixed",
       "importance": "high|medium|low",
-      "source": "Publication name from news feed",
+      "source": "Publication name from news feed or document",
       "sourceUrl": "URL from news feed if available",
+      "ragContext": false,
       "actionItems": ["What to watch", "What to do"],
       "relatedTopics": ["Related topic 1", "Related topic 2"]
     }
   ]
 }
 
-REQUIRED CARDS (generate from the LIVE NEWS FEED above):
+REQUIRED CARDS (generate from the LIVE NEWS FEED and INTELLIGENCE DOCUMENTS above):
 1. TOP STORY: The single most important story from the news feed
 2. MARKET PULSE: Stock market and financial news from the feed
 3. TECH & BUSINESS: Major tech or corporate news from the feed
@@ -171,10 +283,8 @@ REQUIRED CARDS (generate from the LIVE NEWS FEED above):
 7. CRYPTO/FINTECH: Digital assets or financial technology news
 8. EDITOR'S PICK: A story that deserves attention but might be missed
 
-IMPORTANT: Base your cards on the ACTUAL news items provided above. Do not invent stories. If a category has no news, note that briefly.`;
+IMPORTANT: Base your cards on the ACTUAL news items and documents provided above. Do not invent stories. If a category has no news, note that briefly.`;
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    
     if (!LOVABLE_API_KEY) {
       console.log('No Lovable API key configured, using fallback cards');
       return new Response(
@@ -183,6 +293,7 @@ IMPORTANT: Base your cards on the ACTUAL news items provided above. Do not inven
           cards: generateFallbackCards(today),
           generatedAt: new Date().toISOString(),
           newsItemsUsed: newsItems.length,
+          ragDocsUsed: ragDocuments.length,
           source: 'fallback',
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -245,7 +356,7 @@ IMPORTANT: Base your cards on the ACTUAL news items provided above. Do not inven
       timestamp: card.timestamp || new Date().toISOString(),
     }));
 
-    console.log(`Generated ${cards.length} briefing cards from ${newsItems.length} news items`);
+    console.log(`Generated ${cards.length} briefing cards from ${newsItems.length} news items + ${ragDocuments.length} RAG docs`);
 
     return new Response(
       JSON.stringify({ 
@@ -253,7 +364,8 @@ IMPORTANT: Base your cards on the ACTUAL news items provided above. Do not inven
         cards,
         generatedAt: new Date().toISOString(),
         newsItemsUsed: newsItems.length,
-        source: newsItems.length > 0 ? 'live' : 'ai-generated',
+        ragDocsUsed: ragDocuments.length,
+        source: newsItems.length > 0 ? 'live' : ragDocuments.length > 0 ? 'rag-grounded' : 'ai-generated',
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

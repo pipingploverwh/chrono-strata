@@ -119,3 +119,9 @@ verify_jwt = false
 
 [functions.briefing-cards]
 verify_jwt = false
+
+[functions.generate-embeddings]
+verify_jwt = false
+
+[functions.rag-search]
+verify_jwt = false
