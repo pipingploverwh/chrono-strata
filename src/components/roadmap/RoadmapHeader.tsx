@@ -36,9 +36,9 @@ export function RoadmapHeader({
               R&D Preview — Roadmap visualization in active development
             </span>
           </div>
-          <Link to="/labs">
+          <Link to="/">
             <Button variant="ghost" size="sm" className="h-7 text-xs gap-1.5">
-              <span>View Labs</span>
+              <span>Back to Home</span>
               <ExternalLink className="w-3 h-3" />
             </Button>
           </Link>

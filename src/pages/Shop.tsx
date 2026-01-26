@@ -726,24 +726,7 @@ const Shop = () => {
                 </div>
               </div>
 
-              {/* Labs Link for Other Options */}
-              <Link 
-                to="/labs"
-                className="flex items-center justify-between p-4 bg-strata-charcoal/30 border border-strata-steel/30 rounded-lg hover:border-strata-cyan/40 transition-colors group"
-              >
-                <div className="flex items-center gap-3">
-                  <FlaskConical className="w-5 h-5 text-strata-cyan" />
-                  <div>
-                    <p className="font-mono text-sm text-strata-white group-hover:text-strata-cyan transition-colors">
-                      Explore Labs
-                    </p>
-                    <p className="font-mono text-[10px] text-strata-silver/50">
-                      Annual subscriptions, Bonds & experimental gear
-                    </p>
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 text-strata-silver/40 group-hover:text-strata-cyan group-hover:translate-x-1 transition-all" />
-              </Link>
+              {/* Labs link removed from public view */}
 
               {/* Selected Terrain */}
               <div className={`p-4 rounded-lg bg-${selectedTerrain.color}/10 border border-${selectedTerrain.color}/30`}>

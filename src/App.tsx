@@ -81,7 +81,7 @@ import HackerNewsPost from "./pages/HackerNewsPost";
 import CEOLetter from "./pages/CEOLetter";
 import BattleCards from "./pages/BattleCards";
 import EventPage from "./pages/EventPage";
-import Labs from "./pages/Labs";
+// Labs removed from public view
 import ApparelBlueprint from "./pages/ApparelBlueprint";
 import ComplianceHub from "./pages/ComplianceHub";
 import PloverAdmin from "./pages/PloverAdmin";
@@ -170,7 +170,7 @@ const App = () => (
                 <Route path="/ceo-letter" element={<CEOLetter />} />
                 <Route path="/battle-cards" element={<BattleCards />} />
                 <Route path="/event" element={<EventPage />} />
-                <Route path="/labs" element={<Labs />} />
+                {/* Labs removed from public view */}
                 <Route path="/apparel-blueprint" element={<ApparelBlueprint />} />
                 <Route path="/thermal-viz" element={<ThermalMusicVisualizer />} />
                 <Route path="/compliance-hub" element={<ComplianceHub />} />

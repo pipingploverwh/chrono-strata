@@ -225,9 +225,9 @@ export default function RoadmapB2B() {
 
       <div className="relative z-10 container mx-auto px-4 py-8 max-w-7xl">
         {/* Back Link */}
-        <Link to="/labs" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
+        <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to Labs</span>
+          <span>Back to Home</span>
         </Link>
 
         {/* Header */}
