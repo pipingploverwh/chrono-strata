@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Progress } from '@/components/ui/progress';
 import {
   Table,
   TableBody,
@@ -32,7 +33,10 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  Eye
+  Eye,
+  FolderUp,
+  FileSpreadsheet,
+  AlertCircle
 } from 'lucide-react';
 import {
   Dialog,
@@ -82,7 +86,15 @@ const RAGDocumentsTab = () => {
   // Processing state
   const [processingId, setProcessingId] = useState<string | null>(null);
   
+  // Bulk import state
+  const [bulkImportMode, setBulkImportMode] = useState<'files' | 'csv' | null>(null);
+  const [bulkFiles, setBulkFiles] = useState<File[]>([]);
+  const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0, status: '' });
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const bulkFileInputRef = useRef<HTMLInputElement>(null);
+  const csvInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchDocuments();
@@ -126,6 +138,253 @@ const RAGDocumentsTab = () => {
     } catch (error) {
       toast.error('Failed to read file');
     }
+  };
+
+  // Bulk file selection handler
+  const handleBulkFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const validFiles = files.filter(f => 
+      f.type.includes('text') || f.name.endsWith('.md') || f.name.endsWith('.txt')
+    );
+    
+    if (validFiles.length !== files.length) {
+      toast.warning(`${files.length - validFiles.length} non-text files were skipped`);
+    }
+    
+    if (validFiles.length > 0) {
+      setBulkFiles(validFiles);
+      setBulkImportMode('files');
+      toast.success(`${validFiles.length} files ready for import`);
+    }
+  };
+
+  // CSV import handler
+  const handleCSVImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const csvText = await file.text();
+      const lines = csvText.split('\n').filter(line => line.trim());
+      
+      if (lines.length < 2) {
+        toast.error('CSV must have a header row and at least one data row');
+        return;
+      }
+
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+      const requiredHeaders = ['title', 'content'];
+      const hasRequired = requiredHeaders.every(h => headers.includes(h));
+      
+      if (!hasRequired) {
+        toast.error('CSV must have "title" and "content" columns');
+        return;
+      }
+
+      // Parse CSV rows into document objects
+      const documents: Array<{
+        title: string;
+        content: string;
+        contentType: string;
+        entity: string;
+        authority: string;
+        sourceName: string;
+        sourceUrl: string;
+      }> = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        if (values.length < headers.length) continue;
+
+        const row: Record<string, string> = {};
+        headers.forEach((h, idx) => {
+          row[h] = values[idx]?.trim() || '';
+        });
+
+        if (row.title && row.content) {
+          documents.push({
+            title: row.title,
+            content: row.content,
+            contentType: row.content_type || row.contenttype || 'briefing',
+            entity: row.entity || 'general',
+            authority: row.authority || 'informational',
+            sourceName: row.source_name || row.sourcename || '',
+            sourceUrl: row.source_url || row.sourceurl || '',
+          });
+        }
+      }
+
+      if (documents.length === 0) {
+        toast.error('No valid documents found in CSV');
+        return;
+      }
+
+      setBulkImportMode('csv');
+      // Store parsed documents for processing
+      await processBulkDocuments(documents);
+      
+    } catch (error) {
+      console.error('CSV parse error:', error);
+      toast.error('Failed to parse CSV file');
+    }
+  };
+
+  // Helper to parse CSV line (handles quoted values)
+  const parseCSVLine = (line: string): string[] => {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        result.push(current);
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    result.push(current);
+    return result;
+  };
+
+  // Process bulk file uploads
+  const processBulkFiles = async () => {
+    if (bulkFiles.length === 0) return;
+    
+    setIsBulkProcessing(true);
+    setBulkProgress({ current: 0, total: bulkFiles.length, status: 'Reading files...' });
+    
+    const documents: Array<{
+      title: string;
+      content: string;
+      contentType: string;
+      entity: string;
+      authority: string;
+      sourceName: string;
+      sourceUrl: string;
+    }> = [];
+
+    // Read all files
+    for (let i = 0; i < bulkFiles.length; i++) {
+      const file = bulkFiles[i];
+      setBulkProgress({ 
+        current: i + 1, 
+        total: bulkFiles.length, 
+        status: `Reading: ${file.name}` 
+      });
+      
+      try {
+        const content = await file.text();
+        documents.push({
+          title: file.name.replace(/\.[^/.]+$/, ''),
+          content,
+          contentType: uploadForm.contentType,
+          entity: uploadForm.entity,
+          authority: uploadForm.authority,
+          sourceName: '',
+          sourceUrl: '',
+        });
+      } catch (err) {
+        console.error(`Failed to read ${file.name}:`, err);
+      }
+    }
+
+    await processBulkDocuments(documents);
+  };
+
+  // Core bulk processing logic
+  const processBulkDocuments = async (documents: Array<{
+    title: string;
+    content: string;
+    contentType: string;
+    entity: string;
+    authority: string;
+    sourceName: string;
+    sourceUrl: string;
+  }>) => {
+    setIsBulkProcessing(true);
+    const total = documents.length;
+    let successCount = 0;
+    let failCount = 0;
+
+    for (let i = 0; i < documents.length; i++) {
+      const doc = documents[i];
+      setBulkProgress({ 
+        current: i + 1, 
+        total, 
+        status: `Uploading: ${doc.title}` 
+      });
+
+      try {
+        // Insert document
+        const { data: docData, error: insertError } = await supabase
+          .from('intelligence_documents')
+          .insert({
+            title: doc.title,
+            processed_text: doc.content,
+            raw_content: doc.content,
+            content_type: doc.contentType,
+            entity: doc.entity,
+            authority: doc.authority,
+            source_name: doc.sourceName || null,
+            source_url: doc.sourceUrl || null,
+            document_date: new Date().toISOString().split('T')[0],
+          })
+          .select()
+          .single();
+
+        if (insertError) throw insertError;
+
+        // Generate embedding
+        setBulkProgress({ 
+          current: i + 1, 
+          total, 
+          status: `Indexing: ${doc.title}` 
+        });
+
+        const { error: embedError } = await supabase.functions.invoke('generate-embeddings', {
+          body: {
+            documentId: docData.id,
+            text: doc.content.slice(0, 30000),
+            storeInDb: true,
+          },
+        });
+
+        if (embedError) {
+          console.warn(`Embedding failed for ${doc.title}:`, embedError);
+        }
+
+        successCount++;
+      } catch (err) {
+        console.error(`Failed to process ${doc.title}:`, err);
+        failCount++;
+      }
+    }
+
+    setIsBulkProcessing(false);
+    setBulkFiles([]);
+    setBulkImportMode(null);
+    setBulkProgress({ current: 0, total: 0, status: '' });
+    
+    if (successCount > 0) {
+      toast.success(`Successfully imported ${successCount} documents`);
+    }
+    if (failCount > 0) {
+      toast.error(`Failed to import ${failCount} documents`);
+    }
+    
+    fetchDocuments();
+  };
+
+  const cancelBulkImport = () => {
+    setBulkFiles([]);
+    setBulkImportMode(null);
+    setBulkProgress({ current: 0, total: 0, status: '' });
+    if (bulkFileInputRef.current) bulkFileInputRef.current.value = '';
+    if (csvInputRef.current) csvInputRef.current.value = '';
   };
 
   const handleSubmitDocument = async () => {
@@ -273,11 +532,116 @@ const RAGDocumentsTab = () => {
         </div>
       </div>
 
+      {/* Bulk Import Section */}
+      <div className="bg-neutral-900 rounded-xl border border-neutral-800 p-6">
+        <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
+          <FolderUp className="w-5 h-5 text-blue-400" />
+          Bulk Import
+        </h2>
+        
+        {isBulkProcessing ? (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
+              <span className="text-sm text-neutral-300">{bulkProgress.status}</span>
+            </div>
+            <Progress 
+              value={(bulkProgress.current / bulkProgress.total) * 100} 
+              className="h-2"
+            />
+            <p className="text-xs text-neutral-500">
+              {bulkProgress.current} of {bulkProgress.total} documents
+            </p>
+          </div>
+        ) : bulkFiles.length > 0 ? (
+          <div className="space-y-4">
+            <div className="bg-neutral-800 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <FileText className="w-4 h-4 text-blue-400" />
+                <span className="text-sm font-medium">{bulkFiles.length} files selected</span>
+              </div>
+              <div className="max-h-32 overflow-y-auto space-y-1">
+                {bulkFiles.slice(0, 10).map((f, i) => (
+                  <p key={i} className="text-xs text-neutral-400 truncate">{f.name}</p>
+                ))}
+                {bulkFiles.length > 10 && (
+                  <p className="text-xs text-neutral-500">...and {bulkFiles.length - 10} more</p>
+                )}
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={processBulkFiles}
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Import All
+              </Button>
+              <Button
+                onClick={cancelBulkImport}
+                variant="outline"
+                className="border-neutral-700 text-neutral-300"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Multiple Files Upload */}
+            <div className="border-2 border-dashed border-neutral-700 rounded-lg p-6 text-center hover:border-blue-500/50 transition-colors">
+              <input
+                ref={bulkFileInputRef}
+                type="file"
+                accept=".txt,.md"
+                multiple
+                onChange={handleBulkFileSelect}
+                className="hidden"
+              />
+              <FolderUp className="w-8 h-8 text-neutral-500 mx-auto mb-2" />
+              <p className="text-sm text-neutral-400 mb-2">Upload multiple files</p>
+              <Button
+                onClick={() => bulkFileInputRef.current?.click()}
+                variant="outline"
+                size="sm"
+                className="border-neutral-700 text-neutral-300"
+              >
+                Select Files
+              </Button>
+            </div>
+            
+            {/* CSV Import */}
+            <div className="border-2 border-dashed border-neutral-700 rounded-lg p-6 text-center hover:border-amber-500/50 transition-colors">
+              <input
+                ref={csvInputRef}
+                type="file"
+                accept=".csv"
+                onChange={handleCSVImport}
+                className="hidden"
+              />
+              <FileSpreadsheet className="w-8 h-8 text-neutral-500 mx-auto mb-2" />
+              <p className="text-sm text-neutral-400 mb-2">Import from CSV</p>
+              <Button
+                onClick={() => csvInputRef.current?.click()}
+                variant="outline"
+                size="sm"
+                className="border-neutral-700 text-neutral-300"
+              >
+                Upload CSV
+              </Button>
+              <p className="text-xs text-neutral-500 mt-2">
+                Required: title, content columns
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Upload Form */}
       <div className="bg-neutral-900 rounded-xl border border-neutral-800 p-6">
         <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
           <Upload className="w-5 h-5 text-emerald-400" />
-          Upload New Document
+          Upload Single Document
         </h2>
         
         <div className="space-y-4">
