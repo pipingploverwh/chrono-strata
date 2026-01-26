@@ -61,27 +61,26 @@ const B2C_PHASES: TimelinePhase[] = [
 const B2C_KANBAN: KanbanColumn[] = [
   {
     id: 'planned',
-    label: 'Next Sprint (Jan 27-30)',
+    label: 'Next Sprint (Jan 31+)',
     icon: Circle,
     items: [
-      { id: 'shop-stripe', title: 'Shop Stripe Checkout', description: 'Complete payment flow testing', priority: 'high', tags: ['commerce', 'next'] },
-      { id: 'mobile-safari', title: 'Mobile Safari Optimization', description: 'Performance fixes for iOS', priority: 'medium', tags: ['performance'] },
-      { id: 'custom-sizing', title: 'Custom Sizing Tool', description: 'AI-powered measurement recommendations', priority: 'medium', tags: ['ai', 'ux'] },
+      { id: 'inventory-sync', title: 'Inventory Sync', description: 'Real-time stock updates', priority: 'medium', tags: ['commerce'] },
     ],
   },
   {
     id: 'in-progress',
     label: 'In Progress',
     icon: Play,
-    items: [
-      { id: 'inventory-sync', title: 'Inventory Sync', description: 'Shop API integration in progress', priority: 'high', tags: ['commerce'] },
-    ],
+    items: [],
   },
   {
     id: 'shipped',
     label: 'Shipped ✓',
     icon: CheckCircle2,
     items: [
+      { id: 'shop-stripe', title: 'Shop Stripe Checkout', description: 'Payment flow complete with all modes', priority: 'high', tags: ['shipped', 'commerce'] },
+      { id: 'custom-sizing', title: 'Custom Sizing Tool', description: 'AI-powered measurement recommendations', priority: 'medium', tags: ['shipped', 'ai'] },
+      { id: 'mobile-safari', title: 'Mobile Safari Optimization', description: 'Performance mode for iOS devices', priority: 'medium', tags: ['shipped', 'performance'] },
       { id: 'strata-desktop', title: 'STRATA Shell 3D Desktop', description: '100% — HUD, pricing, screenshot utility', priority: 'high', tags: ['shipped', 'critical'] },
       { id: 'gates-removed', title: 'Gates Removed', description: 'All access gates removed for testing', priority: 'high', tags: ['shipped'] },
       { id: 'strata-shell', title: 'STRATA Shell Collection', description: 'Premium technical apparel line', priority: 'high', tags: ['flagship'] },
@@ -179,16 +178,16 @@ const B2C_MATRIX: MatrixData = {
 // Dashboard Metrics - Updated Jan 26 Sprint
 const B2C_METRICS = [
   { label: 'Products', value: 5, icon: Package },
-  { label: 'Features Shipped', value: 16, change: '+2 today', trend: 'up' as const, icon: CheckCircle2 },
-  { label: 'Next Sprint', value: 3, change: 'Jan 27-30', trend: 'up' as const, icon: Play },
+  { label: 'Features Shipped', value: 19, change: '+3 today', trend: 'up' as const, icon: CheckCircle2 },
+  { label: 'In Progress', value: 0, change: 'Sprint complete', icon: Play },
   { label: 'Deferred', value: 3, change: 'Q2 2026', icon: Archive },
 ];
 
 const B2C_MILESTONES = [
-  { label: 'STRATA Desktop 100%', date: '✓ Jan 26' },
-  { label: 'Gates Removed', date: '✓ Jan 26' },
-  { label: 'Shop Stripe Testing', date: 'Jan 27' },
-  { label: 'Mobile Safari Fixes', date: 'Jan 28' },
+  { label: 'Shop Stripe Complete', date: '✓ Jan 26' },
+  { label: 'Sizing Tool Shipped', date: '✓ Jan 26' },
+  { label: 'Safari Optimized', date: '✓ Jan 26' },
+  { label: 'Inventory Sync', date: 'Jan 31' },
 ];
 
 type ViewType = 'timeline' | 'kanban' | 'matrix' | 'dashboard';

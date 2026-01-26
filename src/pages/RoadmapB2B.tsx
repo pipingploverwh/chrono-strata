@@ -62,27 +62,26 @@ const B2B_PHASES: TimelinePhase[] = [
 const B2B_KANBAN: KanbanColumn[] = [
   {
     id: 'planned',
-    label: 'Next Sprint (Jan 27-30)',
+    label: 'Next Sprint (Jan 31+)',
     icon: Circle,
     items: [
-      { id: 'compliance-ocr', title: 'Compliance OCR', description: 'AI document processing for permits', priority: 'high', tags: ['critical', 'next'] },
-      { id: 'briefing-tts', title: 'Briefing Cards TTS', description: 'Voice briefing polish and edge cases', priority: 'medium', tags: ['ai', 'next'] },
-      { id: 'sso-saml', title: 'SSO/SAML Integration', description: 'Enterprise authentication protocols', priority: 'medium', tags: ['security'] },
+      { id: 'compliance-audit', title: 'Compliance Audit Logs', description: 'Activity tracking for shipments', priority: 'medium', tags: ['security'] },
     ],
   },
   {
     id: 'in-progress',
     label: 'In Progress',
     icon: Play,
-    items: [
-      { id: 'compliance-audit', title: 'Compliance Audit Logs', description: 'Activity tracking for shipments', priority: 'medium', tags: ['security'] },
-    ],
+    items: [],
   },
   {
     id: 'shipped',
     label: 'Shipped ✓',
     icon: CheckCircle2,
     items: [
+      { id: 'compliance-ocr', title: 'Compliance OCR', description: 'AI document scanning for permits', priority: 'high', tags: ['shipped', 'ai'] },
+      { id: 'briefing-tts', title: 'Briefing Cards TTS', description: 'Voice briefing with auto-advance', priority: 'medium', tags: ['shipped', 'ai'] },
+      { id: 'sso-saml', title: 'SSO/SAML Integration', description: 'Enterprise authentication protocols', priority: 'medium', tags: ['shipped', 'security'] },
       { id: 'aviation-100', title: 'Aviation Command 100%', description: 'Real-time METAR, multi-airport, TTS briefing', priority: 'high', tags: ['shipped', 'beachhead'] },
       { id: 'gates-removed', title: 'Gates Removed', description: 'All access gates removed for testing', priority: 'high', tags: ['shipped'] },
       { id: 'compliance-hub', title: 'Compliance Hub', description: 'Cross-border regulatory workflow', priority: 'high', tags: ['vertical'] },

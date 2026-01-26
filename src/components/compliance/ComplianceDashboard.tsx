@@ -16,14 +16,17 @@ import {
   Filter,
   Download,
   RefreshCw,
-  Plus
+  Plus,
+  Scan
 } from "lucide-react";
 import { ComplianceStats } from "./ComplianceStats";
 import { ShipmentCard } from "./ShipmentCard";
 import { ShipmentDetailsSheet } from "./ShipmentDetailsSheet";
 import { JurisdictionGuide } from "./JurisdictionGuide";
 import { CreateShipmentWizard } from "./CreateShipmentWizard";
+import { DocumentScanner } from "./DocumentScanner";
 import { useComplianceShipments } from "@/hooks/useComplianceData";
+import { toast } from "sonner";
 
 export function ComplianceDashboard() {
   const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
@@ -31,6 +34,14 @@ export function ComplianceDashboard() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [destinationFilter, setDestinationFilter] = useState<string>("all");
   const [createWizardOpen, setCreateWizardOpen] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
+
+  const handleExtractedText = (text: string) => {
+    toast.success('Document text extracted', {
+      description: 'Text copied to clipboard for use in shipment details',
+    });
+    navigator.clipboard.writeText(text);
+  };
 
   const { data: shipments, isLoading, refetch } = useComplianceShipments(
     statusFilter !== "all" || destinationFilter !== "all"
@@ -106,6 +117,15 @@ export function ComplianceDashboard() {
               >
                 <Download className="w-4 h-4 mr-2" />
                 Export CSV
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setScannerOpen(true)}
+                className="border-neutral-700 hover:bg-neutral-800"
+              >
+                <Scan className="w-4 h-4 mr-2" />
+                Scan Document
               </Button>
               <Button 
                 size="sm"
@@ -212,6 +232,13 @@ export function ComplianceDashboard() {
       <CreateShipmentWizard
         open={createWizardOpen}
         onOpenChange={setCreateWizardOpen}
+      />
+
+      {/* Document Scanner */}
+      <DocumentScanner
+        open={scannerOpen}
+        onOpenChange={setScannerOpen}
+        onExtractedText={handleExtractedText}
       />
     </div>
   );
