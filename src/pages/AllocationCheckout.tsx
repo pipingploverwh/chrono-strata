@@ -7,6 +7,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { ExploreEscapeRoutes } from "@/components/navigation/ExploreEscapeRoutes";
 
 const AllocationCheckout = () => {
   const navigate = useNavigate();
@@ -88,9 +90,12 @@ const AllocationCheckout = () => {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 md:px-12 py-16">
+      <main className="max-w-4xl mx-auto px-6 md:px-12 py-8">
+        {/* Breadcrumbs */}
+        <Breadcrumbs />
+
         {/* Title */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 mt-8">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-lavender/10 border border-lavender/20 rounded-full mb-6">
             <Lock className="w-4 h-4 text-lavender" />
             <span className="text-xs tracking-widest uppercase text-lavender">Secure Checkout</span>
@@ -212,6 +217,11 @@ const AllocationCheckout = () => {
               <span>Secured by Stripe</span>
             </div>
           </div>
+        </div>
+
+        {/* Escape Routes */}
+        <div className="mt-12">
+          <ExploreEscapeRoutes variant="banner" />
         </div>
       </main>
     </div>
