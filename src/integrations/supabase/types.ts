@@ -44,6 +44,41 @@ export type Database = {
         }
         Relationships: []
       }
+      burndown_data: {
+        Row: {
+          actual: number | null
+          created_at: string
+          date: string
+          id: string
+          planned: number
+          sprint_id: string
+        }
+        Insert: {
+          actual?: number | null
+          created_at?: string
+          date: string
+          id?: string
+          planned: number
+          sprint_id: string
+        }
+        Update: {
+          actual?: number | null
+          created_at?: string
+          date?: string
+          id?: string
+          planned?: number
+          sprint_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "burndown_data_sprint_id_fkey"
+            columns: ["sprint_id"]
+            isOneToOne: false
+            referencedRelation: "sprints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       compliance_documents: {
         Row: {
           category: string | null
@@ -1005,6 +1040,39 @@ export type Database = {
         }
         Relationships: []
       }
+      sprints: {
+        Row: {
+          created_at: string
+          end_date: string
+          goals: string[] | null
+          id: string
+          name: string
+          phase: Database["public"]["Enums"]["sprint_phase"]
+          start_date: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          end_date: string
+          goals?: string[] | null
+          id?: string
+          name: string
+          phase?: Database["public"]["Enums"]["sprint_phase"]
+          start_date: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string
+          goals?: string[] | null
+          id?: string
+          name?: string
+          phase?: Database["public"]["Enums"]["sprint_phase"]
+          start_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       strata_access: {
         Row: {
           amount_paid: number | null
@@ -1109,6 +1177,74 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_stories: {
+        Row: {
+          acceptance_criteria: string[] | null
+          api_contract: Json | null
+          assignee: string | null
+          created_at: string
+          description: string | null
+          design_thinking_stage:
+            | Database["public"]["Enums"]["design_thinking_stage"]
+            | null
+          epic: string | null
+          id: string
+          points: number
+          priority: Database["public"]["Enums"]["story_priority"]
+          sprint_id: string | null
+          status: Database["public"]["Enums"]["story_status"]
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          acceptance_criteria?: string[] | null
+          api_contract?: Json | null
+          assignee?: string | null
+          created_at?: string
+          description?: string | null
+          design_thinking_stage?:
+            | Database["public"]["Enums"]["design_thinking_stage"]
+            | null
+          epic?: string | null
+          id?: string
+          points?: number
+          priority?: Database["public"]["Enums"]["story_priority"]
+          sprint_id?: string | null
+          status?: Database["public"]["Enums"]["story_status"]
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          acceptance_criteria?: string[] | null
+          api_contract?: Json | null
+          assignee?: string | null
+          created_at?: string
+          description?: string | null
+          design_thinking_stage?:
+            | Database["public"]["Enums"]["design_thinking_stage"]
+            | null
+          epic?: string | null
+          id?: string
+          points?: number
+          priority?: Database["public"]["Enums"]["story_priority"]
+          sprint_id?: string | null
+          status?: Database["public"]["Enums"]["story_status"]
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_stories_sprint_id_fkey"
+            columns: ["sprint_id"]
+            isOneToOne: false
+            referencedRelation: "sprints"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       visa_applications: {
         Row: {
@@ -1435,6 +1571,12 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      design_thinking_stage:
+        | "empathize"
+        | "define"
+        | "ideate"
+        | "prototype"
+        | "test"
       jurisdiction_type:
         | "us_federal"
         | "us_state"
@@ -1454,6 +1596,7 @@ export type Database = {
         | "logistics_engagement"
         | "cross_border_transport"
         | "post_delivery"
+      sprint_phase: "design" | "build" | "review"
       stakeholder_type:
         | "regulator"
         | "legal_counsel"
@@ -1461,6 +1604,14 @@ export type Database = {
         | "clinical"
         | "customs"
         | "lab"
+      story_priority: "ship" | "defer" | "descope"
+      story_status:
+        | "backlog"
+        | "design"
+        | "ready"
+        | "in-progress"
+        | "qa"
+        | "done"
       transaction_status: "Completed" | "Pending" | "Failed"
       transaction_type: "Premium" | "Claim" | "Adjustment" | "Rebate"
     }
@@ -1591,6 +1742,13 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      design_thinking_stage: [
+        "empathize",
+        "define",
+        "ideate",
+        "prototype",
+        "test",
+      ],
       jurisdiction_type: [
         "us_federal",
         "us_state",
@@ -1613,6 +1771,7 @@ export const Constants = {
         "cross_border_transport",
         "post_delivery",
       ],
+      sprint_phase: ["design", "build", "review"],
       stakeholder_type: [
         "regulator",
         "legal_counsel",
@@ -1621,6 +1780,8 @@ export const Constants = {
         "customs",
         "lab",
       ],
+      story_priority: ["ship", "defer", "descope"],
+      story_status: ["backlog", "design", "ready", "in-progress", "qa", "done"],
       transaction_status: ["Completed", "Pending", "Failed"],
       transaction_type: ["Premium", "Claim", "Adjustment", "Rebate"],
     },
