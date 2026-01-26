@@ -15,6 +15,7 @@ import { HUDGlitchOverlay } from "@/components/shop/HUDGlitchOverlay";
 import { BondVaultReveal } from "@/components/shop/BondVaultReveal";
 import { AcquisitionRitual } from "@/components/shop/AcquisitionRitual";
 import { AddToCartPrompt } from "@/components/shop/AddToCartPrompt";
+import { LearnMoreSection } from "@/components/navigation/LearnMoreSection";
 
 // Import terrain-specific jacket renders
 import strataShellHUD from "@/assets/strata-shell-hud-jacket.jpg";
@@ -928,6 +929,19 @@ const Shop = () => {
             </div>
           </Link>
         </motion.div>
+
+        {/* Learn More Section */}
+        <div className="mt-16">
+          <LearnMoreSection 
+            title="Continue Exploring"
+            variant="compact"
+            links={[
+              { label: "About LAVANDAR", href: "/about", description: "Our mission and values" },
+              { label: "All Features", href: "/features", description: "Platform capabilities" },
+              { label: "Back to Home", href: "/", description: "Return to homepage" },
+            ]}
+          />
+        </div>
 
         {/* Footer */}
         <motion.footer 
