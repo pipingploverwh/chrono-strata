@@ -530,6 +530,57 @@ export type Database = {
         }
         Relationships: []
       }
+      intelligence_documents: {
+        Row: {
+          authority: string | null
+          content_type: string
+          created_at: string | null
+          document_date: string | null
+          embedding: string | null
+          entity: string | null
+          id: string
+          metadata: Json | null
+          processed_text: string | null
+          raw_content: string | null
+          source_name: string | null
+          source_url: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          authority?: string | null
+          content_type?: string
+          created_at?: string | null
+          document_date?: string | null
+          embedding?: string | null
+          entity?: string | null
+          id?: string
+          metadata?: Json | null
+          processed_text?: string | null
+          raw_content?: string | null
+          source_name?: string | null
+          source_url?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          authority?: string | null
+          content_type?: string
+          created_at?: string | null
+          document_date?: string | null
+          embedding?: string | null
+          entity?: string | null
+          id?: string
+          metadata?: Json | null
+          processed_text?: string | null
+          raw_content?: string | null
+          source_name?: string | null
+          source_url?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       investor_contacts: {
         Row: {
           created_at: string | null
@@ -1360,6 +1411,26 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      search_documents: {
+        Args: {
+          filter_entity?: string
+          filter_type?: string
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          authority: string
+          document_date: string
+          entity: string
+          id: string
+          processed_text: string
+          similarity: number
+          source_name: string
+          source_url: string
+          title: string
+        }[]
       }
     }
     Enums: {
