@@ -290,6 +290,8 @@ export function Apparel3DViewer({
   });
   
   const [showHUD, setShowHUD] = useState(true);
+  const [screenshotCount, setScreenshotCount] = useState(0);
+  const [savedConfigs, setSavedConfigs] = useState<string[]>([]);
 
   const handlePieceClick = (pieceId: string) => {
     const newSelected = viewerState.selectedPiece === pieceId ? null : pieceId;
@@ -312,7 +314,15 @@ export function Apparel3DViewer({
   const handleScreenshot = () => {
     if (canvasRef.current) {
       const dataUrl = canvasRef.current.toDataURL('image/png');
+      setScreenshotCount(prev => prev + 1);
+      setSavedConfigs(prev => [...prev.slice(-4), dataUrl]);
       onScreenshot?.(dataUrl);
+      
+      // Auto-download screenshot
+      const link = document.createElement('a');
+      link.download = `strata-shell-${terrain}-${Date.now()}.png`;
+      link.href = dataUrl;
+      link.click();
     }
   };
 
@@ -469,11 +479,11 @@ export function Apparel3DViewer({
             <Button
               variant="outline"
               size="sm"
-              className="h-8 border-zinc-700 text-zinc-400"
+              className="h-8 border-zinc-700 text-zinc-400 hover:text-white hover:border-lavender-500"
               onClick={handleScreenshot}
             >
               <Camera className="w-4 h-4 mr-1" />
-              Capture
+              Capture {screenshotCount > 0 && `(${screenshotCount})`}
             </Button>
           </div>
 
