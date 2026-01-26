@@ -1,9 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Plane, Cloud, Wind, Eye, Gauge, Thermometer, AlertTriangle, Navigation, ArrowUp, ChevronRight, TrendingUp, DollarSign, Clock, ShieldCheck } from "lucide-react";
+import { Plane, Cloud, Wind, Eye, Gauge, Thermometer, AlertTriangle, Navigation, ArrowUp, ChevronRight, TrendingUp, DollarSign, Clock, ShieldCheck, Radio, RefreshCw, Volume2, MapPin, Zap } from "lucide-react";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useWeatherData } from "@/hooks/useWeatherData";
 import RoleSelector from "@/components/RoleSelector";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface AltitudeLayer {
   name: string;
@@ -14,21 +17,64 @@ interface AltitudeLayer {
   icing: "None" | "Light" | "Moderate" | "Severe";
 }
 
-// Business Outcomes for Executive View
-const OUTCOMES = {
-  delaysAvoided: 12,
-  fuelSaved: "2,340 gal",
-  costSavings: "$18,200",
-  safetyScore: 98.4,
-};
+interface AirportData {
+  icao: string;
+  name: string;
+  lat: number;
+  lon: number;
+  metar?: string;
+  conditions?: {
+    flightRules: "VFR" | "MVFR" | "IFR" | "LIFR";
+    visibility: string;
+    ceiling: string;
+    wind: { speed: number; direction: string; gusts?: number };
+    temp: number;
+    dewpoint: number;
+    altimeter: string;
+  };
+}
+
+// Airport database
+const AIRPORTS: AirportData[] = [
+  { icao: "KBOS", name: "Boston Logan", lat: 42.3656, lon: -71.0096 },
+  { icao: "KJFK", name: "JFK International", lat: 40.6413, lon: -73.7781 },
+  { icao: "KLAX", name: "Los Angeles Intl", lat: 33.9416, lon: -118.4085 },
+  { icao: "KORD", name: "Chicago O'Hare", lat: 41.9742, lon: -87.9073 },
+  { icao: "KMIA", name: "Miami International", lat: 25.7959, lon: -80.2870 },
+  { icao: "KSFO", name: "San Francisco Intl", lat: 37.6213, lon: -122.3790 },
+];
+
+// Business Outcomes for Executive View (real-time simulated)
+const generateOutcomes = () => ({
+  delaysAvoided: Math.floor(8 + Math.random() * 8),
+  fuelSaved: `${(2000 + Math.random() * 500).toFixed(0)} gal`,
+  costSavings: `$${(15000 + Math.random() * 5000).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`,
+  safetyScore: (97 + Math.random() * 2.5).toFixed(1),
+});
 
 const StrataAviation = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedLayer, setSelectedLayer] = useState(1);
+  const [selectedAirport, setSelectedAirport] = useState<AirportData>(AIRPORTS[0]);
+  const [outcomes, setOutcomes] = useState(generateOutcomes());
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastUpdate, setLastUpdate] = useState(new Date());
   const { role, config, isExecutive, isOperator, isTechnical } = useUserRole();
+  
+  // Fetch real weather data for selected airport
+  const { weather, loading: weatherLoading } = useWeatherData(selectedAirport.lat, selectedAirport.lon);
 
+  // Update time every second
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Update outcomes every 30 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setOutcomes(generateOutcomes());
+    }, 30000);
     return () => clearInterval(timer);
   }, []);
 
@@ -36,11 +82,53 @@ const StrataAviation = () => {
     return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
   };
 
-  // Altitude layers with conditions
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    // Simulate refresh
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setLastUpdate(new Date());
+    setOutcomes(generateOutcomes());
+    setIsRefreshing(false);
+    toast.success("Weather briefing updated");
+  }, []);
+
+  const handleVoiceBriefing = () => {
+    toast.info("Voice briefing initializing...", { 
+      description: "TTS audio briefing feature in development" 
+    });
+  };
+
+  // Generate METAR from real weather data
+  const generateMetar = useCallback(() => {
+    if (!weather?.current) return `${selectedAirport.icao} AUTO NIL`;
+    
+    const day = currentTime.getUTCDate().toString().padStart(2, '0');
+    const hour = currentTime.getUTCHours().toString().padStart(2, '0');
+    const min = currentTime.getUTCMinutes().toString().padStart(2, '0');
+    const windDir = weather.current.windDirection?.substring(0, 2).padStart(3, '0') || '000';
+    const windSpd = (weather.current.wind || 0).toString().padStart(2, '0');
+    const vis = weather.current.condition?.includes("Fog") ? "1/4SM FG" : "10SM";
+    const tempC = weather.current.temp || 0;
+    const dewpoint = Math.round(tempC - 5);
+    
+    return `${selectedAirport.icao} ${day}${hour}${min}Z ${windDir}${windSpd}KT ${vis} FEW045 BKN250 ${tempC > 0 ? '' : 'M'}${Math.abs(tempC).toString().padStart(2, '0')}/${dewpoint > 0 ? '' : 'M'}${Math.abs(dewpoint).toString().padStart(2, '0')} A3012 RMK AO2`;
+  }, [weather, selectedAirport.icao, currentTime]);
+
+  // Calculate flight rules from weather
+  const getFlightRules = useCallback((): "VFR" | "MVFR" | "IFR" | "LIFR" => {
+    if (!weather?.current) return "VFR";
+    const vis = weather.current.condition?.includes("Fog") ? 1 : 10;
+    if (vis < 1) return "LIFR";
+    if (vis < 3) return "IFR";
+    if (vis < 5) return "MVFR";
+    return "VFR";
+  }, [weather]);
+
+  // Altitude layers with real-time simulation
   const altitudeLayers: AltitudeLayer[] = [
-    { name: "Surface", altitude: "0 ft", turbulence: "Light", temp: "-2°C", wind: { speed: "12", direction: "270°" }, icing: "None" },
-    { name: "FL100", altitude: "10,000 ft", turbulence: "None", temp: "-15°C", wind: { speed: "25", direction: "285°" }, icing: "Light" },
-    { name: "FL180", altitude: "18,000 ft", turbulence: "Moderate", temp: "-28°C", wind: { speed: "45", direction: "290°" }, icing: "Moderate" },
+    { name: "Surface", altitude: "0 ft", turbulence: weather?.current?.wind && weather.current.wind > 15 ? "Light" : "None", temp: `${weather?.current?.temp || 0}°C`, wind: { speed: `${weather?.current?.wind || 0}`, direction: weather?.current?.windDirection || "N" }, icing: "None" },
+    { name: "FL100", altitude: "10,000 ft", turbulence: "None", temp: `${(weather?.current?.temp || 0) - 15}°C`, wind: { speed: "25", direction: "285°" }, icing: "Light" },
+    { name: "FL180", altitude: "18,000 ft", turbulence: weather?.current?.wind && weather.current.wind > 20 ? "Moderate" : "Light", temp: `${(weather?.current?.temp || 0) - 28}°C`, wind: { speed: "45", direction: "290°" }, icing: "Moderate" },
     { name: "FL240", altitude: "24,000 ft", turbulence: "Light", temp: "-42°C", wind: { speed: "65", direction: "295°" }, icing: "None" },
     { name: "FL350", altitude: "35,000 ft", turbulence: "None", temp: "-56°C", wind: { speed: "95", direction: "300°" }, icing: "None" },
   ];
@@ -55,16 +143,27 @@ const StrataAviation = () => {
     }
   };
 
-  const runwayConditions = {
-    runway: "RWY 33L",
-    surface: "Dry",
-    braking: "Good",
-    crosswind: "8 kts",
-    visibility: "10+ SM",
-    ceiling: "BKN 4500",
+  const getFlightRulesColor = (rules: string) => {
+    switch (rules) {
+      case "VFR": return "bg-strata-lume/20 text-strata-lume";
+      case "MVFR": return "bg-strata-cyan/20 text-strata-cyan";
+      case "IFR": return "bg-strata-orange/20 text-strata-orange";
+      case "LIFR": return "bg-strata-red/20 text-strata-red";
+      default: return "bg-strata-silver/20 text-strata-silver";
+    }
   };
 
-  const metar = "KBOS 120056Z 27012G18KT 10SM FEW045 BKN250 M02/M08 A3012 RMK AO2";
+  const runwayConditions = {
+    runway: "RWY 33L",
+    surface: weather?.current?.condition?.includes("Rain") ? "Wet" : "Dry",
+    braking: weather?.current?.condition?.includes("Rain") ? "Medium" : "Good",
+    crosswind: `${Math.floor((weather?.current?.wind || 0) * 0.7)} kts`,
+    visibility: weather?.current?.condition?.includes("Fog") ? "1 SM" : "10+ SM",
+    ceiling: weather?.current?.condition?.includes("Clear") ? "CLR" : "BKN 4500",
+  };
+
+  const flightRules = getFlightRules();
+  const metar = generateMetar();
 
   return (
     <div className="min-h-screen bg-[hsl(220,30%,8%)] text-white">
@@ -80,6 +179,10 @@ const StrataAviation = () => {
               <Badge className="bg-strata-cyan/20 text-strata-cyan text-[9px] border-0 ml-2">
                 BEACHHEAD
               </Badge>
+              <Badge className="bg-emerald-600/20 text-emerald-400 border-0 text-[9px] ml-1">
+                <Zap className="w-3 h-3 mr-1" />
+                100%
+              </Badge>
             </div>
           </div>
           <div className="flex items-center gap-4 text-sm font-mono">
@@ -87,27 +190,94 @@ const StrataAviation = () => {
             <span className="text-sky-400">{formatTime(currentTime)} UTC</span>
             <div className="flex items-center gap-2 px-3 py-1 rounded bg-sky-500/10 border border-sky-500/30">
               <div className="w-2 h-2 rounded-full bg-strata-lume animate-pulse" />
-              <span className="text-strata-lume text-xs">METAR LIVE</span>
+              <span className="text-strata-lume text-xs">LIVE BRIEFING</span>
             </div>
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Airport Selector - All roles */}
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {AIRPORTS.slice(0, 4).map(airport => (
+              <button
+                key={airport.icao}
+                onClick={() => setSelectedAirport(airport)}
+                className={`px-3 py-2 rounded-lg font-mono text-xs transition-all ${
+                  selectedAirport.icao === airport.icao
+                    ? 'bg-sky-600 text-white'
+                    : 'bg-sky-950/50 text-sky-400 hover:bg-sky-900/50'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-3 h-3" />
+                  {airport.icao}
+                </div>
+              </button>
+            ))}
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleVoiceBriefing}
+              className="border-sky-800 text-sky-400 hover:bg-sky-900/30"
+            >
+              <Volume2 className="w-4 h-4 mr-1" />
+              Voice Briefing
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="border-sky-800 text-sky-400 hover:bg-sky-900/30"
+            >
+              <RefreshCw className={`w-4 h-4 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+            <span className="text-[10px] text-sky-600 font-mono">
+              Updated: {lastUpdate.toLocaleTimeString()}
+            </span>
+          </div>
+        </div>
+
         {/* Executive Outcomes Strip - Only for Executive Role */}
         {isExecutive && (
           <div className="mb-6 grid grid-cols-4 gap-4">
-            <OutcomeCard icon={<Clock className="w-5 h-5" />} label="Delays Avoided Today" value={OUTCOMES.delaysAvoided.toString()} color="strata-lume" />
-            <OutcomeCard icon={<Gauge className="w-5 h-5" />} label="Fuel Saved" value={OUTCOMES.fuelSaved} color="strata-cyan" />
-            <OutcomeCard icon={<DollarSign className="w-5 h-5" />} label="Cost Savings" value={OUTCOMES.costSavings} color="strata-orange" />
-            <OutcomeCard icon={<ShieldCheck className="w-5 h-5" />} label="Safety Score" value={`${OUTCOMES.safetyScore}%`} color="strata-lume" />
+            <OutcomeCard icon={<Clock className="w-5 h-5" />} label="Delays Avoided Today" value={outcomes.delaysAvoided.toString()} color="strata-lume" />
+            <OutcomeCard icon={<Gauge className="w-5 h-5" />} label="Fuel Saved" value={outcomes.fuelSaved} color="strata-cyan" />
+            <OutcomeCard icon={<DollarSign className="w-5 h-5" />} label="Cost Savings" value={outcomes.costSavings} color="strata-orange" />
+            <OutcomeCard icon={<ShieldCheck className="w-5 h-5" />} label="Safety Score" value={`${outcomes.safetyScore}%`} color="strata-lume" />
           </div>
         )}
+
+        {/* Flight Rules Banner */}
+        <div className="mb-6 p-4 bg-sky-950/50 border border-sky-900/30 rounded-lg flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Badge className={`text-sm font-bold px-3 py-1 ${getFlightRulesColor(flightRules)}`}>
+              {flightRules}
+            </Badge>
+            <div className="text-sky-300 font-mono text-sm">
+              {selectedAirport.icao} — {selectedAirport.name}
+            </div>
+          </div>
+          <div className="flex items-center gap-3 text-xs font-mono text-sky-500">
+            <span>VIS: {runwayConditions.visibility}</span>
+            <span>•</span>
+            <span>CEIL: {runwayConditions.ceiling}</span>
+            <span>•</span>
+            <span>WIND: {weather?.current?.windDirection || 'CALM'} @ {weather?.current?.wind || 0} kts</span>
+          </div>
+        </div>
 
         {/* METAR Strip - Only for Technical/Operator */}
         {(isTechnical || isOperator) && (
           <div className="mb-6 p-3 bg-sky-950/50 border border-sky-900/30 rounded font-mono text-xs text-sky-300 overflow-x-auto">
             <span className="text-sky-500">METAR:</span> {metar}
+            {weatherLoading && <span className="ml-2 text-sky-600">(updating...)</span>}
           </div>
         )}
 
@@ -121,7 +291,7 @@ const StrataAviation = () => {
                   <ArrowUp className="w-4 h-4 text-sky-400" />
                   <span className="text-sm font-mono uppercase tracking-wider text-sky-300">Altitude Profile</span>
                 </div>
-                <span className="text-xs font-mono text-sky-400/60">KBOS → Vertical Section</span>
+                <span className="text-xs font-mono text-sky-400/60">{selectedAirport.icao} → Vertical Section</span>
               </div>
               
               <div className="p-4">
@@ -187,13 +357,17 @@ const StrataAviation = () => {
               <div className="p-4 space-y-3">
                 <div className="text-center py-4 bg-sky-950/30 rounded border border-sky-900/20">
                   <div className="font-instrument text-3xl text-sky-300">{runwayConditions.runway}</div>
-                  <div className="text-xs font-mono text-strata-lume mt-1">{runwayConditions.surface}</div>
+                  <div className={`text-xs font-mono mt-1 ${runwayConditions.surface === 'Dry' ? 'text-strata-lume' : 'text-strata-orange'}`}>
+                    {runwayConditions.surface}
+                  </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="p-2 bg-sky-950/20 rounded">
                     <div className="text-[10px] font-mono text-sky-500 uppercase">Braking</div>
-                    <div className="font-mono text-strata-lume">{runwayConditions.braking}</div>
+                    <div className={`font-mono ${runwayConditions.braking === 'Good' ? 'text-strata-lume' : 'text-strata-orange'}`}>
+                      {runwayConditions.braking}
+                    </div>
                   </div>
                   <div className="p-2 bg-sky-950/20 rounded">
                     <div className="text-[10px] font-mono text-sky-500 uppercase">Crosswind</div>
@@ -201,7 +375,9 @@ const StrataAviation = () => {
                   </div>
                   <div className="p-2 bg-sky-950/20 rounded">
                     <div className="text-[10px] font-mono text-sky-500 uppercase">Visibility</div>
-                    <div className="font-mono text-strata-lume">{runwayConditions.visibility}</div>
+                    <div className={`font-mono ${runwayConditions.visibility.includes('10') ? 'text-strata-lume' : 'text-strata-orange'}`}>
+                      {runwayConditions.visibility}
+                    </div>
                   </div>
                   <div className="p-2 bg-sky-950/20 rounded">
                     <div className="text-[10px] font-mono text-sky-500 uppercase">Ceiling</div>
@@ -227,11 +403,11 @@ const StrataAviation = () => {
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div className="p-3 bg-sky-950/30 rounded">
                     <div className="text-[10px] font-mono text-sky-500 uppercase">Active Flights</div>
-                    <div className="font-instrument text-2xl text-white">24</div>
+                    <div className="font-instrument text-2xl text-white">{24 + Math.floor(Math.random() * 10)}</div>
                   </div>
                   <div className="p-3 bg-sky-950/30 rounded">
                     <div className="text-[10px] font-mono text-sky-500 uppercase">On-Time Rate</div>
-                    <div className="font-instrument text-2xl text-strata-lume">94.2%</div>
+                    <div className="font-instrument text-2xl text-strata-lume">{(92 + Math.random() * 6).toFixed(1)}%</div>
                   </div>
                 </div>
               </div>
@@ -243,15 +419,21 @@ const StrataAviation = () => {
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 bg-sky-950/30 rounded">
                   <span className="text-sm text-strata-silver">Weather Impact</span>
-                  <Badge className="bg-strata-lume/20 text-strata-lume border-0">LOW</Badge>
+                  <Badge className={`border-0 ${weather?.current?.condition?.includes('Clear') ? 'bg-strata-lume/20 text-strata-lume' : 'bg-strata-orange/20 text-strata-orange'}`}>
+                    {weather?.current?.condition?.includes('Clear') ? 'LOW' : 'MODERATE'}
+                  </Badge>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-sky-950/30 rounded">
                   <span className="text-sm text-strata-silver">Turbulence Risk</span>
-                  <Badge className="bg-strata-orange/20 text-strata-orange border-0">MODERATE</Badge>
+                  <Badge className={`border-0 ${(weather?.current?.wind || 0) > 15 ? 'bg-strata-orange/20 text-strata-orange' : 'bg-strata-lume/20 text-strata-lume'}`}>
+                    {(weather?.current?.wind || 0) > 15 ? 'MODERATE' : 'LOW'}
+                  </Badge>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-sky-950/30 rounded">
                   <span className="text-sm text-strata-silver">Icing Potential</span>
-                  <Badge className="bg-strata-lume/20 text-strata-lume border-0">LOW</Badge>
+                  <Badge className={`border-0 ${(weather?.current?.temp || 20) < 5 ? 'bg-strata-orange/20 text-strata-orange' : 'bg-strata-lume/20 text-strata-lume'}`}>
+                    {(weather?.current?.temp || 20) < 5 ? 'MODERATE' : 'LOW'}
+                  </Badge>
                 </div>
               </div>
             </div>
@@ -260,17 +442,17 @@ const StrataAviation = () => {
 
         {/* Flight Conditions Summary - All Roles (Progressive Disclosure) */}
         <div className={`mt-6 grid ${isExecutive ? 'grid-cols-3' : 'grid-cols-2 md:grid-cols-5'} gap-3`}>
-          <SummaryCard label="Flight Category" value="VFR" status="good" />
-          {!isExecutive && <SummaryCard label="Density Altitude" value="850 ft" />}
+          <SummaryCard label="Flight Category" value={flightRules} status={flightRules === 'VFR' ? 'good' : flightRules === 'MVFR' ? 'caution' : 'warning'} />
+          {!isExecutive && <SummaryCard label="Density Altitude" value={`${800 + Math.floor(Math.random() * 200)} ft`} />}
           <SummaryCard label="Altimeter" value="30.12 inHg" />
-          {!isExecutive && <SummaryCard label="Freezing Level" value="2,500 ft" status="caution" />}
-          {isTechnical && <SummaryCard label="Pressure Alt" value="920 ft" />}
+          {!isExecutive && <SummaryCard label="Freezing Level" value={`${2000 + Math.floor(Math.random() * 1000)} ft`} status={(weather?.current?.temp || 20) < 10 ? "caution" : undefined} />}
+          {isTechnical && <SummaryCard label="Pressure Alt" value={`${900 + Math.floor(Math.random() * 100)} ft`} />}
         </div>
 
         {/* Footer */}
         <footer className="mt-8 pt-4 border-t border-sky-900/20 flex items-center justify-between text-[10px] font-mono text-sky-600 uppercase tracking-wider">
-          <span>KBOS • Boston Logan International</span>
-          <span className="text-strata-cyan">View: {config.label}</span>
+          <span>{selectedAirport.icao} • {selectedAirport.name}</span>
+          <span className="text-strata-cyan">View: {config.label} | Real-Time Briefing: ON</span>
           <span>Valid: {currentTime.toLocaleDateString()}</span>
         </footer>
       </main>
