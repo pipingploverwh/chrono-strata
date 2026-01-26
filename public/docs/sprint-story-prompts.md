@@ -4,6 +4,51 @@ Implementation-ready prompts for each user story in the current sprint. Copy-pas
 
 ---
 
+## 🗄️ DATABASE PERSISTENCE (New!)
+
+### Sprint Dashboard Database Integration
+**Priority:** SHIP | **Database tables created**
+
+```
+Connect the Sprint Dashboard to Supabase for persistent data storage:
+
+1. Database Schema (Already Created)
+Tables: sprints, user_stories, burndown_data
+- sprints: id, name, phase, start_date, end_date, goals[]
+- user_stories: id, sprint_id, title, description, acceptance_criteria[], status, priority, points, assignee, epic, tags[], design_thinking_stage, api_contract (JSONB)
+- burndown_data: id, sprint_id, date, planned, actual
+
+2. Create Sprint Hook (src/hooks/useSprints.ts)
+- Fetch active sprint with stories and burndown
+- CRUD operations for stories (admin only)
+- Real-time subscription for story updates
+- Optimistic updates for drag-and-drop
+
+3. Update SprintBoard Component
+- Replace static CURRENT_SPRINT data with useSprints hook
+- Add drag-and-drop to update story status
+- Show loading/error states
+- Sync changes to database on drop
+
+4. Update SprintHeader Component
+- Calculate metrics from live data
+- Show sprint progress from burndown_data
+
+5. Seed Initial Data
+- Create "Jan 31 Launch Sprint" record
+- Import existing stories from types.ts
+- Generate burndown data points
+
+RLS: Public read, admin-only write. Use has_role() function for admin checks.
+
+Integration points:
+- Import { supabase } from "@/integrations/supabase/client"
+- Use useQuery/useMutation from @tanstack/react-query
+- Add toast notifications for save success/failure
+```
+
+---
+
 ## ✅ SHIPPED Stories (Reference Only)
 
 ### Story 1: Aviation Command - Real-time Weather Briefing
