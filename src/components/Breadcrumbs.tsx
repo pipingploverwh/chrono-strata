@@ -60,8 +60,7 @@ const routeLabels: Record<string, string> = {
   "/battle-cards": "Battle Cards",
   "/links": "Shareable Links",
   
-  // Labs & Development
-  "/labs": "Development Labs",
+  // Development (Labs removed from public view)
   "/roadmap/b2c": "B2C Roadmap",
   "/roadmap/b2b": "B2B Roadmap",
   "/validation-report": "Validation Report",

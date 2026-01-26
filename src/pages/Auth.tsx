@@ -162,11 +162,10 @@ const Auth = () => {
             </span>
           </div>
           <Link 
-            to="/labs" 
+            to="/" 
             className="flex items-center gap-2 text-xs font-mono text-strata-silver hover:text-strata-orange transition-colors"
           >
-            <Beaker className="w-3 h-3" />
-            <span>View in Labs</span>
+            <span>Back to Home</span>
           </Link>
         </div>
       </motion.div>

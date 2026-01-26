@@ -162,16 +162,8 @@ const navItems: NavItem[] = [
   isPublic: true,
   roles: ["operator", "technical", "executive"]
 },
-// Labs - Sandboxed R&D
-{
-  path: "/labs",
-  label: "Labs",
-  description: "R&D Sandbox • Experimental Features",
-  icon: Beaker,
-  category: "labs",
-  isPublic: true,
-  roles: ["technical"] // Only technical users see R&D sandbox
-}];
+// Labs removed from public navigation
+];
 
 // Precision Corner Accent component
 const PrecisionCornerAccent = ({

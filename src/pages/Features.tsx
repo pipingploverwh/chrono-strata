@@ -209,8 +209,8 @@ const Features = () => {
         title="Continue Exploring"
         links={[
           { label: "About LAVANDAR", href: "/about", description: "Our mission and values" },
-          { label: "Development Labs", href: "/labs", description: "Experimental features and R&D" },
           { label: "Executive Summary", href: "/exec", description: "Platform overview for stakeholders" },
+          { label: "Product Roadmap", href: "/roadmap/b2c", description: "Upcoming features and releases" },
         ]}
       />
 
