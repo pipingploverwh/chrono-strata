@@ -59,8 +59,9 @@ const Footer = () => {
     { path: "/ai", label: "AI Showcase" },
   ];
 
-  // Development links (Labs removed from public view)
+  // Development links
   const labsLinks = [
+    { path: "/sprint", label: "Sprint Dashboard" },
     { path: "/roadmap/b2c", label: "B2C Roadmap" },
     { path: "/roadmap/b2b", label: "B2B Roadmap" },
     { path: "/beena", label: "Beena Analysis" },

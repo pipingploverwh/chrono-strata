@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { LucideIcon, ArrowLeft, Beaker, ExternalLink } from 'lucide-react';
+import { LucideIcon, ArrowLeft, Beaker, ExternalLink, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -36,12 +36,20 @@ export function RoadmapHeader({
               R&D Preview — Roadmap visualization in active development
             </span>
           </div>
-          <Link to="/">
-            <Button variant="ghost" size="sm" className="h-7 text-xs gap-1.5">
-              <span>Back to Home</span>
-              <ExternalLink className="w-3 h-3" />
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link to="/sprint">
+              <Button variant="default" size="sm" className="h-7 text-xs gap-1.5">
+                <Zap className="w-3 h-3" />
+                <span>Sprint Board</span>
+              </Button>
+            </Link>
+            <Link to="/">
+              <Button variant="ghost" size="sm" className="h-7 text-xs gap-1.5">
+                <span>Back to Home</span>
+                <ExternalLink className="w-3 h-3" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </motion.div>
 
