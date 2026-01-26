@@ -30,6 +30,7 @@ import {
 } from '@/components/roadmap';
 
 // Timeline Phases
+// Timeline Phases - Updated with RR3 Ship/Defer/Descope decisions
 const B2B_PHASES: TimelinePhase[] = [
   {
     id: 'mvp',
@@ -39,14 +40,14 @@ const B2B_PHASES: TimelinePhase[] = [
   },
   {
     id: 'expansion',
-    label: 'Q1 2026 — Vertical Expansion',
-    description: 'Marine and compliance modules, MeetingFlow recording hub, briefing intelligence',
+    label: 'Q1 2026 — Ship Sprint',
+    description: 'Aviation Command 100%, Compliance OCR, Briefing Cards. Marine DEFERRED.',
     status: 'active',
   },
   {
     id: 'integration',
     label: 'Q2 2026 — Enterprise Integration',
-    description: 'SSO/SAML, Odoo sync, API marketplace, white-label licensing',
+    description: 'SSO/SAML, Odoo sync, API marketplace, Marine Command',
     status: 'planned',
   },
   {
@@ -57,28 +58,28 @@ const B2B_PHASES: TimelinePhase[] = [
   },
 ];
 
-// Kanban Data
+// Kanban Data - Updated with RR3 decisions
 const B2B_KANBAN: KanbanColumn[] = [
   {
     id: 'planned',
-    label: 'Planned',
+    label: 'Planned (Q2+)',
     icon: Circle,
     items: [
       { id: 'api-marketplace', title: 'API Marketplace', description: 'Self-service integration platform for partners', priority: 'high', tags: ['platform'] },
       { id: 'white-label', title: 'White-Label Licensing', description: 'Reseller and OEM partnership program', priority: 'medium', tags: ['revenue'] },
       { id: 'predictive-ai', title: 'Predictive Analytics', description: 'ML-powered forecasting for operations', priority: 'high', tags: ['ai'] },
-      { id: 'auto-compliance', title: 'Auto-Compliance', description: 'Automated regulatory filing and alerts', priority: 'medium', tags: ['compliance'] },
+      { id: 'marine-command', title: 'Marine Command', description: 'DEFERRED — Lower priority than Aviation', priority: 'medium', tags: ['deferred'] },
     ],
   },
   {
     id: 'in-progress',
-    label: 'In Progress',
+    label: 'Ship Sprint (Jan 27-30)',
     icon: Play,
     items: [
-      { id: 'sso-saml', title: 'SSO/SAML Integration', description: 'Enterprise authentication protocols', priority: 'high', tags: ['security', 'enterprise'] },
-      { id: 'odoo-sync', title: 'Odoo ERP Sync', description: 'Bidirectional inventory and order sync', priority: 'high', tags: ['integration'] },
-      { id: 'economic-forecast', title: 'Economic Forecast', description: 'AI-powered market predictions dashboard', priority: 'medium', tags: ['ai', 'analytics'] },
-      { id: 'briefing-tts', title: 'Briefing TTS', description: 'Text-to-speech for executive summaries', priority: 'low', tags: ['ai'] },
+      { id: 'aviation-100', title: 'Aviation Command 100%', description: 'Real-time weather briefing, multi-airport', priority: 'high', tags: ['critical', 'beachhead'] },
+      { id: 'compliance-ocr', title: 'Compliance OCR', description: 'AI document processing for permits', priority: 'high', tags: ['critical'] },
+      { id: 'briefing-cards', title: 'Briefing Cards TTS', description: 'Voice briefing for executives', priority: 'medium', tags: ['ai'] },
+      { id: 'sso-saml', title: 'SSO/SAML Integration', description: 'Enterprise authentication protocols', priority: 'medium', tags: ['security'] },
     ],
   },
   {
@@ -87,7 +88,6 @@ const B2B_KANBAN: KanbanColumn[] = [
     icon: CheckCircle2,
     items: [
       { id: 'aviation-command', title: 'Aviation Command', description: 'METAR/weather ops with role-based views', priority: 'high', tags: ['beachhead'] },
-      { id: 'marine-command', title: 'Marine Command', description: 'NOAA marine forecasts integration', priority: 'high', tags: ['vertical'] },
       { id: 'compliance-hub', title: 'Compliance Hub', description: 'Cross-border regulatory workflow', priority: 'high', tags: ['vertical'] },
       { id: 'meetingflow', title: 'MeetingFlow', description: 'Meeting recording and prompt generation', priority: 'medium', tags: ['productivity'] },
       { id: 'briefing-cards', title: 'Briefing Cards', description: 'AI-synthesized executive intelligence', priority: 'medium', tags: ['ai', 'analytics'] },
@@ -96,10 +96,12 @@ const B2B_KANBAN: KanbanColumn[] = [
   },
   {
     id: 'archived',
-    label: 'Archived',
+    label: 'Descoped/Deferred',
     icon: Archive,
     items: [
-      { id: 'sports-betting', title: 'Sports Predictions', description: 'NFL predictions module — deprioritized', priority: 'low', tags: ['r&d'] },
+      { id: 'meetingflow-ai', title: 'MeetingFlow AI', description: 'DEFERRED — Internal tool, lower priority', priority: 'low', tags: ['deferred'] },
+      { id: 'compliance-permits', title: 'Compliance Permits', description: 'DEFERRED — Complex, post-MVP', priority: 'low', tags: ['deferred'] },
+      { id: 'sports-betting', title: 'Sports Predictions', description: 'DESCOPED — NFL module deprioritized', priority: 'low', tags: ['descoped'] },
     ],
   },
 ];
@@ -195,19 +197,19 @@ const B2B_MATRIX: MatrixData = {
   },
 };
 
-// Dashboard Metrics
+// Dashboard Metrics - Updated post-RR3
 const B2B_METRICS = [
-  { label: 'Verticals', value: 6, icon: Building2 },
-  { label: 'Features Shipped', value: 18, change: '+5 this quarter', trend: 'up' as const, icon: CheckCircle2 },
-  { label: 'In Progress', value: 4, icon: Play },
-  { label: 'Enterprise Pilots', value: 3, change: '+1 pending', trend: 'up' as const, icon: Building2 },
+  { label: 'Verticals', value: 4, change: 'Active focus', icon: Building2 },
+  { label: 'Features Shipped', value: 20, change: '+6 this sprint', trend: 'up' as const, icon: CheckCircle2 },
+  { label: 'Ship Sprint', value: 4, change: 'Jan 27-30', trend: 'up' as const, icon: Play },
+  { label: 'Enterprise Pilots', value: 3, change: 'Aviation focus', trend: 'up' as const, icon: Building2 },
 ];
 
 const B2B_MILESTONES = [
-  { label: 'SSO/SAML General Availability', date: 'Feb 2026' },
-  { label: 'Odoo Integration Complete', date: 'Feb 2026' },
-  { label: 'API Marketplace Beta', date: 'Q2 2026' },
-  { label: 'White-Label Program Launch', date: 'Q3 2026' },
+  { label: 'Aviation Command 100%', date: 'Jan 28' },
+  { label: 'Compliance OCR Complete', date: 'Jan 29' },
+  { label: 'Briefing TTS Launch', date: 'Jan 30' },
+  { label: 'Marine Command Launch', date: 'Q2 2026' },
 ];
 
 type ViewType = 'timeline' | 'kanban' | 'matrix' | 'dashboard';
