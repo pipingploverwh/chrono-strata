@@ -8,7 +8,10 @@ import {
   Sparkles, 
   ArrowLeft, 
   AlertTriangle,
-  ExternalLink 
+  ExternalLink,
+  ShoppingBag,
+  Building2,
+  Map,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -16,13 +19,31 @@ interface LabProject {
   id: string;
   name: string;
   description: string;
-  classification: 'brand-signal' | 'r-and-d' | 'deprecated';
+  classification: 'brand-signal' | 'r-and-d' | 'deprecated' | 'roadmap';
   icon: React.ComponentType<{ className?: string }>;
   path: string;
   status: 'active' | 'experimental' | 'archived';
 }
 
 const LAB_PROJECTS: LabProject[] = [
+  {
+    id: 'roadmap-b2c',
+    name: 'Consumer Roadmap (B2C)',
+    description: 'Product roadmap for STRATA Shell, Kids Kit, APEX-1, Thermal, and Shop',
+    classification: 'roadmap',
+    icon: ShoppingBag,
+    path: '/roadmap/b2c',
+    status: 'active',
+  },
+  {
+    id: 'roadmap-b2b',
+    name: 'Enterprise Roadmap (B2B)',
+    description: 'Product roadmap for Aviation, Marine, Compliance, MeetingFlow, and Briefing',
+    classification: 'roadmap',
+    icon: Building2,
+    path: '/roadmap/b2b',
+    status: 'active',
+  },
   {
     id: 'aal-auth',
     name: 'AAL Geometric Authentication',
@@ -88,6 +109,12 @@ const CLASSIFICATION_STYLES = {
     border: 'border-strata-steel/30',
     text: 'text-strata-silver',
     label: 'Deprecated',
+  },
+  'roadmap': {
+    bg: 'bg-emerald-500/10',
+    border: 'border-emerald-500/30',
+    text: 'text-emerald-500',
+    label: 'Roadmap',
   },
 };
 
