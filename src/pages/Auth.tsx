@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Sparkles, Shield, Building2, ArrowLeft, Command } from 'lucide-react';
+import { Mail, Sparkles, Shield, Building2, ArrowLeft, Command, Beaker, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useEnhancedAuth, AuthMethod } from '@/hooks/useEnhancedAuth';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,6 +11,7 @@ import { EmailPasswordForm } from '@/components/auth/EmailPasswordForm';
 import { MagicLinkForm } from '@/components/auth/MagicLinkForm';
 import { GoogleAuthButton } from '@/components/auth/GoogleAuthButton';
 import { SSOForm } from '@/components/auth/SSOForm';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 const AUTH_METHODS: Array<{
@@ -147,8 +148,31 @@ const Auth = () => {
     <div className="min-h-screen relative overflow-hidden">
       <AALGeometricBackground />
       
+      {/* R&D Labs Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="fixed top-0 left-0 right-0 z-50 bg-strata-orange/10 border-b border-strata-orange/30 backdrop-blur-sm"
+      >
+        <div className="container mx-auto px-4 py-2 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="w-4 h-4 text-strata-orange" />
+            <span className="text-xs font-mono text-strata-orange uppercase tracking-wider">
+              R&D Feature — Authentication is currently inactive
+            </span>
+          </div>
+          <Link 
+            to="/labs" 
+            className="flex items-center gap-2 text-xs font-mono text-strata-silver hover:text-strata-orange transition-colors"
+          >
+            <Beaker className="w-3 h-3" />
+            <span>View in Labs</span>
+          </Link>
+        </div>
+      </motion.div>
+      
       {/* Content */}
-      <div className="relative z-10 min-h-screen flex flex-col lg:flex-row">
+      <div className="relative z-10 min-h-screen flex flex-col lg:flex-row pt-12">
         {/* Left Panel - Branding */}
         <div className="lg:w-1/2 p-8 lg:p-16 flex flex-col justify-between">
           <div>
