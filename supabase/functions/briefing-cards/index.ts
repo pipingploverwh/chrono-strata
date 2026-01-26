@@ -101,16 +101,19 @@ async function fetchRealNews(apiKey: string): Promise<NewsItem[]> {
 }
 
 // RAG: Fetch relevant documents for context grounding
+// Supports both semantic search (with embeddings) and keyword fallback
 async function fetchRagContext(
   query: string, 
   lovableApiKey: string, 
   supabaseUrl: string, 
   supabaseKey: string
 ): Promise<RagDocument[]> {
+  const supabase = createClient(supabaseUrl, supabaseKey);
+  
   try {
     console.log('Fetching RAG context for briefing...');
     
-    // Generate query embedding
+    // Try semantic search first with embeddings
     const embeddingResponse = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
       method: "POST",
       headers: {
@@ -123,35 +126,58 @@ async function fetchRagContext(
       }),
     });
 
-    if (!embeddingResponse.ok) {
-      console.log('RAG embedding failed, continuing without context');
+    if (embeddingResponse.ok) {
+      const embeddingData = await embeddingResponse.json();
+      const queryEmbedding = embeddingData.data?.[0]?.embedding;
+
+      if (queryEmbedding) {
+        const { data: documents, error } = await supabase.rpc("search_documents", {
+          query_embedding: queryEmbedding,
+          match_threshold: 0.4,
+          match_count: 8,
+          filter_entity: null,
+          filter_type: null,
+        });
+
+        if (!error && documents?.length > 0) {
+          console.log(`RAG (semantic): Found ${documents.length} relevant documents`);
+          return documents;
+        }
+      }
+    } else {
+      console.log('Embedding API unavailable, falling back to keyword search');
+    }
+    
+    // Fallback: Fetch recent documents directly (keyword/recency-based)
+    console.log('Using recency-based document retrieval...');
+    const { data: recentDocs, error: recentError } = await supabase
+      .from('intelligence_documents')
+      .select('id, title, processed_text, document_date, entity, authority, source_name, source_url')
+      .not('processed_text', 'is', null)
+      .order('document_date', { ascending: false })
+      .limit(10);
+
+    if (recentError) {
+      console.error('Recent docs fetch error:', recentError);
       return [];
     }
 
-    const embeddingData = await embeddingResponse.json();
-    const queryEmbedding = embeddingData.data?.[0]?.embedding;
+    // Filter for relevant content (simple keyword matching)
+    const keywords = ['market', 'policy', 'tech', 'ai', 'economy', 'funding', 'fintech', 'startup', 'business'];
+    const relevantDocs = (recentDocs || [])
+      .filter(doc => {
+        const text = (doc.processed_text || '').toLowerCase();
+        const title = (doc.title || '').toLowerCase();
+        return keywords.some(kw => text.includes(kw) || title.includes(kw));
+      })
+      .slice(0, 6)
+      .map(doc => ({
+        ...doc,
+        similarity: 0.6, // Placeholder for keyword matches
+      }));
 
-    if (!queryEmbedding) {
-      return [];
-    }
-
-    // Search documents
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    const { data: documents, error } = await supabase.rpc("search_documents", {
-      query_embedding: queryEmbedding,
-      match_threshold: 0.4,
-      match_count: 5,
-      filter_entity: null,
-      filter_type: null,
-    });
-
-    if (error) {
-      console.error('RAG search error:', error);
-      return [];
-    }
-
-    console.log(`RAG: Found ${documents?.length || 0} relevant documents`);
-    return documents || [];
+    console.log(`RAG (keyword): Found ${relevantDocs.length} relevant documents`);
+    return relevantDocs as RagDocument[];
   } catch (err) {
     console.error('RAG context error:', err);
     return []; // Graceful degradation
@@ -320,14 +346,19 @@ IMPORTANT: Base your cards on the ACTUAL news items and documents provided above
     if (!response.ok) {
       const error = await response.text();
       console.error('AI API error:', error);
+      
+      // Generate cards from real data when AI is unavailable
+      const realDataCards = generateCardsFromRealData(newsItems, ragDocuments, today);
+      
       return new Response(
         JSON.stringify({ 
           success: true, 
-          cards: generateFallbackCards(today),
+          cards: realDataCards.length > 0 ? realDataCards : generateFallbackCards(today),
           generatedAt: new Date().toISOString(),
           newsItemsUsed: newsItems.length,
-          source: 'fallback',
-          note: 'Using cached briefing data',
+          ragDocsUsed: ragDocuments.length,
+          source: realDataCards.length > 0 ? 'real-data-fallback' : 'static-fallback',
+          note: 'AI temporarily unavailable - using indexed data',
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -383,6 +414,124 @@ IMPORTANT: Base your cards on the ACTUAL news items and documents provided above
     );
   }
 });
+
+// Generate cards from real indexed data when AI is unavailable
+function generateCardsFromRealData(
+  newsItems: NewsItem[], 
+  ragDocuments: RagDocument[], 
+  date: string
+): BriefingCard[] {
+  const cards: BriefingCard[] = [];
+  const now = new Date().toISOString();
+  
+  // Categorize news items by keyword matching
+  const categoryKeywords = {
+    business: ['stock', 'market', 'earnings', 'ceo', 'company', 'revenue', 'profit', 'startup', 'funding'],
+    policy: ['policy', 'regulation', 'government', 'fed', 'congress', 'tariff', 'tax', 'law'],
+    current_events: ['breaking', 'crisis', 'election', 'war', 'disaster', 'climate'],
+    question: ['crypto', 'bitcoin', 'ethereum', 'blockchain', 'defi', 'nft'],
+  };
+
+  function categorize(text: string): BriefingCard['category'] {
+    const lowerText = text.toLowerCase();
+    for (const [category, keywords] of Object.entries(categoryKeywords)) {
+      if (keywords.some(kw => lowerText.includes(kw))) {
+        return category as BriefingCard['category'];
+      }
+    }
+    return 'current_events';
+  }
+
+  function extractSentiment(text: string): BriefingCard['sentiment'] {
+    const lowerText = text.toLowerCase();
+    const positiveWords = ['surge', 'rally', 'growth', 'record', 'success', 'boost', 'gain'];
+    const negativeWords = ['crash', 'decline', 'fall', 'crisis', 'risk', 'concern', 'drop'];
+    
+    const hasPositive = positiveWords.some(w => lowerText.includes(w));
+    const hasNegative = negativeWords.some(w => lowerText.includes(w));
+    
+    if (hasPositive && hasNegative) return 'mixed';
+    if (hasPositive) return 'positive';
+    if (hasNegative) return 'negative';
+    return 'neutral';
+  }
+
+  // Create cards from news items
+  const usedUrls = new Set<string>();
+  for (const news of newsItems.slice(0, 5)) {
+    if (usedUrls.has(news.url)) continue;
+    usedUrls.add(news.url);
+    
+    const title = news.title.length > 40 ? news.title.slice(0, 40) + '...' : news.title;
+    const cleanTitle = news.title.split(' ').slice(0, 3).join(' ');
+    
+    cards.push({
+      id: `news-${cards.length}-${Date.now()}`,
+      category: categorize(news.title + ' ' + news.description),
+      title: cleanTitle,
+      headline: title,
+      summary: news.description || `Breaking news from ${news.source}. Click through for full coverage.`,
+      details: [
+        `Source: ${news.source}`,
+        `Today's top story in this category`,
+        'Real-time intelligence'
+      ],
+      sentiment: extractSentiment(news.title + ' ' + news.description),
+      importance: cards.length < 2 ? 'high' : 'medium',
+      source: news.source,
+      sourceUrl: news.url,
+      timestamp: now,
+      ragContext: false,
+    });
+  }
+
+  // Create cards from RAG documents
+  for (const doc of ragDocuments.slice(0, 3)) {
+    if (!doc.processed_text || doc.processed_text.length < 100) continue;
+    
+    // Clean the text - remove markdown links, images, and other artifacts
+    const cleanText = (doc.processed_text || '')
+      .replace(/\[.*?\]\(.*?\)/g, '') // Remove markdown links
+      .replace(/!\[.*?\]\(.*?\)/g, '') // Remove images
+      .replace(/https?:\/\/[^\s]+/g, '') // Remove URLs
+      .replace(/\n+/g, ' ') // Normalize newlines
+      .replace(/\s+/g, ' ') // Normalize spaces
+      .trim();
+    
+    // Extract first meaningful sentence (min 50 chars, doesn't start with common noise)
+    const sentences = cleanText
+      .split(/[.!?]/)
+      .map(s => s.trim())
+      .filter(s => s.length > 50 && !s.toLowerCase().startsWith('skip to') && !s.toLowerCase().startsWith('we use'))
+      .slice(0, 3);
+    
+    if (sentences.length === 0) continue;
+    
+    const summary = sentences[0] || doc.title;
+    const details = sentences.slice(1, 3).filter(Boolean);
+    
+    cards.push({
+      id: `rag-${cards.length}-${Date.now()}`,
+      category: categorize(doc.title + ' ' + cleanText.slice(0, 500)),
+      title: doc.title.split(' ').slice(0, 3).join(' '),
+      headline: doc.title.length > 60 ? doc.title.slice(0, 60) + '...' : doc.title,
+      summary: summary.slice(0, 250),
+      details: details.length > 0 ? details.map(d => d.slice(0, 120)) : [
+        `From: ${doc.source_name || 'Intelligence Archive'}`,
+        `Authority: ${doc.authority || 'Informational'}`,
+        `Date: ${doc.document_date || 'Recent'}`
+      ],
+      sentiment: extractSentiment(doc.title + ' ' + summary),
+      importance: (doc.similarity || 0.6) > 0.7 ? 'high' : 'medium',
+      source: doc.source_name || 'Intelligence Archive',
+      timestamp: now,
+      ragContext: true,
+    });
+  }
+
+  console.log(`Generated ${cards.length} cards from ${newsItems.length} news + ${ragDocuments.length} RAG docs`);
+  return cards;
+}
 
 function generateFallbackCards(date: string): BriefingCard[] {
   return [
