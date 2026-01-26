@@ -149,6 +149,13 @@ Generate a complete Red Team analysis following the JSON schema exactly. Be spec
         );
       }
       
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: 'AI credits exhausted. The analysis requires AI processing which is temporarily unavailable. Please try again later.' }),
+          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
       throw new Error(`AI Gateway error: ${response.status}`);
     }
 
