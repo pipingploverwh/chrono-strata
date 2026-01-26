@@ -95,6 +95,7 @@ import BriefingCards from "./pages/BriefingCards";
 import BriefingBookmarks from "./pages/BriefingBookmarks";
 import RoadmapB2C from "./pages/RoadmapB2C";
 import RoadmapB2B from "./pages/RoadmapB2B";
+import SprintDashboard from "./pages/SprintDashboard";
 import About from "./pages/About";
 import Features from "./pages/Features";
 const queryClient = new QueryClient();
@@ -185,6 +186,7 @@ const App = () => (
                 <Route path="/briefing/bookmarks" element={<BriefingBookmarks />} />
                 <Route path="/roadmap/b2c" element={<RoadmapB2C />} />
                 <Route path="/roadmap/b2b" element={<RoadmapB2B />} />
+                <Route path="/sprint" element={<SprintDashboard />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/features" element={<Features />} />
                 
