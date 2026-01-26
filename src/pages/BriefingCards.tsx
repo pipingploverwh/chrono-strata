@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import { 
   Compass, RefreshCw, Play, Pause, Bookmark, 
-  Layers, FileText, Activity
+  FileText, Activity, Mic, Loader2, Layers
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +17,14 @@ import {
 import { MarketAlertBadge } from "@/components/briefing/MarketAlertBadge";
 import { BriefingCardStack } from "@/components/briefing/BriefingCardStack";
 import type { BriefingCard } from "@/components/briefing/BriefingCardStack";
+import { useBriefingTTS, VOICE_OPTIONS, type VoiceId } from "@/hooks/useBriefingTTS";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface MarketIndex {
   symbol: string;
@@ -47,11 +55,6 @@ const BriefingCards = () => {
   const [marketAlerts, setMarketAlerts] = useState<MarketAlerts>({ critical: 0, warning: 0 });
   const [isMarketLoading, setIsMarketLoading] = useState(true);
   
-  // TTS state
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [speakingCardId, setSpeakingCardId] = useState<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  
   // Auto modes
   const [autoReadEnabled, setAutoReadEnabled] = useState(false);
   const [autoAdvanceEnabled, setAutoAdvanceEnabled] = useState(false);
@@ -61,6 +64,24 @@ const BriefingCards = () => {
   // Bookmarks
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const sessionId = useRef(`session-${Date.now()}`);
+  
+  // TTS hook with auto-advance callback
+  const handlePlaybackEnd = useCallback(() => {
+    if (autoAdvanceRef.current) {
+      setCurrentIndex((prev) => {
+        const nextIdx = prev + 1;
+        if (nextIdx >= cards.length) {
+          setAutoAdvanceEnabled(false);
+          autoAdvanceRef.current = false;
+          toast.success('Briefing complete');
+          return prev;
+        }
+        return nextIdx;
+      });
+    }
+  }, [cards.length]);
+  
+  const tts = useBriefingTTS({ onPlaybackEnd: handlePlaybackEnd });
 
   // Fetch bookmarks
   const fetchBookmarks = useCallback(async () => {
@@ -163,95 +184,22 @@ const BriefingCards = () => {
     setIsMarketLoading(false);
   }, []);
 
-  // Text-to-speech
-  const speakCard = useCallback(async (card: BriefingCard, isAutoRead = false): Promise<void> => {
-    if (speakingCardId === card.id && isSpeaking && !isAutoRead) {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-      setIsSpeaking(false);
-      setSpeakingCardId(null);
-      return;
-    }
-
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-
-    const textToSpeak = `
+  // Generate TTS text from card
+  const getCardText = useCallback((card: BriefingCard) => {
+    return `
       ${card.category.replace('_', ' ')} briefing. ${card.importance} priority.
       ${card.title}. ${card.headline}.
       ${card.summary}
       ${card.details?.slice(0, 3).join('. ')}.
       ${card.actionItems && card.actionItems.length > 0 ? `Action items: ${card.actionItems.slice(0, 2).join('. ')}` : ''}
     `.trim();
+  }, []);
 
-    setIsSpeaking(true);
-    setSpeakingCardId(card.id);
-
-    return new Promise(async (resolve, reject) => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/briefing-tts`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-            },
-            body: JSON.stringify({ text: textToSpeak }),
-          }
-        );
-
-        if (!response.ok) throw new Error('TTS request failed');
-
-        const audioBlob = await response.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-        
-        const audio = new Audio(audioUrl);
-        audioRef.current = audio;
-        
-        audio.onended = () => {
-          setIsSpeaking(false);
-          setSpeakingCardId(null);
-          URL.revokeObjectURL(audioUrl);
-          
-          if (autoAdvanceRef.current) {
-            setCurrentIndex((prev) => {
-              const nextIdx = prev + 1;
-              if (nextIdx >= cards.length) {
-                setAutoAdvanceEnabled(false);
-                autoAdvanceRef.current = false;
-                toast.success('Briefing complete');
-                return prev;
-              }
-              return nextIdx;
-            });
-          }
-          
-          resolve();
-        };
-
-        audio.onerror = () => {
-          setIsSpeaking(false);
-          setSpeakingCardId(null);
-          toast.error('Failed to play audio');
-          reject(new Error('Audio playback failed'));
-        };
-
-        await audio.play();
-      } catch (error) {
-        console.error('TTS error:', error);
-        setIsSpeaking(false);
-        setSpeakingCardId(null);
-        toast.error('Voice synthesis unavailable');
-        reject(error);
-      }
-    });
-  }, [speakingCardId, isSpeaking, cards.length]);
+  // Speak a card using the TTS hook
+  const speakCard = useCallback(async (card: BriefingCard, isAutoRead = false) => {
+    const text = getCardText(card);
+    await tts.speak(card.id, text, isAutoRead);
+  }, [tts, getCardText]);
 
   // Sync refs
   useEffect(() => {
@@ -277,19 +225,14 @@ const BriefingCards = () => {
   const toggleAutoRead = useCallback(() => {
     setAutoReadEnabled(prev => {
       const newState = !prev;
-      if (!newState && audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-        setIsSpeaking(false);
-        setSpeakingCardId(null);
-      }
       if (!newState) {
+        tts.stop();
         setAutoAdvanceEnabled(false);
       }
       toast.success(newState ? 'Auto-read enabled' : 'Auto-read disabled');
       return newState;
     });
-  }, []);
+  }, [tts]);
 
   const toggleAutoAdvance = useCallback(() => {
     setAutoAdvanceEnabled(prev => {
@@ -297,23 +240,18 @@ const BriefingCards = () => {
       if (newState) {
         setAutoReadEnabled(true);
         toast.success('Continuous mode enabled');
-        if (cards[currentIndex] && !isSpeaking) {
+        if (cards[currentIndex] && !tts.isSpeaking) {
           setTimeout(() => {
             speakCard(cards[currentIndex], true);
           }, 400);
         }
       } else {
-        if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current = null;
-          setIsSpeaking(false);
-          setSpeakingCardId(null);
-        }
+        tts.stop();
         toast.success('Continuous mode disabled');
       }
       return newState;
     });
-  }, [cards, currentIndex, isSpeaking, speakCard]);
+  }, [cards, currentIndex, tts, speakCard]);
 
   // Initial fetch
   useEffect(() => {
@@ -324,14 +262,12 @@ const BriefingCards = () => {
     return () => clearInterval(marketInterval);
   }, [fetchBriefing, fetchMarketData, fetchBookmarks]);
 
-  // Cleanup audio
+  // Cleanup audio on unmount
   useEffect(() => {
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
+      tts.stop();
     };
-  }, []);
+  }, [tts]);
 
   // Navigation
   const nextCard = () => setCurrentIndex((prev) => (prev + 1) % cards.length);
@@ -359,7 +295,7 @@ const BriefingCards = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [cards.length, currentIndex, speakCard, toggleAutoRead, toggleAutoAdvance]);
+  }, [cards, currentIndex, speakCard, toggleAutoRead, toggleAutoAdvance]);
 
   return (
     <div className="min-h-screen bg-zinc-950 relative overflow-hidden">
@@ -461,6 +397,36 @@ const BriefingCards = () => {
               <kbd className="hidden sm:inline text-[9px] px-1 py-0.5 rounded bg-white/[0.05] text-zinc-600 ml-1">C</kbd>
             </motion.button>
 
+            {/* Voice Selector */}
+            <div className="flex items-center gap-2">
+              <Mic className="w-3.5 h-3.5 text-zinc-600" />
+              <Select
+                value={tts.selectedVoice}
+                onValueChange={(value) => tts.setSelectedVoice(value as VoiceId)}
+              >
+                <SelectTrigger className="h-8 w-[140px] text-xs bg-white/[0.02] border-white/[0.06] text-zinc-400">
+                  <SelectValue placeholder="Voice" />
+                </SelectTrigger>
+                <SelectContent className="bg-zinc-900 border-white/[0.1]">
+                  {VOICE_OPTIONS.map((voice) => (
+                    <SelectItem 
+                      key={voice.id} 
+                      value={voice.id}
+                      className="text-xs text-zinc-300 focus:bg-white/[0.05]"
+                    >
+                      <div className="flex flex-col">
+                        <span>{voice.name}</span>
+                        <span className="text-[10px] text-zinc-600">{voice.style}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {tts.isGenerating && (
+                <Loader2 className="w-3.5 h-3.5 text-emerald-400 animate-spin" />
+              )}
+            </div>
+
             <div className="flex-1" />
             
             <Link 
@@ -490,8 +456,8 @@ const BriefingCards = () => {
             onPrev={prevCard}
             onIndexChange={setCurrentIndex}
             onSpeak={speakCard}
-            speakingCardId={speakingCardId}
-            isSpeaking={isSpeaking}
+            speakingCardId={tts.speakingCardId}
+            isSpeaking={tts.isSpeaking || tts.isGenerating}
             bookmarkedIds={bookmarkedIds}
             onToggleBookmark={toggleBookmark}
             isLoading={isLoading}
