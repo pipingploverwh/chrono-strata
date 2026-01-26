@@ -57,33 +57,33 @@ const B2C_PHASES: TimelinePhase[] = [
   },
 ];
 
-// Kanban Data - Updated with RR3 decisions
+// Kanban Data - Updated Jan 26 Sprint Status
 const B2C_KANBAN: KanbanColumn[] = [
   {
     id: 'planned',
-    label: 'Planned (Q2+)',
+    label: 'Next Sprint (Jan 27-30)',
     icon: Circle,
     items: [
-      { id: 'loyalty', title: 'Loyalty Program', description: 'Points-based rewards and exclusive access', priority: 'medium', tags: ['retention'] },
-      { id: 'gift-cards', title: 'Digital Gift Cards', description: 'Customizable gift card system', priority: 'low', tags: ['commerce'] },
-      { id: 'kids-v2', title: 'Kids Kit V2', description: 'DEFERRED — Additional sizes and seasonal variants', priority: 'medium', tags: ['product', 'deferred'] },
-    ],
-  },
-  {
-    id: 'in-progress',
-    label: 'Ship Sprint (Jan 27-30)',
-    icon: Play,
-    items: [
-      { id: 'strata-desktop', title: 'STRATA Shell Desktop', description: 'Complete 3D configurator with HUD & pricing', priority: 'high', tags: ['critical'] },
-      { id: 'shop-integration', title: 'Shop Integration', description: 'Unified checkout across product lines', priority: 'high', tags: ['commerce'] },
+      { id: 'shop-stripe', title: 'Shop Stripe Checkout', description: 'Complete payment flow testing', priority: 'high', tags: ['commerce', 'next'] },
+      { id: 'mobile-safari', title: 'Mobile Safari Optimization', description: 'Performance fixes for iOS', priority: 'medium', tags: ['performance'] },
       { id: 'custom-sizing', title: 'Custom Sizing Tool', description: 'AI-powered measurement recommendations', priority: 'medium', tags: ['ai', 'ux'] },
     ],
   },
   {
+    id: 'in-progress',
+    label: 'In Progress',
+    icon: Play,
+    items: [
+      { id: 'inventory-sync', title: 'Inventory Sync', description: 'Shop API integration in progress', priority: 'high', tags: ['commerce'] },
+    ],
+  },
+  {
     id: 'shipped',
-    label: 'Shipped',
+    label: 'Shipped ✓',
     icon: CheckCircle2,
     items: [
+      { id: 'strata-desktop', title: 'STRATA Shell 3D Desktop', description: '100% — HUD, pricing, screenshot utility', priority: 'high', tags: ['shipped', 'critical'] },
+      { id: 'gates-removed', title: 'Gates Removed', description: 'All access gates removed for testing', priority: 'high', tags: ['shipped'] },
       { id: 'strata-shell', title: 'STRATA Shell Collection', description: 'Premium technical apparel line', priority: 'high', tags: ['flagship'] },
       { id: 'kids-initial', title: 'Kids Explorer Kit', description: 'Junior equipment bundle at $399/yr', priority: 'high', tags: ['product'] },
       { id: 'apex1', title: 'APEX-1 Configurator', description: 'Custom DJ console builder', priority: 'medium', tags: ['product'] },
@@ -93,13 +93,12 @@ const B2C_KANBAN: KanbanColumn[] = [
   },
   {
     id: 'archived',
-    label: 'Descoped/Archived',
+    label: 'Deferred to Q2',
     icon: Archive,
     items: [
-      { id: 'ar-tryon', title: 'AR Try-On', description: 'DESCOPED — 0% complete, high technical risk', priority: 'low', tags: ['descoped'] },
-      { id: 'thermal-mobile', title: 'Thermal Mobile', description: 'DESCOPED — Desktop-first policy', priority: 'low', tags: ['descoped'] },
-      { id: 'apex1-mobile', title: 'APEX-1 Mobile', description: 'DESCOPED — Focus desktop configurator', priority: 'low', tags: ['descoped'] },
-      { id: 'print-catalog', title: 'Print Catalog', description: 'ARCHIVED — Physical lookbook deprioritized', priority: 'low', tags: ['archived'] },
+      { id: 'kids-v2', title: 'Kids Kit V2', description: 'Additional sizes and seasonal variants', priority: 'medium', tags: ['deferred'] },
+      { id: 'ar-tryon', title: 'AR Try-On', description: 'High technical risk — desktop first', priority: 'low', tags: ['descoped'] },
+      { id: 'loyalty', title: 'Loyalty Program', description: 'Points-based rewards system', priority: 'medium', tags: ['deferred'] },
     ],
   },
 ];
@@ -177,18 +176,19 @@ const B2C_MATRIX: MatrixData = {
   },
 };
 
-// Dashboard Metrics - Updated post-RR3
+// Dashboard Metrics - Updated Jan 26 Sprint
 const B2C_METRICS = [
   { label: 'Products', value: 5, icon: Package },
-  { label: 'Features Shipped', value: 14, change: '+5 this sprint', trend: 'up' as const, icon: CheckCircle2 },
-  { label: 'Ship Sprint', value: 3, change: 'Jan 27-30', trend: 'up' as const, icon: Play },
-  { label: 'Descoped', value: 4, change: 'RR3 decision', icon: Archive },
+  { label: 'Features Shipped', value: 16, change: '+2 today', trend: 'up' as const, icon: CheckCircle2 },
+  { label: 'Next Sprint', value: 3, change: 'Jan 27-30', trend: 'up' as const, icon: Play },
+  { label: 'Deferred', value: 3, change: 'Q2 2026', icon: Archive },
 ];
 
 const B2C_MILESTONES = [
-  { label: 'STRATA Desktop 100%', date: 'Jan 28' },
-  { label: 'Shop Integration Complete', date: 'Jan 29' },
-  { label: 'Kids Kit V2 Launch', date: 'Q2 2026' },
+  { label: 'STRATA Desktop 100%', date: '✓ Jan 26' },
+  { label: 'Gates Removed', date: '✓ Jan 26' },
+  { label: 'Shop Stripe Testing', date: 'Jan 27' },
+  { label: 'Mobile Safari Fixes', date: 'Jan 28' },
 ];
 
 type ViewType = 'timeline' | 'kanban' | 'matrix' | 'dashboard';
