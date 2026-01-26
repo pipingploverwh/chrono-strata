@@ -93,41 +93,8 @@ const StrataAviation = () => {
   }, []);
 
   const [isSpeaking, setIsSpeaking] = useState(false);
-
-  const handleVoiceBriefing = useCallback(() => {
-    if ('speechSynthesis' in window) {
-      // Cancel any existing speech
-      window.speechSynthesis.cancel();
-      
-      if (isSpeaking) {
-        setIsSpeaking(false);
-        return;
-      }
-
-      const briefingText = generateBriefingText();
-      const utterance = new SpeechSynthesisUtterance(briefingText);
-      utterance.rate = 0.95;
-      utterance.pitch = 1.0;
-      utterance.volume = 1.0;
-      
-      // Try to use a professional voice
-      const voices = window.speechSynthesis.getVoices();
-      const preferredVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Microsoft') || v.name.includes('Samantha'));
-      if (preferredVoice) utterance.voice = preferredVoice;
-
-      utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => {
-        setIsSpeaking(false);
-        toast.error("Voice briefing failed");
-      };
-
-      window.speechSynthesis.speak(utterance);
-      toast.success("Voice briefing started", { description: `${selectedAirport.icao} weather briefing` });
-    } else {
-      toast.error("Voice synthesis not supported in this browser");
-    }
-  }, [isSpeaking, selectedAirport.icao]);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+  const [ttsLoading, setTtsLoading] = useState(false);
 
   // Runway conditions - defined early for use in briefing text
   const runwayConditions = {
@@ -167,6 +134,71 @@ const StrataAviation = () => {
       `Altimeter setting 30.12. ` +
       `End of briefing.`;
   }, [weather, selectedAirport, runwayConditions, getFlightRules]);
+
+  const handleVoiceBriefing = useCallback(async () => {
+    // If already playing, stop
+    if (isSpeaking && audioElement) {
+      audioElement.pause();
+      audioElement.currentTime = 0;
+      setIsSpeaking(false);
+      return;
+    }
+
+    setTtsLoading(true);
+    const briefingText = generateBriefingText();
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/aviation-briefing-tts`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ text: briefingText }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`TTS request failed: ${response.status}`);
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      
+      audio.onplay = () => setIsSpeaking(true);
+      audio.onended = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+      };
+      audio.onerror = () => {
+        setIsSpeaking(false);
+        toast.error("Audio playback failed");
+      };
+
+      setAudioElement(audio);
+      await audio.play();
+      toast.success("Voice briefing started", { description: `${selectedAirport.icao} weather briefing` });
+    } catch (error) {
+      console.error('TTS error:', error);
+      // Fallback to Web Speech API
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(briefingText);
+        utterance.rate = 0.95;
+        utterance.onstart = () => setIsSpeaking(true);
+        utterance.onend = () => setIsSpeaking(false);
+        window.speechSynthesis.speak(utterance);
+        toast.info("Using browser voice (fallback)", { description: "ElevenLabs unavailable" });
+      } else {
+        toast.error("Voice briefing failed");
+      }
+    } finally {
+      setTtsLoading(false);
+    }
+  }, [isSpeaking, audioElement, generateBriefingText, selectedAirport.icao]);
 
   // Generate METAR from real weather data
   const generateMetar = useCallback(() => {
@@ -274,10 +306,11 @@ const StrataAviation = () => {
               variant="outline"
               size="sm"
               onClick={handleVoiceBriefing}
+              disabled={ttsLoading}
               className={`border-sky-800 hover:bg-sky-900/30 ${isSpeaking ? 'text-strata-lume border-strata-lume/50' : 'text-sky-400'}`}
             >
-              <Volume2 className={`w-4 h-4 mr-1 ${isSpeaking ? 'animate-pulse' : ''}`} />
-              {isSpeaking ? 'Stop Briefing' : 'Voice Briefing'}
+              <Volume2 className={`w-4 h-4 mr-1 ${isSpeaking ? 'animate-pulse' : ''} ${ttsLoading ? 'animate-spin' : ''}`} />
+              {ttsLoading ? 'Loading...' : isSpeaking ? 'Stop Briefing' : 'Voice Briefing'}
             </Button>
             <Button
               variant="outline"
