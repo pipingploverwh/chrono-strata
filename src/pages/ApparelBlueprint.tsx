@@ -11,10 +11,11 @@ import {
   Sparkles,
   AlertTriangle
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from 'sonner';
 import { 
   Apparel3DViewer, 
   PatternLayout2D, 
@@ -49,6 +50,7 @@ const TERRAIN_OPTIONS: { id: TerrainType; label: string; color: string }[] = [
 ];
 
 export default function ApparelBlueprint() {
+  const navigate = useNavigate();
   const [selectedTerrain, setSelectedTerrain] = useState<TerrainType>('standard');
   const [selectedSize, setSelectedSize] = useState('M');
   const [selectedPiece, setSelectedPiece] = useState<string | null>(null);
@@ -72,6 +74,15 @@ export default function ApparelBlueprint() {
   }, [showPerformanceWarning]);
 
   const colorway = STRATA_COLORWAYS[selectedTerrain];
+
+  // Handle add to cart - navigate to shop with configuration
+  const handleAddToCart = () => {
+    toast.success('Configuration saved', {
+      description: `STRATA Shell ${colorway.name} (${selectedSize}) added to cart`,
+    });
+    // Navigate to shop with pre-selected config
+    navigate(`/shop?terrain=${selectedTerrain}&size=${selectedSize}`);
+  };
 
   return (
     <div className="min-h-screen bg-zinc-950">
@@ -210,7 +221,9 @@ export default function ApparelBlueprint() {
               <div className="lg:col-span-2">
                 <Apparel3DViewer
                   terrain={selectedTerrain}
+                  selectedSize={selectedSize}
                   onPieceSelect={setSelectedPiece}
+                  onAddToCart={handleAddToCart}
                   className="h-[600px]"
                 />
               </div>

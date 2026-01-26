@@ -28,6 +28,7 @@ import { STRATA_PATTERN_PIECES, STRATA_COLORWAYS, STRATA_MATERIALS } from './dat
 
 interface Apparel3DViewerProps {
   terrain?: 'standard' | 'marine' | 'polar' | 'desert' | 'urban';
+  selectedSize?: string;
   onPieceSelect?: (pieceId: string | null) => void;
   onScreenshot?: (dataUrl: string) => void;
   onAddToCart?: () => void;
@@ -264,6 +265,7 @@ const PRICING = {
 
 export function Apparel3DViewer({ 
   terrain = 'standard', 
+  selectedSize = 'M',
   onPieceSelect,
   onScreenshot,
   onAddToCart,
@@ -429,11 +431,16 @@ export function Apparel3DViewer({
               <span>HUD Display</span>
               <span className="text-cyan-400">+$200</span>
             </div>
+            <div className="flex justify-between border-t border-zinc-800 pt-1 mt-1">
+              <span>Size</span>
+              <span className="text-lavender-400 font-mono">{selectedSize}</span>
+            </div>
           </div>
           <Button 
             onClick={onAddToCart}
             className="w-full bg-lavender-600 hover:bg-lavender-700 text-white text-sm"
             size="sm"
+            disabled={!onAddToCart}
           >
             <ShoppingBag className="w-4 h-4 mr-2" />
             Add to Cart
