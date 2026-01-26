@@ -58,36 +58,33 @@ const B2B_PHASES: TimelinePhase[] = [
   },
 ];
 
-// Kanban Data - Updated with RR3 decisions
+// Kanban Data - Updated Jan 26 Sprint Status
 const B2B_KANBAN: KanbanColumn[] = [
   {
     id: 'planned',
-    label: 'Planned (Q2+)',
+    label: 'Next Sprint (Jan 27-30)',
     icon: Circle,
     items: [
-      { id: 'api-marketplace', title: 'API Marketplace', description: 'Self-service integration platform for partners', priority: 'high', tags: ['platform'] },
-      { id: 'white-label', title: 'White-Label Licensing', description: 'Reseller and OEM partnership program', priority: 'medium', tags: ['revenue'] },
-      { id: 'predictive-ai', title: 'Predictive Analytics', description: 'ML-powered forecasting for operations', priority: 'high', tags: ['ai'] },
-      { id: 'marine-command', title: 'Marine Command', description: 'DEFERRED — Lower priority than Aviation', priority: 'medium', tags: ['deferred'] },
-    ],
-  },
-  {
-    id: 'in-progress',
-    label: 'Ship Sprint (Jan 27-30)',
-    icon: Play,
-    items: [
-      { id: 'aviation-100', title: 'Aviation Command 100%', description: 'Real-time weather briefing, multi-airport', priority: 'high', tags: ['critical', 'beachhead'] },
-      { id: 'compliance-ocr', title: 'Compliance OCR', description: 'AI document processing for permits', priority: 'high', tags: ['critical'] },
-      { id: 'briefing-cards', title: 'Briefing Cards TTS', description: 'Voice briefing for executives', priority: 'medium', tags: ['ai'] },
+      { id: 'compliance-ocr', title: 'Compliance OCR', description: 'AI document processing for permits', priority: 'high', tags: ['critical', 'next'] },
+      { id: 'briefing-tts', title: 'Briefing Cards TTS', description: 'Voice briefing polish and edge cases', priority: 'medium', tags: ['ai', 'next'] },
       { id: 'sso-saml', title: 'SSO/SAML Integration', description: 'Enterprise authentication protocols', priority: 'medium', tags: ['security'] },
     ],
   },
   {
+    id: 'in-progress',
+    label: 'In Progress',
+    icon: Play,
+    items: [
+      { id: 'compliance-audit', title: 'Compliance Audit Logs', description: 'Activity tracking for shipments', priority: 'medium', tags: ['security'] },
+    ],
+  },
+  {
     id: 'shipped',
-    label: 'Shipped',
+    label: 'Shipped ✓',
     icon: CheckCircle2,
     items: [
-      { id: 'aviation-command', title: 'Aviation Command', description: 'METAR/weather ops with role-based views', priority: 'high', tags: ['beachhead'] },
+      { id: 'aviation-100', title: 'Aviation Command 100%', description: 'Real-time METAR, multi-airport, TTS briefing', priority: 'high', tags: ['shipped', 'beachhead'] },
+      { id: 'gates-removed', title: 'Gates Removed', description: 'All access gates removed for testing', priority: 'high', tags: ['shipped'] },
       { id: 'compliance-hub', title: 'Compliance Hub', description: 'Cross-border regulatory workflow', priority: 'high', tags: ['vertical'] },
       { id: 'meetingflow', title: 'MeetingFlow', description: 'Meeting recording and prompt generation', priority: 'medium', tags: ['productivity'] },
       { id: 'briefing-cards', title: 'Briefing Cards', description: 'AI-synthesized executive intelligence', priority: 'medium', tags: ['ai', 'analytics'] },
@@ -96,12 +93,12 @@ const B2B_KANBAN: KanbanColumn[] = [
   },
   {
     id: 'archived',
-    label: 'Descoped/Deferred',
+    label: 'Deferred to Q2',
     icon: Archive,
     items: [
-      { id: 'meetingflow-ai', title: 'MeetingFlow AI', description: 'DEFERRED — Internal tool, lower priority', priority: 'low', tags: ['deferred'] },
-      { id: 'compliance-permits', title: 'Compliance Permits', description: 'DEFERRED — Complex, post-MVP', priority: 'low', tags: ['deferred'] },
-      { id: 'sports-betting', title: 'Sports Predictions', description: 'DESCOPED — NFL module deprioritized', priority: 'low', tags: ['descoped'] },
+      { id: 'marine-command', title: 'Marine Command', description: 'Coastal weather ops — after Aviation', priority: 'medium', tags: ['deferred'] },
+      { id: 'meetingflow-ai', title: 'MeetingFlow AI', description: 'Action item extraction — internal tool', priority: 'low', tags: ['deferred'] },
+      { id: 'api-marketplace', title: 'API Marketplace', description: 'Partner integrations — Q2+', priority: 'medium', tags: ['deferred'] },
     ],
   },
 ];
@@ -197,19 +194,19 @@ const B2B_MATRIX: MatrixData = {
   },
 };
 
-// Dashboard Metrics - Updated post-RR3
+// Dashboard Metrics - Updated Jan 26 Sprint
 const B2B_METRICS = [
   { label: 'Verticals', value: 4, change: 'Active focus', icon: Building2 },
-  { label: 'Features Shipped', value: 20, change: '+6 this sprint', trend: 'up' as const, icon: CheckCircle2 },
-  { label: 'Ship Sprint', value: 4, change: 'Jan 27-30', trend: 'up' as const, icon: Play },
-  { label: 'Enterprise Pilots', value: 3, change: 'Aviation focus', trend: 'up' as const, icon: Building2 },
+  { label: 'Features Shipped', value: 22, change: '+2 today', trend: 'up' as const, icon: CheckCircle2 },
+  { label: 'Next Sprint', value: 3, change: 'Jan 27-30', trend: 'up' as const, icon: Play },
+  { label: 'Enterprise Pilots', value: 3, change: 'Aviation 100%', trend: 'up' as const, icon: Building2 },
 ];
 
 const B2B_MILESTONES = [
-  { label: 'Aviation Command 100%', date: 'Jan 28' },
-  { label: 'Compliance OCR Complete', date: 'Jan 29' },
-  { label: 'Briefing TTS Launch', date: 'Jan 30' },
-  { label: 'Marine Command Launch', date: 'Q2 2026' },
+  { label: 'Aviation Command 100%', date: '✓ Jan 26' },
+  { label: 'Gates Removed', date: '✓ Jan 26' },
+  { label: 'Compliance OCR Complete', date: 'Jan 27' },
+  { label: 'Briefing TTS Polish', date: 'Jan 28' },
 ];
 
 type ViewType = 'timeline' | 'kanban' | 'matrix' | 'dashboard';
