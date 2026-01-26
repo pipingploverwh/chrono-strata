@@ -29,8 +29,10 @@ import {
   Loader2,
   AlertTriangle,
   Briefcase,
+  Database,
 } from 'lucide-react';
 import PilotApplicationsTab from '@/components/admin/PilotApplicationsTab';
+import RAGDocumentsTab from '@/components/admin/RAGDocumentsTab';
 
 interface UserRole {
   id: string;
@@ -202,10 +204,14 @@ const AdminDashboard = () => {
       {/* Content */}
       <main className="max-w-7xl mx-auto p-6">
         <Tabs defaultValue="pilots" className="space-y-6">
-          <TabsList className="bg-neutral-900 border border-neutral-800">
+          <TabsList className="bg-neutral-900 border border-neutral-800 flex-wrap">
             <TabsTrigger value="pilots" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-black">
               <Briefcase className="w-4 h-4 mr-2" />
               Pilot Applications
+            </TabsTrigger>
+            <TabsTrigger value="rag" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-black">
+              <Database className="w-4 h-4 mr-2" />
+              RAG Documents
             </TabsTrigger>
             <TabsTrigger value="roles" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-black">
               <Users className="w-4 h-4 mr-2" />
@@ -220,6 +226,11 @@ const AdminDashboard = () => {
           {/* Pilot Applications Tab */}
           <TabsContent value="pilots">
             <PilotApplicationsTab />
+          </TabsContent>
+
+          {/* RAG Documents Tab */}
+          <TabsContent value="rag">
+            <RAGDocumentsTab />
           </TabsContent>
 
           {/* User Roles Tab */}
